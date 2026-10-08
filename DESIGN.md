@@ -1,314 +1,414 @@
 ---
-name: NİRENGİ
-description: Beyan değil, kanıt. Evidence-based matching infrastructure, drawn as a measurement bench.
+name: nirengi
+description: Pafta, a survey map you draw yourself. One next step on the surface, the whole reasoning one tap below.
 colors:
-  enclosure-grey: "#e2e4e8"
-  panel-face: "#f3f4f6"
-  recess-grey: "#d5d8dd"
-  print-ink: "#13151a"
-  print-ink-2: "#3a3e48"
-  print-ink-3: "#5c616c"
-  seam: "#c4c8cf"
-  seam-strong: "#a5aab3"
-  signal-orange: "#f99400"
-  zemin-indigo: "#6451e7"
-  zemin-purple: "#9b04da"
-  zemin-cyan: "#00b4d8"
-  level-s1-declared: "#5c616c"
-  level-s2-machine: "#0078a0"
-  level-s3-certified: "#5440d6"
-  warn-amber: "#b06000"
-  danger-red: "#c8283c"
-  screen-glass: "#0d1015"
-  screen-raised: "#161a21"
-  screen-phosphor: "#dee4ec"
-  screen-phosphor-3: "#768090"
-  screen-seam: "#262d38"
-  screen-s2: "#3cd2f0"
-  screen-s3: "#aa9cff"
-  screen-ch3: "#c45cff"
-  screen-ch4: "#8c7cff"
+  ground: "#ffffff"
+  ground-2: "#f7f7fa"
+  ground-3: "#efeff5"
+  ink: "#252338"
+  ink-2: "#4b4a5c"
+  ink-3: "#6a697e"
+  ink-4: "#9695aa"
+  seam: "#e5e5ed"
+  seam-2: "#d0cfde"
+  indigo: "#6451e7"
+  indigo-lip: "#4a39c4"
+  indigo-tint: "#eeebff"
+  orange: "#f99400"
+  orange-lip: "#d67800"
+  orange-tint: "#fff2de"
+  orange-ink: "#b85c00"
+  cyan: "#00b4d8"
+  cyan-lip: "#008cac"
+  cyan-tint: "#def6fb"
+  purple: "#9b04da"
+  purple-lip: "#7600a8"
+  purple-tint: "#f6e6fd"
+  gold: "#ffc400"
+  gold-lip: "#e0a000"
+  gold-tint: "#fff6d6"
+  gold-ink: "#a06a00"
+  green: "#34c26b"
+  green-lip: "#249c52"
+  green-tint: "#e1f8ea"
+  red: "#ff4b4b"
+  red-lip: "#d63434"
+  red-tint: "#ffe7e7"
+  tier-zemin: "#c48448"
+  tier-tepe: "#34c26b"
+  tier-sirt: "#00b4d8"
+  tier-doruk: "#9b04da"
+  tier-zirve: "#6451e7"
 typography:
   display:
-    fontFamily: "Archivo Variable, ui-sans-serif, sans-serif"
-    fontSize: "clamp(40px, 6vw, 86px)"
-    fontWeight: 780
-    lineHeight: 0.98
-    letterSpacing: "-0.03em"
-    fontVariation: "'wdth' 112"
+    fontFamily: "Bricolage Grotesque Variable, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "clamp(36px, 5.4vw, 64px)"
+    fontWeight: 800
+    lineHeight: 1
+    letterSpacing: "-0.035em"
   headline:
-    fontFamily: "Archivo Variable, ui-sans-serif, sans-serif"
-    fontSize: "clamp(32px, 4vw, 54px)"
-    fontWeight: 780
-    lineHeight: 0.98
+    fontFamily: "Bricolage Grotesque Variable, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "34px"
+    fontWeight: 800
+    lineHeight: 1.05
     letterSpacing: "-0.03em"
-    fontVariation: "'wdth' 112"
   title:
-    fontFamily: "Archivo Variable, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "Bricolage Grotesque Variable, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "21px"
+    fontWeight: 750
+    lineHeight: 1.15
+    letterSpacing: "-0.02em"
+  lead:
+    fontFamily: "Bricolage Grotesque Variable, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "17px"
+    fontWeight: 450
+    lineHeight: 1.625
+  body:
+    fontFamily: "Bricolage Grotesque Variable, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "16px"
+    fontWeight: 450
+    lineHeight: 1.55
+  caption:
+    fontFamily: "Bricolage Grotesque Variable, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "13px"
+    fontWeight: 650
+  label:
+    fontFamily: "Bricolage Grotesque Variable, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "15px"
+    fontWeight: 700
+  key:
+    fontFamily: "Bricolage Grotesque Variable, ui-sans-serif, system-ui, sans-serif"
     fontSize: "16px"
     fontWeight: 700
-    lineHeight: 1.375
-  body:
-    fontFamily: "Archivo Variable, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "15px"
-    fontWeight: 400
-    lineHeight: 1.55
-  body-lead:
-    fontFamily: "Archivo Variable, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "15.5px"
-    fontWeight: 400
-    lineHeight: 1.625
-  label:
-    fontFamily: "Archivo Variable, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "11px"
-    fontWeight: 600
-    lineHeight: 1.3
-    letterSpacing: "0.08em"
-    fontVariation: "'wdth' 78"
-  readout:
+    letterSpacing: "-0.005em"
+  mono:
     fontFamily: "JetBrains Mono Variable, ui-monospace, Cascadia Mono, monospace"
-    fontSize: "13px"
-    fontWeight: 400
-    fontFeature: "'tnum' 1"
+    fontSize: "14px"
+    fontWeight: 500
+    fontFeature: "\"tnum\" 1"
 rounded:
-  hairline: "1px"
-  chip: "3px"
-  screen: "4px"
-  key: "5px"
-  panel: "6px"
-  bezel: "8px"
-  enclosure: "10px"
+  tag: "8px"
+  key-sm: "10px"
+  key: "12px"
+  field: "14px"
+  panel: "16px"
+  card: "18px"
+  feature: "20px"
+  sheet: "24px"
+  pill: "9999px"
 spacing:
-  row-y: "12px"
-  gutter: "16px"
-  panel-pad: "20px"
-  panel-pad-lg: "32px"
-  section: "96px"
-  section-lg: "128px"
+  page-x-phone: "16px"
+  page-x-tablet: "24px"
+  page-x-desktop: "40px"
+  card-pad: "20px"
+  card-pad-tight: "16px"
+  sidebar: "256px"
+  rail: "340px"
+  column-genc: "600px"
+  shell-narrow: "1080px"
+  shell-wide: "1240px"
+  public-wrap: "1120px"
 components:
   button-primary:
-    backgroundColor: "{colors.signal-orange}"
-    textColor: "{colors.print-ink}"
-    typography: "{typography.title}"
+    backgroundColor: "{colors.indigo}"
+    textColor: "{colors.ground}"
+    typography: "{typography.key}"
     rounded: "{rounded.key}"
-    padding: "10px 16px"
-  button-primary-hover:
-    backgroundColor: "#ffa21f"
-    textColor: "{colors.print-ink}"
-  button-ink:
-    backgroundColor: "{colors.print-ink}"
-    textColor: "{colors.enclosure-grey}"
+    padding: "0 20px"
+    height: "48px"
+  button-primary-sm:
+    backgroundColor: "{colors.indigo}"
+    textColor: "{colors.ground}"
+    rounded: "{rounded.key-sm}"
+    padding: "0 14px"
+    height: "38px"
+  button-primary-lg:
+    backgroundColor: "{colors.indigo}"
+    textColor: "{colors.ground}"
     rounded: "{rounded.key}"
-    padding: "10px 16px"
+    padding: "0 28px"
+    height: "54px"
   button-line:
-    backgroundColor: "{colors.panel-face}"
-    textColor: "{colors.print-ink}"
+    backgroundColor: "{colors.ground}"
+    textColor: "{colors.indigo}"
+    typography: "{typography.key}"
     rounded: "{rounded.key}"
-    padding: "10px 16px"
+    padding: "0 20px"
+    height: "48px"
+  button-line-hover:
+    backgroundColor: "{colors.ground-2}"
   button-quiet:
-    backgroundColor: "transparent"
-    textColor: "{colors.print-ink-2}"
+    textColor: "{colors.indigo}"
     rounded: "{rounded.key}"
-    padding: "10px 12px"
-  button-small:
-    rounded: "{rounded.screen}"
-    padding: "6px 12px"
-  chip:
-    backgroundColor: "{colors.enclosure-grey}"
-    textColor: "{colors.print-ink-2}"
-    rounded: "{rounded.chip}"
-    padding: "2px 8px"
-  field:
-    backgroundColor: "{colors.panel-face}"
-    textColor: "{colors.print-ink}"
-    typography: "{typography.body}"
-    rounded: "{rounded.screen}"
-    padding: "10px 12px"
+    padding: "0 20px"
+  button-disabled:
+    backgroundColor: "{colors.ground-3}"
+    textColor: "{colors.ink-4}"
   card:
-    backgroundColor: "{colors.panel-face}"
-    rounded: "{rounded.panel}"
-  tab-on:
-    backgroundColor: "{colors.panel-face}"
-    textColor: "{colors.print-ink}"
-    rounded: "{rounded.screen}"
-    padding: "6px 12px"
-  screen:
-    backgroundColor: "{colors.screen-glass}"
-    textColor: "{colors.screen-phosphor}"
-    rounded: "{rounded.screen}"
-    padding: "16px"
+    backgroundColor: "{colors.ground}"
+    rounded: "{rounded.card}"
+    padding: "20px"
+  card-press-hover:
+    backgroundColor: "{colors.ground-2}"
+  field:
+    backgroundColor: "{colors.ground-2}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.field}"
+    padding: "12px 16px"
+  field-focus:
+    backgroundColor: "{colors.ground}"
+  chip:
+    backgroundColor: "{colors.ground}"
+    textColor: "{colors.ink-2}"
+    rounded: "{rounded.pill}"
+    padding: "2px 10px"
+  pill-verified:
+    backgroundColor: "{colors.cyan-tint}"
+    textColor: "{colors.cyan-lip}"
+    rounded: "{rounded.pill}"
+    padding: "4px 10px"
+  pill-institution:
+    backgroundColor: "{colors.indigo-tint}"
+    textColor: "{colors.indigo}"
+    rounded: "{rounded.pill}"
+    padding: "4px 10px"
+  pill-declared:
+    backgroundColor: "{colors.ground-3}"
+    textColor: "{colors.ink-3}"
+    rounded: "{rounded.pill}"
+    padding: "4px 10px"
+  nav-item:
+    textColor: "{colors.ink-3}"
+    rounded: "{rounded.key}"
+    padding: "8px 12px"
+  nav-item-active:
+    textColor: "{colors.indigo}"
+    rounded: "{rounded.key}"
+    padding: "8px 12px"
+  segmented-active:
+    backgroundColor: "{colors.ground}"
+    textColor: "{colors.indigo}"
+    rounded: "{rounded.key-sm}"
+    padding: "6px 14px"
+  next-step-card:
+    backgroundColor: "{colors.indigo}"
+    textColor: "{colors.ground}"
+    rounded: "{rounded.feature}"
+    padding: "20px"
+  niri-bubble:
+    backgroundColor: "{colors.ground}"
+    textColor: "{colors.ink-2}"
+    rounded: "{rounded.card}"
+    padding: "12px 16px"
+  sheet:
+    backgroundColor: "{colors.ground}"
+    rounded: "{rounded.sheet}"
+    padding: "24px"
 ---
 
-# Design System: NİRENGİ
+# Design System: nirengi
+
+<!-- Source of truth: src/styles/global.css. Tokens are RGB channels (light on
+     :root, dark on [data-theme="dark"]) mapped to Tailwind colours in
+     @theme inline. Hex values above are the light theme; dark values are in
+     .impeccable/design.json → extensions.colorMeta.*.dark.
+     Round 2 ("Pafta", 2026-10-08) replaced the round-1 "Pressable Road". -->
 
 ## Overview
 
-**Creative North Star: "The Measurement Bench"**
+**Creative North Star: "Pafta"**
 
-NİRENGİ is drawn as a piece of lab equipment, not a brochure. The page is a light instrument enclosure: cool grey panels with printed condensed-caps labels, seams instead of decorations, physical keys that travel a pixel when pressed. Wherever the engine computes something, the enclosure opens onto an inset dark screen with a real graticule, and the numbers on that screen are the numbers the engine produced a moment ago. The four match components are four channels in the Zemin360 colours, and that colour code is the spine of the whole system.
+A pafta is a survey map sheet. Nirengi means triangulation point: every verified piece of work is one more point on your map, and leagues are elevations from Zemin to Zirve. The world is a white ground cut by 2px seams, drawn with survey geometry: rounded triangle markers instead of circles and coins, faint contour lines on hero panels, a dashed trail that inks itself up to where you stand, ripple rings instead of bounces. Type is Bricolage Grotesque in sentence case. Keys sit on a 3px lip of their own hue and sink onto it when pressed. Every hue owns one concept.
 
-Density is that of a datasheet: rows, columns, readouts and units, with generous section spacing between instruments but tight, ruled spacing inside them. Display type is wide and heavy (Archivo stretched), labels are narrow and silk-screened (Archivo condensed), and figures are monospaced. Ornament is limited to what an instrument would actually carry: graticules, LEDs, channel colours, line weights that encode verification level.
+The mechanics are a lesson app's (weekly goal, streak, league, quests, feedback bar, celebration). The geometry, type, icons, motion and structure are ours. Depth stays one tap below: reasoning, formulas and thresholds live behind "Neden?" in a sheet. Niri, the triangle surveyor, guides, reacts and celebrates, at most once per screen. The genç face (phone-first) gets the game layer; the kurum face (desk-first) keeps keys, cards, sheets, feedback and Niri as assistant, and drops XP, league and streak.
 
-The confirmed rejections from the brand owner: no AI-template look (gradient hero, feature-card grid, logo strip), no career-platform look, and no return to the earlier paper-and-ink "pafta" map aesthetic.
+**Why Pafta.** Round 1 read as a Duolingo copy (rounded heavy type, uppercase chunky keys, a circle lesson path, flames and chests). Round 2 kept the mechanics and the simplicity and replaced everything you can see: geometry, type, iconography, motion and screen structure.
 
 **Key Characteristics:**
-- Light grey enclosure panels; dark inset screens for anything computed.
-- Four fixed channel colours (CH1 orange, CH2 cyan, CH3 purple, CH4 indigo) carry the match components everywhere.
-- Verification level is written as line weight and dash, not as a badge colour alone.
-- Wide heavy display, condensed caps panel print, monospaced readouts.
-- Square-ish corners (1 to 10px), seams and inset shadows rather than floating cards.
+- White ground, 2px seams, no hairlines, no blurred shadows on resting surfaces.
+- The triangle is the primitive: logo, Niri, survey markers, week days, trail steps, confetti, rank medals, verification glyphs.
+- Contour lines and dashed survey trails carry the map; the current point pings with ripple rings.
+- Bricolage Grotesque Variable, sentence case everywhere, keys included.
+- Keys and pressable cards carry a 3px same-hue lip and sink 3px on press.
+- Seven palette roles, each bound to one concept, each with a lip and a tint.
+- Every action answers with `feedback()`; milestones answer with `celebrate()`; Niri reacts to both.
 
 ## Colors
 
-A cool grey instrument body with four saturated Zemin360 channel colours, used as signal and never as decoration.
+A full-palette system where hue is semantics: indigo acts, six other hues each name exactly one concept.
 
 ### Primary
-- **Signal Orange** (`signal-orange`): the one fill colour for the primary key ("Kanıtını bağla") and CH1 Kanıt. On a dark screen it also marks the active mode label, the 90-day window and the signal path wire. Hover lifts to a brighter orange (#ffa21f).
+- **Act Indigo** (`indigo`, `indigo-lip`, `indigo-tint`): primary keys, the next-step card, active nav (text and triangle pointer), links, "Neden?", focus rings (indigo at 55%), caret, wordmark, Niri's body, the Kurum onaylı level. On the kurum face it stands in for anything that would otherwise be orange.
 
 ### Secondary
-- **Zemin Indigo** (`zemin-indigo`): CH4 Geçmiş, the logo tile, the focus ring, the text caret, the active nav underline (2px inset) and the accent word inside a display headline on light panels.
-- **Zemin Cyan** (`zemin-cyan`): CH2 Bağlam and the text selection tint (35%).
+- **Seri Orange** (`orange`, `orange-lip`, `orange-tint`, text `orange-ink`): the weekly streak only. The beacon icon, lit week-day triangles, today's dashed triangle, the Seri celebration tile. Genç face only.
+- **Verified Cyan** (`cyan`, `cyan-lip`, `cyan-tint`): Doğrulandı. Level pill, verify keys, mid-range score rings (55 to 74), the ping ellipse under the Bugün marker icon.
+- **League Purple** (`purple`, `purple-lip`, `purple-tint`): lig and topluluk. The climbed part of the league elevation profile, community actions.
 
 ### Tertiary
-- **Zemin Purple** (`zemin-purple`): CH3 Kapasite only. On screens it lifts to `screen-ch3`.
-
-### Verification levels and states
-- **Declared Grey** (`level-s1-declared`): S1 beyan; always drawn dashed and thin.
-- **Machine Cyan** (`level-s2-machine`): S2 makine doğrulaması and every pass state (a published canvas, an intact chain, a passing check). On screens it lifts to `screen-s2`.
-- **Certified Violet** (`level-s3-certified`): S3 kurum tasdiki, approved milestones, the measured quantity column of the spec table, the feedback trace in the loop. On screens it lifts to `screen-s3`.
-- **Warn Amber** (`warn-amber`) and **Danger Red** (`danger-red`): non-blocking warnings and blocking failures (locked publish, broken chain row).
+- **XP Gold** (`gold`, `gold-lip`, `gold-tint`, text `gold-ink`): XP only. The faceted gem icon, the Görevler folded-map icon, the "Kazanılan XP" tile.
+- **Done Green** (`green`, `green-lip`, `green-tint`): tamam. Planted waypoints, good feedback, high score rings (75+), promotion zone, positive deltas in `green-lip`.
+- **Problem Red** (`red`, `red-lip`, `red-tint`): hata and problem. Bad feedback, failed checks, demotion zone, a record changed after verification.
+- **Tier colours** (`tier-zemin` to `tier-zirve`): the five elevations. Only the Lig ridge icon and tier markers use them.
 
 ### Neutral
-- **Enclosure Grey** (`enclosure-grey`): page background.
-- **Panel Face** (`panel-face`): raised panels, cards, keys, fields, nav.
-- **Recess Grey** (`recess-grey`): table header strips, footnote strips, meter tracks, the bezel tray around a screen, hover fills of quiet keys.
-- **Print Ink** (`print-ink`, `print-ink-2`, `print-ink-3`): primary text, secondary text, labels and units.
-- **Seam** (`seam`, `seam-strong`): 1px rules between rows and around panels; the strong seam outlines enclosures, line keys and fields.
-- **Screen Glass** (`screen-glass`, `screen-raised`, `screen-phosphor`, `screen-phosphor-3`, `screen-seam`): the inset screen palette. A `.screen` region re-skins every token inside it, so components work unchanged on glass.
-
-A dark theme (`[data-theme="dark"]`) remaps the same roles; its values live in the sidecar.
+- **Ground** (`ground`, `ground-2`, `ground-3`): page and card face; hover wash, field fill and waiting markers; disabled keys, bar tracks, locked markers.
+- **Ink** (`ink`) headings and numbers that matter; **Ink 2** (`ink-2`) body; **Ink 3** (`ink-3`) captions, hints, inactive nav, demo-data notes; **Ink 4** (`ink-4`) icons, disabled key text and placeholders only.
+- **Seam** (`seam`, `seam-2`): 2px borders; `seam-2` for contour lines, the undrawn dashed trail, waiting and locked marker lips.
 
 ### Named Rules
-**The Four Channels Rule.** Orange, cyan, purple and indigo are CH1 to CH4, in that order, everywhere. Where they appear as data on a screen they mean a channel, and the four always appear together in that order.
+**The One Concept, One Hue Rule.** Indigo = act, orange = seri, cyan = doğrulandı, purple = lig/topluluk, gold = XP, green = tamam, red = problem. Never borrow a hue for its look.
 
-**The Signal Key Rule.** Orange as a fill belongs to the primary key and to CH1 data. One primary key per panel; the alternative action is a line or ink key.
+**The Orange Stays Young Rule.** No kurum screen shows orange. A low fit score on the kurum side is indigo; kurum warnings are red or neutral ink.
 
-**The Pass Is Machine Cyan Rule.** A passing state uses the S2 machine colour, because passing a check is machine verification. Green is not part of the system.
+**The Ink Tokens Rule.** `orange`, `gold` and their lips are fills, never text on a light ground; coloured text uses `orange-ink` / `gold-ink` (they re-point to the bright tones in dark mode). `ink-4` is never text a person must read; readable text bottoms out at `ink-3`.
 
 ## Typography
 
-**Display Font:** Archivo Variable, expanded (width 112) (with ui-sans-serif)
-**Body Font:** Archivo Variable, normal width (with ui-sans-serif, system-ui)
-**Label/Mono Font:** Archivo Variable condensed (width 78) for panel print; JetBrains Mono Variable for readouts
+**Display Font:** Bricolage Grotesque Variable (optical sizing on; ui-sans-serif, system-ui fallback)
+**Body Font:** Bricolage Grotesque Variable
+**Label/Mono Font:** JetBrains Mono Variable for ids, hashes, codes and formulas
 
-**Character:** One variable family stretched three ways: a wide, heavy badge for statements, a plain body for reading, and a narrow silk-screened caps for labels. Monospace appears only where a machine wrote the value.
+**Character:** One grotesque with optical sizing, carried by weight and tight negative tracking at the top of the ramp. Bricolage sets darker than a rounded face, so the Tailwind weight names are remapped a notch lighter: `font-semibold` 560, `font-bold` 620, `font-extrabold` 700, `font-black` 780.
 
 ### Hierarchy
-- **Display** (780, clamp(40px, 6vw, 86px), 0.98, -0.03em, balanced wrap): the hero statement only.
-- **Headline** (780, clamp(32px, 4vw, 54px) to clamp(34px, 4.4vw, 60px), 0.98): one per landing section; app page titles use 44px, 56px from md.
-- **Title** (700, 15.5 to 17px): panel titles, table problem names, candidate and need names.
-- **Body** (400, 15px, 1.55): default. Leads run 15.5 to 17px at relaxed leading, capped at 34 to 62ch.
-- **Label** (600, 11px, 0.08em, uppercase, width 78): panel print on table headers, definition terms, channel names, LED captions, enclosure nameplates.
-- **Readout** (JetBrains Mono, tabular, 10 to 13px; up to 34px for a canvas score): scores, weights, blind codes, hashes, dates, routes, axis ticks.
+- **Display** (`h-hero`; 800, clamp(36px, 5.4vw, 64px), 1, -0.035em): landing hero and 404 only.
+- **Headline** (`h-page`; 800, 30px phone / 34px md+, 1.05, -0.03em): one page title per page.
+- **Title** (`h-sec`; 750, 21px, 1.15, -0.02em): section headings, card titles, rail headings. Sheet titles are 20px `font-black`.
+- **Lead** (`lead`; 450, 17px, relaxed, `ink-3`): the sentence under a page title.
+- **Body** (450, 16px, 1.55, `ink-2`): running text; card copy is 14 to 15px `font-bold` in `ink-3`.
+- **Caption** (`cap`; 650, 13px, `ink-3`): metadata, demo-data notes, map labels.
+- **Label** (700, 15px, `ink`, sentence case): field labels. Hints 14px 450 `ink-3`.
+- **Key** (700, 16px, -0.005em, sentence case): buttons; 14px small, 17px large. Nav items 16px, `font-semibold` inactive, `font-bold` active.
+- **Numbers**: tabular figures (`num`) wherever a value can change; values count up over ~800ms.
 
 ### Named Rules
-**The Panel Print Rule.** Condensed caps labels name a control, a column, a value or an enclosure; they sit on the thing they label. They are never a prefix stacked above a heading.
+**The Sentence Case Rule.** Nothing is uppercase: not keys, not nav, not labels, not day names. A key's label is a short sentence ("Projeye git", "Bayrağı dik").
 
-**The Readout Rule.** If the engine computed it or a machine identifies it, it is set in JetBrains Mono with tabular figures. Prose and headings never use the mono.
+**The No Kicker Rule.** Nothing small sits above a heading. Headings stand alone; context goes in the lead below.
 
-**The Accent Word Rule.** A display headline may set one phrase in an accent colour (indigo on panels, orange on screens) without italics; one per headline at most.
+**The Plain Words Rule.** Address the reader as "sen". Use plain terms: netlik puanı, deneme projesi (short: proje), kayıt defteri, isimsiz inceleme, ihtiyaç kartı; levels are Beyan / Doğrulandı / Kurum onaylı (S1 to S3 only on /yontem). Never sandık, alev or şimşek. Demo data says it is fictional ("kurgusal").
 
 ## Layout
 
-A single 1240px container with 16px side padding (24px from 640px). Landing sections are separated by 96px (128px from 768px) and each section is one instrument: an enclosure panel (10px corners, strong seam) holding prose on the panel face and one or more inset screens sitting in an 8 to 12px bezel tray. Inside panels, spacing is ruled rather than airy: rows of 12 to 16px vertical padding separated by 1px seams, panel padding of 20px (32px from 768px).
+One shell (`App.astro`) renders both faces; `html[data-mode="genc|kurum"]` hides one with `.only-genc` / `.only-kurum` before any script runs.
 
-The hero splits 0.8 / 1.2 at 1024px: statement, keys and a three-row definition list on the left; the live bench spanning both rows on the right. Tables become grids with fixed label columns (3.5rem number, 9rem route); on mobile they collapse to stacked rows and the signal path turns vertical with a left wire. Breakpoints follow Tailwind defaults (640, 768, 1024).
-
-**The Fixed Regions Rule.** On an instrument, regions never move. Mode keys swap the contents of the screen; the screen, its header strip, its channel readout row and its front-panel keys keep their position and size.
+- **Desktop (lg, 1024px+):** fixed 256px sidebar with a 2px right seam: Mark plus 28px indigo wordmark, five nav items with 32px icons, and at the foot the Genç/Kurum switch plus quiet Tema and Demo turu keys. Content offset 256px, padded 40px.
+- **Phone (<1024px):** 64px sticky header with the wordmark and a Menü key only (popover card: switch, Yöntem, Tema, Demo turu). Fixed bottom tab bar: five 58px tabs, 26px icon over an 11px label, labels always shown. Content pads 16px (24px from sm) and 128px at the bottom.
+- **Content width:** narrow 1080px for genç, wide 1240px for kurum. Genç pages centre a 600px column.
+- **Right rail (xl, 1280px+):** 340px, 48px gap. On genç it is one "Bu haftan" card (league, week, this week's route) divided by 2px seams; `omit` drops what the page already shows. Hidden below xl, so it is never the only path to anything.
+- **Rhythm:** card padding 16 to 20px; 12px between list cards; 20px between stacked blocks; 40px before a major section.
+- **Flows** (Kanıt bağla): a 560px column, a quiet "Geri" at the top, NiriSays per step, and the primary key in flow after the content. No X, no lesson progress chrome, no pinned footer.
 
 ## Elevation & Depth
 
-Depth is physical, not atmospheric. Enclosures lift off the grey body with a long soft drop and a white top lip; screens sink into them with dark inner shadows; keys carry a darker lower lip and press 1px down. Cards inside the app barely lift (1px) and gain a short drop only on hover. Shadows are always cool black or ink, never coloured glows.
+Flat surfaces, physical controls. Resting cards are flat behind 2px seams. Elevation means "you can press this": a solid, unblurred lip of the element's own darker shade. Floating layers use a scrim (`ink` at 40 to 45%) or 95% ground with a light blur; only true floats (phone menu, coach card) get a blurred shadow.
 
 ### Shadow Vocabulary
-- **Enclosure lift** (`box-shadow: 0 1px 0 rgb(255 255 255 / 0.5) inset, 0 18px 40px -28px rgb(0 0 0 / 0.45)`): landing instrument panels.
-- **Bezel tray** (`box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.18)`): the recessed grey tray a screen sits in.
-- **Screen recess** (`box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.6), inset 0 2px 8px rgb(0 0 0 / 0.5)`): every inset dark screen.
-- **Key lip** (`box-shadow: inset 0 -2px 0 rgb(0 0 0 / 0.16), 0 1px 2px rgb(0 0 0 / 0.14)`), pressed (`inset 0 1px 2px rgb(0 0 0 / 0.2)` with translateY(1px)): all keys except quiet ones.
-- **Card rest / hover** (`0 1px 2px rgb(var(--ink) / 0.06)` / `0 6px 16px -10px rgb(var(--ink) / 0.35)`): app cards.
-- **Field well** (`inset 0 1px 2px rgb(var(--ink) / 0.08)`): text inputs.
+- **Key lip** (`box-shadow: 0 3px 0 rgb(var(--key-lip))`): every key; `:active` translates 3px and the lip collapses.
+- **Card lip** (`box-shadow: 0 3px 0 rgb(var(--line))`): `card-press`; same press travel.
+- **Feature lip** (`box-shadow: 0 4px 0 rgb(var(--indigo-lip))`): the pressable next-step card; tap sinks it 4px.
+- **Selected option** (`box-shadow: 0 4px 0 rgb(var(--indigo) / 0.5)`): a chosen `card-press` option, with indigo border and `indigo-tint` face.
+- **Marker lip**: triangle markers draw their own lip, the same triangle offset 7% in `<tone>-lip` (`seam-2` when locked or waiting).
+- **Segment lift** (`box-shadow: 0 2px 0 rgb(var(--line-2))`): the selected segment.
+- **Field focus** (`box-shadow: 0 0 0 4px rgb(var(--indigo) / 0.14)`): with an indigo border.
+- **Float** (`box-shadow: 0 12px 32px -12px rgb(0 0 0 / 0.25)`; coach card `0 14px 36px -14px rgb(0 0 0 / 0.4)`): phone menu and Niri's coach card only.
 
 ### Named Rules
-**The Enclosure and Screen Rule.** Light panels lift; screens sink. Nothing computed floats on a raised card; it is shown on glass inside the panel.
+**The Lip Means Press Rule.** A lip appears only on something that responds to a press, and pressing must sink it. A static section or card never carries a lip.
 
 ## Shapes
 
-Square-ish and machined. Radii step with the size of the part: 1px for LEDs, meter tracks and bars; 3px chips; 4px screens, fields, small keys and tabs; 5px keys; 6px cards and data panels; 8px bezel trays and dialogs; 10px enclosures. Circles appear only where the object is round: avatars and the score dial. Borders are 1px seams; dashed borders mean "not yet verified" (blind avatars, selected bar outline, S1 lines, divider above a screen's caption).
+The triangle is the system's silhouette. One path (`M50 9 91 82H9Z`, 14-unit round join) draws every marker: filled on its own lip with a white highlight stroke (done, current), `ground-3` (locked), `ground-2` with a dashed `seam-2` outline (waiting), outline (missed) or dashed (today, paused) in dense rows. Circles survive only in score rings, bars, avatars and the feedback mark.
 
-**The Verification Weight Rule.** Line weight encodes verification level on every surface: S1 a thin dashed grey line, S2 a solid medium cyan line, S3 a heavy violet line (ratio roughly 1 : 2 : 4). A level glyph follows the same logic: dashed outline triangle, outline triangle with a dot, filled triangle.
+Corners scale with the element: 8px label backings on maps, 10px small keys and segments, 12px keys and nav items, 14px fields and the segmented track, 16px inset panels and tiles, 18px cards and bubbles, 20px the indigo feature card, 24px sheets, full round for chips, pills and bars. Borders are always 2px; dashed means "not yet" (undrawn trail, today's open day, waiting marker, Beyan glyph).
 
 ## Components
 
-### Buttons (keys)
-Physical keys with a printed face.
-- **Shape:** 5px corners (4px on small keys), 14px semibold at width 96.
-- **Primary:** signal orange face, print-ink text, 10px 16px; landing keys enlarge to 12px 20px at 15px.
-- **Hover / Focus:** face brightens; 2px indigo focus ring offset 2px; pressed keys travel 1px and the lip turns inward. Disabled at 40% opacity.
-- **Ink:** print-ink face with enclosure-grey text; the secondary call to action and the active mode key.
-- **Line:** panel-face key with a strong seam; hover darkens the seam. Used for channel keys, steppers and the alternative action.
-- **Quiet:** no face, no lip; secondary text that fills recess grey on hover. Icons, theme toggle, dialog close.
+### Buttons
+Keys with a short, firm press.
+- **Shape:** 12px (10px small).
+- **Primary:** indigo face, white 16px 700 sentence-case label, 48px tall, 20px side padding, 3px `indigo-lip` lip. Small 38px / 14px, large 54px / 17px, block full width.
+- **Tone keys:** orange, cyan, green, red, purple change face and lip only, and only when the action is that concept.
+- **Line:** white face, 2px seam, seam lip, indigo text; hover `ground-2`. **Ink** is the same with `ink-2` text.
+- **Quiet:** no face, no lip, indigo text, indigo 8% wash on hover, no travel. Utilities, close, "Geri".
+- **Hover / Focus:** hover brightness 1.06; focus 3px indigo/55 outline, 2px offset. Disabled: `ground-3` face, `seam-2` lip, `ink-4` text.
 
-### Channel keys and LEDs
-A line key carrying a 7px square LED (1px corners), the CH number in mono, the channel name and its weight in mono. The LED is a 25% tint with a 60% outline when off and fills solid when the key is pressed (`aria-pressed`). The last live channel cannot be muted. LEDs also serve as status lamps in check lists and canvas reports, coloured S2 (pass), warn or danger.
-
-### Chips
-- **Style:** 3px corners, enclosure-grey fill, 1px seam, 12px semibold secondary text.
-- **Level badge:** a chip variant in mono 11px, tinted 8 to 10% with a 35 to 40% border in the level colour, led by the level glyph.
+### Chips and Pills
+- **Chip:** white, 2px seam, full round, 13px 600 `ink-2`; filters and the goal chip.
+- **Pill:** borderless tint with the tone's lip or base text, 13px 650. Level pills carry the triangle glyph: Beyan (dashed, `ground-3`/`ink-3`), Doğrulandı (outline with dot, `cyan-tint`/`cyan-lip`), Kurum onaylı (filled with white dot, `indigo-tint`/indigo).
 
 ### Cards / Containers
-- **Corner Style:** 6px (cards and data panels), 10px (landing enclosures).
-- **Background:** panel face; header and footnote strips in recess grey.
-- **Shadow Strategy:** see Elevation; data panels on the landing carry no shadow, only a strong seam.
-- **Border:** 1px seam; enclosures and data panels use the strong seam.
-- **Internal Padding:** 12 to 16px rows; 20 to 32px panel bodies.
+- **Corner Style:** 18px. **Border:** 2px `seam`. **Background:** `ground`; inset panels `ground-2` or a tone tint at 16px.
+- **Shadow Strategy:** flat at rest; `card-press` carries the card lip and sinks.
+- **Internal Padding:** 16 to 20px.
 
 ### Inputs / Fields
-- **Style:** panel face, 1px strong seam, 4px corners, 10px 12px, 15px text, inset well shadow, indigo caret.
-- **Focus:** border turns indigo with a 3px indigo ring at 20%.
-- **Labels and hints:** 13px bold label above; 12.5px tertiary hint below.
+- **Style:** `ground-2` fill, 2px seam, 14px radius, 12px 16px padding, 16px 500 text, `ink-4` placeholder, indigo caret.
+- **Focus:** indigo border, `ground` fill, 4px indigo/14 ring.
 
 ### Navigation
-Sticky 56px strip in panel face at 95% with a blur and a bottom seam. Wordmark in Archivo extra-bold with 0.04em tracking beside the indigo logo tile. Links are 14px semibold secondary ink; the active link turns print ink with a 2px indigo underline drawn inset at the strip's bottom edge. A segmented Kurum / Yetenek persona switch uses the tab treatment. Below 1024px links move into a "Menü" line key opening a 256px card.
+- **Sidebar:** 16px items with 32px two-tone icons, 12px radius, no fill. Active: indigo bold text plus a small filled indigo triangle pointer outside the left edge. Inactive: `ink-3` semibold, `ground-2` hover.
+- **Phone tab bar:** five equal tabs, icon over an 11px extrabold label; active tab is indigo with a downward triangle pointer on the bar's top seam.
+- **Faces:** genç = Bugün, Görevler, Lig, Topluluk, Profil. kurum = Ana sayfa, İhtiyaçlar, Keşfet, Projeler, Yöntem.
+- **Segmented control:** `ground-2` track, 2px seam, 4px inset; the selected segment is white, 10px, indigo text, segment lift.
 
-### Tabs / Segmented switch
-13px semibold keys at 4px corners; the selected segment becomes panel face with a strong-seam ring and a 1px drop.
+### Icons
+Authored two-tone SVGs on a 32px grid; each concept owns its colour. Seri is a lit survey beacon (orange triangle, gold lamp and rays; `flame-live` breathes it). XP is a faceted gold gem. Lig is a ridge in the tier colour with a summit flag. Bugün is an indigo marker over cyan ping rings. Görevler is a folded gold map with a dashed route and an indigo flag. Utility glyphs (chevrons, close, check) come from lucide at stroke 3. Status is always a drawn mark, never a Unicode glyph or emoji.
 
-### Signature: the Instrument Screen
-A dark glass region (4px corners, screen recess shadow) with a header strip (mode label in orange panel print, context in secondary text, a cyan "motor canlı" LED), a plot area over a 10 x 4 graticule (7% white lines, 14% frame), and a channel readout row of five ruled cells (CH1 to CH4 values coloured by channel, then Σ skor). Stacked bars per candidate use channel colours bottom-up and animate their segments with a 700ms expo-out ease, staggered 60ms; ranking reorders with layout animation. A dashed seam separates the plot from its one-line caption.
+### Survey primitives (signature)
+- **Contours:** faint wobbled topographic rings filling a `relative overflow-hidden` hero panel; `seam-2` at ~50% on ground, white at ~16% on indigo, a tone at ~13% on tinted heroes. Every fourth ring is heavier.
+- **Tri:** the survey marker with its lip; content centred on the triangle's centroid.
+- **Trail:** markers on a dashed `seam-2` line (4px, dash 2/12) that inks itself in the lead tone up to the current marker over ~0.9s. Titles sit on 8px `ground` backings; an optional caption carries status (PilotDetail uses it for each aşama's state).
+- **ClimbMap ("Paftan"):** steps climb a contour map bottom-up in switchbacks; zones are dashed isolines in their tone with a "title n/m" label; the last step sits on the summit. The current point carries "Buradasın · sıradaki adım".
+- **Ripple rings:** the current point pings with two staggered `ping-soft` rings in its tone (35% and 25%). This is the only "you are here" signal.
+- **SurveyFlag:** indigo pole, orange cloth; drops in, settles, the cloth ripples. Planted on finished waypoints and beside Niri in celebrations.
 
-### Measures
-- **Meter:** 6px track in recess grey, 1px corners, fill in ink, S2, S3, signal or warn, scaled from the left over 600ms.
-- **Score dial:** a 2.8px ring on a seam track, butt caps, coloured S3 at 75 and above, CH2 at 55 and above, tertiary ink below; the value counts up in mono over 900ms.
-- **Status icon:** drawn Lucide marks (check, x, alert triangle, circle) at 14px with 2.4 stroke for pass, block, warn, pending. Never a Unicode glyph.
+### Screen patterns
+- **Bugün:** NiriSays greeting (typing) → week card with WeekDots (seven 40px triangles: lit orange with a check, today dashed orange, past outline, future `ground-2`) → the indigo next-step card on white contours with an inner white key → "Paftan" ClimbMap in a card.
+- **Görevler:** an indigo hero on contours with a Ridge and a SurveyFlag, then this week's route as waypoints: grey marker until done, lit with "Bayrağı dik" when ready, filled green with a flag once planted.
+- **Lig:** the five tiers as points on one elevation profile; the climbed part fills `purple` at 14% with a purple line; standings with tier TriMarks and green/red zone dividers.
+- **Assistant (both faces):** first visit Welcome (kurum 4 cards; genç 5 cards, each with Niri in a different mood: wave, point, think, cheer, happy), then once-per-page Coach spotlight tours whose Niri mood follows the step (point for "here", think for explanations, cheer for rewards), then one persistent "Niri'ye sor" key opening page help, "Bu sayfayı bana göster", the Sözlük and "Jüri için demo turu". Keys: `nirengi:asistan:welcome`, `nirengi:asistan:genc:welcome`, `nirengi:asistan:tour:<route>`.
+- **Landing (/):** Niri narrates the story. From 1280px one sticky narrator in a left column changes mood and re-types its bubble per section (`data-narrate`, text in `index.astro` `say`); below that, each section opens with an inline NiriSays. The hero summit Niri hides while the narrator is visible.
+
+### Feedback, celebration and sheets
+- **`feedback({tone, title, text?, xp?, streak?, action?})`:** a compact floating toast (2px seam, radius 18, soft float shadow, no lip), bottom-centre of the content on desktop, above the tab bar on phones. A 52px mini Niri reacts (good happy, good with xp/streak cheer, bad sad with a small shake, info talk); the tone is a drawn triangle mark next to the title, never a coloured slab. `xp` adds a counting gold gem chip, `streak` a beacon chip. A thin tone line shrinks over 4.2s (5.6s with chips), pauses on hover/focus; X or swipe down dismisses; at most two stack. Marked `.feedback-dock` while visible so floating keys lift by its real height.
+- **`celebrate({title, sub?, xp?, streak?, cta?, href?})`:** full screen on 95% ground; four rounded-triangle rings spread once behind Niri (cheer, 150px), 32 triangle confetti in palette tones, a SurveyFlag drops in, a 30 to 36px title, optional XP (gold, gem) and Seri (orange, beacon) tiles, one large primary key ("Devam et"). Kurum omits `xp` and `streak`.
+- **Sheet / Why:** "Neden?" is a sentence-case indigo 13px trigger; the sheet is a bottom sheet (24px top corners, max 85dvh) on phones and a 512px centred panel from sm.
+- **EmptyState:** a card with Niri (think, 96px), an 18px title and the next step as an action.
+
+### Niri
+The triangle surveyor, pure SVG. Moods: idle, happy, cheer, think, wave, sad, point, talk, sleep. NiriSays sets Niri beside an 18px-radius, 2px-seam bubble with a rotated-square tail; on every new message Niri hops and the bubble grows from its tail; with `typing` the text types in (max 600ms) while Niri talks. Niri reacts to `feedback()`: good = happy plus a hop, bad = sad, info = looks up. Pupils follow the cursor on fine pointers. Under reduced motion every mood shows its finished static pose, and rings, flag and dust stop.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** show anything the engine computes on an inset screen with a graticule, using the screen palette.
-- **Do** keep CH1 to CH4 in orange, cyan, purple, indigo order and use those colours only for channel data, the primary key and the documented accents.
-- **Do** encode verification level as line weight and dash (S1 thin dashed grey, S2 solid cyan, S3 heavy violet), with colour as reinforcement.
-- **Do** use S2 machine cyan for every pass state (published, chain intact, check passed).
-- **Do** set scores, weights, codes, hashes, dates and routes in JetBrains Mono with tabular figures.
-- **Do** attach condensed caps labels to the control, column or value they name.
-- **Do** keep corners between 1px and 10px, stepping with the size of the part.
-- **Do** label fictional organisations and people as demo data wherever they appear.
+- **Do** give every key and pressable card its 3px same-hue lip and make `:active` sink 3px onto it.
+- **Do** draw progress, markers and "you are here" with the triangle, the dashed trail and ripple rings.
+- **Do** put Contours behind hero panels only (the next-step card, page heroes), never behind body text.
+- **Do** write every label in sentence case and address the reader as "sen".
+- **Do** answer every action with `feedback()` and milestones with `celebrate()`.
+- **Do** put explanations, formulas and thresholds behind "Neden?" in a Sheet.
+- **Do** read every number from the engine (`src/lib/engine/progress.ts`) and explain it on /yontem.
+- **Do** label fictional demo data where it appears (13px bold `ink-3`).
+- **Do** keep the kurum face on the same grammar with Niri as assistant and no XP, league or streak.
+- **Do** keep reduced motion working: CSS animation zeroed, `MotionGlobalConfig.skipAnimations`, no confetti or rings, count-ups jump, Niri static.
 
 ### Don't:
-- **Don't** use Unicode glyphs (check marks, crosses, bullets, triangles) for status; use the drawn status icon.
-- **Don't** stack an uppercase label or a numbered "01 ·" prefix above a heading as a kicker.
-- **Don't** use green for status, decorative gradients or coloured glows; pass is S2 cyan and depth is black or ink shadow.
-- **Don't** put the graticule on surfaces that do not measure anything.
-- **Don't** float computed numbers on raised cards; screens sink, panels lift.
-- **Don't** move instrument regions between modes; swap their contents.
-- **Don't** use the SaaS arrangement of gradient hero, feature-card grid and logo strip, or a career-platform profile look.
-- **Don't** return to the paper-and-ink map ("pafta") texture.
+- **Don't** use more than one Niri on a screen.
+- **Don't** use orange on any kurum screen.
+- **Don't** set `orange`, `gold` or their lips as text on a light ground, or use `ink-4` for readable text.
+- **Don't** put a lip on a static section or card.
+- **Don't** use blurred shadows on resting surfaces or 1px hairlines.
+- **Don't** use a Unicode glyph or emoji as an icon or status mark.
+- **Don't** show S1 / S2 / S3 outside /yontem.
+
+### Do not regress (round 1 patterns that are gone):
+- **Don't** bring back the circle lesson path; steps are triangle markers on a trail or the climb map.
+- **Don't** bring back the full-width bottom answer bar; acknowledgements are the floating toast.
+- **Don't** use a reward chest; quests are waypoints you plant a flag on.
+- **Don't** set uppercase keys, nav or labels.
+- **Don't** pin a lesson footer (X plus a fixed Devam bar) on flows; the key sits in flow.
+- **Don't** put a counter strip (league, streak, XP) in the phone header; it carries the wordmark only.
+- **Don't** use pin bubbles or bobbing callouts over the current step; it gets ripple rings and a plain caption below.
+- **Don't** use flame, chest or lightning imagery; Seri is a beacon, XP is a gem.
