@@ -7,6 +7,7 @@ import Niri from '../ui/Niri';
 import { NiriFace, Pip } from './art';
 import { glossaryFor, helpFor, type RouteKey } from './tours';
 import type { Face } from './util';
+import { openDefter } from '../genc/defter';
 
 interface Props {
   face: Face;
@@ -110,6 +111,18 @@ export default function Help({ face, route, open, onOpen, onClose, hasTour, home
           <button type="button" className="btn-line btn-block" onClick={onWelcome}>
             Baştan anlat
           </button>
+          {face === 'genc' && (
+            <button
+              type="button"
+              className="btn-line btn-block"
+              onClick={() => {
+                onClose();
+                window.setTimeout(() => openDefter(), 200);
+              }}
+            >
+              Niri’nin saha defteri
+            </button>
+          )}
           <button
             type="button"
             className="btn-quiet btn-block !text-ink-3"

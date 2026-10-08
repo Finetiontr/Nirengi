@@ -64,7 +64,7 @@ export default function LiveWeek() {
         </span>
         <Why title="Bu sayılar nereden geliyor?" label="Canlı demo: Neden?">
           <p className="text-[15px] font-bold text-ink-2">
-            Bu kart demo kullanıcısının verisinden, şu an tarayıcında hesaplanıyor. Bir gün; GitHub’da üretim yaptığın, işin doğrulandığı, bir görevi bitirdiğin ya da cevabının işe yaradığı gündür.
+            Bu kart demo kullanıcısının verisinden, şu an tarayıcında hesaplanıyor. Bir gün; kod deponda üretim yaptığın, işin doğrulandığı, bir görevi bitirdiğin ya da cevabının işe yaradığı gündür.
           </p>
           <p className="mt-3 text-[15px] font-bold text-ink-3">Seri, hedefini tutturduğun ardışık hafta sayısıdır. Mola haftası seriyi ne bozar ne artırır.</p>
           <a href="/yontem#ilerleme" className="btn-primary btn-block mt-5">

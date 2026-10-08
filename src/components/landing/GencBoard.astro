@@ -1,0 +1,31 @@
+---
+// The genç chapter's body in one dense board: the habit loop in four stops, the live
+// week (goal, beacons, streak), Niri's weekly note and a small costume teaser. The note
+// is its own narration stop, so the narrator turns to it as the reader gets there.
+import GencLoop from './GencLoop.astro';
+import Analiz from './Analiz.astro';
+import Sheet from './Sheet.astro';
+import LiveWeek from './LiveWeek';
+import Costumes from './Costumes';
+import type { Line } from './Say';
+
+interface Props {
+  tiers: Line[];
+}
+const { tiers } = Astro.props;
+---
+
+<div>
+  <GencLoop />
+  <div class="mt-8 grid gap-6 lg:grid-cols-2 lg:gap-7">
+    <div class="flex min-w-0 flex-col gap-6">
+      <Sheet tone="orange">
+        <LiveWeek client:only="react"><div slot="fallback" class="h-[262px]"></div></LiveWeek>
+      </Sheet>
+      <Costumes client:visible tiers={tiers} />
+    </div>
+    <Sheet tone="purple" data-narrate="analiz" class="scroll-mt-24">
+      <Analiz />
+    </Sheet>
+  </div>
+</div>

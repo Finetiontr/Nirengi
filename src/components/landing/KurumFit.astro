@@ -1,13 +1,16 @@
 ---
-// The kurum chapter's answer to "ne ölçüde çözer?": the three things you get, in the
-// order you meet them, and the three sourced numbers behind the problem. Every number
-// carries its source; nothing here is invented.
+// The kurum chapter's answer to "ne ölçüde çözer?" in one board: the three things you
+// get, in the order you meet them, beside a live explainable match (its own narration
+// stop), then the three sourced numbers behind the problem. Every number carries its
+// source; nothing here is invented. Calm palette, no orange.
 import { Tri } from '../ui/pafta';
+import Sheet from './Sheet.astro';
+import LiveMatch from './LiveMatch';
 
 const steps = [
   { n: 1, title: 'İhtiyaç kartı', text: 'Sorununu yedi alanlı karta yazarsın. Netlik puanı 70’i geçince yayına çıkar.' },
   { n: 2, title: 'Gerekçeli kısa liste', text: 'Her adayın puanı dört parçadan çıkar ve “Neden?” ile açılır. İsim ilk temasa kadar gizli.' },
-  { n: 3, title: 'Deneme projesi', text: 'Aşamalar iki tarafın onayıyla kapanır; her kayıt değiştirilemez deftere yazılır.' },
+  { n: 3, title: 'Deneme projesi', text: 'Her aşama iki tarafın onayıyla kapanır ve deftere zincirli bir kayıt olarak yazılır; sonradan değişirse zincir bunu gösterir.' },
 ];
 
 const facts = [
@@ -18,23 +21,30 @@ const facts = [
 ---
 
 <div>
-  <ol class="grid gap-4 md:grid-cols-3">
-    {
-      steps.map((s) => (
-        <li class="rounded-[18px] border-2 border-line bg-bg p-4 sm:p-5">
-          <span class="block w-fit" aria-hidden="true">
-            <Tri size={34} tone="indigo" state="done">
-              <span class="text-[13px] font-black leading-none text-white">{s.n}</span>
-            </Tri>
-          </span>
-          <p class="mt-3 text-[17px] font-black text-ink">{s.title}</p>
-          <p class="mt-1 text-[15px] font-semibold leading-snug text-ink-3">{s.text}</p>
-        </li>
-      ))
-    }
-  </ol>
+  <div class="grid items-start gap-6 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-7">
+    <ol class="grid gap-3">
+      {
+        steps.map((s) => (
+          <li class="flex gap-3.5 rounded-[18px] border-2 border-line bg-bg p-4">
+            <span class="block shrink-0" aria-hidden="true">
+              <Tri size={34} tone="indigo" state="done">
+                <span class="text-[13px] font-black leading-none text-white">{s.n}</span>
+              </Tri>
+            </span>
+            <div class="min-w-0">
+              <p class="text-[17px] font-black text-ink">{s.title}</p>
+              <p class="mt-1 text-[15px] font-semibold leading-snug text-ink-3">{s.text}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+    <Sheet tone="indigo" data-narrate="eslesme" class="scroll-mt-24">
+      <LiveMatch client:only="react"><div slot="fallback" class="h-[430px]"></div></LiveMatch>
+    </Sheet>
+  </div>
 
-  <div class="mt-10">
+  <div class="mt-9">
     <p class="h-sec">Çözdüğü sorun, sayılarla</p>
     <dl class="mt-4 grid gap-x-6 gap-y-5 md:grid-cols-3">
       {

@@ -12,6 +12,7 @@ import { Mark } from '../components/ui/icons';
 import { Overlays } from '../components/ui/kit';
 import DemoTour from '../components/app/DemoTour';
 import Assistant from '../components/assistant/Assistant';
+import SahaDefteri from '../components/genc/SahaDefteri';
 
 interface Props {
   title: string;
@@ -186,6 +187,7 @@ const hasRail = Astro.slots.has('rail');
     <Overlays client:only="react" />
     <DemoTour client:only="react" />
     <Assistant client:only="react" />
+    <SahaDefteri client:only="react" />
 
     <script>
       for (const b of document.querySelectorAll('[data-theme-toggle]'))

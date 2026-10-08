@@ -1,0 +1,57 @@
+/*
+ * Saha defteri: Niri's field notebook. The stage page is surveyor's grid paper
+ * (dots on bg-2), the binding is a stitched seam, and Niri stands on a graduated
+ * plate like a theodolite's horizontal circle.
+ */
+
+.df-grid {
+  background-color: rgb(var(--bg-2));
+  background-image: radial-gradient(rgb(var(--line-2)) 1.3px, transparent 1.6px);
+  background-size: 18px 18px;
+  background-position: 9px 9px;
+}
+
+/* The stitched binding between the two pages (desktop) or above the record (phone). */
+.df-seam {
+  border-top: 2px dashed rgb(var(--line-2));
+}
+@media (min-width: 640px) {
+  .df-seam {
+    border-top: 0;
+    border-left: 2px dashed rgb(var(--line-2));
+  }
+}
+
+/* Locked pages: Niri as a silhouette, waiting to be filled in. */
+.df-ghost {
+  filter: brightness(0);
+  opacity: 0.16;
+}
+html[data-theme='dark'] .df-ghost {
+  filter: brightness(0) invert(1);
+  opacity: 0.18;
+}
+
+/* The page number pops when the page turns. */
+@keyframes df-no {
+  0% { transform: translateY(6px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+.df-no { animation: df-no 0.32s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+/* Unread page: a small pulsing survey point on the tab. */
+.df-new::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  right: 5px;
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: rgb(var(--indigo));
+  box-shadow: 0 0 0 2px rgb(var(--bg));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .df-no { animation: none; }
+}

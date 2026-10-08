@@ -9,6 +9,8 @@ import './niri.css';
 export type Mood = 'idle' | 'happy' | 'cheer' | 'think' | 'wave' | 'sad' | 'point' | 'talk' | 'sleep';
 export type Dir = 'left' | 'right' | 'up' | 'down';
 export type Look = 'cursor' | Dir;
+/** Field tools from the saha defteri, held in the right hand (genç side only). */
+export type Item = 'loupe' | 'seal' | 'beacon' | 'compass';
 
 interface Props {
   mood?: Mood;
@@ -24,6 +26,12 @@ interface Props {
   cue?: string | number;
   /** League costume, by tier index (TIERS in engine/progress.ts). Genç side only; unset = no costume. */
   gear?: number;
+  /** A field tool in the right hand. Genç side only. */
+  item?: Item;
+  /** Extra idle life (stretches, foot taps, gear fidgets, the odd spin) and tap combos. Genç screens only. */
+  lively?: boolean;
+  /** What a `cue` change plays: the entrance hop (default) or a celebratory spin. */
+  cueAct?: 'enter' | 'spin';
 }
 
 const c = (v: string) => `rgb(var(--${v}))`;
@@ -191,7 +199,7 @@ function Tool({ gear }: { gear: number }) {
   switch (gear) {
     case 3: // the ranging pole, red and white like the real thing
       return (
-        <g className="n-gear">
+        <g className="n-gear n-tool">
           <path d="M-2.4 18 0 25 2.4 18Z" fill={c('ink-4')} />
           <rect x="-2.6" y="-60" width="5.2" height="79" rx="2" fill={c('red')} stroke={c('red-lip')} strokeWidth="1.2" />
           {[-50, -30, -10, 10].map((y) => (
@@ -201,7 +209,7 @@ function Tool({ gear }: { gear: number }) {
       );
     case 4: // the summit flag
       return (
-        <g className="n-gear">
+        <g className="n-gear n-tool">
           <rect x="-1.9" y="-62" width="3.8" height="84" rx="1.9" fill={c('indigo-lip')} />
           <g className="n-cloth">
             <path d="M-2 -58-28-48.5-2-39Z" fill={c('gold')} stroke={c('gold')} strokeWidth="3.4" strokeLinejoin="round" />
@@ -215,9 +223,80 @@ function Tool({ gear }: { gear: number }) {
   }
 }
 
+/** The approval seal's scalloped rim: 24 points, alternately out and in, rounded by the stroke. */
+const SEAL = (() => {
+  const pts = Array.from({ length: 24 }, (_, i) => {
+    const a = (i / 24) * Math.PI * 2;
+    const r = i % 2 ? 9 : 11;
+    return `${(10 + Math.sin(a) * r).toFixed(2)} ${(-16 - Math.cos(a) * r).toFixed(2)}`;
+  });
+  return `M${pts.join('L')}Z`;
+})();
+
+/**
+ * Saha defteri tools, held in the right hand. Drawn around the hand's centre and
+ * leaning outward, because the arms sit behind the body.
+ */
+function HeldItem({ item }: { item: Item }) {
+  switch (item) {
+    case 'loupe': // büyüteç: the first verified work, looked at closely
+      return (
+        <g className="n-gear n-item">
+          <path d="M-1 3 7.5-10" stroke={c('t0')} strokeWidth="5.6" strokeLinecap="round" />
+          <circle cx="12" cy="-18.5" r="9.6" fill="rgb(var(--cyan) / 0.32)" stroke={c('gold')} strokeWidth="4.4" />
+          <path className="n-glint" d="M7 -20.5a5.6 5.6 0 0 1 4.4-3.8" fill="none" stroke="#fff" strokeWidth="2.3" strokeLinecap="round" opacity=".95" />
+        </g>
+      );
+    case 'seal': // onay mührü: an institution signed the milestone
+      return (
+        <g className="n-gear n-item" strokeLinejoin="round">
+          <g className="n-flutter" style={{ transformOrigin: '10px -8px' }} fill={c('green-lip')} stroke={c('green-lip')} strokeWidth="1.6">
+            <path d="M6-9 1.5 3 6 1 8.5 5 11-8Z" />
+            <path d="M14-9 18.5 3 14 1 11.5 5 9-8Z" />
+          </g>
+          <path d={SEAL} fill={c('green')} stroke={c('green')} strokeWidth="2.2" />
+          <circle cx="10" cy="-16" r="6.2" fill="none" stroke="#fff" strokeWidth="1.6" opacity=".55" />
+          <path d="M6.6-16.2 9-13.6 13.6-18.6" fill="none" stroke="#fff" strokeWidth="2.6" strokeLinecap="round" />
+        </g>
+      );
+    case 'beacon': // seri feneri: the streak's survey beacon, on a short pole
+      return (
+        <g className="n-gear n-item" strokeLinejoin="round" strokeLinecap="round">
+          <path d="M0 4 7.5-15" stroke={c('indigo-lip')} strokeWidth="4" />
+          <path d="M9-32 18.5-14H-.5Z" fill={c('orange')} stroke={c('orange')} strokeWidth="3.6" />
+          <path d="M9-24.5 14.4-14H3.6Z" fill={c('orange-lip')} stroke={c('orange-lip')} strokeWidth="2" />
+          <circle className="n-lamp" cx="9" cy="-32" r="4" fill={c('gold')} />
+          <path className="n-beam" d="M9-40.5v-3M1.5-37.5l-2.2-2.2M16.5-37.5l2.2-2.2" stroke={c('gold')} strokeWidth="2.6" />
+        </g>
+      );
+    case 'compass': // pusula: you showed someone the way
+      return (
+        <g className="n-gear n-item">
+          <circle cx="11" cy="-27.5" r="2.6" fill="none" stroke={c('gold-lip')} strokeWidth="2.2" />
+          <circle cx="11" cy="-15" r="10.2" fill="#fff" stroke={c('gold')} strokeWidth="3.8" />
+          <g className="n-needle">
+            <path d="M11-23.2 13.7-15H8.3Z" fill={c('red')} />
+            <path d="M11-6.8 13.7-15H8.3Z" fill={c('indigo-lip')} />
+          </g>
+          <circle cx="11" cy="-15" r="1.7" fill={c('gold-lip')} />
+        </g>
+      );
+    default:
+      return null;
+  }
+}
+
 // ---------------------------------------------------------------- face
 
-function Eyes({ kind }: { kind: 'round' | 'arc' | 'closed' }) {
+function Eyes({ kind }: { kind: 'round' | 'arc' | 'closed' | 'dizzy' }) {
+  if (kind === 'dizzy')
+    return (
+      <g className="n-dizzy" fill="none" stroke={INK} strokeWidth="3" strokeLinecap="round">
+        {[47, 73].map((x) => (
+          <path key={x} style={{ transformOrigin: `${x}px 55px` }} d={`M${x} 55a2.2 2.2 0 0 1 4.2 .6 4.6 4.6 0 0 1-6.4 4.4 7 7 0 0 1-3.6-9.4 9 9 0 0 1 10-4.4`} />
+        ))}
+      </g>
+    );
   if (kind === 'arc')
     return (
       <g fill="none" stroke={INK} strokeWidth="4" strokeLinecap="round">
@@ -299,6 +378,7 @@ interface Over {
   mood?: Mood;
   look?: Dir;
   brows?: 'up';
+  eyes?: 'dizzy' | 'closed';
 }
 
 const reducedMotion = () => typeof window !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -306,8 +386,11 @@ const FOLLOWERS: Mood[] = ['idle', 'wave', 'talk'];
 /** Moods whose pupils may glance around on their own, with their resting gaze. */
 const DRIFT: Partial<Record<Mood, [number, number]>> = { idle: [1.2, 0.8], wave: [1.2, 0.8], talk: [0.8, 0.4] };
 const FIXED_GAZE: Mood[] = ['think', 'sad', 'point', 'sleep'];
+/** One-shot acts and how long each runs (ms); the keyframes live in niri.css. */
+const ACT_MS = { hop: 800, tilt: 1600, perk: 1200, enter: 1000, spin: 950, glance: 1500, shift: 1500, stretch: 1700, tap: 1300, fidget: 1500, wobble: 1300 } as const;
+type Act = keyof typeof ACT_MS;
 
-export default function Niri({ mood = 'idle', size = 120, className = '', look, point = 'right', react, cue, gear }: Props) {
+export default function Niri({ mood = 'idle', size = 120, className = '', look, point = 'right', react, cue, gear, item, lively = false, cueAct = 'enter' }: Props) {
   const reactive = react ?? size >= 64;
   const root = useRef<SVGSVGElement>(null);
   const [over, setOver] = useState<Over | null>(null);
@@ -320,22 +403,28 @@ export default function Niri({ mood = 'idle', size = 120, className = '', look, 
   const lastAct = useRef(-Infinity);
   const lastHover = useRef(-Infinity);
   const fixedGaze = useRef(false);
+  const livelyRef = useRef(lively);
+  /** What the idle fidgets may use: something worn to fiddle with, and whether the hands are free. */
+  const kit = useRef({ dressed: false, handsFree: true });
+  const taps = useRef({ n: 0, at: -Infinity });
 
   const eff = over?.mood ?? mood;
   const gaze: Dir | undefined = over?.look ?? (look && look !== 'cursor' ? look : undefined);
   const follow = look === 'cursor' || (look === undefined && reactive && FOLLOWERS.includes(eff) && !over?.look);
   const arms = armsFor(eff, point);
-  const eyeKind = eff === 'happy' || eff === 'cheer' ? 'arc' : eff === 'sleep' ? 'closed' : 'round';
+  const eyeKind = over?.eyes ?? (eff === 'happy' || eff === 'cheer' ? 'arc' : eff === 'sleep' ? 'closed' : 'round');
   const brows = over?.brows ?? (eff === 'sad' ? 'sad' : eff === 'think' ? 'think' : null);
 
   useEffect(() => {
     moodRef.current = mood;
     overRef.current = over;
     fixedGaze.current = !!gaze || FIXED_GAZE.includes(eff);
+    livelyRef.current = lively;
+    kit.current = { dressed: gear !== undefined || item !== undefined, handsFree: item === undefined && (gear === undefined || gear < 3) };
   });
 
-  /** One-shot body action (hop, tilt, perk), restartable. */
-  const play = useCallback((act: string, ms: number) => {
+  /** One-shot body action (hop, tilt, perk, spin…), restartable. */
+  const play = useCallback((act: Act, ms: number = ACT_MS[act]) => {
     const el = root.current;
     if (!el) return;
     el.removeAttribute('data-act');
@@ -359,10 +448,11 @@ export default function Niri({ mood = 'idle', size = 120, className = '', look, 
     root.current?.style.removeProperty('--ly');
   }, [eff, gaze]);
 
-  // Entrance: one big hop with a ripple where it lands.
+  // Entrance: one big hop with a ripple where it lands, or a celebratory spin.
   useEffect(() => {
     if (cue === undefined || reducedMotion()) return;
-    play('enter', 1000);
+    play(cueAct === 'spin' ? 'spin' : 'enter');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cue, play]);
 
   // Presence: pause everything off-screen and in hidden tabs; blinks and micro-actions.
@@ -410,7 +500,8 @@ export default function Niri({ mood = 'idle', size = 120, className = '', look, 
       const blink = () => {
         if (live.current) {
           el.setAttribute('data-blink', '');
-          later(() => el.removeAttribute('data-blink'), 130);
+          // Lively: now and then a slow, contented blink.
+          later(() => el.removeAttribute('data-blink'), livelyRef.current && Math.random() < 0.15 ? 300 : 130);
           if (Math.random() < 0.2)
             later(() => {
               el.setAttribute('data-blink', '');
@@ -425,25 +516,50 @@ export default function Niri({ mood = 'idle', size = 120, className = '', look, 
       let last = '';
       let first = true;
       let glancing = false;
+      const blinkOnce = () => {
+        el.setAttribute('data-blink', '');
+        later(() => el.removeAttribute('data-blink'), 120);
+      };
       const micro = () => {
         const m = moodRef.current;
         const idle = m === 'idle';
+        const lv = livelyRef.current;
         if (live.current && !overRef.current && (idle || ['wave', 'talk'].includes(m)) && !fixedGaze.current) {
           const watching = performance.now() - lastPointer.current < 4000;
-          const pool = first && idle ? ['hop', 'tilt'] : idle ? ['look', 'hop', 'tilt', 'look'] : ['look'];
+          const { dressed, handsFree } = kit.current;
+          // Lively Niri has a wider repertoire: weight shifts, stretches, foot taps, fiddling with
+          // the costume, and now and then a spin. Plain Niri keeps the original three.
+          const extra = lv ? ['shift', 'tap', ...(handsFree ? ['stretch'] : []), ...(dressed ? ['fidget', 'fidget'] : [])] : [];
+          const pool = first && idle ? ['hop', 'tilt'] : idle ? ['look', 'hop', 'tilt', 'look', ...extra] : lv && dressed ? ['look', 'fidget'] : ['look'];
           const ok = pool.filter((a) => (idle ? a !== last : true) && !(a === 'look' && watching));
           if (ok.length) {
-            const act = ok[Math.floor(Math.random() * ok.length)];
+            const act = lv && idle && !first && Math.random() < 0.08 ? 'spin' : ok[Math.floor(Math.random() * ok.length)];
             last = act;
-            if (act === 'hop') play('hop', 800);
+            if (act === 'hop' || act === 'shift' || act === 'spin') play(act);
             else if (act === 'tilt') {
-              play('tilt', 1600);
+              play('tilt');
               setGaze(-3, -1.5);
               later(() => setGaze(null), 1500);
+            } else if (act === 'stretch') {
+              play('stretch');
+              later(() => hold({ eyes: 'closed' }, 950), 320);
+            } else if (act === 'tap') {
+              play('tap');
+              setGaze(0.6, 3.2);
+              later(() => setGaze(null), 1300);
+            } else if (act === 'fidget') {
+              play('fidget');
+              setGaze(0.4, -3.4);
+              later(() => setGaze(null), 1200);
             } else {
+              // Look around; a lively Niri turns its body with the gaze and blinks as the eyes cross.
               glancing = true;
+              if (lv) play('glance');
               setGaze(-3.6, 0.6);
-              later(() => setGaze(3.6, 0.6), 700);
+              later(() => {
+                if (lv) blinkOnce();
+                setGaze(3.6, 0.6);
+              }, 700);
               later(() => {
                 setGaze(null);
                 glancing = false;
@@ -452,7 +568,7 @@ export default function Niri({ mood = 'idle', size = 120, className = '', look, 
           }
         }
         first = false;
-        later(micro, 5000 + Math.random() * 5000);
+        later(micro, livelyRef.current ? 3800 + Math.random() * 4200 : 5000 + Math.random() * 5000);
       };
       later(micro, 1500 + Math.random() * 1000);
 
@@ -473,7 +589,7 @@ export default function Niri({ mood = 'idle', size = 120, className = '', look, 
       window.clearTimeout(holdTimer.current);
       window.clearTimeout(actTimer.current);
     };
-  }, [play]);
+  }, [play, hold]);
 
   // Cursor gaze: one throttled rAF per pointer move, clamped to the eye.
   useEffect(() => {
@@ -518,11 +634,12 @@ export default function Niri({ mood = 'idle', size = 120, className = '', look, 
       if (m === 'sleep' || m === 'cheer' || !live.current) return;
       if (tone === 'good') {
         hold({ mood: 'happy' }, 1300);
-        play('hop', 800);
+        // Earned XP on a lively screen is worth a spin.
+        play(livelyRef.current && (e as CustomEvent<{ xp?: number }>).detail?.xp ? 'spin' : 'hop');
       } else if (tone === 'bad') hold({ mood: 'sad' }, 1500);
       else if (tone === 'info') {
         hold({ look: 'up', brows: 'up' }, 1200);
-        play('perk', 1200);
+        play('perk');
       }
     };
     window.addEventListener('nirengi:feedback', onFeedback);
@@ -535,12 +652,31 @@ export default function Niri({ mood = 'idle', size = 120, className = '', look, 
     if (!['idle', 'think', 'point'].includes(moodRef.current)) return;
     lastHover.current = now;
     hold({ mood: 'wave' }, 1500);
+    if (livelyRef.current) play('perk');
   };
 
   const onClick = () => {
-    if (performance.now() - lastAct.current < 500) return;
+    const now = performance.now();
+    if (livelyRef.current && !reducedMotion()) {
+      // Tap combos: a hop, a happy hop, a spin, and too many taps leave Niri dizzy.
+      const t = taps.current;
+      t.n = now - t.at < 1400 ? t.n + 1 : 1;
+      t.at = now;
+      if (t.n >= 5) {
+        t.n = 0;
+        hold({ eyes: 'dizzy' }, 1500);
+        return play('wobble');
+      }
+      if (t.n === 3) {
+        hold({ mood: 'happy' }, 1100);
+        return play('spin');
+      }
+      if (t.n === 2) hold({ mood: 'happy' }, 900);
+      return play('hop');
+    }
+    if (now - lastAct.current < 500) return;
     if (moodRef.current === 'sleep') hold({ mood: 'idle', brows: 'up' }, 1800);
-    play('hop', 800);
+    play('hop');
   };
 
   const surprised = over?.brows === 'up';
@@ -557,6 +693,7 @@ export default function Niri({ mood = 'idle', size = 120, className = '', look, 
       data-mood={eff}
       data-look={gaze}
       data-point={eff === 'point' ? point : undefined}
+      data-lively={lively || undefined}
       role="img"
       aria-label="Niri"
       onPointerEnter={reactive ? onEnter : undefined}
@@ -570,26 +707,33 @@ export default function Niri({ mood = 'idle', size = 120, className = '', look, 
             <g className="n-breath">
               {gear !== undefined && <Pack gear={gear} />}
               <ArmShape arm={arms[0]} side="l" pointing={pointingArm === 0} held={gear !== undefined && gear >= 3 ? <Tool gear={gear} /> : undefined} />
-              <ArmShape arm={arms[1]} side="r" pointing={pointingArm === 1} />
+              <ArmShape arm={arms[1]} side="r" pointing={pointingArm === 1} held={item ? <g transform="scale(1.25)"><HeldItem item={item} /></g> : undefined} />
               {/* feet */}
-              <ellipse cx="45" cy="108" rx="10" ry="6.5" fill={c('indigo-lip')} />
-              <ellipse cx="75" cy="108" rx="10" ry="6.5" fill={c('indigo-lip')} />
+              <ellipse className="n-foot n-foot-l" cx="45" cy="108" rx="10" ry="6.5" fill={c('indigo-lip')} />
+              <ellipse className="n-foot n-foot-r" cx="75" cy="108" rx="10" ry="6.5" fill={c('indigo-lip')} />
               {/* body: a rounded triangle */}
               <path d="M60 15 105 97H15Z" fill={c('indigo')} stroke={c('indigo')} strokeWidth="18" strokeLinejoin="round" />
               <path d="M15 97h90" stroke={c('indigo-lip')} strokeWidth="18" strokeLinecap="round" opacity=".45" />
-              {/* belly with the survey point */}
-              <path d="M60 58 82 94H38Z" fill="rgb(255 255 255 / 0.2)" stroke="rgb(255 255 255 / 0.2)" strokeWidth="9" strokeLinejoin="round" />
-              <circle className="n-ping" cx="60" cy="82" r="7.5" fill="none" stroke={c('orange')} strokeWidth="2" />
-              <circle cx="60" cy="82" r="7.5" fill="#fff" />
-              <circle cx="60" cy="82" r="4.6" fill={c('orange')} />
-              {/* cheeks */}
-              <ellipse cx="33" cy="70" rx="5.5" ry="3.4" fill={c('orange')} opacity={cheeks} />
-              <ellipse cx="87" cy="70" rx="5.5" ry="3.4" fill={c('orange')} opacity={cheeks} />
-              <Eyes key={eyeKind} kind={eyeKind} />
-              {brows && <Brows kind={brows} />}
-              <Mouth mood={eff} surprised={surprised} />
-              {eff === 'sad' && <path className="n-tear" d="M81 66c-3.2 4.4-3.2 7.6 0 7.6s3.2-3.2 0-7.6Z" fill={c('cyan')} />}
-              {gear !== undefined && <Headgear gear={gear} />}
+              {/* the face side: hidden for the moment a spin shows Niri's back */}
+              <g className="n-face">
+                {/* belly with the survey point */}
+                <path d="M60 58 82 94H38Z" fill="rgb(255 255 255 / 0.2)" stroke="rgb(255 255 255 / 0.2)" strokeWidth="9" strokeLinejoin="round" />
+                <circle className="n-ping" cx="60" cy="82" r="7.5" fill="none" stroke={c('orange')} strokeWidth="2" />
+                <circle cx="60" cy="82" r="7.5" fill="#fff" />
+                <circle cx="60" cy="82" r="4.6" fill={c('orange')} />
+                {/* cheeks */}
+                <ellipse cx="33" cy="70" rx="5.5" ry="3.4" fill={c('orange')} opacity={cheeks} />
+                <ellipse cx="87" cy="70" rx="5.5" ry="3.4" fill={c('orange')} opacity={cheeks} />
+                <Eyes key={eyeKind} kind={eyeKind} />
+                {brows && <Brows kind={brows} />}
+                <Mouth mood={eff} surprised={surprised} />
+                {eff === 'sad' && <path className="n-tear" d="M81 66c-3.2 4.4-3.2 7.6 0 7.6s3.2-3.2 0-7.6Z" fill={c('cyan')} />}
+              </g>
+              {gear !== undefined && (
+                <g className="n-hat">
+                  <Headgear gear={gear} />
+                </g>
+              )}
             </g>
           </g>
         </g>

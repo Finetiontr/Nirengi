@@ -6,7 +6,7 @@
  * Groups are nested so independent motions never fight over one transform:
  *   n-pose  static lean/droop of the mood (transitions between moods)
  *   n-loop  the mood's own loop (bounce, jump, rock, nod)
- *   n-micro one-shot actions (hop, tilt, perk) set via data-act
+ *   n-micro one-shot actions (hop, tilt, perk, spin, and the lively set) via data-act
  *   n-breath always-on breathing
  */
 
@@ -238,6 +238,29 @@
 }
 .n-lamp { animation: n-lamp 3.6s ease-in-out infinite; }
 
+/* Saha defteri tools: the compass needle settles, the beacon keeps signalling. */
+@keyframes n-needle {
+  0%, 100% { transform: rotate(-14deg); }
+  30% { transform: rotate(10deg); }
+  60% { transform: rotate(-5deg); }
+  80% { transform: rotate(3deg); }
+}
+.n-needle { transform-box: fill-box; transform-origin: center; animation: n-needle 3.4s ease-in-out infinite; }
+@keyframes n-beam {
+  0%, 100% { opacity: 0.25; transform: scale(0.85); }
+  45% { opacity: 1; transform: scale(1.08); }
+}
+.n-beam { transform-box: fill-box; transform-origin: 50% 100%; animation: n-beam 1.8s ease-in-out infinite; }
+@keyframes n-glint {
+  0%, 82%, 100% { opacity: 0.95; }
+  88% { opacity: 0.3; }
+}
+.n-glint { animation: n-glint 4.2s ease-in-out infinite; }
+.n-hat, .n-item, .n-tool { transform-box: fill-box; }
+.n-hat { transform-origin: 50% 100%; }
+.n-item { transform-origin: 30% 100%; }
+.n-tool { transform-origin: 50% 75%; }
+
 /* ---------------------------------------------------------------- one-shot actions */
 
 @keyframes n-hop {
@@ -263,6 +286,126 @@
   100% { transform: translateY(0) scale(1, 1); }
 }
 .niri[data-act='perk'] .n-micro { animation: n-perk 1.2s var(--niri-spring) both; }
+
+/* Spin: crouch, jump and turn round once, land squashed. The turn is a scaleX through
+   zero, so Niri goes edge-on twice and shows the plain back in between. */
+@keyframes n-spin {
+  0%   { transform: translateY(0) scale(1, 1); animation-timing-function: ease-out; }
+  12%  { transform: translateY(0) scale(1.08, 0.9); animation-timing-function: cubic-bezier(0.2, 0.8, 0.3, 1); }
+  26%  { transform: translateY(-18px) scale(0.35, 1.06); }
+  38%  { transform: translateY(-26px) scale(-1, 1.04); }
+  50%  { transform: translateY(-24px) scale(-0.35, 1.02); animation-timing-function: cubic-bezier(0.55, 0, 0.9, 0.6); }
+  62%  { transform: translateY(-9px) scale(1, 1); animation-timing-function: cubic-bezier(0.55, 0, 0.9, 0.6); }
+  72%  { transform: translateY(0) scale(1.1, 0.88); animation-timing-function: ease-out; }
+  86%  { transform: translateY(0) scale(0.97, 1.04); animation-timing-function: ease-in-out; }
+  100% { transform: translateY(0) scale(1, 1); }
+}
+.niri[data-act='spin'] .n-micro { animation: n-spin 0.95s linear both; }
+@keyframes n-back {
+  0%, 28%, 54%, 100% { opacity: 1; }
+  30%, 52% { opacity: 0; }
+}
+.niri[data-act='spin'] .n-face { animation: n-back 0.95s linear both; }
+@keyframes n-shadow-spin {
+  0%, 12%, 72%, 100% { transform: scale(1); opacity: 1; }
+  38% { transform: scale(0.62); opacity: 0.45; }
+  72% { transform: scale(1.1); }
+}
+.niri[data-act='spin'] .n-shadow { animation: n-shadow-spin 0.95s linear both; }
+.niri[data-act='spin'] .n-ground { animation: n-ground 0.8s ease-out 0.66s both; }
+
+/* Lively idle set (genç screens and the saha defteri only, see the lively prop). */
+
+/* glance: the body turns a little with the eyes as Niri looks around */
+@keyframes n-glance {
+  0%, 100% { transform: rotate(0); }
+  18%, 42% { transform: rotate(-2.6deg) translateX(-1px); }
+  56%, 84% { transform: rotate(2.6deg) translateX(1px); }
+}
+.niri[data-act='glance'] .n-micro { animation: n-glance 1.5s ease-in-out both; }
+
+/* shift: weight from one foot to the other, with a small dip in the middle */
+@keyframes n-shift {
+  0%, 100% { transform: translateX(0) rotate(0) scale(1, 1); }
+  25% { transform: translateX(-2.5px) rotate(-3.5deg) scale(1, 1); }
+  50% { transform: translateX(0) rotate(0) scale(1.03, 0.96); }
+  75% { transform: translateX(2.5px) rotate(3.5deg) scale(1, 1); }
+}
+.niri[data-act='shift'] .n-micro { animation: n-shift 1.5s ease-in-out both; }
+
+/* stretch: wind up, reach tall with both arms, eyes shut, settle */
+@keyframes n-stretch {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  14% { transform: translateY(0) scale(1.05, 0.93); }
+  36%, 70% { transform: translateY(-3px) scale(0.95, 1.1); }
+  84% { transform: translateY(0) scale(1.04, 0.95); }
+}
+.niri[data-act='stretch'] .n-micro { animation: n-stretch 1.7s cubic-bezier(0.4, 0, 0.3, 1) both; }
+@keyframes n-stretch-arm {
+  0%, 100% { transform: rotate(0); }
+  14% { transform: rotate(calc(var(--s) * -10deg)); }
+  36%, 70% { transform: rotate(calc(var(--s) * 96deg)); }
+  84% { transform: rotate(calc(var(--s) * -6deg)); }
+}
+.niri[data-act='stretch'] .n-arm-fx { animation: n-stretch-arm 1.7s cubic-bezier(0.4, 0, 0.3, 1) both; }
+
+/* tap: the right foot taps twice, as if keeping time */
+.n-foot { transform-box: fill-box; transform-origin: 15% 100%; }
+@keyframes n-tap {
+  0%, 24%, 48%, 100% { transform: rotate(0) translateY(0); }
+  12%, 36% { transform: rotate(-16deg) translateY(-2px); }
+}
+.niri[data-act='tap'] .n-foot-r { animation: n-tap 1.3s ease-in-out both; }
+@keyframes n-tap-body {
+  0%, 24%, 48%, 100% { transform: translateY(0) rotate(0); }
+  12%, 36% { transform: translateY(-1px) rotate(-1.2deg); }
+}
+.niri[data-act='tap'] .n-micro { animation: n-tap-body 1.3s ease-in-out both; }
+
+/* fidget: Niri fiddles with the costume: lifts the hat, the ribbon and the flag catch a
+   gust, the lamp flashes, the pole is lifted and planted, the tool is held up */
+@keyframes n-hat-lift {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  22%, 48% { transform: translateY(-7px) rotate(-11deg); }
+  66% { transform: translateY(1px) rotate(2deg); }
+  80% { transform: translateY(-1px) rotate(0); }
+}
+.niri[data-act='fidget'] .n-hat { animation: n-hat-lift 1.5s cubic-bezier(0.4, 0, 0.3, 1) both; }
+.niri[data-act='fidget'] .n-flutter { animation: n-flutter 0.3s ease-in-out 5; }
+.niri[data-act='fidget'] .n-cloth { animation: n-cloth 0.4s ease-in-out 4; }
+@keyframes n-lamp-flash {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  20%, 50% { opacity: 1; transform: scale(1.35); }
+  35% { opacity: 0.5; transform: scale(1.1); }
+}
+.niri[data-act='fidget'] .n-lamp { transform-box: fill-box; transform-origin: center; animation: n-lamp-flash 1.2s ease-in-out both; }
+@keyframes n-plant {
+  0%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-9px); }
+  52% { transform: translateY(2px); }
+  64% { transform: translateY(-1.5px); }
+}
+.niri[data-act='fidget'] .n-tool { animation: n-plant 1.2s cubic-bezier(0.4, 0, 0.3, 1) both; }
+@keyframes n-show {
+  0%, 100% { transform: translateY(0) rotate(0) scale(1); }
+  25%, 60% { transform: translateY(-6px) rotate(-10deg) scale(1.12); }
+  78% { transform: translateY(1px) rotate(3deg) scale(1); }
+}
+.niri[data-act='fidget'] .n-item { animation: n-show 1.5s var(--niri-spring) both; }
+.niri[data-act='fidget'] .n-needle { animation: n-needle 0.5s ease-in-out 3; }
+
+/* wobble: too many taps; Niri sways on the spot with spiral eyes */
+@keyframes n-wobble {
+  0%, 100% { transform: rotate(0); }
+  15% { transform: rotate(-7deg); }
+  32% { transform: rotate(6deg); }
+  50% { transform: rotate(-4deg); }
+  68% { transform: rotate(3deg); }
+  84% { transform: rotate(-1deg); }
+}
+.niri[data-act='wobble'] .n-micro { animation: n-wobble 1.3s ease-in-out both; }
+@keyframes n-dizzy { to { transform: rotate(360deg); } }
+.n-dizzy path { animation: n-dizzy 0.9s linear infinite; }
 
 /* The shadow shrinks while Niri is in the air. */
 .n-shadow { transform-box: fill-box; transform-origin: center; }

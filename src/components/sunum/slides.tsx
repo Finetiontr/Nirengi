@@ -138,10 +138,10 @@ function Problem() {
 
 /** Positions on the map, 0–1 on each axis: x = how real the proof is, y = how habitual. */
 const RIVALS = [
-  { name: 'Duolingo, Codewars', x: 0.16, y: 0.84 },
-  { name: 'Youthall, Anbean', x: 0.12, y: 0.2 },
-  { name: 'HackerRank, Coderspace', x: 0.38, y: 0.36 },
-  { name: 'Parker Dewey, Riipen', x: 0.72, y: 0.2 },
+  { name: 'Oyunlaştırılmış öğrenme', x: 0.16, y: 0.84 },
+  { name: 'İlan ve kariyer siteleri', x: 0.12, y: 0.2 },
+  { name: 'Test ve bootcamp', x: 0.38, y: 0.36 },
+  { name: 'Mikro staj', x: 0.72, y: 0.2 },
 ];
 
 function Worlds() {
@@ -222,7 +222,7 @@ function Difference() {
   return (
     <>
       <div className="absolute left-[112px] top-[150px] w-[820px]">
-        <p className="s-in text-[46px] font-bold leading-[1.15] tracking-[-0.03em] text-ink-3">Duolingo’da XP uygulamada kalır.</p>
+        <p className="s-in text-[46px] font-bold leading-[1.15] tracking-[-0.03em] text-ink-3">Başka yerlerde XP uygulamanın içinde kalır.</p>
         <p className="s-in mt-[28px] text-[76px] font-extrabold leading-[1.04] tracking-[-0.04em] text-ink" style={d(260)}>
           Nirengi’de her XP bir <span className="text-indigo">iş makbuzudur.</span>
         </p>

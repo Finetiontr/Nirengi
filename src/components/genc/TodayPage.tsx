@@ -14,6 +14,7 @@ import { Bar, feedback, Head, Ring, Sheet, WeekDots } from '../ui/kit';
 import { Flame, Lock } from '../ui/icons';
 import { ClimbMap, Contours } from '../ui/pafta';
 import ClosestDoor from './ClosestDoor';
+import { openDefter, pages, unread, useWorn } from './defter';
 
 const firstName = (p: Person) => p.name.split(' ')[0];
 
@@ -60,6 +61,8 @@ export default function TodayPage() {
   const closest = personInsight(s, me).closest;
   const [goalOpen, setGoalOpen] = useState(false);
   const [stepOpen, setStepOpen] = useState<{ step: Step; unit: Unit } | null>(null);
+  const niri = useWorn(s, me);
+  const fresh = unread(pages(s, me)).length;
 
   const currentId = units.flatMap((u) => u.steps).find((st) => !st.done)?.id;
 
@@ -74,7 +77,21 @@ export default function TodayPage() {
   return (
     <div className="mx-auto max-w-[600px]">
       {/* Greeting */}
-      <NiriSays mood={p.met ? 'happy' : 'wave'} size={92} gear={me.tier ?? 0} typing>
+      <NiriSays
+        mood={p.met ? 'happy' : 'wave'}
+        size={92}
+        gear={niri.gear}
+        item={niri.item}
+        lively
+        typing
+        wrap={(n) => (
+          // Tapping Niri opens its saha defteri; new pages show as a small count.
+          <button type="button" onClick={() => openDefter()} className="relative -m-1 shrink-0 rounded-[18px] p-1 transition-colors hover:bg-bg-2" aria-label={`Niri’nin saha defterini aç${fresh ? `, ${fresh} yeni sayfa` : ''}`}>
+            {n}
+            {fresh > 0 && <span className="pill num absolute -bottom-1 left-1/2 -translate-x-1/2 whitespace-nowrap bg-indigo !px-2 !py-0.5 text-[12px] text-white">{fresh} yeni</span>}
+          </button>
+        )}
+      >
         <p className="text-[17px] font-extrabold text-ink">
           {greeting()}, {firstName(me)}!
         </p>

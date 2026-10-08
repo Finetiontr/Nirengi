@@ -2,6 +2,18 @@ import { currentMe, useAppState } from '../../lib/store.ts';
 import { league, progress, questsFor, TIERS, XP } from '../../lib/engine/progress.ts';
 import { Bolt, Flame, Shield } from '../ui/icons';
 import { TriMark } from '../ui/TriMark';
+import { openDefter, pages, unread, useDefterStore } from '../genc/defter';
+
+/** Niri's field notebook: an indigo cover with the survey triangle and the elastic band. */
+const NotebookMark = () => (
+  <svg viewBox="0 0 40 40" width="40" height="40" className="shrink-0" aria-hidden="true">
+    <rect x="7" y="4" width="26" height="32" rx="5" fill="rgb(var(--indigo))" />
+    <path d="M7 9h-2M7 15h-2M7 21h-2M7 27h-2M7 33h-2" stroke="rgb(var(--indigo-lip))" strokeWidth="2.4" strokeLinecap="round" />
+    <path d="M18 13.5 24.5 25h-13Z" fill="#fff" stroke="#fff" strokeWidth="2.4" strokeLinejoin="round" />
+    <circle cx="18" cy="21.3" r="2" fill="rgb(var(--indigo))" />
+    <rect x="27" y="4" width="3.4" height="32" fill="rgb(var(--indigo-lip))" />
+  </svg>
+);
 
 /** Right rail on wide screens: one sheet that says where you stand this week; `omit` drops what the page already shows. */
 export default function GencRail({ omit }: { omit?: 'week' | 'route' }) {
@@ -12,6 +24,9 @@ export default function GencRail({ omit }: { omit?: 'week' | 'route' }) {
   const mine = l.rows.find((r) => r.personId === me.id);
   const weekly = questsFor(s, me).filter((q) => q.kind === 'haftalik');
   const left = Math.max(0, Math.ceil((l.endsAt - Date.now()) / 86_400_000));
+  useDefterStore();
+  const book = pages(s, me);
+  const fresh = unread(book).length;
 
   return (
     <div className="sticky top-6 space-y-4">
@@ -86,6 +101,17 @@ export default function GencRail({ omit }: { omit?: 'week' | 'route' }) {
           </div>
         )}
       </section>
+
+      <button type="button" onClick={() => openDefter()} className="card-press flex w-full items-center gap-3 px-4 py-3 text-left">
+        <NotebookMark />
+        <span className="min-w-0 flex-1">
+          <span className="block text-[16px] font-extrabold text-ink">Saha defteri</span>
+          <span className="num block text-[14px] font-bold text-ink-3">
+            {book.filter((b) => b.earned).length}/{book.length} sayfa{fresh ? ` · ${fresh} yeni` : ''}
+          </span>
+        </span>
+        {fresh > 0 && <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-indigo" aria-hidden="true" />}
+      </button>
 
       <p className="px-2 text-[13px] font-bold leading-relaxed text-ink-3">
         XP yalnız doğrulanabilir olaylardan gelir; günde en fazla {XP.dailyCap}.{' '}

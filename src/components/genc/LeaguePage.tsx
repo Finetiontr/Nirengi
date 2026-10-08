@@ -13,6 +13,7 @@ import { Contours, Tri } from '../ui/pafta';
 import { TriMark } from '../ui/TriMark';
 import { Avatar } from '../ui/primitives';
 import Niri from '../ui/Niri';
+import { ENTRIES, openDefter, pages, useWorn, type EntryId, type Page } from './defter';
 
 const DISC = ['indigo', 'cyan', 'purple', 'orange', 'green'] as const;
 const disc = (id: string) => DISC[[...id].reduce((n, c) => n + c.charCodeAt(0), 0) % DISC.length];
@@ -179,68 +180,39 @@ const HOW: { key: Exclude<keyof typeof XP, 'dailyCap'>; label: string }[] = [
   { key: 'support', label: 'Paylaşımının aldığı her destek' },
 ];
 
-// ---------------------------------------------------------------- wardrobe
-
-/** Niri's league wardrobe: each tier adds one piece of field kit (drawn in Niri.tsx). */
-const COSTUMES = [
-  { name: 'İşaret şeridi', text: 'Arazide bir noktayı işaretleyen turuncu şerit. Her ölçüm bir işaretle başlar.' },
-  { name: 'Arazi şapkası', text: 'Uzun arazi günleri için geniş kenarlı şapka. Güneş artık sorun değil.' },
-  { name: 'Bandana ve pafta', text: 'Sırt boyunca yürürken rulo pafta hep sırtında. Yolu kaybetmek yok.' },
-  { name: 'Kask ve jalon', text: 'Sarp yamaçlar için kask, noktayı uzaktan göstermek için kırmızı beyaz jalon.' },
-  { name: 'Zirve bayrağı', text: 'Kar gözlüğü alında, bayrak en tepede. Buradan bütün pafta görünür.' },
-] as const;
+// ---------------------------------------------------------------- saha defteri
 
 const SEEN_KEY = 'nirengi:niri:gear';
+const pad = (n: number) => String(n).padStart(2, '0');
 
-function Wardrobe({ tier, sel, onSelect }: { tier: number; sel: number; onSelect: (i: number) => void }) {
-  const c = COSTUMES[sel];
-  // On phones the row scrolls sideways: start with the current costume in view.
-  const list = useRef<HTMLUListElement>(null);
-  useEffect(() => {
-    const ul = list.current;
-    const li = ul?.children[tier] as HTMLElement | undefined;
-    if (ul && li && ul.scrollWidth > ul.clientWidth) ul.scrollLeft = li.offsetLeft - ul.offsetLeft - (ul.clientWidth - li.offsetWidth) / 2;
-  }, [tier]);
+/** Niri's saha defteri at a glance: every page by number; a tap opens the notebook on it. */
+function DefterCard({ list, wearing }: { list: Page[]; wearing: EntryId[] }) {
+  const earned = list.filter((p) => p.earned).length;
   return (
     <section id="niri-koleksiyonu" className="mt-10 scroll-mt-6" aria-labelledby="koleksiyon">
-      <Head title={<span id="koleksiyon">Niri koleksiyonu</span>} action={<span className="text-[13px] font-bold text-ink-3">{tier + 1}/{COSTUMES.length} kostüm</span>} />
+      <Head title={<span id="koleksiyon">Niri’nin saha defteri</span>} action={<span className="num text-[13px] font-bold text-ink-3">{earned}/{list.length} sayfa</span>} />
       <div className="card mt-4 p-3">
-        <ul ref={list} className="-mx-1 flex snap-x gap-2 overflow-x-auto px-1 pb-1 sm:grid sm:grid-cols-5 sm:overflow-visible" aria-label="Kostümler">
-          {COSTUMES.map((k, i) => {
-            const owned = i <= tier;
-            const on = i === sel;
-            const note = i === tier ? 'Şu an giyiyor' : owned ? (on ? 'Deniyor' : 'Kazandın') : i === tier + 1 ? `${TIERS[i]} Ligi’ne çıkınca açılır` : `${TIERS[i]} Ligi’nde`;
-            return (
-              <li key={k.name} className="w-[96px] shrink-0 snap-start sm:w-auto">
-                <button
-                  type="button"
-                  onClick={() => onSelect(i)}
-                  aria-pressed={on}
-                  className={`flex h-full w-full flex-col items-center rounded-[14px] border-2 px-1.5 pb-2.5 pt-2 text-center transition-colors ${on ? 'border-purple bg-purple-tint' : 'border-transparent hover:bg-bg-2'}`}
-                >
-                  <span className="relative grid h-[68px] w-[68px] place-items-center">
-                    {owned ? (
-                      <Niri gear={i} size={64} react={false} className={on ? '' : 'n-still'} />
-                    ) : (
-                      <>
-                        <Niri gear={i} size={64} react={false} className={`n-still brightness-0 dark:invert ${i === tier + 1 ? 'opacity-[.2]' : 'opacity-[.08]'}`} />
-                        {i > tier + 1 && <Lock size={22} className="absolute" />}
-                      </>
-                    )}
-                  </span>
-                  <span className={`mt-1.5 text-[13px] font-extrabold leading-tight ${owned ? 'text-ink' : 'text-ink-3'}`}>{owned || i === tier + 1 ? k.name : 'Gizli kostüm'}</span>
-                  <span className={`mt-0.5 text-[12px] font-bold leading-tight ${i === tier ? 'text-purple' : 'text-ink-3'}`}>{note}</span>
-                </button>
-              </li>
-            );
-          })}
+        <ul className="-mx-1 flex gap-1 overflow-x-auto px-1 pb-1 sm:grid sm:grid-cols-9 sm:overflow-visible" aria-label="Defterin sayfaları">
+          {list.map((p) => (
+            <li key={p.id} className="w-[64px] shrink-0 sm:w-auto">
+              <button
+                type="button"
+                onClick={() => openDefter(p.id)}
+                aria-label={`No. ${pad(p.no)}, ${p.earned ? p.name : 'açılmamış sayfa'}`}
+                className={`flex w-full flex-col items-center rounded-[12px] border-2 pb-1.5 pt-1.5 transition-colors hover:bg-bg-2 ${wearing.includes(p.id) ? 'border-purple bg-purple-tint' : 'border-transparent'}`}
+              >
+                <Niri size={46} react={false} gear={p.kind === 'costume' ? p.gear : undefined} item={p.item} mood={p.kind === 'tool' ? 'wave' : 'idle'} className={p.earned ? 'n-still' : 'n-still df-ghost'} />
+                <span className="num mt-0.5 font-mono text-[11px] font-bold leading-none text-ink-3">{pad(p.no)}</span>
+              </button>
+            </li>
+          ))}
         </ul>
-        <p className="mt-2 border-t-2 border-line px-2 pt-3 text-[14px] font-bold text-ink-3" aria-live="polite">
-          <b className="text-ink-2">{sel <= tier + 1 ? c.name : 'Gizli kostüm'}</b>
-          {' · '}
-          {sel <= tier ? c.text : `${TIERS[sel]} Ligi’ne çıkınca açılır.`}
-          {tier > 0 && <span className="mt-1 block text-[13px]">Kazandığın bir kostüme dokun, Niri denesin.</span>}
-        </p>
+        <div className="mt-2 flex flex-wrap items-center gap-3 border-t-2 border-line px-2 pt-3">
+          <p className="min-w-0 flex-1 text-[14px] font-bold text-ink-3">Her lig bir kıyafet, her ilk adım bir saha aleti. Niri hepsini defterine yazar.</p>
+          <button type="button" className="btn-line btn-sm" onClick={() => openDefter()}>
+            Defteri aç
+          </button>
+        </div>
       </div>
     </section>
   );
@@ -260,10 +232,9 @@ export default function LeaguePage() {
   const mine = l.rows.find((r) => r.personId === me.id);
   const st = status(l.rows, mine, l.tier);
 
-  // Niri wears this tier's costume; tapping an earned one in the wardrobe tries it on.
-  const [sel, setSel] = useState<number | null>(null);
-  const pick = sel ?? l.tier;
-  const gear = pick <= l.tier ? pick : l.tier;
+  // Niri wears what the person chose in the saha defteri (default: this tier's costume).
+  const list = pages(s, me);
+  const niri = useWorn(s, me);
 
   // A higher tier than last seen grows the wardrobe: celebrate the new costume once.
   useEffect(() => {
@@ -277,11 +248,11 @@ export default function LeaguePage() {
     }
     if (seen !== null && l.tier > seen)
       celebrate({
-        title: `Yeni kostüm: ${COSTUMES[l.tier].name}`,
+        title: `Yeni kostüm: ${ENTRIES[l.tier].name}`,
         gear: l.tier,
         sub: `${l.name} Ligi’ne çıktın. Niri yeni donanımını giydi.`,
-        cta: 'Koleksiyona bak',
-        href: '#niri-koleksiyonu',
+        cta: 'Saha defterine bak',
+        href: `#defter-${ENTRIES[l.tier].id}`,
       });
   }, [l.tier, l.name]);
 
@@ -304,7 +275,7 @@ export default function LeaguePage() {
         <div className="relative">
           <div className="flex items-start justify-between gap-3">
             <div className="flex min-w-0 items-center gap-3">
-              <Niri gear={gear} mood={gear !== l.tier ? 'happy' : 'idle'} size={76} cue={gear} className="-my-1" />
+              <Niri gear={niri.gear} item={niri.item} size={76} cue={`${niri.gear}-${niri.item}`} lively className="-my-1" />
               <div className="min-w-0">
                 <h1 id="lig" className="h-page">
                   {l.name} Ligi
@@ -405,7 +376,7 @@ export default function LeaguePage() {
       </ol>
       <p className="mt-3 text-center text-[13px] font-bold text-ink-3">Lig arkadaşların kurgusal demo verisi.</p>
 
-      <Wardrobe tier={l.tier} sel={pick} onSelect={(i) => setSel(i === l.tier ? null : i)} />
+      <DefterCard list={list} wearing={[niri.costume, ...(niri.tool ? [niri.tool] : [])]} />
 
       <section className="mt-10" aria-labelledby="xp-nasil">
         <Head title={<span id="xp-nasil">XP nasıl kazanılır</span>} action={<span className="text-[13px] font-bold text-ink-3">Günde en fazla {XP.dailyCap} XP</span>} />

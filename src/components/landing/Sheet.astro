@@ -1,0 +1,23 @@
+---
+// A drawn sheet: the white card the story's diagrams sit on, pinned at its corner by a
+// survey marker in the section's tone. Same seam and lip as the Feature sheets.
+import { Tri } from '../ui/pafta';
+
+interface Props {
+  tone: 'orange' | 'cyan' | 'indigo' | 'purple' | 'gold' | 'green';
+  class?: string;
+  [key: `data-${string}`]: string | undefined;
+}
+const { tone, class: cls, ...rest } = Astro.props;
+---
+
+<div class:list={['relative min-w-0', cls]} {...rest}>
+  <span class="absolute -left-2 -top-3 z-10 sm:-left-3 sm:-top-4" aria-hidden="true">
+    <Tri size={30} tone={tone} state="done">
+      <span class="block h-2 w-2 rounded-full bg-white"></span>
+    </Tri>
+  </span>
+  <div class="relative h-full overflow-hidden rounded-[20px] border-2 border-line bg-bg p-4 sm:p-5" style="box-shadow:0 4px 0 rgb(var(--line))">
+    <slot />
+  </div>
+</div>

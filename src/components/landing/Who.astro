@@ -3,7 +3,8 @@
 // from; Niri stands on its pillar and sights the points of your map. Measured work is a
 // filled marker with a drawn sight line; a mere claim stays dashed and unmeasured.
 // Lines draw and markers pop once the sheet scrolls in; at rest everything is drawn.
-import Niri from '../ui/Niri';
+// Niri arrives plain and twirls into the first league's ribbon (Zemin): the climb starts here.
+import TwirlIn from './TwirlIn';
 import { Tri } from '../ui/pafta';
 import { LevelGlyph } from '../ui/primitives';
 
@@ -19,7 +20,7 @@ const pc = (v: number, of: number) => `${((v / of) * 100).toFixed(2)}%`;
 ---
 
 <section id="niri" class="relative overflow-hidden border-b-2 border-line" aria-labelledby="who-title">
-  <div class="mx-auto grid max-w-[1120px] items-center gap-8 px-4 py-14 sm:px-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-12 lg:py-24">
+  <div class="mx-auto grid max-w-[var(--frame,1120px)] items-center gap-8 px-4 py-14 sm:px-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-12 lg:py-16">
     <div data-reveal>
       <h2 id="who-title" class="text-[clamp(30px,4vw,46px)] font-black leading-[1.08] tracking-[-0.025em] text-ink">
         Ben bir <span class="text-indigo">nirengi noktasıyım.</span>
@@ -67,7 +68,7 @@ const pc = (v: number, of: number) => `${((v / of) * 100).toFixed(2)}%`;
         <div class="who-pt absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center" style={`left:${pc(claim.x, 500)};top:${pc(claim.y, 340)};--d:1.1s`}>
           <Tri size={38} tone="indigo" state="waiting" />
           <span class="mt-1 whitespace-nowrap rounded-[8px] bg-bg px-1.5 text-center text-[12px] font-semibold sm:text-[13px] leading-tight text-ink-3">
-            “Excel biliyorum”<br /><span class="font-bold">ölçülmedi</span>
+            “Veri analizi biliyorum”<br /><span class="font-bold">ölçülmedi</span>
           </span>
         </div>
 
@@ -87,7 +88,7 @@ const pc = (v: number, of: number) => `${((v / of) * 100).toFixed(2)}%`;
 
         {/* Niri on the pillar: feet on the plate (sheet y 236 → 69.4%), 24% of the width wide. */}
         <div class="absolute left-[38%] top-[33.4%] w-[24%] [&_svg]:h-auto [&_svg]:w-full">
-          <Niri client:visible mood="happy" size={132} cue="in" />
+          <TwirlIn client:visible mood="happy" size={132} gear={0} />
         </div>
       </div>
     </div>

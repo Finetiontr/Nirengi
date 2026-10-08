@@ -1,7 +1,7 @@
 ---
 // First screen: the hero sits on a map sheet. A survey trail climbs through
-// four triangle markers (the league elevations); Niri climbs it marker by marker,
-// lands on the summit and waves (HeroNiri), then the flag drops in beside it.
+// four triangle markers (the league elevations); Niri hops it marker by marker, landing
+// on each marker's tip, reaches the summit and waves (HeroNiri), then the flag drops in.
 import { Contours, Tri } from '../ui/pafta';
 import HeroNiri from './HeroNiri';
 
@@ -39,6 +39,10 @@ const marks = [
   { at: pts[3], size: 66, tone: 'purple', state: 'done', label: 'Doruk', delay: 1.4 },
 ] as const;
 
+// Where Niri's feet land: the tip of each marker (the triangle's apex sits 3% below the
+// top of its box, which is drawn from y - 0.55 * size), then the summit itself.
+const stops: Pt[] = [...marks.map((m): Pt => [m.at[0], m.at[1] - m.size * 0.52 + 2]), summit];
+
 const NIRI = 150;
 // The sheet's scale steps, shared with the island that draws Niri on top of it.
 const SHEET = 'scale-[0.66] sm:scale-[0.8] lg:scale-[0.88] xl:scale-[1.05]';
@@ -53,7 +57,7 @@ const rings = [
 <section class="relative overflow-hidden border-b-2 border-line" aria-labelledby="hero-title">
   <Contours seed={2} x={0.7} y={0.52} rings={12} step={34} opacity={0.5} className="[mask-image:linear-gradient(to_right,transparent_8%,black_55%)] max-lg:[mask-image:linear-gradient(to_bottom,black_35%,transparent_60%)]" />
 
-  <div class="relative mx-auto grid max-w-[1120px] items-center gap-4 px-4 pb-12 pt-5 sm:px-6 lg:grid-cols-[1fr_auto] lg:gap-10 lg:pb-20 lg:pt-10">
+  <div class="relative mx-auto grid max-w-[var(--frame,1120px)] items-center gap-4 px-4 pb-12 pt-5 sm:px-6 lg:grid-cols-[1fr_auto] lg:gap-10 lg:pb-20 lg:pt-10">
     <div class="order-last text-center lg:order-none lg:text-left">
       <h1 id="hero-title" class="h-hero rise">Yaptığın işle <span class="text-indigo">fark edil.</span></h1>
       <p class="lead rise mx-auto mt-4 max-w-[38ch] lg:mx-0" style="animation-delay:80ms">
@@ -69,6 +73,7 @@ const rings = [
     <!-- The sheet is drawn at 500x420 and scaled down as one piece on small screens. -->
     <div
       data-narrate-hero
+      data-climb
       class="relative mx-auto h-[277px] w-[330px] sm:h-[336px] sm:w-[400px] lg:h-[370px] lg:w-[440px] xl:h-[441px] xl:w-[525px]"
     >
       <div
@@ -99,7 +104,7 @@ const rings = [
         {
           marks.map((m) => (
             <>
-              <div class="pop absolute" style={`left:${m.at[0] - m.size / 2}px;top:${m.at[1] - m.size * 0.55}px;animation-delay:${m.delay}s`}>
+              <div data-mark class="pop absolute" style={`left:${m.at[0] - m.size / 2}px;top:${m.at[1] - m.size * 0.55}px;animation-delay:${m.delay}s`}>
                 <Tri size={m.size} tone={m.tone} state={m.state}>
                   {m.state === 'done' && <span class="block h-3 w-3 rounded-full bg-white"></span>}
                 </Tri>
@@ -115,9 +120,9 @@ const rings = [
         }
 
         {/* a planted flag at the summit */}
-        <svg viewBox="0 0 30 60" width="30" height="60" class="c-flag absolute overflow-visible" style={`left:${summit[0] - 92}px;top:${summit[1] - 56}px;--d:2.5s`} aria-hidden="true">
+        <svg viewBox="0 0 30 60" width="30" height="60" class="hero-flag absolute overflow-visible" style={`left:${summit[0] - 92}px;top:${summit[1] - 56}px;--d:0s`} aria-hidden="true">
           <path d="M5 4v54" stroke="rgb(var(--ink-3))" stroke-width="3" stroke-linecap="round"></path>
-          <g class="c-cloth" style="--d:2.5s">
+          <g class="c-cloth" style="--d:0s">
             <path d="M7 5 26 12 7 20Z" fill="rgb(var(--orange))" stroke="rgb(var(--orange))" stroke-width="3" stroke-linejoin="round"></path>
           </g>
         </svg>
@@ -132,7 +137,7 @@ const rings = [
       </div>
       </div>
 
-      <HeroNiri client:load trail={trail} size={NIRI} sheet={SHEET} />
+      <HeroNiri client:load stops={stops} size={NIRI} sheet={SHEET} />
     </div>
   </div>
 </section>
@@ -156,50 +161,17 @@ const rings = [
 </style>
 
 <style is:global>
-  /* Niri's climb (HeroNiri): four hops along the trail, one per marker, growing as it
-     nears the summit. The resting state is the summit, so no animation means "arrived". */
-  .climb {
-    offset-distance: 100%;
-    offset-rotate: 0deg;
-    offset-anchor: 50% 90%;
-    transform-origin: 50% 90%;
-    animation: climb 2s linear 0.35s both;
-  }
-  .climb-hop {
-    transform-origin: 50% 90%;
-    animation: climb-hop 2s linear 0.35s both, climb-grow 2s linear 0.35s both;
-  }
-  /* Rests at 28.9 / 52.6 / 79% are where the markers sit on the trail. */
-  @keyframes climb {
-    0% { offset-distance: 0%; opacity: 0; }
-    5% { opacity: 1; }
-    8% { offset-distance: 0%; animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1); }
-    26%, 33% { offset-distance: 28.9%; animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1); }
-    51%, 58% { offset-distance: 52.6%; animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1); }
-    76%, 83% { offset-distance: 79%; animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1); }
-    97%, 100% { offset-distance: 100%; opacity: 1; }
-  }
-  /* Size lives on the inner element: a scale on .climb would also scale the offset. */
-  @keyframes climb-grow {
-    0%, 8% { scale: 0.5; }
-    26%, 33% { scale: 0.6; }
-    51%, 58% { scale: 0.7; }
-    76%, 83% { scale: 0.8; }
-    97%, 100% { scale: 1; }
-  }
-  @keyframes climb-hop {
-    0%, 4% { transform: none; }
-    8%, 33%, 58%, 83% { transform: scale(1.12, 0.86); animation-timing-function: cubic-bezier(0.2, 0.8, 0.3, 1); }
-    17%, 42%, 67%, 92% { transform: translateY(-46px) scale(0.94, 1.08); animation-timing-function: cubic-bezier(0.55, 0, 0.9, 0.6); }
-    26%, 51%, 76% { transform: scale(1.1, 0.88); animation-timing-function: ease-out; }
-    29%, 54%, 79% { transform: none; }
-    97% { transform: scale(1.1, 0.88); animation-timing-function: ease-out; }
-    100% { transform: none; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .climb,
-    .climb-hop {
-      animation: none;
+  /* Until the climb starts (HeroNiri sets data-go) the server's summit pose stays hidden,
+     and the flag waits for the landing (data-landed). If the script never runs, the
+     failsafe shows the end pose. Reduced motion shows it at once. */
+  @media (prefers-reduced-motion: no-preference) {
+    .js [data-climb]:not([data-go]) .hero-climber,
+    .js [data-climb]:not([data-landed]) .hero-bubble,
+    .js [data-climb]:not([data-landed]) .hero-flag {
+      opacity: 0;
+    }
+    .js [data-climb]:not([data-go]) :is(.hero-climber, .hero-bubble, .hero-flag) {
+      animation: reveal-failsafe 0s 3.6s forwards;
     }
   }
 </style>

@@ -4,7 +4,7 @@
 // of its tail; with `typing` the text then types in while Niri talks.
 
 import { Children, cloneElement, isValidElement, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
-import Niri, { type Dir, type Look, type Mood } from './Niri';
+import Niri, { type Dir, type Item, type Look, type Mood } from './Niri';
 
 export interface NiriSaysProps {
   mood?: Mood;
@@ -21,6 +21,12 @@ export interface NiriSaysProps {
   entrance?: boolean;
   /** League costume, passed through to Niri (genç side only). */
   gear?: number;
+  /** Field tool in Niri's hand, passed through (genç side only). */
+  item?: Item;
+  /** Extra idle life, passed through (genç side only). */
+  lively?: boolean;
+  /** Wraps the Niri, e.g. in a button that opens the saha defteri. */
+  wrap?: (niri: ReactNode) => ReactNode;
   className?: string;
 }
 
@@ -61,7 +67,7 @@ function reveal(node: ReactNode, n: number): ReactNode {
   return walk(node);
 }
 
-export default function NiriSays({ mood = 'idle', size = 92, children, side = 'right', typing = false, point, look, entrance = true, gear, className = '' }: NiriSaysProps) {
+export default function NiriSays({ mood = 'idle', size = 92, children, side = 'right', typing = false, point, look, entrance = true, gear, item, lively, wrap, className = '' }: NiriSaysProps) {
   const text = textOf(children);
   const bubble = useRef<HTMLDivElement>(null);
   const seen = useRef(text);
@@ -104,9 +110,10 @@ export default function NiriSays({ mood = 'idle', size = 92, children, side = 'r
   }, [typing, text, entrance]);
 
   const left = side === 'left';
+  const niri = <Niri mood={typed ? 'talk' : mood} size={size} point={point} look={look} cue={entrance ? text : undefined} gear={gear} item={item} lively={lively} />;
   return (
     <div className={`flex items-end gap-3 ${left ? 'flex-row-reverse' : ''} ${className}`}>
-      <Niri mood={typed ? 'talk' : mood} size={size} point={point} look={look} cue={entrance ? text : undefined} gear={gear} />
+      {wrap ? wrap(niri) : niri}
       <div
         ref={bubble}
         className="n-bubble relative mb-4 min-w-0 flex-1 rounded-[18px] border-2 border-line bg-bg px-4 py-3"

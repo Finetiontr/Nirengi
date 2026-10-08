@@ -1,26 +1,48 @@
 ---
-// The landing's body: the feature sections, with Niri narrating them. On wide screens
-// (with JS) the narrator is a sticky column beside the sections; everywhere else each
-// section carries its own inline bubble, which is also what shows without JS.
+// The landing's body: the story sections, with Niri narrating them. Sections are full
+// bleed (their bands and contours run edge to edge); their content sits in one centred
+// frame. On wide screens (with JS) that frame keeps a left rail where the sticky
+// narrator lives, so Niri is part of the composition instead of a gutter beside it.
+// Everywhere else each section carries its own inline bubble, which is also what shows
+// without JS. Section content uses `.wrap` to join the frame.
 import Narrator from './Narrator';
 import type { Line } from './Say';
 
 interface Props {
   lines: Line[];
+  tiers: Line[];
 }
-const { lines } = Astro.props;
+const { lines, tiers } = Astro.props;
 ---
 
 <div class="story">
   <aside class="story-aside" aria-hidden="true">
-    <Narrator client:load lines={lines} />
+    <div class="story-rail">
+      <Narrator client:load lines={lines} tiers={tiers} />
+    </div>
   </aside>
-  <div class="story-main">
-    <slot />
-  </div>
+  <slot />
 </div>
 
 <style is:global>
+  /* The landing's one frame: nav, hero, story, closing (and footer) share this width, so
+     their left edges line up. Other pages keep the 1120px default. */
+  :root {
+    --frame: 1120px;
+  }
+  @media (min-width: 1280px) {
+    :root {
+      --frame: 1280px;
+    }
+  }
+  @media (min-width: 1600px) {
+    :root {
+      --frame: 1360px;
+    }
+  }
+  .story {
+    position: relative;
+  }
   .story-aside {
     display: none;
   }
@@ -28,17 +50,41 @@ const { lines } = Astro.props;
   .say-sr {
     display: none;
   }
+  /* The bubble steps back while Niri turns, then grows in with the new line. */
+  .say-bubble[data-out] {
+    animation: say-out 140ms ease-in both;
+  }
+  @keyframes say-out {
+    to { opacity: 0; transform: scale(0.94); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .say-bubble[data-out] { animation: none; }
+  }
   @media (min-width: 1280px) {
     .js .story {
-      display: grid;
-      grid-template-columns: clamp(336px, 25vw, 372px) minmax(0, 1fr);
-      column-gap: 24px;
-      max-width: 1400px;
-      margin-inline: auto;
-      padding-inline: 24px;
+      --rail: 288px;
+      --gap: 56px;
     }
     .js .story-aside {
       display: block;
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      pointer-events: none;
+    }
+    .js .story-rail {
+      height: 100%;
+      max-width: var(--frame);
+      margin-inline: auto;
+      padding-inline: 24px;
+    }
+    .js .story-rail [data-narrator] {
+      width: var(--rail);
+    }
+    .js .story .wrap {
+      max-width: var(--frame);
+      padding-left: calc(24px + var(--rail) + var(--gap));
+      padding-right: 24px;
     }
     .js .say-inline {
       display: none;
@@ -52,6 +98,12 @@ const { lines } = Astro.props;
       overflow: hidden;
       clip: rect(0 0 0 0);
       white-space: nowrap;
+    }
+  }
+  @media (min-width: 1600px) {
+    .js .story {
+      --rail: 312px;
+      --gap: 72px;
     }
   }
 </style>
