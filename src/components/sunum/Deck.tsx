@@ -1,11 +1,13 @@
 // The stage deck: one idea per slide, Niri on stage with one short line each.
 // Keys: →, Space, PageDown next; ←, PageUp back; Home/End; 1–9 and 0 jump;
-// F fullscreen; B blanks the screen; T flips the theme for this visit.
-// A click anywhere but a link or key advances. The slide number lives in the
-// hash, so a reload or a shared link lands on the same slide.
+// F fullscreen; B blanks the screen; T flips the theme for this visit; N opens the
+// presenter window (/sunum?notlar) with the speaker notes, which follows the deck
+// and can drive it. A click anywhere but a link or key advances. The slide number
+// lives in the hash, so a reload or a shared link lands on the same slide.
 
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type MouseEvent } from 'react';
-import NiriSays from '../ui/NiriSays';
+import StageNiri from './StageNiri';
+import Presenter, { CHANNEL, type Msg } from './Presenter';
 import { SLIDES, type Mark } from './slides';
 import './sunum.css';
 
@@ -23,7 +25,7 @@ function fromHash(): number {
   return Number.isFinite(n) ? clamp(n - 1) : 0;
 }
 
-export default function Deck() {
+function Stage() {
   const [i, setI] = useState(0);
   const [moved, setMoved] = useState(false);
   const [blank, setBlank] = useState(false);
@@ -65,6 +67,30 @@ export default function Deck() {
     return () => window.removeEventListener('hashchange', onHash);
   }, []);
 
+  // The presenter window follows the deck and can drive it.
+  const channel = useRef<BroadcastChannel | null>(null);
+  const iRef = useRef(i);
+  iRef.current = i;
+  useEffect(() => {
+    if (typeof BroadcastChannel === 'undefined') return;
+    const ch = new BroadcastChannel(CHANNEL);
+    channel.current = ch;
+    ch.onmessage = (e: MessageEvent<Msg>) => {
+      if (e.data.type === 'go') go(e.data.i);
+      else if (e.data.type === 'hello') ch.postMessage({ type: 'at', i: iRef.current } satisfies Msg);
+    };
+    return () => {
+      ch.close();
+      channel.current = null;
+    };
+  }, [go]);
+  useEffect(() => channel.current?.postMessage({ type: 'at', i } satisfies Msg), [i]);
+
+  const notes = useCallback(() => {
+    const w = window.open(`/sunum?notlar#${i + 1}`, 'nirengi-notlar', 'width=1100,height=760');
+    if (!w) say('Açılır pencere engellendi; /sunum?notlar adresini ayrı bir pencerede aç.');
+  }, [i, say]);
+
   useEffect(() => {
     const want = `#${i + 1}`;
     if (location.hash !== want) history.replaceState(null, '', want);
@@ -85,6 +111,7 @@ export default function Deck() {
       else if (k === 'End') go(last);
       else if (/^[0-9]$/.test(k)) go(k === '0' ? 9 : Number(k) - 1);
       else if (k === 'f' || k === 'F') fullscreen();
+      else if (k === 'n' || k === 'N') notes();
       else if (k === 'b' || k === 'B' || k === '.') setBlank((b) => !b);
       else if (k === 't' || k === 'T') {
         const d = document.documentElement;
@@ -94,7 +121,7 @@ export default function Deck() {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [i, go, fullscreen]);
+  }, [i, go, fullscreen, notes]);
 
   // The cursor hides after a moment of stillness so it never sits on a slide.
   useEffect(() => {
@@ -136,13 +163,13 @@ export default function Deck() {
               <View />
             </section>
 
-            <div className="narrator" style={{ left: mark.left, bottom: mark.bottom, width: mark.width }} aria-live="polite">
-              <NiriSays mood={slide.niri.mood} point={slide.niri.point} size={mark.size} side={mark.side} typing>
-                <span className="block px-2 py-1 text-[29px] font-bold leading-[1.3] tracking-[-0.01em] text-ink">{slide.niri.line}</span>
-              </NiriSays>
-            </div>
           </>
         )}
+
+        {/* Niri stays mounted across slides (and a blank screen) so every change is a twirl. */}
+        <div className={`narrator ${blank ? 'invisible' : ''}`} style={{ left: mark.left, bottom: mark.bottom, width: mark.width }} aria-live="polite">
+          <StageNiri line={{ key: slide.id, ...slide.niri, text: slide.niri.line, size: mark.size, side: mark.side }} />
+        </div>
 
         {/* A quiet counter: the route so far as small survey markers. */}
         <div className="absolute right-[48px] top-[34px] flex items-center gap-3" aria-hidden="true">
@@ -169,6 +196,8 @@ export default function Deck() {
             <kbd className="s-kbd">→</kbd> ya da <kbd className="s-kbd">boşluk</kbd> ileri
             <span className="mx-2 text-line-2">·</span>
             <kbd className="s-kbd">F</kbd> tam ekran
+            <span className="mx-2 text-line-2">·</span>
+            <kbd className="s-kbd">N</kbd> konuşmacı notları
           </p>
         )}
 
@@ -180,4 +209,12 @@ export default function Deck() {
       </div>
     </div>
   );
+}
+
+/** The deck, or with ?notlar the presenter window that follows it. */
+export default function Deck() {
+  // Decided after hydration: the prerendered page is the stage.
+  const [notes, setNotes] = useState(false);
+  useEffect(() => setNotes(new URLSearchParams(location.search).has('notlar')), []);
+  return notes ? <Presenter /> : <Stage />;
 }

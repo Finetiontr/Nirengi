@@ -3,9 +3,12 @@
 // on the right for the opening and the close, 'dock' bottom-left elsewhere, so
 // every slide keeps that corner (x < 760, y > 700) free.
 //
-// Numbers come from docs/PAZAR-ANALIZI.md with their sources; product numbers
-// from the engine. Nothing here is invented: people and institutions in the
-// demo are fictional and the deck says so.
+// The arc is the one a jury and investors look for: problem, why now, solution,
+// product, trust, demo, market, competition, how it lives, where we are, what we
+// will measure, roadmap, the ask. Numbers come from docs/PAZAR-ANALIZI.md with
+// their sources on the slide; product numbers from the engine. Nothing here is
+// invented: plans are labelled as plans, and people and institutions in the demo
+// are fictional and the deck says so. No third-party brand names: categories only.
 
 import type { CSSProperties, ReactNode } from 'react';
 import { Check } from 'lucide-react';
@@ -15,6 +18,8 @@ import { SurveyFlag } from '../ui/kit';
 import { LevelGlyph } from '../ui/primitives';
 import { Bolt, Compass, Flame, Mark as BrandMark, Route, Shield } from '../ui/icons';
 import { PUBLISH_THRESHOLD } from '../../lib/engine/canvas.ts';
+import { GENESIS, sha256, shortHash } from '../../lib/engine/ledger.ts';
+import { WEIGHTS } from '../../lib/engine/match.ts';
 import { TIERS, XP } from '../../lib/engine/progress.ts';
 
 export type Mark = 'hero' | 'dock';
@@ -23,12 +28,13 @@ export interface Slide {
   id: string;
   title: string;
   mark: Mark;
-  niri: { mood: Mood; line: string; point?: Dir };
+  /** Niri's line. `gear` is the league costume (climbing toward Zirve by the close); `turns` the twirl into it. */
+  niri: { mood: Mood; line: string; point?: Dir; gear?: number; turns?: 1 | 2 };
   View: () => ReactNode;
 }
 
 /** The team fills this in before going on stage; until then the close shows a dashed placeholder. */
-const TEAM: string[] = [];
+const TEAM: string[] = ['Sezer Uzun', 'Emirhan Açık'];
 
 const d = (ms: number) => ({ '--d': `${ms}ms` }) as CSSProperties;
 const f = (n: number) => n.toLocaleString('tr-TR');
@@ -39,6 +45,11 @@ function Heading({ children, width = 1180, className = '' }: { children: ReactNo
       {children}
     </h2>
   );
+}
+
+/** A figure's source, small and quiet under it. */
+function Src({ children, className = '' }: { children: ReactNode; className?: string }) {
+  return <p className={`s-cap !text-[16px] ${className}`}>{children}</p>;
 }
 
 function Wordmark({ size }: { size: number }) {
@@ -65,7 +76,12 @@ function Ping({ tone = 'indigo', size = 90 }: { tone?: string; size?: number }) 
   );
 }
 
-// ---------------------------------------------------------------- 1 title
+function Tag({ who, children }: { who: 'genc' | 'kurum' | 'plan'; children: ReactNode }) {
+  const tone = who === 'genc' ? 'bg-cyan-tint text-cyan-lip' : who === 'kurum' ? 'bg-indigo-tint text-indigo' : 'bg-bg-3 text-ink-2';
+  return <span className={`pill !px-[12px] !text-[17px] ${tone}`}>{children}</span>;
+}
+
+// ---------------------------------------------------------------- title
 
 function Title() {
   return (
@@ -92,113 +108,101 @@ function Title() {
   );
 }
 
-// ---------------------------------------------------------------- 2 problem
-
-const STATS = [
-  {
-    value: '%71,0',
-    text: 'BİT uzmanı almakta zorlanan girişimlerin “ilgili iş deneyimi yok” diyen payı',
-    src: 'TÜİK, Girişimlerde BİT Kullanımı 2025',
-  },
-  {
-    value: '%13,0',
-    text: '15–24 yaş işsizliği; genç kadınlarda %19,4',
-    src: 'TÜİK, Ağustos 2026',
-  },
-  {
-    value: '%23,3',
-    text: '15–24 yaşta ne eğitimde ne istihdamda olanlar',
-    src: 'TÜİK, 2025',
-  },
-  {
-    value: '700’de 1',
-    text: 'Diploma şartını kaldıran şirketlerde gerçekten değişen işe alım: bundan bile az',
-    src: 'Harvard Business School ve Burning Glass Institute, 2024',
-  },
-];
+// ---------------------------------------------------------------- problem: two sides, sourced
 
 function Problem() {
   return (
     <>
       <Heading width={1400}>Deneyim yoksa iş yok. İş yoksa deneyim yok.</Heading>
-      <div className="absolute left-[112px] top-[206px] grid w-[1376px] grid-cols-2 gap-[20px]">
-        {STATS.map((s, n) => (
-          <div key={s.value} className="s-in h-[222px] rounded-[18px] border-2 border-line bg-bg px-[32px] py-[22px]" style={d(120 + n * 90)}>
-            <p className="num text-[70px] font-extrabold leading-none tracking-[-0.04em] text-ink">{s.value}</p>
-            <p className="mt-[14px] text-[23px] font-semibold leading-[1.3] text-ink-2">{s.text}</p>
-            <p className="s-cap mt-[8px] !text-[16px]">{s.src}</p>
+
+      {/* Genç: ends above Niri's corner. */}
+      <div className="s-in absolute left-[112px] top-[214px] w-[640px]" style={d(120)}>
+        <div className="flex items-center gap-[14px]">
+          <Tag who="genc">Genç</Tag>
+          <p className="s-t !text-[28px]">görünmüyor</p>
+        </div>
+        <p className="num mt-[22px] text-[104px] font-extrabold leading-none tracking-[-0.045em] text-ink">%23,3</p>
+        <p className="mt-[12px] text-[24px] font-semibold leading-[1.3] text-ink-2">15–24 yaşta ne eğitimde ne istihdamda olanlar. 2024’te AB ülkeleriyle kıyaslandığında en yüksek oran.</p>
+        <Src className="mt-[8px]">TÜİK, 2025 · Betam ve Eurostat, 2024</Src>
+        <div className="mt-[22px] flex items-baseline gap-[18px] border-t-2 border-line pt-[18px]">
+          <p className="num text-[44px] font-extrabold leading-none tracking-[-0.03em] text-ink">%13,0</p>
+          <div>
+            <p className="text-[21px] font-semibold leading-[1.3] text-ink-2">15–24 yaş işsizliği; genç kadınlarda %19,4</p>
+            <Src>TÜİK, Ağustos 2026</Src>
           </div>
-        ))}
+        </div>
       </div>
+
+      {/* Kurum. */}
+      <div className="s-in absolute left-[848px] top-[214px] w-[640px]" style={d(260)}>
+        <div className="flex items-center gap-[14px]">
+          <Tag who="kurum">Kurum</Tag>
+          <p className="s-t !text-[28px]">emin olamıyor</p>
+        </div>
+        <p className="num mt-[22px] text-[104px] font-extrabold leading-none tracking-[-0.045em] text-ink">%71,0</p>
+        <p className="mt-[12px] text-[24px] font-semibold leading-[1.3] text-ink-2">BİT uzmanı almakta zorlanan girişimlerin “ilgili iş deneyimi yok” diyen payı.</p>
+        <Src className="mt-[8px]">TÜİK, Girişimlerde BİT Kullanımı 2025</Src>
+        <div className="mt-[22px] flex items-baseline gap-[18px] border-t-2 border-line pt-[18px]">
+          <p className="num text-[44px] font-extrabold leading-none tracking-[-0.03em] text-ink">%10,8</p>
+          <div>
+            <p className="text-[21px] font-semibold leading-[1.3] text-ink-2">10–49 çalışanlı girişimlerde BİT uzmanı çalıştıranlar</p>
+            <Src>TÜİK, BİT bülteni 2026</Src>
+          </div>
+        </div>
+      </div>
+
+      <svg viewBox="0 0 4 470" width="4" height="470" className="absolute left-[798px] top-[214px]" aria-hidden="true">
+        <path d="M2 2V468" stroke="rgb(var(--line-2))" strokeWidth="3" strokeDasharray="2 10" strokeLinecap="round" />
+      </svg>
     </>
   );
 }
 
-// ---------------------------------------------------------------- 3 two worlds
+// ---------------------------------------------------------------- why now: a timeline
 
-/** Positions on the map, 0–1 on each axis: x = how real the proof is, y = how habitual. */
-const RIVALS = [
-  { name: 'Oyunlaştırılmış öğrenme', x: 0.16, y: 0.84 },
-  { name: 'İlan ve kariyer siteleri', x: 0.12, y: 0.2 },
-  { name: 'Test ve bootcamp', x: 0.38, y: 0.36 },
-  { name: 'Mikro staj', x: 0.72, y: 0.2 },
-];
-
-function Worlds() {
-  const W = 740;
-  const H = 440;
-  const px = (x: number) => 40 + x * (W - 80);
-  const py = (y: number) => H - 40 - y * (H - 80);
+function WhyNow() {
+  const marks = [
+    { when: 'Şubat 2024', value: '700’de 1', text: 'Diploma şartını kaldıran şirketlerde gerçekten değişen işe alım: bundan bile az.', src: 'Harvard Business School ve Burning Glass Institute' },
+    { when: 'Ocak 2025', value: '%63', text: 'İşverenlerin dönüşümdeki 1 numaralı engeli: beceri açığı.', src: 'Dünya Ekonomik Forumu, İşlerin Geleceği 2025' },
+    { when: 'Ağustos 2025', value: '%13', text: 'Yapay zekâya en açık mesleklerde 22–25 yaş istihdamındaki görece düşüş. Deneyimlilerde düşüş yok.', src: 'Stanford, ABD bordro verisi' },
+  ];
+  const COL = 344;
   return (
     <>
-      <Heading width={1400}>İki dünya var, birbirine dokunmuyor.</Heading>
-      <div className="absolute left-[112px] top-[244px] flex w-[560px] flex-col gap-[20px]">
-        <div className="s-in rounded-[18px] border-2 border-line px-[26px] py-[22px]" style={d(120)}>
-          <p className="s-t">Oyunlaştırılmış öğrenme</p>
-          <p className="s-p mt-[8px] !text-ink-3">Seri, lig, XP. Alışkanlık kurar ama XP uygulamada kalır.</p>
+      <Heading>Neden şimdi?</Heading>
+      <p className="s-in absolute left-[112px] top-[180px] w-[1100px] text-[28px] font-medium leading-[1.35] text-ink-3" style={d(80)}>
+        Beceriye bakma niyeti var, ölçme aracı yok. İlk deneyimin kapısı ise daralıyor.
+      </p>
+      <svg viewBox="0 0 1376 40" width="1376" height="40" className="absolute left-[112px] top-[262px]" aria-hidden="true">
+        <path d={`M20 20H${COL * 3 + 20}`} stroke="rgb(var(--line-2))" strokeWidth="5" strokeDasharray="2 14" strokeLinecap="round" />
+        <path d={`M${COL * 3 + 20} 20H1356`} stroke="rgb(var(--indigo) / 0.6)" strokeWidth="5" strokeDasharray="2 14" strokeLinecap="round" />
+      </svg>
+      {marks.map((m, n) => (
+        <div key={m.when} className="s-in absolute w-[312px]" style={{ left: 112 + n * COL, top: 250, ...d(160 + n * 120) }}>
+          <span className="block w-fit rounded-[8px] bg-bg">
+            <Tri size={52} state="waiting" />
+          </span>
+          <p className="mt-[16px] text-[19px] font-bold text-ink-3">{m.when}</p>
+          <p className="num mt-[6px] text-[76px] font-extrabold leading-none tracking-[-0.04em] text-ink">{m.value}</p>
+          <p className="mt-[12px] text-[21px] font-semibold leading-[1.32] text-ink-2">{m.text}</p>
+          <Src className="mt-[8px]">{m.src}</Src>
         </div>
-        <div className="s-in rounded-[18px] border-2 border-line px-[26px] py-[22px]" style={d(220)}>
-          <p className="s-t">İşe alım platformları</p>
-          <p className="s-p mt-[8px] !text-ink-3">CV, test skoru, katılım sertifikası. Tek seferlik bir eşik.</p>
-        </div>
-      </div>
-
-      {/* The map: x from declared to verified real work, y from one-off to habit. */}
-      <div className="s-in absolute left-[748px] top-[214px] w-[740px]" style={d(320)}>
-        <div className="relative h-[440px] w-[740px] overflow-hidden rounded-[18px] border-2 border-line">
-          <Contours seed={5} x={0.9} y={0.15} rings={10} step={34} opacity={0.4} />
-          <div className="absolute right-0 top-0 h-1/2 w-1/2 bg-indigo-tint/60" />
-          <svg viewBox={`0 0 ${W} ${H}`} className="absolute inset-0 h-full w-full" aria-hidden="true">
-            <path d={`M${W / 2} 16V${H - 16}M16 ${H / 2}H${W - 16}`} stroke="rgb(var(--line-2))" strokeWidth="2" strokeDasharray="2 10" strokeLinecap="round" />
-          </svg>
-          {RIVALS.map((r) => (
-            <div key={r.name} className="absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center" style={{ left: px(r.x), top: py(r.y) }}>
-              <Tri size={40} state="locked" />
-              <p className="mt-[6px] whitespace-nowrap rounded-[8px] bg-bg px-[8px] py-[2px] text-[19px] font-semibold text-ink-2">{r.name}</p>
-            </div>
-          ))}
-          <div className="absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center" style={{ left: px(0.82), top: py(0.8) }}>
-            <span className="relative block">
-              <Ping />
-              <Tri size={64} />
-            </span>
-            <p className="mt-[8px] rounded-[8px] bg-bg px-[10px] py-[2px] text-[26px] font-black tracking-[-0.03em] text-indigo">nirengi</p>
-          </div>
-        </div>
-        <div className="mt-[12px] flex justify-between text-[18px] font-bold text-ink-3">
-          <span>Beyan, katılım</span>
-          <span>Dışarıda doğrulanmış gerçek iş</span>
-        </div>
-        <div className="absolute left-[-36px] top-0 flex h-[440px] w-[24px] flex-col items-center justify-between text-[18px] font-bold text-ink-3">
-          <span className="[writing-mode:vertical-rl] rotate-180">Alışkanlık</span>
-          <span className="[writing-mode:vertical-rl] rotate-180">Tek seferlik</span>
-        </div>
+      ))}
+      <div className="s-in absolute w-[312px]" style={{ left: 112 + 3 * COL, top: 250, ...d(520) }}>
+        <span className="relative block w-fit">
+          <Ping size={70} />
+          <Tri size={52} />
+        </span>
+        <p className="mt-[16px] text-[19px] font-bold text-indigo">Bugün</p>
+        <p className="mt-[8px] text-[34px] font-extrabold leading-[1.08] tracking-[-0.03em] text-ink">Taşınabilir kanıtın açık standardı hazır.</p>
+        <p className="mt-[12px] text-[21px] font-semibold leading-[1.32] text-ink-2">Open Badges 3.0, W3C doğrulanabilir kimlik bilgisi olarak.</p>
+        <p className="mt-[14px] text-[21px] font-bold leading-[1.32] text-indigo">Ölçme aracını kurmanın zamanı.</p>
       </div>
     </>
   );
 }
 
-// ---------------------------------------------------------------- 4 the difference
+// ---------------------------------------------------------------- solution: the one-sentence difference
 
 function Zigzag({ flip = false }: { flip?: boolean }) {
   const teeth = 22;
@@ -259,7 +263,7 @@ function Difference() {
   );
 }
 
-// ---------------------------------------------------------------- 5 three objects
+// ---------------------------------------------------------------- the loop: three objects
 
 function Objects() {
   return (
@@ -330,7 +334,6 @@ function Objects() {
       {/* The loop back: an approved milestone becomes Kurum onaylı evidence. */}
       <svg viewBox="0 0 1376 70" width="1376" height="70" className="absolute left-[112px] top-[628px]" aria-hidden="true">
         <path
-          
           d="M1148 2C1148 50 1100 56 1000 56H330C236 56 226 50 226 6"
           fill="none"
           stroke="rgb(var(--indigo) / 0.6)"
@@ -347,77 +350,179 @@ function Objects() {
   );
 }
 
-// ---------------------------------------------------------------- 6 genç
+// ---------------------------------------------------------------- product: the two faces side by side
 
-function Genc() {
-  const cards = [
-    { icon: <Flame size={58} />, title: 'Haftalık hedef ve seri', text: 'Commit sayısı değil, üretim yaptığın gün sayılır.' },
-    {
-      icon: <Shield size={58} tier={4} />,
-      title: 'Lig ve Niri’nin kostümleri',
-      text: `Benzer seviyedekilerle haftalık lig, ${TIERS[0]}’den ${TIERS[TIERS.length - 1]}’ye ${TIERS.length} kademe.`,
-    },
-    { icon: <Route size={58} />, title: 'Açık kaynak görevleri', text: 'Gerçek “good first issue”lar. PR birleşince sayılır.' },
-    { icon: <Compass size={58} />, title: 'Niri’nin analizi', text: 'Neyin eksik, nasıl gelişirsin: eşleşmediğinde nedenini görürsün.' },
+function Faces() {
+  const genc = [
+    { icon: <Flame size={44} />, title: 'Haftalık hedef ve seri', text: 'Commit sayısı değil, üretim yapılan gün sayılır.' },
+    { icon: <Shield size={44} tier={4} />, title: 'Lig ve Niri’nin kostümleri', text: `Benzer seviyede haftalık lig, ${TIERS[0]}’den ${TIERS[TIERS.length - 1]}’ye.` },
+    { icon: <Route size={44} />, title: 'Açık kaynak görevleri', text: 'Gerçek “good first issue”lar; PR birleşince sayılır.' },
+    { icon: <Compass size={44} />, title: 'Niri’nin analizi', text: 'Eşleşmediğinde eksiğini ve sıradaki adımı görür.' },
   ];
+  const kurum = [
+    { title: 'Şikâyetten ihtiyaca', text: 'Muğlak bir dert, kanvasla ölçülebilir ihtiyaca döner.' },
+    { title: 'Gerekçeli kısa liste', text: 'İsimsiz inceleme; her adayın yanında “neden bu uyum?”' },
+    { title: 'Kadro yerine küçük pilot', text: 'İşe alım riski almadan, aşamaları belli kısa bir proje.' },
+    { title: 'Hesap verebilir kayıt', text: 'Çift onaylı aşamalar, iki tarafın da gördüğü defter.' },
+  ];
+  const Row = ({ mark, title, text }: { mark: ReactNode; title: string; text: string }) => (
+    <li className="flex items-center gap-[20px] border-t-2 border-line py-[16px] first:border-t-0">
+      <span className="grid w-[48px] shrink-0 place-items-center">{mark}</span>
+      <div className="min-w-0">
+        <p className="text-[25px] font-bold leading-tight tracking-[-0.015em] text-ink">{title}</p>
+        <p className="mt-[3px] text-[19px] font-semibold leading-[1.3] text-ink-3">{text}</p>
+      </div>
+    </li>
+  );
   return (
     <>
-      <Heading>Genç için: her hafta küçük ama gerçek bir adım</Heading>
-      <div className="absolute left-[112px] top-[292px] grid w-[1376px] grid-cols-2 gap-[24px]">
-        {cards.map((c, n) => (
-          <div key={c.title} className="s-in flex h-[178px] items-center gap-[26px] rounded-[18px] border-2 border-line px-[30px]" style={d(120 + n * 90)}>
-            {c.icon}
-            <div className="min-w-0">
-              <p className="s-t !text-[28px]">{c.title}</p>
-              <p className="s-p mt-[6px] !text-[22px] !text-ink-3">{c.text}</p>
-            </div>
-          </div>
-        ))}
+      <Heading width={1300}>Aynı kanıt, iki yüz</Heading>
+      <div className="s-in absolute left-[112px] top-[200px] w-[664px] rounded-[18px] border-2 border-line px-[28px] pb-[8px] pt-[22px]" style={d(120)}>
+        <div className="flex items-center gap-[14px]">
+          <Tag who="genc">Genç</Tag>
+          <p className="s-t !text-[26px]">tanıdık bir oyun ritmi</p>
+        </div>
+        <ul className="mt-[8px]">
+          {genc.map((c) => (
+            <Row key={c.title} mark={c.icon} title={c.title} text={c.text} />
+          ))}
+        </ul>
       </div>
-      <p className="s-cap s-in absolute left-[800px] top-[720px] w-[688px]" style={d(500)}>
-        XP yalnızca dışarıda doğrulanabilen işten gelir; günde en fazla {f(XP.dailyCap)} XP.
+      <div className="s-in absolute left-[824px] top-[200px] w-[664px] rounded-[18px] border-2 border-line px-[28px] pb-[8px] pt-[22px]" style={d(260)}>
+        <div className="flex items-center gap-[14px]">
+          <Tag who="kurum">Kurum</Tag>
+          <p className="s-t !text-[26px]">sakin bir ölçüm</p>
+        </div>
+        <ul className="mt-[8px]">
+          {kurum.map((s, n) => (
+            <Row
+              key={s.title}
+              mark={
+                <Tri size={44}>
+                  <span className="text-[17px] font-black leading-none text-white">{n + 1}</span>
+                </Tri>
+              }
+              title={s.title}
+              text={s.text}
+            />
+          ))}
+        </ul>
+      </div>
+      <p className="s-cap s-in absolute left-[824px] top-[730px] w-[664px]" style={d(420)}>
+        XP yalnızca dışarıda doğrulanabilen işten gelir; günde en fazla {f(XP.dailyCap)} XP. Kurum ekranında XP, lig ve seri yok.
       </p>
     </>
   );
 }
 
-// ---------------------------------------------------------------- 7 kurum
+// ---------------------------------------------------------------- trust: how matching works
 
-function Kurum() {
-  const steps = [
-    { title: 'Şikâyetten ihtiyaca', text: 'Muğlak bir dert, kanvasla ölçülebilir bir ihtiyaca dönüşür.' },
-    { title: 'Gerekçeli kısa liste', text: 'İsimsiz inceleme: önce iş görünür. Her adayın yanında “neden bu uyum?”' },
-    { title: 'Kadro yerine küçük pilot', text: 'İşe alım riski almadan, aşamaları belli kısa bir proje.' },
-    { title: 'Hesap verebilir kayıt', text: 'Çift onaylı aşamalar, değiştirilemez defter, iki tarafın da görebildiği kayıt.' },
+/** A real three-link chain from the engine's own SHA-256, so the hashes on screen are honest. */
+const CHAIN = (() => {
+  let prev = GENESIS;
+  return [
+    { title: 'Aşama 1', genc: true, kurum: true },
+    { title: 'Aşama 2', genc: true, kurum: true },
+    { title: 'Aşama 3', genc: true, kurum: false },
+  ].map((m) => {
+    const hash = sha256(`${prev}|${m.title}|${m.genc ? 'teslim' : ''}|${m.kurum ? 'onay' : ''}`);
+    prev = hash;
+    return { ...m, hash: shortHash(hash) };
+  });
+})();
+
+function Trust() {
+  const parts = [
+    { name: 'Kanıt', w: WEIGHTS.evidence, tone: 'indigo' },
+    { name: 'Bağlam', w: WEIGHTS.context, tone: 'cyan' },
+    { name: 'Kapasite', w: WEIGHTS.capacity, tone: 'purple' },
+    { name: 'İş birliği geçmişi', w: WEIGHTS.history, tone: 'green' },
   ];
-  const X = [170, 514, 858, 1202];
+  const panel = 's-in absolute top-[214px] h-[452px] w-[442px] rounded-[18px] border-2 border-line px-[28px] py-[24px]';
   return (
     <>
-      <Heading width={1100}>Kurum için tek soru: ihtiyacını ne ölçüde çözer?</Heading>
-      <svg viewBox="0 0 1376 120" width="1376" height="120" className="absolute left-[112px] top-[300px]" aria-hidden="true">
-        <path
-          
-          d={`M${X[0]} 60H${X[3]}`}
-          stroke="rgb(var(--indigo) / 0.55)"
-          strokeWidth="5"
-          strokeDasharray="2 14"
-          strokeLinecap="round"
-        />
-      </svg>
-      {steps.map((s, n) => (
-        <div key={s.title} className="s-in absolute flex w-[316px] flex-col items-center text-center" style={{ left: 112 + X[n] - 158, top: 314, ...d(120 + n * 110) }}>
-          <Tri size={88}>
-            <span className="text-[30px] font-black leading-none text-white">{n + 1}</span>
-          </Tri>
-          <p className="s-t mt-[18px] !text-[27px]">{s.title}</p>
-          <p className="s-p mt-[8px] !text-[21px] !text-ink-3">{s.text}</p>
+      <Heading width={1300}>Neden güvenilir?</Heading>
+
+      <div className={panel} style={{ left: 112, ...d(120) }}>
+        <p className="s-t !text-[28px]">Açıklanabilir puan</p>
+        <p className="mt-[6px] text-[20px] font-semibold leading-[1.3] text-ink-3">Dört parça, ağırlıklar açık.</p>
+        <div className="mt-[26px] flex h-[30px] overflow-hidden rounded-full">
+          {parts.map((p) => (
+            <span key={p.name} className="h-full border-r-[3px] border-bg last:border-r-0" style={{ width: `${p.w * 100}%`, background: `rgb(var(--${p.tone}))` }} />
+          ))}
         </div>
-      ))}
+        <ul className="mt-[20px] flex flex-col gap-[10px]">
+          {parts.map((p) => (
+            <li key={p.name} className="flex items-center gap-[12px] text-[21px] font-semibold text-ink-2">
+              <span className="h-[14px] w-[14px] shrink-0 rounded-[4px]" style={{ background: `rgb(var(--${p.tone}))` }} />
+              <span className="flex-1">{p.name}</span>
+              <span className="font-bold text-ink">
+                <span className="mono">{f(p.w * 100)}</span> puan
+              </span>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-[18px] text-[19px] font-bold leading-[1.3] text-indigo">Her adayın yanında: neden bu uyum, ne eksik.</p>
+      </div>
+
+      <div className={panel} style={{ left: 579, ...d(240) }}>
+        <p className="s-t !text-[28px]">Temasa kadar kör</p>
+        <p className="mt-[6px] text-[20px] font-semibold leading-[1.3] text-ink-3">Kurum önce işi görür; kimlik pilot teklifiyle açılır.</p>
+        <div className="mt-[18px] rounded-[14px] border-2 border-line bg-bg-2 px-[20px] py-[14px]">
+          <p className="text-[20px] font-bold text-ink">Aday 3</p>
+          {[
+            ['İsim', 150],
+            ['Okul', 120],
+            ['Şehir', 90],
+          ].map(([k, w]) => (
+            <div key={k} className="mt-[10px] flex items-center gap-[12px]">
+              <span className="w-[64px] text-[18px] font-semibold text-ink-3">{k}</span>
+              <span className="h-[16px] rounded-full bg-line-2" style={{ width: w as number }} />
+            </div>
+          ))}
+          <div className="mt-[14px] flex flex-col gap-[8px] border-t-2 border-line pt-[12px]">
+            <p className="flex items-center gap-[10px] text-[19px] font-semibold text-ink-2">
+              <LevelGlyph level="S3" size={22} /> 1 kurum onaylı aşama
+            </p>
+            <p className="flex items-center gap-[10px] text-[19px] font-semibold text-ink-2">
+              <LevelGlyph level="S2" size={22} /> 3 doğrulanmış iş
+            </p>
+          </div>
+        </div>
+        <p className="mt-[10px] text-[16px] font-bold text-ink-3">Örnek kart, kurgusal aday</p>
+      </div>
+
+      <div className={panel} style={{ left: 1046, ...d(360) }}>
+        <p className="s-t !text-[28px]">Çift onaylı defter</p>
+        <p className="mt-[6px] text-[20px] font-semibold leading-[1.3] text-ink-3">Kurcalanan kayıt zinciri kırar.</p>
+        <ol className="mt-[20px] flex flex-col">
+          {CHAIN.map((c, n) => (
+            <li key={c.title} className="flex flex-col">
+              {n > 0 && <span className="ml-[30px] h-[14px] w-[4px] bg-line-2" />}
+              <div className="flex items-center justify-between gap-[12px] rounded-[14px] border-2 border-line bg-bg-2 px-[16px] py-[10px]">
+                <div>
+                  <p className="text-[19px] font-bold text-ink">{c.title}</p>
+                  <p className="mono text-[15px] font-semibold text-ink-3">{c.hash}</p>
+                </div>
+                <span className="flex gap-[4px]">
+                  <Check size={22} strokeWidth={3.4} className="text-green-lip" />
+                  {c.kurum ? <Check size={22} strokeWidth={3.4} className="text-indigo" /> : <span className="h-[22px] w-[22px] rounded-full border-2 border-dashed border-line-2" />}
+                </span>
+              </div>
+            </li>
+          ))}
+        </ol>
+        <p className="mt-[14px] text-[16px] font-bold text-ink-3">Örnek zincir; özetler motorun kendi SHA-256’sıyla</p>
+      </div>
+
+      <p className="s-in absolute left-[848px] top-[716px] w-[640px] text-[21px] font-bold leading-[1.35] text-ink-2" style={d(500)}>
+        Kod açık, MIT lisanslı: her formülü herkes okuyabilir.
+      </p>
     </>
   );
 }
 
-// ---------------------------------------------------------------- 8 live demo
+// ---------------------------------------------------------------- live demo
 
 function Demo() {
   const steps = [
@@ -449,6 +554,9 @@ function Demo() {
             </a>
           </div>
         ))}
+        <p className="s-cap s-in mt-[4px]" style={d(320)}>
+          Demodaki kişiler ve kurumlar kurgusal; GitHub ve DNS doğrulaması gerçek.
+        </p>
       </div>
       <ol className="absolute left-[760px] top-[120px] flex w-[728px] flex-col gap-[14px]">
         {steps.map((s, n) => (
@@ -465,69 +573,268 @@ function Demo() {
   );
 }
 
-// ---------------------------------------------------------------- 9 open source
+// ---------------------------------------------------------------- market: who first, nested like a map inset
 
-function Open() {
-  const principles = [
-    { title: 'Açık kaynak', text: 'MIT lisanslı. Kod, kurallar ve formüller herkesin önünde.' },
-    { title: 'Açıklanabilir', text: 'Her puanın formülü görünür. Kara kutu öneri yok.' },
-    { title: 'Önyargıya kapalı', text: 'İlk temasta isim, okul, şehir görünmez. Önce iş.' },
+function Market() {
+  return (
+    <>
+      <Heading width={600}>Önce kim?</Heading>
+      <p className="s-in absolute left-[112px] top-[186px] w-[580px] text-[24px] font-medium leading-[1.4] text-ink-3" style={d(80)}>
+        Mikro staj pazarının büyüklüğü için bağımsız bir kaynak bulamadık. Uydurma bir rakam yerine nereden başlayacağımızı gösteriyoruz.
+      </p>
+
+      {/* Genç side: the demand is already there. */}
+      <div className="s-in absolute left-[112px] top-[372px] w-[580px] rounded-[18px] border-2 border-line px-[28px] py-[22px]" style={d(200)}>
+        <div className="flex items-center gap-[14px]">
+          <Tag who="genc">Genç</Tag>
+          <p className="s-t !text-[26px]">talep zaten var</p>
+        </div>
+        <p className="mt-[14px] flex items-baseline gap-[14px]">
+          <span className="num shrink-0 whitespace-nowrap text-[52px] font-extrabold leading-none tracking-[-0.04em] text-ink">~1 milyon</span>
+          <span className="text-[22px] font-bold leading-[1.25] text-ink-3">başvuru, ~1.000 fellow ve mezun</span>
+        </p>
+        <p className="mt-[10px] text-[21px] font-semibold leading-[1.3] text-ink-2">Seçici programlara sığmayan gençler de kanıt biriktirebilmeli.</p>
+        <Src className="mt-[6px]">GİRVAK Fellow, 10. yıl açıklaması</Src>
+      </div>
+
+      {/* Kurum side: rings from the first tour out to the whole market. */}
+      <div className="s-in absolute left-[760px] top-[150px] h-[690px] w-[728px] rounded-[22px] border-2 border-dashed border-line-2 px-[30px] py-[24px]" style={d(160)}>
+        <p className="text-[19px] font-bold text-ink-3">Ölçek</p>
+        <p className="mt-[2px] flex items-baseline gap-[14px]">
+          <span className="num text-[44px] font-extrabold leading-none tracking-[-0.03em] text-ink">3,93 milyon</span>
+          <span className="text-[21px] font-semibold text-ink-2">girişim, %99,6’sı KOBİ</span>
+        </p>
+        <Src className="mt-[4px]">TÜİK, KOBİ istatistikleri 2024</Src>
+      </div>
+      <div className="s-in absolute left-[816px] top-[330px] h-[480px] w-[644px] rounded-[20px] border-2 border-line bg-bg-2 px-[30px] py-[22px]" style={d(300)}>
+        <p className="text-[19px] font-bold text-ink-3">İlk pazar</p>
+        <p className="mt-[4px] text-[25px] font-bold leading-[1.25] text-ink">BİT uzmanı olmayan küçük işletmeler, kamu birimleri, STK’lar</p>
+        <p className="mt-[8px] text-[20px] font-semibold leading-[1.3] text-ink-2">
+          10–49 çalışanlı girişimlerin yalnızca <span className="num font-extrabold text-ink">%10,8</span>’i BİT uzmanı çalıştırıyor.
+        </p>
+        <Src className="mt-[4px]">TÜİK, BİT bülteni 2026</Src>
+      </div>
+      <div className="s-in absolute left-[872px] top-[600px] h-[180px] w-[558px] overflow-hidden rounded-[18px] bg-indigo px-[30px] py-[22px]" style={d(440)}>
+        <div className="pointer-events-none absolute inset-0 opacity-60">
+          <Contours seed={4} x={0.92} y={0.9} rings={8} step={26} opacity={0.35} color="white" />
+        </div>
+        <p className="relative text-[19px] font-bold text-white/80">İlk tur · plan</p>
+        <p className="relative mt-[4px] text-[30px] font-extrabold leading-[1.15] tracking-[-0.02em] text-white">Zemin360 ve GİRVAK ağındaki kurumlar ve gençler</p>
+      </div>
+    </>
+  );
+}
+
+// ---------------------------------------------------------------- competition: categories only
+
+/** Positions on the map, 0–1 on each axis: x = how real the proof is, y = how habitual. */
+const RIVALS = [
+  { name: 'Oyunlaştırılmış öğrenme', x: 0.16, y: 0.84 },
+  { name: 'İlan ve kariyer siteleri', x: 0.12, y: 0.2 },
+  { name: 'Test ve bootcamp', x: 0.38, y: 0.36 },
+  { name: 'Açık inovasyon programları', x: 0.52, y: 0.1 },
+  { name: 'Mikro staj', x: 0.8, y: 0.28 },
+];
+
+function Worlds() {
+  const W = 740;
+  const H = 440;
+  const px = (x: number) => 40 + x * (W - 80);
+  const py = (y: number) => H - 40 - y * (H - 80);
+  const cards = [
+    { title: 'Oyunlaştırılmış öğrenme', text: 'Alışkanlık kurar; ama XP uygulamada kalır.' },
+    { title: 'İşe alım ve eşleşme', text: 'CV, test, sertifika: tek seferlik bir eşik.' },
   ];
   return (
     <>
-      <Heading>Kamu yararı için açık bir altyapı</Heading>
-      <div className="absolute left-[112px] top-[226px] grid w-[1376px] grid-cols-3 gap-[24px]">
-        {principles.map((p, n) => (
-          <div key={p.title} className="s-in rounded-[18px] border-2 border-line px-[28px] py-[24px]" style={d(100 + n * 90)}>
-            <p className="s-t !text-[28px]">{p.title}</p>
-            <p className="s-p mt-[8px] !text-[22px] !text-ink-3">{p.text}</p>
+      <Heading width={1400}>İki dünya var, birbirine dokunmuyor.</Heading>
+      <div className="absolute left-[112px] top-[214px] flex w-[560px] flex-col gap-[16px]">
+        {cards.map((c, n) => (
+          <div key={c.title} className="s-in rounded-[18px] border-2 border-line px-[26px] py-[18px]" style={d(120 + n * 100)}>
+            <p className="s-t !text-[27px]">{c.title}</p>
+            <p className="s-p mt-[4px] !text-[21px] !text-ink-3">{c.text}</p>
           </div>
         ))}
+        <div className="s-in rounded-[18px] bg-indigo-tint px-[26px] py-[18px]" style={d(320)}>
+          <p className="s-t !text-[27px] !text-indigo">Boş köşe</p>
+          <p className="s-p mt-[4px] !text-[21px]">Oyun ritmi, dışarıda doğrulanmış iş ve kurum imzası bir arada. Türkiye’de bu bileşimi sunan bir platform bulamadık.</p>
+        </div>
       </div>
-      <div className="s-in absolute left-[112px] top-[440px] flex w-[1376px] gap-[40px] rounded-[18px] bg-bg-2 px-[32px] py-[26px]" style={d(400)}>
-        <p className="s-t w-[300px] shrink-0 !text-[27px]">Gerçek mi, demo mu?</p>
-        <div className="grid flex-1 grid-cols-2 gap-[32px]">
-          <ul className="flex flex-col gap-[10px]">
-            <li className="text-[18px] font-bold text-green-lip">Gerçek</li>
-            {['GitHub doğrulaması', 'DNS TXT doğrulaması', 'Puanlar, eşleşme ve defter canlı hesaplanır'].map((t) => (
-              <li key={t} className="flex gap-[10px] text-[21px] font-semibold leading-snug text-ink-2">
-                <Check size={22} strokeWidth={3.4} className="mt-[3px] shrink-0 text-green-lip" />
-                {t}
-              </li>
-            ))}
-          </ul>
-          <ul className="flex flex-col gap-[10px]">
-            <li className="text-[18px] font-bold text-ink-3">Demo</li>
-            {['Kurumlar ve kişiler kurgusal', 'Veri şimdilik tarayıcıda tutulur'].map((t) => (
-              <li key={t} className="flex gap-[10px] text-[21px] font-semibold leading-snug text-ink-2">
-                <span className="mt-[5px] shrink-0">
-                  <LevelGlyph level="S1" size={20} />
-                </span>
-                {t}
-              </li>
-            ))}
-          </ul>
+
+      {/* The map: x from declared to verified real work, y from one-off to habit. */}
+      <div className="s-in absolute left-[748px] top-[214px] w-[740px]" style={d(240)}>
+        <div className="relative h-[440px] w-[740px] overflow-hidden rounded-[18px] border-2 border-line">
+          <Contours seed={5} x={0.9} y={0.15} rings={10} step={34} opacity={0.4} />
+          <div className="absolute right-0 top-0 h-1/2 w-1/2 bg-indigo-tint/60" />
+          <svg viewBox={`0 0 ${W} ${H}`} className="absolute inset-0 h-full w-full" aria-hidden="true">
+            <path d={`M${W / 2} 16V${H - 16}M16 ${H / 2}H${W - 16}`} stroke="rgb(var(--line-2))" strokeWidth="2" strokeDasharray="2 10" strokeLinecap="round" />
+          </svg>
+          {RIVALS.map((r) => (
+            <div key={r.name} className="absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center" style={{ left: px(r.x), top: py(r.y) }}>
+              <Tri size={36} state="locked" />
+              <p className="mt-[4px] whitespace-nowrap rounded-[8px] bg-bg px-[8px] py-[2px] text-[18px] font-semibold text-ink-2">{r.name}</p>
+            </div>
+          ))}
+          <div className="absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center" style={{ left: px(0.82), top: py(0.8) }}>
+            <span className="relative block">
+              <Ping />
+              <Tri size={64} />
+            </span>
+            <p className="mt-[8px] rounded-[8px] bg-bg px-[10px] py-[2px] text-[26px] font-black tracking-[-0.03em] text-indigo">nirengi</p>
+          </div>
+        </div>
+        <div className="mt-[12px] flex justify-between text-[18px] font-bold text-ink-3">
+          <span>Beyan, katılım</span>
+          <span>Dışarıda doğrulanmış gerçek iş</span>
+        </div>
+        <div className="absolute left-[-36px] top-0 flex h-[440px] w-[24px] flex-col items-center justify-between text-[18px] font-bold text-ink-3">
+          <span className="[writing-mode:vertical-rl] rotate-180">Alışkanlık</span>
+          <span className="[writing-mode:vertical-rl] rotate-180">Tek seferlik</span>
         </div>
       </div>
     </>
   );
 }
 
-// ---------------------------------------------------------------- 10 roadmap
+// ---------------------------------------------------------------- sustainability: hypotheses, not revenue
+
+function Model() {
+  const promises = ['Gence ücret yok', 'Kod açık, MIT lisanslı', 'Kanıt gencindir'];
+  const options = [
+    { title: 'Kamu ve vakıf fonları', text: 'Fonlu gençlik ve istihdam programlarına hazır pilot raporu: kim, ne üretti, kim onayladı.' },
+    { title: 'Kalkınma ajansları', text: 'Bölgesel ihtiyaç turları: yerel kurumun ihtiyacı, yerel gencin işi.' },
+    { title: 'Üniversite kariyer merkezleri', text: 'Öğrencilerinin doğrulanmış kanıtlarını kendi sistemlerine alır.' },
+    { title: 'Kurum tarafında barındırma ve destek', text: 'Çekirdek açık ve ücretsiz kalır; kurulum, barındırma ve ihtiyaç turu desteği isteyene hizmet.' },
+  ];
+  return (
+    <>
+      <Heading width={1300}>Nasıl yaşar?</Heading>
+      <div className="s-in absolute left-[112px] top-[190px] flex gap-[14px]" style={d(80)}>
+        {promises.map((p) => (
+          <span key={p} className="flex items-center gap-[10px] rounded-full border-2 border-line px-[18px] py-[8px] text-[21px] font-bold text-ink-2">
+            <Check size={22} strokeWidth={3.4} className="text-green-lip" />
+            {p}
+          </span>
+        ))}
+      </div>
+      <div className="absolute left-[112px] top-[282px] grid w-[1376px] grid-cols-2 gap-[20px]">
+        {options.map((o, n) => (
+          <div key={o.title} className="s-in h-[158px] rounded-[18px] border-2 border-dashed border-line-2 px-[28px] py-[20px]" style={d(160 + n * 90)}>
+            <div className="flex items-center justify-between gap-4">
+              <p className="s-t !text-[27px]">{o.title}</p>
+              <Tag who="plan">Hipotez</Tag>
+            </div>
+            <p className="s-p mt-[8px] !text-[21px] !text-ink-3">{o.text}</p>
+          </div>
+        ))}
+      </div>
+      <p className="s-in absolute left-[848px] top-[700px] w-[640px] text-[23px] font-bold leading-[1.35] text-ink" style={d(560)}>
+        Bugün gelirimiz yok. Bunlar pilotta sınayacağımız seçenekler; henüz hiçbiri gelir değil.
+      </p>
+    </>
+  );
+}
+
+// ---------------------------------------------------------------- where we are: the honest table
+
+function Today() {
+  const real = ['Gerçek GitHub hesap sahipliği ve DNS TXT doğrulaması', 'Eşleşme, kanvas ve defter motoru otomatik testlerle', 'Açık kod, MIT lisansı'];
+  const notYet = ['Gerçek kullanıcı, kurum ya da pilot: demo verisi kurgusal', 'Kalıcı veritabanı: veri şimdilik tarayıcıda', 'Kod dışı kanıt türleri'];
+  return (
+    <>
+      <Heading width={1300}>Bugün neredeyiz?</Heading>
+      <div className="s-in absolute left-[112px] top-[208px] w-[640px]" style={d(120)}>
+        <p className="text-[19px] font-bold text-green-lip">Çalışıyor</p>
+        <p className="mt-[6px] flex items-end gap-[18px]">
+          <span className="num text-[96px] font-extrabold leading-none tracking-[-0.045em] text-ink">6 / 6</span>
+          <span className="text-[23px] font-semibold leading-[1.3] text-ink-2">
+            başvurudaki problem için
+            <br />
+            çalışan ekran
+          </span>
+        </p>
+        <ul className="mt-[22px] flex flex-col gap-[12px] border-t-2 border-line pt-[18px]">
+          {real.map((t) => (
+            <li key={t} className="flex gap-[12px] text-[22px] font-semibold leading-snug text-ink-2">
+              <Check size={24} strokeWidth={3.4} className="mt-[3px] shrink-0 text-green-lip" />
+              {t}
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div className="s-in absolute left-[848px] top-[208px] w-[640px] rounded-[18px] bg-bg-2 px-[30px] py-[24px]" style={d(260)}>
+        <p className="text-[19px] font-bold text-ink-3">Henüz yok</p>
+        <ul className="mt-[14px] flex flex-col gap-[14px]">
+          {notYet.map((t) => (
+            <li key={t} className="flex gap-[12px] text-[22px] font-semibold leading-snug text-ink-2">
+              <span className="mt-[5px] shrink-0">
+                <LevelGlyph level="S1" size={22} />
+              </span>
+              {t}
+            </li>
+          ))}
+        </ul>
+      </div>
+      <p className="s-in absolute left-[848px] top-[690px] w-[640px] text-[26px] font-extrabold leading-[1.25] tracking-[-0.02em] text-ink" style={d(420)}>
+        Bir hackathon prototipi. Gerisini <span className="text-indigo">pilotta kanıtlayacağız.</span>
+      </p>
+    </>
+  );
+}
+
+// ---------------------------------------------------------------- impact: what the pilot will measure
+
+function Measure() {
+  const kpis = [
+    { title: 'İlk doğrulanmış işe kadar', text: 'Kayıttan ilk Doğrulandı kanıta kaç gün geçiyor?', unit: 'gün' },
+    { title: 'Yanıt bulan ihtiyaç', text: 'Yayımlanan ihtiyaçların kaçı pilota dönüşüyor?', unit: '%' },
+    { title: 'Kurum onaylı aşama', text: 'Çift onaylanan aşamalar ve pilot tamamlanma oranı.', unit: 'adet' },
+    { title: 'Eşleşmeyenin dönüşü', text: 'Eksik geri bildiriminden sonra yeni kanıt ekleyenler.', unit: '%' },
+  ];
+  return (
+    <>
+      <Heading width={1300}>Pilotta neyi ölçeceğiz?</Heading>
+      <div className="absolute left-[112px] top-[214px] grid w-[1376px] grid-cols-4 gap-[20px]">
+        {kpis.map((k, n) => (
+          <div key={k.title} className="s-in flex h-[420px] flex-col rounded-[18px] border-2 border-line px-[24px] py-[24px]" style={d(120 + n * 100)}>
+            {/* An empty dial: nothing measured yet. */}
+            <div className="relative grid h-[120px] w-[120px] place-items-center">
+              <svg viewBox="0 0 120 120" width="120" height="120" className="absolute inset-0" aria-hidden="true">
+                <circle cx="60" cy="60" r="50" fill="none" stroke="rgb(var(--line-2))" strokeWidth="10" strokeDasharray="3 11" strokeLinecap="round" />
+              </svg>
+              <span className="text-[34px] font-black leading-none text-ink-3">?</span>
+            </div>
+            <p className="mt-[4px] text-[17px] font-bold text-ink-3">{k.unit}</p>
+            <p className="mt-[16px] text-[26px] font-bold leading-[1.15] tracking-[-0.015em] text-ink">{k.title}</p>
+            <p className="mt-[10px] text-[20px] font-semibold leading-[1.32] text-ink-3">{k.text}</p>
+            <span className="mt-auto w-fit">
+              <Tag who="plan">Pilotta ölçülecek</Tag>
+            </span>
+          </div>
+        ))}
+      </div>
+      <p className="s-in absolute left-[848px] top-[702px] w-[640px] text-[23px] font-bold leading-[1.35] text-ink" style={d(560)}>
+        Hedef rakam koymuyoruz. Önce taban çizgisini ölçüp kaynağıyla paylaşacağız.
+      </p>
+    </>
+  );
+}
+
+// ---------------------------------------------------------------- roadmap
 
 function Roadmap() {
   const items = [
-    { title: 'Kalıcılık', text: 'Cloudflare D1 ve OAuth ile gerçek hesaplar' },
-    { title: 'Kod dışı kanıtlar', text: 'Behance, Figma ve DOI doğrulaması' },
+    { title: 'Kalıcılık', text: 'Gerçek hesaplar, kurum hesapları, kalıcı veritabanı' },
+    { title: 'İlk ihtiyaç turu', text: 'Zemin360 ve GİRVAK ağındaki kurumlarla' },
+    { title: 'Kod dışı kanıtlar', text: 'Tasarım, yayın (DOI) ve paket doğrulaması' },
     { title: 'Taşınabilir kanıt', text: 'Open Badges 3.0 ile platform dışına çıkan kayıt' },
     { title: 'Fon verene pilot raporu', text: 'Fonlu projeler için hazır hesap verebilirlik çıktısı' },
-    { title: 'İlk ihtiyaç turu', text: 'Zemin360 ve GİRVAK ağındaki kurumlarla' },
   ];
   const ROW = 116;
   return (
     <>
-      <Heading width={560}>Finalden sonra</Heading>
-      <p className="s-in absolute left-[112px] top-[192px] w-[520px] text-[28px] font-medium leading-[1.35] text-ink-3" style={d(100)}>
+      <Heading width={560}>Finalden sonra: 4 ay</Heading>
+      <p className="s-in absolute left-[112px] top-[200px] w-[520px] text-[28px] font-medium leading-[1.35] text-ink-3" style={d(100)}>
         Hackathon bir başlangıç noktası. Sıradaki beş nirengi noktası:
       </p>
       <svg viewBox={`0 0 60 ${ROW * 4}`} width="60" height={ROW * 4} className="absolute left-[790px] top-[150px]" aria-hidden="true">
@@ -550,7 +857,42 @@ function Roadmap() {
   );
 }
 
-// ---------------------------------------------------------------- 11 close
+// ---------------------------------------------------------------- the ask
+
+function Ask() {
+  const asks = [
+    { title: 'İlk ihtiyaç turuna kurum', text: 'Gerçek bir ihtiyacını kanvasa yazacak bir KOBİ, kamu birimi ya da STK.' },
+    { title: 'Mentorluk', text: 'Kamu fonlu programların raporlaması, kurum tarafında benimseme, kişisel veri uyumu.' },
+    { title: 'Kuluçka ve hibe yolu', text: 'Pilotu taşıyacak bir program ya da fon için yönlendirme.' },
+  ];
+  return (
+    <>
+      <Heading width={560}>Sizden üç şey istiyoruz</Heading>
+      <p className="s-in absolute left-[112px] top-[262px] w-[540px] text-[28px] font-medium leading-[1.35] text-ink-3" style={d(100)}>
+        En somutu: bu salondan bir kurumun gerçek bir ihtiyacı. İlk kanvası birlikte yazalım.
+      </p>
+      {asks.map((a, n) => (
+        <div
+          key={a.title}
+          className="s-in absolute flex w-[728px] items-center gap-[28px] rounded-[18px] border-2 border-line px-[30px] py-[26px]"
+          style={{ left: 760, top: 150 + n * 196, ...d(180 + n * 120) }}
+        >
+          <span className="shrink-0">
+            <Tri size={78}>
+              <span className="text-[28px] font-black leading-none text-white">{n + 1}</span>
+            </Tri>
+          </span>
+          <div className="min-w-0">
+            <p className="s-t !text-[30px]">{a.title}</p>
+            <p className="mt-[6px] text-[22px] font-semibold leading-[1.32] text-ink-3">{a.text}</p>
+          </div>
+        </div>
+      ))}
+    </>
+  );
+}
+
+// ---------------------------------------------------------------- close
 
 function Close() {
   return (
@@ -575,6 +917,7 @@ function Close() {
         ) : (
           <p className="mt-[8px] rounded-[14px] border-2 border-dashed border-line-2 px-[18px] py-[10px] text-[22px] font-semibold text-ink-3">Ekip adları buraya</p>
         )}
+        <p className="mt-[18px] text-[21px] font-semibold text-ink-3">Açık kaynak · MIT lisanslı</p>
       </div>
       <SurveyFlag size={96} delay={0.6} className="absolute left-[1478px] top-[694px]" />
     </>
@@ -582,15 +925,20 @@ function Close() {
 }
 
 export const SLIDES: Slide[] = [
-  { id: 'baslik', title: 'Beyan değil, kanıt', mark: 'hero', niri: { mood: 'wave', line: 'Merhaba, ben Niri! Bugün size haritamı göstereceğim.' }, View: Title },
-  { id: 'problem', title: 'Problem', mark: 'dock', niri: { mood: 'sad', line: 'Gençler görünmüyor, kurumlar emin olamıyor.' }, View: Problem },
-  { id: 'iki-dunya', title: 'İki dünya', mark: 'dock', niri: { mood: 'point', point: 'right', line: 'İkisinin buluştuğu köşe boştu. Oraya yerleştim.' }, View: Worlds },
-  { id: 'fark', title: 'Tek cümlelik fark', mark: 'dock', niri: { mood: 'happy', line: 'Benim XP’m boş tıklamayla gelmez.' }, View: Difference },
-  { id: 'nesneler', title: 'Üç nesne', mark: 'dock', niri: { mood: 'think', line: 'İş bitince kanıtın bir basamak yükselir.' }, View: Objects },
-  { id: 'genc', title: 'Genç tarafı', mark: 'dock', niri: { mood: 'cheer', line: 'Seri de lig de var; hepsini gerçek iş kazandırır.' }, View: Genc },
-  { id: 'kurum', title: 'Kurum tarafı', mark: 'dock', niri: { mood: 'talk', line: 'Kurum ilan yazmaz; çözülecek bir ihtiyaç yazar.' }, View: Kurum },
-  { id: 'demo', title: 'Canlı demo', mark: 'dock', niri: { mood: 'point', point: 'up', line: 'Lafı bırakalım, ekrana geçelim.' }, View: Demo },
-  { id: 'acik', title: 'Açık kaynak', mark: 'dock', niri: { mood: 'happy', line: 'Kodum açık. Her puanımın nedenini sorabilirsiniz.' }, View: Open },
-  { id: 'yol', title: 'Yol haritası', mark: 'dock', niri: { mood: 'point', point: 'right', line: 'Sıradaki nirengi noktalarım bunlar.' }, View: Roadmap },
-  { id: 'kapanis', title: 'Teşekkürler', mark: 'hero', niri: { mood: 'wave', line: 'Teşekkürler! Haritada görüşmek üzere.' }, View: Close },
+  { id: 'baslik', title: 'Beyan değil, kanıt', mark: 'hero', niri: { mood: 'wave', gear: 0, line: 'Merhaba, ben Niri! Bugün size haritamı göstereceğim.' }, View: Title },
+  { id: 'problem', title: 'Problem', mark: 'dock', niri: { mood: 'sad', gear: 0, line: 'Gençler görünmüyor, kurumlar emin olamıyor.' }, View: Problem },
+  { id: 'neden-simdi', title: 'Neden şimdi', mark: 'dock', niri: { mood: 'think', gear: 0, line: 'Kapı daralırken kanıt her zamankinden değerli.' }, View: WhyNow },
+  { id: 'fark', title: 'Çözüm', mark: 'dock', niri: { mood: 'happy', gear: 1, line: 'Benim XP’m boş tıklamayla gelmez.' }, View: Difference },
+  { id: 'dongu', title: 'Üç nesne, tek döngü', mark: 'dock', niri: { mood: 'think', gear: 1, line: 'İş bitince kanıtın bir basamak yükselir.' }, View: Objects },
+  { id: 'iki-yuz', title: 'Genç ve kurum', mark: 'dock', niri: { mood: 'cheer', gear: 1, line: 'Gence oyun, kuruma ölçüm; ikisi de aynı kanıttan.' }, View: Faces },
+  { id: 'guven', title: 'Neden güvenilir', mark: 'dock', niri: { mood: 'talk', gear: 2, line: 'Her puanımın nedenini sorabilirsiniz.' }, View: Trust },
+  { id: 'demo', title: 'Canlı demo', mark: 'dock', niri: { mood: 'point', point: 'up', gear: 2, line: 'Lafı bırakalım, ekrana geçelim.' }, View: Demo },
+  { id: 'pazar', title: 'Önce kim', mark: 'dock', niri: { mood: 'point', point: 'right', gear: 2, line: 'Haritayı en yakın tepeden çizmeye başlıyorum.' }, View: Market },
+  { id: 'rekabet', title: 'Rekabet', mark: 'dock', niri: { mood: 'point', point: 'right', gear: 3, line: 'İkisinin buluştuğu köşe boştu. Oraya yerleştim.' }, View: Worlds },
+  { id: 'model', title: 'Nasıl yaşar', mark: 'dock', niri: { mood: 'think', gear: 3, line: 'Gence ücret yok. Gerisini pilotta sınayacağız.' }, View: Model },
+  { id: 'bugun', title: 'Bugün neredeyiz', mark: 'dock', niri: { mood: 'happy', gear: 3, line: 'Prototipim çalışıyor. Kullanıcılarımı pilotta bulacağım.' }, View: Today },
+  { id: 'olcum', title: 'Pilotta ölçülecekler', mark: 'dock', niri: { mood: 'think', gear: 3, line: 'Rakam uydurmak yok; ölçüp size getireceğim.' }, View: Measure },
+  { id: 'yol', title: 'Yol haritası', mark: 'dock', niri: { mood: 'point', point: 'right', gear: 3, line: 'Sıradaki nirengi noktalarım bunlar.' }, View: Roadmap },
+  { id: 'istek', title: 'Sizden istediğimiz', mark: 'dock', niri: { mood: 'point', point: 'right', gear: 3, line: 'Bir ihtiyacınızı yazın, ilk pilotu birlikte kuralım.' }, View: Ask },
+  { id: 'kapanis', title: 'Teşekkürler', mark: 'hero', niri: { mood: 'wave', gear: 4, turns: 2, line: 'Zirvedeyim! Teşekkürler, haritada görüşmek üzere.' }, View: Close },
 ];

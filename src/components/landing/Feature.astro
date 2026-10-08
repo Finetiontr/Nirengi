@@ -10,7 +10,7 @@ interface Props {
   id: string;
   heading: string;
   say: Pick<Line, 'mood' | 'text' | 'gear'>;
-  /** The costume Niri wears before it twirls into this section's (phones). */
+  /** The costume Niri wears before it twirls into this section's. */
   from?: number | null;
   tone: 'orange' | 'cyan' | 'indigo' | 'purple' | 'gold';
   reverse?: boolean;
@@ -19,21 +19,19 @@ interface Props {
 
 const { id, heading, say, from = null, tone, reverse = false, more } = Astro.props;
 const parts = heading.split('*');
-const spoken = say.text.split('*');
 // Bright orange, gold and cyan are too light as heading text on white: use their darker tones.
 const ink = { orange: '--orange-ink', gold: '--gold-ink', cyan: '--cyan-lip', indigo: '--indigo', purple: '--purple' }[tone];
 ---
 
-<section id={id} data-narrate={id} class="scroll-mt-16 border-t-2 border-line">
-  <div class="wrap mx-auto grid max-w-[1040px] items-center gap-8 px-4 py-12 sm:px-6 lg:grid-cols-2 lg:gap-10 lg:py-16 xl:gap-12">
+<section id={id} class="scroll-mt-16 border-t-2 border-line">
+  <div class="mx-auto grid max-w-[var(--frame,1120px)] items-center gap-8 px-4 py-12 sm:px-6 lg:grid-cols-2 lg:gap-10 lg:py-16 xl:gap-16">
     <div data-reveal class:list={['min-w-0', reverse && 'lg:order-2']}>
       <h2 class="text-[clamp(28px,3.6vw,40px)] font-black leading-[1.12] tracking-[-0.02em] text-ink">
         {parts.map((t, i) => (i % 2 ? <span style={`color:rgb(var(${ink}))`}>{t}</span> : t))}
       </h2>
-      <div class="say-inline mt-5">
-        <Say client:visible mood={say.mood} text={say.text} gear={say.gear} from={from} point="down" />
+      <div class="mt-5 xl:mt-7 xl:max-w-[540px]">
+        <Say client:idle mood={say.mood} text={say.text} gear={say.gear} from={from} watch="section" point="down" />
       </div>
-      <p class="say-sr">{spoken.map((t, i) => (i % 2 ? <b>{t}</b> : t))}</p>
       {more && <a href={more.href} class="-ml-2 mt-3 inline-block rounded-full px-2 py-1 text-[15px] font-extrabold text-indigo transition-colors hover:bg-indigo-tint">{more.label}</a>}
     </div>
     <div data-reveal style="--d:120ms" class:list={['min-w-0', reverse && 'lg:order-1']}>

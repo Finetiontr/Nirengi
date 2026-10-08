@@ -1,6 +1,7 @@
 ---
 // The genç loop in four stops: what you do, and what it turns into. Each stop is a
-// concept icon in its own colour on a short dashed trail, read left to right.
+// concept icon in its own colour on a short dashed trail, read left to right (a 2×2
+// block beside the week on wide screens).
 import { Bolt, Flame, Route, Shield } from '../ui/icons';
 
 const stops = [
@@ -11,12 +12,12 @@ const stops = [
 ] as const;
 ---
 
-<ol class="grid grid-cols-2 gap-x-4 gap-y-6 md:grid-cols-4">
+<ol class="grid grid-cols-2 gap-x-4 gap-y-6 md:grid-cols-4 lg:grid-cols-2 lg:gap-y-5">
   {
     stops.map((s, i) => (
       <li class="relative">
         {i < stops.length - 1 && (
-          <span class="absolute left-[56px] right-2 top-[24px] hidden border-t-[3px] border-dotted border-orange/50 md:block" aria-hidden="true" />
+          <span class="absolute left-[56px] right-2 top-[24px] hidden border-t-[3px] border-dotted border-orange/50 md:block lg:hidden" aria-hidden="true" />
         )}
         <span class="relative grid h-[48px] w-[48px] place-items-center rounded-[14px] border-2 border-line bg-bg">
           {s.icon === 'route' && <Route size={34} />}

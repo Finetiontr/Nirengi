@@ -1,7 +1,6 @@
 ---
 // The kurum chapter's answer to "ne ölçüde çözer?" in one board: the three things you
-// get, in the order you meet them, beside a live explainable match (its own narration
-// stop), then the three sourced numbers behind the problem. Every number carries its
+// get, in the order you meet them, beside a live explainable match, then the three sourced numbers behind the problem. Every number carries its
 // source; nothing here is invented. Calm palette, no orange.
 import { Tri } from '../ui/pafta';
 import Sheet from './Sheet.astro';
@@ -39,7 +38,7 @@ const facts = [
         ))
       }
     </ol>
-    <Sheet tone="indigo" data-narrate="eslesme" class="scroll-mt-24">
+    <Sheet tone="indigo">
       <LiveMatch client:only="react"><div slot="fallback" class="h-[430px]"></div></LiveMatch>
     </Sheet>
   </div>

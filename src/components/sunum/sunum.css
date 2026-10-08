@@ -87,3 +87,7 @@ kbd.s-kbd {
   .s-in { animation: none; }
   .narrator { transition: none; }
 }
+
+/* Niri's bubble steps back while Niri twirls to the next slide (StageNiri). */
+.stage-bubble { transition: opacity 180ms ease, transform 180ms ease; }
+.n-bubble.stage-bubble[data-out] { animation: none; opacity: 0; transform: scale(0.94); }

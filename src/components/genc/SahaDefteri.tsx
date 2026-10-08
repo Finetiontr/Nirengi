@@ -197,6 +197,34 @@ function Notebook({ start, onClose }: { start?: { entry?: EntryId }; onClose: ()
   const earnedCount = list.filter((p) => p.earned).length;
   const costumes = ENTRIES.filter((e) => e.kind === 'costume').length;
 
+  // The action: inline on the right page on desktop, pinned above the index on phones.
+  const action = (
+    !page.earned ? (
+      <a href={page.href} className="btn-line btn-block">
+        {page.cta}
+      </a>
+    ) : page.kind === 'costume' ? (
+      wearing ? (
+        <p className="flex min-h-12 items-center justify-center gap-2 rounded-[12px] bg-green-tint px-4 text-[16px] font-extrabold text-green-lip">
+          <Check className="h-5 w-5" strokeWidth={3.5} />
+          Niri bunu giyiyor
+        </p>
+      ) : (
+        <button type="button" className="btn-primary btn-block" onClick={() => put(page.id)}>
+          Giy
+        </button>
+      )
+    ) : wearing ? (
+      <button type="button" className="btn-line btn-block" onClick={() => put(null)}>
+        Elinden al
+      </button>
+    ) : (
+      <button type="button" className="btn-primary btn-block" onClick={() => put(page.id)}>
+        Eline ver
+      </button>
+    )
+  );
+
   return (
     <motion.div className="fixed inset-0 z-[72] flex items-stretch justify-center sm:items-center sm:p-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
       <button type="button" tabIndex={-1} className="absolute inset-0 bg-ink/45" aria-label="Defteri kapat" onClick={onClose} />
@@ -299,36 +327,15 @@ function Notebook({ start, onClose }: { start?: { entry?: EntryId }; onClose: ()
                 </div>
               </dl>
 
-              <div className="mt-5 sm:mt-6">
-                {!page.earned ? (
-                  <a href={page.href} className="btn-line btn-block">
-                    {page.cta}
-                  </a>
-                ) : page.kind === 'costume' ? (
-                  wearing ? (
-                    <p className="flex min-h-12 items-center justify-center gap-2 rounded-[12px] bg-green-tint px-4 text-[16px] font-extrabold text-green-lip">
-                      <Check className="h-5 w-5" strokeWidth={3.5} />
-                      Niri bunu giyiyor
-                    </p>
-                  ) : (
-                    <button type="button" className="btn-primary btn-block" onClick={() => put(page.id)}>
-                      Giy
-                    </button>
-                  )
-                ) : wearing ? (
-                  <button type="button" className="btn-line btn-block" onClick={() => put(null)}>
-                    Elinden al
-                  </button>
-                ) : (
-                  <button type="button" className="btn-primary btn-block" onClick={() => put(page.id)}>
-                    Eline ver
-                  </button>
-                )}
+              <div className="mt-6 hidden sm:block">
+                {action}
                 {page.earned && <p className="mt-2 text-center text-[13px] font-bold text-ink-3">Niri, Bugün ve Lig ekranlarında böyle görünür.</p>}
               </div>
             </motion.div>
           </section>
         </div>
+
+        <div className="border-t-2 border-line bg-bg px-4 py-3 sm:hidden">{action}</div>
 
         {/* The index: every page by number; kıyafetler, then aletler */}
         <nav className="border-t-2 border-line px-2 pb-[max(8px,env(safe-area-inset-bottom))] pt-2" aria-label="Defterin sayfaları">

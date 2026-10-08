@@ -13,9 +13,9 @@ import type { Line } from '../components/landing/Say';
 
 export const prerender = true;
 
-// What Niri says in each chapter: one source for the inline bubbles and the sticky narrator.
-// Genç lines are playful and Niri climbs the league costumes with the story (Who wears
-// Zemin, then Tepe, Sırt, Doruk; the closing band is Zirve); kurum lines are short,
+// What each section's Niri says. Genç lines are playful and Niri climbs the league
+// costumes with the story (Who wears Zemin, the receipt Tepe, the genç chapter Sırt,
+// with chips for every league; the closing band is Zirve); kurum lines are short,
 // factual and plain, with no costume.
 const say: Record<string, Omit<Line, 'key'>> = {
   fark: {
@@ -28,21 +28,11 @@ const say: Record<string, Omit<Line, 'key'>> = {
     gear: 2,
     text: 'Bu kısım senin için! *Hedefi sen seçersin:* haftada 1, 3 ya da 5 gün. Sayılan commit değil, üretim yaptığın gün; mola haftası serini bozmaz.',
   },
-  analiz: {
-    mood: 'talk',
-    gear: 3,
-    text: 'Her hafta sana kısa bir not yazarım: *neyi iyi yaptın, hangi kanıtın eksik*, sıradaki hangi görev seni ileri taşır.',
-  },
   kurum: {
     mood: 'idle',
     text: 'Kurumlara kısa anlatırım: *ihtiyacını yaz, gerekçeli listeyi gör, işi iki onayla kapat.*',
   },
-  eslesme: {
-    mood: 'point',
-    text: 'Her puanın bir *“Neden?”* ekranı var. Adaylar kanıtıyla görünür, *isim ilk temasa kadar gizli*.',
-  },
 };
-const lines: Line[] = Object.entries(say).map(([key, v]) => ({ key, ...v }));
 
 // The costume teaser: what Niri says in each league's outfit (the key is the tier name).
 const tiers: Line[] = [
@@ -58,7 +48,7 @@ const tiers: Line[] = [
   <Hero />
   <Who />
 
-  <Story lines={lines} tiers={tiers}>
+  <Story>
     <Feature id="fark" tone="gold" heading="Burada her XP bir *iş makbuzudur*." say={say.fark} from={0} more={{ href: '/yontem#ilerleme', label: 'XP nereden geliyor?' }}>
       <Receipt />
     </Feature>
@@ -70,6 +60,7 @@ const tiers: Line[] = [
       lead="Haftalık hedef, seri, lig ve görevler. Hepsi gerçek işinle dolar; Niri de her hafta nerede güçlü olduğunu ve nasıl gelişeceğini söyler."
       say={say.genc}
       from={1}
+      tiers={tiers}
       door={{ href: '/bugun', label: 'Genç olarak başla' }}
     >
       <GencBoard tiers={tiers} />
@@ -81,7 +72,7 @@ const tiers: Line[] = [
       heading="Kurum musun? Tek soru: ihtiyacını *ne ölçüde* çözer?"
       lead="İlan değil ihtiyaç yazarsın. Adayları ismiyle değil kanıtıyla görürsün. İş birliğini iki tarafın onayıyla kapatırsın."
       say={say.kurum}
-      from={3}
+      from={null}
       door={{ href: '/kurum', label: 'Kurum olarak ihtiyaç yaz' }}
     >
       <KurumFit />

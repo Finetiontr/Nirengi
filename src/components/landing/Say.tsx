@@ -1,7 +1,10 @@
-// Niri speaking one line of the landing. `*word*` marks the words that matter.
-// The same line feeds the inline bubble (phones, no JS) and the sticky narrator.
-// Niri never cuts from one line to the next: it twirls (NiriTwirl), comes back in the
-// new mood and costume, and the bubble re-types once the turn has landed.
+// Niri speaking one line of the landing, in its own section. `*word*` marks the words
+// that matter. Each section's Niri makes one calm entrance per page load: once the
+// section is well in view (40% visible for a short settle, so scrolling past does
+// nothing) Niri twirls into its costume at a readable pace, and only after it lands
+// does the bubble grow and type. Later changes (the costume chips) queue the same way:
+// one turn at a time, the bubble steps back at the turn and re-types after the landing.
+// The server markup (and no JS, and reduced motion) shows the finished line at once.
 
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import Niri, { type Dir, type Mood } from '../ui/Niri';
@@ -14,6 +17,9 @@ export interface Line {
   /** League costume (genç side); unset = plain Niri. */
   gear?: number;
 }
+
+/** What Niri shows; `pre` is the pose before the entrance (so even a plain Niri has a turn to make). */
+type Scene = Omit<Line, 'key'> & { pre?: boolean };
 
 export const emphasise = (text: string): ReactNode[] => text.split('*').map((t, i) => (i % 2 ? <b key={i}>{t}</b> : t));
 
@@ -34,135 +40,191 @@ function typed(text: string, n: number): ReactNode[] {
 }
 
 const reduced = () => typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches;
-// NiriTwirl's beats: a 100 ms crouch, then the turn (200 ms to edge-on, then a 460 ms
-// eased spin that is visually down by about half way).
-/** The turn starts: the bubble steps back. */
-const TURN_MS = 100;
-/** Niri has landed: the new line grows in and types. */
-const LAND_MS = 600;
-const TYPE_MS = 600;
+const useIsoLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
+const sceneKey = (s: Scene) => `${s.pre ? 'pre|' : ''}${s.gear ?? '-'}|${s.mood}|${s.text}`;
+
+/** The landing's twirl pace (NiriTwirl `pace`): about 1.4 s from crouch to settled feet. */
+export const PACE = 1.45;
+/** When the turn itself starts (after the crouch): the bubble steps back then. */
+const TURN_MS = 100 * PACE;
+/** Typing: a calm pace per character, never longer than this in all. */
+const CHAR_MS = 38;
+const TYPE_CAP = 1600;
+/** How much of the section must be in view, and for how long, before Niri enters. */
+const SEEN = 0.4;
+const SETTLE_MS = 250;
 
 export default function Say({
   mood,
   text,
   gear,
   size = 84,
+  wide = size + 20,
   point = 'down',
   side = 'right',
-  stack = false,
   from,
   turns = 1,
-  twirlKey,
+  watch,
   className = '',
+  children,
 }: {
   mood: Mood;
   text: string;
   gear?: number;
   size?: number;
+  /** Niri's size from 1280px up. */
+  wide?: number;
   point?: Dir;
-  /** Bubble beside Niri (default) or, with `stack`, above it. */
+  /** Which side of Niri the bubble sits on. */
   side?: 'right' | 'left';
-  stack?: boolean;
-  /** Costume to start in; once hydrated Niri twirls from it into `gear` (an inline section's entrance). */
+  /** Costume Niri wears before its entrance (null = plain); unset = no entrance. */
   from?: number | null;
-  turns?: 0.5 | 1 | 2;
-  /** Changing it twirls Niri even when the line is the same (the narrator re-appearing). */
-  twirlKey?: string | number;
+  turns?: 0 | 0.5 | 1 | 2;
+  /** The element whose visibility starts the entrance (CSS selector of an ancestor); default Niri's own row. */
+  watch?: string;
   className?: string;
+  /** Extra content under the bubble (the costume chips). */
+  children?: ReactNode;
 }) {
-  // What is on screen: the entrance starts in `from`, then the line's own costume.
+  const target: Scene = { mood, text, gear };
   const entering = from !== undefined;
-  const [arrived, setArrived] = useState(!entering);
-  const shownGear = arrived ? gear : (from ?? undefined);
-  const k = `${twirlKey ?? ''}|${arrived ? text : 'from'}|${shownGear ?? '-'}`;
 
-  useEffect(() => {
-    if (!entering) return;
-    const t = window.setTimeout(() => setArrived(true), reduced() ? 0 : 280);
-    return () => window.clearTimeout(t);
-  }, [entering]);
-
-  // The bubble keeps the old words until Niri starts to turn, then waits for the landing
-  // to grow again with the new line and type it.
+  // What Niri shows (the twirl heads here) and what the bubble says.
+  const [niri, setNiri] = useState<Scene>(target);
   const [said, setSaid] = useState(text);
+  const [bubble, setBubble] = useState(true);
   const [n, setN] = useState(Infinity);
-  const bubble = useRef<HTMLDivElement>(null);
-  const first = useRef(true);
-  useLayoutEffect(() => {
-    if (first.current) {
-      first.current = false;
+  // Remounting the twirl (a new epoch) resets Niri without a spin.
+  const [epoch, setEpoch] = useState(0);
+  const root = useRef<HTMLDivElement>(null);
+  const box = useRef<HTMLDivElement>(null);
+  const entered = useRef(!entering);
+  const busy = useRef(false);
+  const want = useRef(target);
+  want.current = target;
+
+  const [px, setPx] = useState(size);
+  useIsoLayoutEffect(() => {
+    if (matchMedia('(min-width: 1280px)').matches) setPx(wide);
+  }, [wide]);
+
+  // Hydrated: step back to the "before" pose, unseen, and wait for the section.
+  useIsoLayoutEffect(() => {
+    if (!entering || reduced()) {
+      entered.current = true;
       return;
     }
-    if (text === said) return;
-    const el = bubble.current;
-    const now = reduced();
-    const out = window.setTimeout(() => {
-      el?.removeAttribute('data-in');
-      el?.setAttribute('data-out', '');
-    }, now ? 0 : TURN_MS);
-    const t = window.setTimeout(() => {
-      setSaid(text);
-      if (el) {
-        el.removeAttribute('data-out');
-        el.removeAttribute('data-in');
-        el.getBoundingClientRect();
-        el.setAttribute('data-in', '');
-      }
-    }, now ? 0 : LAND_MS);
+    setNiri({ ...target, mood: 'idle', gear: from ?? undefined, pre: true });
+    setBubble(false);
+    setEpoch(1);
+    const el = (watch && root.current?.closest<HTMLElement>(watch)) || root.current;
+    if (!el) return;
+    let t = 0;
+    const io = new IntersectionObserver(
+      ([e]) => {
+        const seen = e.intersectionRatio >= SEEN || e.intersectionRect.height >= window.innerHeight * SEEN;
+        window.clearTimeout(t);
+        if (!seen) return;
+        t = window.setTimeout(() => {
+          io.disconnect();
+          entered.current = true;
+          go(want.current);
+        }, SETTLE_MS);
+      },
+      { threshold: [0, 0.2, SEEN, 0.6, 0.8, 1] },
+    );
+    io.observe(el);
     return () => {
-      window.clearTimeout(out);
+      io.disconnect();
       window.clearTimeout(t);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [text]);
+  }, []);
 
-  // Typing runs for every new line after the first paint (the server markup stays fully shown).
-  const seen = useRef(said);
-  useEffect(() => {
-    if (seen.current === said || reduced()) return;
-    seen.current = said;
+  const outTimer = useRef(0);
+  const go = (s: Scene) => {
+    busy.current = true;
+    setNiri(s);
+    window.clearTimeout(outTimer.current);
+    outTimer.current = window.setTimeout(() => setBubble(false), TURN_MS);
+  };
+
+  // Niri has landed: the bubble grows with the new line and types; a queued scene goes next.
+  const landed = () => {
+    busy.current = false;
+    window.clearTimeout(outTimer.current);
+    const next = want.current;
+    if (sceneKey(next) !== sceneKey(niri)) return go(next);
+    setSaid(niri.text);
+    setBubble(true);
+    if (reduced()) return;
+    const el = box.current;
+    if (el) {
+      el.removeAttribute('data-in');
+      el.getBoundingClientRect();
+      el.setAttribute('data-in', '');
+    }
+    const len = niri.text.replaceAll('*', '').length;
     setN(0);
-    const dur = Math.min(TYPE_MS, said.length * 18);
-    let raf = 0;
-    const t0 = performance.now() + 120;
-    const tick = (t: number) => {
-      const p = Math.max(0, Math.min(1, (t - t0) / dur));
-      setN(p >= 1 ? Infinity : Math.floor(said.replaceAll('*', '').length * p));
-      if (p < 1) raf = requestAnimationFrame(tick);
+    const dur = Math.min(TYPE_CAP, len * CHAR_MS);
+    const t0 = performance.now() + 180;
+    const tick = (now: number) => {
+      const p = Math.max(0, Math.min(1, (now - t0) / dur));
+      setN(p >= 1 ? Infinity : Math.floor(len * p));
+      if (p < 1) typing.current = requestAnimationFrame(tick);
     };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [said]);
+    cancelAnimationFrame(typing.current);
+    typing.current = requestAnimationFrame(tick);
+  };
+  const typing = useRef(0);
+  useEffect(() => () => cancelAnimationFrame(typing.current), []);
 
-  const typing = n !== Infinity;
+  // A new target from the parent (chips) after the entrance: one turn at a time.
+  const key = sceneKey(target);
+  useEffect(() => {
+    if (!entered.current || busy.current || key === sceneKey(niri)) return;
+    if (reduced()) {
+      setNiri(target);
+      setSaid(target.text);
+      return;
+    }
+    cancelAnimationFrame(typing.current);
+    setN(Infinity);
+    go(target);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key]);
+
+  const talking = n !== Infinity;
   const left = side === 'left';
-  const tail = stack
-    ? 'left-[38px] -bottom-[9px] border-b-2 border-r-2 border-line'
-    : left
-      ? 'bottom-4 -right-[9px] border-r-2 border-t-2 border-line'
-      : 'bottom-4 -left-[9px] border-b-2 border-l-2 border-line';
   return (
-    <div className={`flex ${stack ? 'flex-col items-start gap-4' : `items-end gap-3 ${left ? 'flex-row-reverse' : ''}`} ${className}`}>
-      <NiriTwirl k={k} turns={turns} className={stack ? 'order-last ml-2' : ''}>
-        <Niri mood={typing ? 'talk' : mood} size={size} point={point} gear={shownGear} />
+    <div ref={root} className={`flex items-end gap-3 ${left ? 'flex-row-reverse' : ''} ${className}`}>
+      <NiriTwirl key={epoch} k={sceneKey(niri)} turns={turns} pace={PACE} onDone={landed}>
+        <Niri mood={talking ? 'talk' : niri.mood} size={px} point={point} gear={niri.gear} />
       </NiriTwirl>
-      <div
-        ref={bubble}
-        className={`say-bubble n-bubble relative min-w-0 rounded-[18px] border-2 border-line bg-bg px-4 py-3 ${stack ? 'w-full' : 'mb-4 flex-1'}`}
-        data-in=""
-        style={{ transformOrigin: stack ? '50px 100%' : `${left ? '100%' : '0'} calc(100% - 24px)` }}
-      >
-        <span className={`absolute h-4 w-4 rotate-45 bg-bg ${tail}`} aria-hidden="true" />
-        <p className="text-[16px] font-semibold leading-snug text-ink-2">
-          {typing ? (
-            <>
-              <span aria-hidden="true">{typed(said, n)}</span>
-              <span className="sr-only">{said.replaceAll('*', '')}</span>
-            </>
-          ) : (
-            emphasise(said)
-          )}
-        </p>
+      <div className="mb-4 min-w-0 flex-1">
+        <div
+          ref={box}
+          className="say-bubble n-bubble relative rounded-[18px] border-2 border-line bg-bg px-4 py-3"
+          data-in=""
+          data-hide={bubble ? undefined : ''}
+          style={{ transformOrigin: `${left ? '100%' : '0'} calc(100% - 24px)` }}
+        >
+          <span
+            className={`absolute bottom-4 h-4 w-4 rotate-45 bg-bg ${left ? '-right-[9px] border-r-2 border-t-2 border-line' : '-left-[9px] border-b-2 border-l-2 border-line'}`}
+            aria-hidden="true"
+          />
+          <p className="text-[16px] font-semibold leading-snug text-ink-2">
+            {talking ? (
+              <>
+                <span aria-hidden="true">{typed(said, n)}</span>
+                <span className="sr-only">{said.replaceAll('*', '')}</span>
+              </>
+            ) : (
+              emphasise(said)
+            )}
+          </p>
+        </div>
+        {children}
       </div>
     </div>
   );

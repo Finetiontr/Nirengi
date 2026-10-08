@@ -1,7 +1,7 @@
 ---
 // The genç chapter's body in one dense board: the habit loop in four stops, the live
-// week (goal, beacons, streak), Niri's weekly note and a small costume teaser. The note
-// is its own narration stop, so the narrator turns to it as the reader gets there.
+// week (goal, beacons, streak), Niri's weekly note and, on phones, a small costume
+// teaser (on wide screens the chips sit under the chapter's Niri).
 import GencLoop from './GencLoop.astro';
 import Analiz from './Analiz.astro';
 import Sheet from './Sheet.astro';
@@ -15,17 +15,15 @@ interface Props {
 const { tiers } = Astro.props;
 ---
 
-<div>
-  <GencLoop />
-  <div class="mt-8 grid gap-6 lg:grid-cols-2 lg:gap-7">
-    <div class="flex min-w-0 flex-col gap-6">
-      <Sheet tone="orange">
-        <LiveWeek client:only="react"><div slot="fallback" class="h-[262px]"></div></LiveWeek>
-      </Sheet>
-      <Costumes client:visible tiers={tiers} />
-    </div>
-    <Sheet tone="purple" data-narrate="analiz" class="scroll-mt-24">
-      <Analiz />
+<div class="grid gap-6 lg:grid-cols-2 lg:gap-7">
+  <div class="flex min-w-0 flex-col gap-6">
+    <GencLoop />
+    <Sheet tone="orange">
+      <LiveWeek client:only="react"><div slot="fallback" class="h-[262px]"></div></LiveWeek>
     </Sheet>
+    <div class="xl:hidden"><Costumes client:visible tiers={tiers} /></div>
   </div>
+  <Sheet tone="purple">
+    <Analiz />
+  </Sheet>
 </div>

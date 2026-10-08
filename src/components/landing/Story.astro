@@ -1,26 +1,11 @@
 ---
-// The landing's body: the story sections, with Niri narrating them. Sections are full
-// bleed (their bands and contours run edge to edge); their content sits in one centred
-// frame. On wide screens (with JS) that frame keeps a left rail where the sticky
-// narrator lives, so Niri is part of the composition instead of a gutter beside it.
-// Everywhere else each section carries its own inline bubble, which is also what shows
-// without JS. Section content uses `.wrap` to join the frame.
-import Narrator from './Narrator';
-import type { Line } from './Say';
-
-interface Props {
-  lines: Line[];
-  tiers: Line[];
-}
-const { lines, tiers } = Astro.props;
+// The landing's body: the story sections. Sections are full bleed (their bands and
+// contours run edge to edge); their content sits in one centred frame shared with the
+// nav, hero and closing band. Each section has its own Niri in its own layout (Say),
+// on phones and wide screens alike.
 ---
 
 <div class="story">
-  <aside class="story-aside" aria-hidden="true">
-    <div class="story-rail">
-      <Narrator client:load lines={lines} tiers={tiers} />
-    </div>
-  </aside>
   <slot />
 </div>
 
@@ -40,70 +25,14 @@ const { lines, tiers } = Astro.props;
       --frame: 1360px;
     }
   }
-  .story {
-    position: relative;
-  }
-  .story-aside {
-    display: none;
-  }
-  /* The inline copy, for assistive tech only, once the sticky narrator takes over. */
-  .say-sr {
-    display: none;
-  }
-  /* The bubble steps back while Niri turns, then grows in with the new line. */
-  .say-bubble[data-out] {
-    animation: say-out 140ms ease-in both;
+  /* Niri's bubble waits while Niri enters or turns, then grows in with its line (Say). */
+  .js .say-bubble[data-hide] {
+    animation: say-out 160ms ease-in both;
   }
   @keyframes say-out {
-    to { opacity: 0; transform: scale(0.94); }
+    to { opacity: 0; transform: scale(0.94); visibility: hidden; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .say-bubble[data-out] { animation: none; }
-  }
-  @media (min-width: 1280px) {
-    .js .story {
-      --rail: 288px;
-      --gap: 56px;
-    }
-    .js .story-aside {
-      display: block;
-      position: absolute;
-      inset: 0;
-      z-index: 5;
-      pointer-events: none;
-    }
-    .js .story-rail {
-      height: 100%;
-      max-width: var(--frame);
-      margin-inline: auto;
-      padding-inline: 24px;
-    }
-    .js .story-rail [data-narrator] {
-      width: var(--rail);
-    }
-    .js .story .wrap {
-      max-width: var(--frame);
-      padding-left: calc(24px + var(--rail) + var(--gap));
-      padding-right: 24px;
-    }
-    .js .say-inline {
-      display: none;
-    }
-    .js .say-sr {
-      display: block;
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0 0 0 0);
-      white-space: nowrap;
-    }
-  }
-  @media (min-width: 1600px) {
-    .js .story {
-      --rail: 312px;
-      --gap: 72px;
-    }
+    .js .say-bubble[data-hide] { animation: none; opacity: 0; }
   }
 </style>

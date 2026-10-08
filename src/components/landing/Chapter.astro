@@ -1,10 +1,12 @@
 ---
-// A path's chapter: who it is for, in one sentence, Niri's line (inline on phones, the
-// sticky narrator on wide screens), the chapter's dense body and its own door. The genç
-// chapter is warm (beacon orange allowed); the kurum chapter stays calm indigo on grey.
-// `*phrase*` in the heading takes the path's colour.
+// A path's chapter: who it is for, in one sentence, with the chapter's own Niri beside
+// it (under it on phones), the chapter's dense body and its own door. The genç chapter
+// is warm (beacon orange allowed) and its Niri carries the costume chips on wide
+// screens; the kurum chapter stays calm indigo on grey, with a plain Niri that only
+// hops to face you. `*phrase*` in the heading takes the path's colour.
 import { Contours } from '../ui/pafta';
 import Say from './Say';
+import GencSay from './GencSay';
 import type { Line } from './Say';
 
 interface Props {
@@ -13,31 +15,39 @@ interface Props {
   heading: string;
   lead: string;
   say: Pick<Line, 'mood' | 'text' | 'gear'>;
-  /** The costume Niri wears before it twirls into this chapter's (phones). */
+  /** The costume Niri wears before it twirls into this chapter's. */
   from?: number | null;
+  /** The league costumes for the genç chapter's chips. */
+  tiers?: Line[];
   door: { href: string; label: string };
 }
 
-const { id, side, heading, lead, say, from = null, door } = Astro.props;
+const { id, side, heading, lead, say, from = null, tiers, door } = Astro.props;
 const parts = heading.split('*');
-const spoken = say.text.split('*');
 const genc = side === 'genc';
 ---
 
-<section id={id} data-narrate={id} class:list={['relative scroll-mt-16 overflow-hidden border-t-2 border-line', genc ? 'bg-orange-tint/45' : 'bg-bg-2']}>
+<section id={id} class:list={['relative scroll-mt-16 overflow-hidden border-t-2 border-line', genc ? 'bg-orange-tint/45' : 'bg-bg-2']}>
   <Contours seed={genc ? 3 : 7} x={genc ? 0.85 : 0.12} y={0.4} rings={12} step={30} color={genc ? 'orange' : 'line-2'} opacity={genc ? 0.16 : 0.55} />
-  <div class="wrap relative mx-auto max-w-[1040px] px-4 py-12 sm:px-6 lg:py-16">
-    <div data-reveal class="max-w-[760px]">
-      <h2 class="text-[clamp(30px,4vw,44px)] font-black leading-[1.08] tracking-[-0.025em] text-ink">
-        {parts.map((t, i) => (i % 2 ? <span style={`color:rgb(var(${genc ? '--orange-ink' : '--indigo'}))`}>{t}</span> : t))}
-      </h2>
-      <p class="mt-3 max-w-[60ch] text-[18px] font-medium leading-relaxed text-ink-2">{lead}</p>
-      <div class="say-inline mt-5">
-        <Say client:visible mood={say.mood} text={say.text} gear={say.gear} from={from} turns={genc ? 1 : 0.5} point="down" />
+  <div class="relative mx-auto max-w-[var(--frame,1120px)] px-4 py-12 sm:px-6 lg:py-16">
+    <div class="grid items-end gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,500px)] xl:gap-14">
+      <div data-reveal class="max-w-[760px]">
+        <h2 class="text-[clamp(30px,4vw,44px)] font-black leading-[1.08] tracking-[-0.025em] text-ink">
+          {parts.map((t, i) => (i % 2 ? <span style={`color:rgb(var(${genc ? '--orange-ink' : '--indigo'}))`}>{t}</span> : t))}
+        </h2>
+        <p class="mt-3 max-w-[60ch] text-[18px] font-medium leading-relaxed text-ink-2">{lead}</p>
       </div>
-      <p class="say-sr">{spoken.map((t, i) => (i % 2 ? <b>{t}</b> : t))}</p>
+      <div data-reveal style="--d:80ms" class="min-w-0">
+        {
+          genc && tiers ? (
+            <GencSay client:idle line={say} tiers={tiers} from={from} />
+          ) : (
+            <Say client:idle mood={say.mood} text={say.text} gear={say.gear} from={from} turns={genc ? 1 : 0} watch="section" point="down" />
+          )
+        }
+      </div>
     </div>
-    <div data-reveal style="--d:100ms" class="mt-8">
+    <div data-reveal style="--d:100ms" class="mt-8 xl:mt-10">
       <slot />
     </div>
     <div data-reveal style="--d:160ms" class="mt-8">
