@@ -218,6 +218,26 @@
 }
 .n-z { transform-box: fill-box; transform-origin: center; animation: n-z 4.2s ease-out infinite; animation-delay: calc(var(--i) * 1.3s); }
 
+/* ---------------------------------------------------------------- gear */
+
+/* League costumes: the held tool follows the arm's pose; loose ends move in the wind. */
+.n-held { transition: transform 0.45s var(--niri-spring); }
+@keyframes n-flutter {
+  0%, 100% { transform: rotate(0); }
+  50% { transform: rotate(9deg); }
+}
+.n-flutter { animation: n-flutter 1.6s ease-in-out infinite; }
+@keyframes n-cloth {
+  0%, 100% { transform: skewY(0) scaleX(1); }
+  50% { transform: skewY(6deg) scaleX(0.9); }
+}
+.n-cloth { transform-box: fill-box; transform-origin: 100% 50%; animation: n-cloth 2s ease-in-out infinite; }
+@keyframes n-lamp {
+  0%, 86%, 100% { opacity: 1; }
+  92% { opacity: 0.55; }
+}
+.n-lamp { animation: n-lamp 3.6s ease-in-out infinite; }
+
 /* ---------------------------------------------------------------- one-shot actions */
 
 @keyframes n-hop {
@@ -312,6 +332,8 @@
 .n-bubble[data-in] { animation: n-bubble-in 0.26s cubic-bezier(0.2, 0.8, 0.3, 1) 0.1s both; }
 
 .niri[data-paused] * { animation-play-state: paused !important; }
+/* Thumbnails (the wardrobe) hold their pose. */
+.niri.n-still * { animation: none !important; }
 
 /* ---------------------------------------------------------------- celebration */
 

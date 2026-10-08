@@ -1,8 +1,9 @@
 ---
 // First screen: the hero sits on a map sheet. A survey trail climbs through
-// four triangle markers (the league elevations) to the summit where Niri waves.
-import Niri from '../ui/Niri';
+// four triangle markers (the league elevations); Niri climbs it marker by marker,
+// lands on the summit and waves (HeroNiri), then the flag drops in beside it.
 import { Contours, Tri } from '../ui/pafta';
+import HeroNiri from './HeroNiri';
 
 type Pt = [number, number];
 const W = 500;
@@ -39,6 +40,8 @@ const marks = [
 ] as const;
 
 const NIRI = 150;
+// The sheet's scale steps, shared with the island that draws Niri on top of it.
+const SHEET = 'scale-[0.66] sm:scale-[0.8] lg:scale-[0.88] xl:scale-[1.05]';
 const rings = [
   { rx: 34, ry: 11, o: 0.5 },
   { rx: 68, ry: 22, o: 0.34 },
@@ -57,8 +60,8 @@ const rings = [
         Gençlerin yaptığı doğrulanmış işi, kurumların yazdığı ihtiyaçlarla buluşturuyoruz. Özgeçmiş yok, iş var.
       </p>
       <div class="rise mx-auto mt-7 flex max-w-[380px] flex-col gap-3 sm:max-w-none sm:flex-row sm:flex-wrap sm:justify-center lg:mx-0 lg:justify-start" style="animation-delay:160ms">
-        <a href="/bugun" class="btn-primary btn-lg">Genç olarak başla</a>
-        <a href="/kurum" class="btn-line btn-lg">Kurum olarak ihtiyaç yaz</a>
+        <a href="/bugun" data-door="genc" class="btn-primary btn-lg">Genç olarak başla</a>
+        <a href="/kurum" data-door="kurum" class="btn-line btn-lg">Kurum olarak ihtiyaç yaz</a>
       </div>
       <p class="rise mt-4 text-[14px] font-semibold text-ink-3" style="animation-delay:220ms">Kayıt gerekmez. Demo verisi bu tarayıcıda kalır.</p>
     </div>
@@ -71,9 +74,9 @@ const rings = [
       <div
         class="absolute inset-0"
         role="img"
-        aria-label="Bir iz dört nirengi noktasından geçip zirvede el sallayan Niri’ye çıkıyor"
+        aria-label="Niri dört nirengi noktasından geçen izi tırmanıp zirvede el sallıyor"
       >
-      <div class="absolute left-0 top-0 origin-top-left scale-[0.66] sm:scale-[0.8] lg:scale-[0.88] xl:scale-[1.05]" style={`width:${W}px;height:${H}px`}>
+      <div class:list={['absolute left-0 top-0 origin-top-left', SHEET]} style={`width:${W}px;height:${H}px`}>
         <svg viewBox={`0 0 ${W} ${H}`} width={W} height={H} class="absolute inset-0" aria-hidden="true">
           {/* the summit: contour rings that also ping like a survey signal */}
           <ellipse cx={summit[0]} cy={summit[1]} rx="102" ry="33" fill="rgb(var(--indigo) / 0.05)"></ellipse>
@@ -112,14 +115,13 @@ const rings = [
         }
 
         {/* a planted flag at the summit */}
-        <svg viewBox="0 0 30 60" width="30" height="60" class="pop absolute" style={`left:${summit[0] - 92}px;top:${summit[1] - 56}px;animation-delay:1.95s`} aria-hidden="true">
+        <svg viewBox="0 0 30 60" width="30" height="60" class="c-flag absolute overflow-visible" style={`left:${summit[0] - 92}px;top:${summit[1] - 56}px;--d:2.5s`} aria-hidden="true">
           <path d="M5 4v54" stroke="rgb(var(--ink-3))" stroke-width="3" stroke-linecap="round"></path>
-          <path d="M7 5 26 12 7 20Z" fill="rgb(var(--orange))" stroke="rgb(var(--orange))" stroke-width="3" stroke-linejoin="round"></path>
+          <g class="c-cloth" style="--d:2.5s">
+            <path d="M7 5 26 12 7 20Z" fill="rgb(var(--orange))" stroke="rgb(var(--orange))" stroke-width="3" stroke-linejoin="round"></path>
+          </g>
         </svg>
 
-        <div class="rise absolute" style={`left:${summit[0] - NIRI / 2}px;top:${summit[1] - NIRI * 0.94 + 6}px;animation-delay:1.7s`}>
-          <Niri client:visible mood="wave" size={NIRI} />
-        </div>
 
         <p
           class="pop absolute -translate-x-1/2 whitespace-nowrap rounded-[8px] bg-bg px-1.5 text-[13px] font-semibold leading-snug text-ink-2"
@@ -130,14 +132,7 @@ const rings = [
       </div>
       </div>
 
-      <!-- Niri's first words, drawn at reading size (outside the scaled sheet). -->
-      <p
-        class="pop absolute left-0 top-1 w-[46%] rounded-[16px] border-2 border-line bg-bg px-3 py-2 text-[14px] font-semibold leading-snug text-ink-2 sm:text-[15px]"
-        style="animation-delay:2s"
-      >
-        <span class="absolute -right-[9px] top-[44%] h-4 w-4 rotate-45 border-r-2 border-t-2 border-line bg-bg" aria-hidden="true"></span>
-        Merhaba, ben <b>Niri</b>! Bu sayfayı sana ben anlatacağım.
-      </p>
+      <HeroNiri client:load trail={trail} size={NIRI} sheet={SHEET} />
     </div>
   </div>
 </section>
@@ -156,6 +151,55 @@ const rings = [
   @media (prefers-reduced-motion: reduce) {
     .ink {
       animation-delay: 0s;
+    }
+  }
+</style>
+
+<style is:global>
+  /* Niri's climb (HeroNiri): four hops along the trail, one per marker, growing as it
+     nears the summit. The resting state is the summit, so no animation means "arrived". */
+  .climb {
+    offset-distance: 100%;
+    offset-rotate: 0deg;
+    offset-anchor: 50% 90%;
+    transform-origin: 50% 90%;
+    animation: climb 2s linear 0.35s both;
+  }
+  .climb-hop {
+    transform-origin: 50% 90%;
+    animation: climb-hop 2s linear 0.35s both, climb-grow 2s linear 0.35s both;
+  }
+  /* Rests at 28.9 / 52.6 / 79% are where the markers sit on the trail. */
+  @keyframes climb {
+    0% { offset-distance: 0%; opacity: 0; }
+    5% { opacity: 1; }
+    8% { offset-distance: 0%; animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1); }
+    26%, 33% { offset-distance: 28.9%; animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1); }
+    51%, 58% { offset-distance: 52.6%; animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1); }
+    76%, 83% { offset-distance: 79%; animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1); }
+    97%, 100% { offset-distance: 100%; opacity: 1; }
+  }
+  /* Size lives on the inner element: a scale on .climb would also scale the offset. */
+  @keyframes climb-grow {
+    0%, 8% { scale: 0.5; }
+    26%, 33% { scale: 0.6; }
+    51%, 58% { scale: 0.7; }
+    76%, 83% { scale: 0.8; }
+    97%, 100% { scale: 1; }
+  }
+  @keyframes climb-hop {
+    0%, 4% { transform: none; }
+    8%, 33%, 58%, 83% { transform: scale(1.12, 0.86); animation-timing-function: cubic-bezier(0.2, 0.8, 0.3, 1); }
+    17%, 42%, 67%, 92% { transform: translateY(-46px) scale(0.94, 1.08); animation-timing-function: cubic-bezier(0.55, 0, 0.9, 0.6); }
+    26%, 51%, 76% { transform: scale(1.1, 0.88); animation-timing-function: ease-out; }
+    29%, 54%, 79% { transform: none; }
+    97% { transform: scale(1.1, 0.88); animation-timing-function: ease-out; }
+    100% { transform: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .climb,
+    .climb-hop {
+      animation: none;
     }
   }
 </style>

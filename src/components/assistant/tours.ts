@@ -7,7 +7,7 @@ import { DEMOTE, PROMOTE, XP } from '../../lib/engine/progress.ts';
 import type { Face } from './util';
 
 export type KurumRoute = 'kurum' | 'ihtiyaclar' | 'ihtiyac-yeni' | 'ihtiyac-detay' | 'kesfet' | 'pilotlar' | 'pilot-detay';
-export type GencRoute = 'bugun' | 'gorevler' | 'lig' | 'topluluk' | 'profil' | 'kanit-bagla';
+export type GencRoute = 'bugun' | 'analiz' | 'gorevler' | 'lig' | 'topluluk' | 'profil' | 'kanit-bagla';
 export type RouteKey = KurumRoute | GencRoute | 'diger';
 
 export interface CoachStep {
@@ -31,6 +31,7 @@ export function routeKey(pathname: string): RouteKey {
   if (p === '/pilotlar') return 'pilotlar';
   if (p.startsWith('/pilotlar/')) return 'pilot-detay';
   if (p === '/bugun') return 'bugun';
+  if (p === '/analiz') return 'analiz';
   if (p === '/gorevler') return 'gorevler';
   if (p === '/lig') return 'lig';
   if (p === '/topluluk') return 'topluluk';
@@ -474,6 +475,11 @@ export const HELP_GENC: Record<GencRoute | 'ihtiyac-detay' | 'pilot-detay' | 'di
     'Sıradaki adım kartı, bugün ne yapacağını tek cümleyle söyler.',
     'Paftan doğrulanmış işlerinin haritasıdır. Aşağıda sana uyan ihtiyaçları da görürsün.',
   ],
+  analiz: [
+    'Burada haftanı ve işlerini okuyup sana ne yapman gerektiğini söylerim.',
+    '“En yakın kapın”, tek bir doğrulanmış işle uyumunun en çok artacağı ihtiyaçtır.',
+    'Haftalık notum canlı sürümde her pazartesi e-postayla gelir; buradan önizleyebilirsin.',
+  ],
   gorevler: [
     'Her hafta üç kısa görevin var; hepsi rotada birer durak.',
     'Bir görev bitince “Bayrağı dik” düğmesi çıkar; basınca XP’ni alırsın.',
@@ -507,7 +513,7 @@ export const HELP_GENC: Record<GencRoute | 'ihtiyac-detay' | 'pilot-detay' | 'di
     'Her onay profiline “Kurum onaylı” iş olarak yazılır.',
   ],
   diger: [
-    'Menüden Bugün, Görevler, Lig, Topluluk ve Profil sayfalarına geçebilirsin.',
+    'Menüden Bugün, Analiz, Görevler, Lig, Topluluk ve Profil sayfalarına geçebilirsin.',
     'Takıldığında buradan beni çağırabilir, turu yeniden başlatabilirsin.',
   ],
 };

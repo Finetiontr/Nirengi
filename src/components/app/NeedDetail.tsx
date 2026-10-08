@@ -216,9 +216,8 @@ function Detail({ need }: { need: Need }) {
 
           {ranked.length > 0 ? (
             <>
-              <NiriSays mood="point" point="down" size={72} className="mt-5">
-                <p className="text-[15px] font-bold text-ink-2">Bir adaya dokun: puanın nereden geldiğini, yaptığı işi ve eksiklerini gör.</p>
-              </NiriSays>
+              {/* Candidate list stays Niri-free: the kurum reads scores and reasons, not the mascot. */}
+              <p className="mt-5 text-[15px] font-bold text-ink-3">Bir adaya dokun: puanın nereden geldiğini, yaptığı işi ve eksiklerini gör.</p>
               <ol data-coach="need-adaylar" className="mt-4 space-y-3">
                 {ranked.map((m, i) => (
                   <li key={m.person.id} data-coach={i === 0 ? 'need-aday' : undefined} className="rise" style={{ animationDelay: `${i * 40}ms` }}>

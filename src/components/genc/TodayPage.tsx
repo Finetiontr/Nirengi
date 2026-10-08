@@ -6,12 +6,14 @@ import { Check, ChevronRight, Crosshair } from 'lucide-react';
 import { actions, currentMe, useAppState } from '../../lib/store.ts';
 import { journey, progress, weekKey, type Step, type Unit } from '../../lib/engine/progress.ts';
 import { needsForPerson } from '../../lib/engine/match.ts';
+import { personInsight } from '../../lib/engine/insight.ts';
 import { skillLabel } from '../../lib/skills.ts';
 import type { Person, State, WeeklyGoal } from '../../lib/types.ts';
 import NiriSays from '../ui/NiriSays';
 import { Bar, feedback, Head, Ring, Sheet, WeekDots } from '../ui/kit';
 import { Flame, Lock } from '../ui/icons';
 import { ClimbMap, Contours } from '../ui/pafta';
+import ClosestDoor from './ClosestDoor';
 
 const firstName = (p: Person) => p.name.split(' ')[0];
 
@@ -55,6 +57,7 @@ export default function TodayPage() {
   const units = journey(s, me);
   const next = nextStep(s, me, p.met, Math.max(0, p.goal - p.active));
   const matches = needsForPerson(s, me).slice(0, 3);
+  const closest = personInsight(s, me).closest;
   const [goalOpen, setGoalOpen] = useState(false);
   const [stepOpen, setStepOpen] = useState<{ step: Step; unit: Unit } | null>(null);
 
@@ -71,7 +74,7 @@ export default function TodayPage() {
   return (
     <div className="mx-auto max-w-[600px]">
       {/* Greeting */}
-      <NiriSays mood={p.met ? 'happy' : 'wave'} size={92} typing>
+      <NiriSays mood={p.met ? 'happy' : 'wave'} size={92} gear={me.tier ?? 0} typing>
         <p className="text-[17px] font-extrabold text-ink">
           {greeting()}, {firstName(me)}!
         </p>
@@ -134,6 +137,13 @@ export default function TodayPage() {
           </span>
         </div>
       </motion.a>
+
+      {/* The door one verified piece of work away */}
+      {closest && (
+        <div className="mt-5">
+          <ClosestDoor s={s} closest={closest} more />
+        </div>
+      )}
 
       {/* The pafta: every verified step is a point on your own map, climbing to the summit */}
       <section data-coach="g-pafta" className="card mt-10 p-4 sm:p-5" aria-labelledby="pafta">

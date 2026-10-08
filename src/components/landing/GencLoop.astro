@@ -1,0 +1,32 @@
+---
+// The genç loop in four stops: what you do, and what it turns into. Each stop is a
+// concept icon in its own colour on a short dashed trail, read left to right.
+import { Bolt, Flame, Route, Shield } from '../ui/icons';
+
+const stops = [
+  { icon: 'route', title: 'Bir iş yap', text: 'Görev, açık kaynak PR’ı ya da kendi projen.' },
+  { icon: 'gem', title: 'Kanıtla', text: 'Doğrulanınca XP’si makbuzuyla gelir.' },
+  { icon: 'beacon', title: 'Seriyi yak', text: 'Haftalık hedefini tuttur, seri büyüsün.' },
+  { icon: 'ridge', title: 'Ligde tırman', text: 'Zemin’den Zirve’ye, her hafta yeniden.' },
+] as const;
+---
+
+<ol class="grid grid-cols-2 gap-x-4 gap-y-6 md:grid-cols-4">
+  {
+    stops.map((s, i) => (
+      <li class="relative">
+        {i < stops.length - 1 && (
+          <span class="absolute left-[56px] right-2 top-[26px] hidden border-t-[3px] border-dotted border-orange/50 md:block" aria-hidden="true" />
+        )}
+        <span class="relative grid h-[52px] w-[52px] place-items-center rounded-[14px] border-2 border-line bg-bg">
+          {s.icon === 'route' && <Route size={36} />}
+          {s.icon === 'gem' && <Bolt size={36} />}
+          {s.icon === 'beacon' && <Flame size={36} className="flame-live" />}
+          {s.icon === 'ridge' && <Shield size={36} tier={3} />}
+        </span>
+        <p class="mt-3 text-[17px] font-black text-ink">{s.title}</p>
+        <p class="mt-0.5 text-[15px] font-semibold leading-snug text-ink-3">{s.text}</p>
+      </li>
+    ))
+  }
+</ol>

@@ -214,6 +214,8 @@ export interface Celebration {
   cta?: string;
   /** Where the button goes after closing; without it the moment just closes. */
   href?: string;
+  /** League tier costume Niri wears for the moment (genç side only). */
+  gear?: number;
 }
 
 export interface FeedbackMsg {
@@ -338,7 +340,7 @@ function CelebrationView({ c, onClose }: { c: Celebration; onClose: () => void }
         {!calm && <Rings />}
         {!calm && <Confetti />}
         <SurveyFlag className="absolute -right-[52px] bottom-[6px]" delay={0.85} />
-        <Niri mood="cheer" size={150} className="relative" />
+        <Niri mood="cheer" size={150} gear={c.gear} className="relative" />
       </motion.div>
       <motion.h2
         className="mt-6 text-[30px] font-black text-ink md:text-[36px]"

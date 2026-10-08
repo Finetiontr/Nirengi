@@ -1,6 +1,6 @@
 // The sticky narrator for wide screens: one Niri that stays beside the story and
 // changes mood and words as each section reaches the reading line. It appears once
-// the hero's Niri has scrolled away and leaves before the closing band's Niri comes in,
+// the last stage Niri above the story (hero, then "who") has scrolled away and leaves before the closing band's Niri comes in,
 // so there is never more than one on screen. Phones and no-JS get inline bubbles instead.
 
 import { useEffect, useState } from 'react';
@@ -16,7 +16,7 @@ export default function Narrator({ lines }: { lines: Line[] }) {
 
   useEffect(() => {
     const sections = [...document.querySelectorAll<HTMLElement>('[data-narrate]')];
-    const hero = document.querySelector<HTMLElement>('[data-narrate-hero]');
+    const hero = [...document.querySelectorAll<HTMLElement>('[data-narrate-hero]')].at(-1);
     const end = document.querySelector<HTMLElement>('[data-narrate-end]');
     if (!sections.length) return;
     let raf = 0;
@@ -31,7 +31,7 @@ export default function Narrator({ lines }: { lines: Line[] }) {
       let cur = sections[0];
       for (const s of sections) if (s.getBoundingClientRect().top <= vh * 0.6) cur = s;
       setKey(cur.dataset.narrate ?? lines[0].key);
-      // Niri's feet on the summit sit about halfway down the hero sheet.
+      // The stage Niri stands about halfway down its sheet.
       const h = hero?.getBoundingClientRect();
       const heroGone = !h || h.top + h.height * 0.5 < 64;
       const endFar = !end || end.getBoundingClientRect().top > vh * 0.7;

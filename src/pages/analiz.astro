@@ -1,0 +1,10 @@
+---
+import App from '../layouts/App.astro';
+import AnalysisPage from '../components/genc/AnalysisPage';
+import GencRail from '../components/shell/GencRail';
+---
+
+<App title="Analiz" mode="genc" description="Niri haftanı ve işlerini okur: güçlü yanların, kurumların aradığı beceriler ve sıradaki adımların.">
+  <AnalysisPage client:only="react" />
+  <GencRail slot="rail" client:only="react" />
+</App>

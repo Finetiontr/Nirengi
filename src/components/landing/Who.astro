@@ -1,0 +1,114 @@
+---
+// Chapter two: who Niri is. A nirengi point is the fixed survey point measurements start
+// from; Niri stands on its pillar and sights the points of your map. Measured work is a
+// filled marker with a drawn sight line; a mere claim stays dashed and unmeasured.
+// Lines draw and markers pop once the sheet scrolls in; at rest everything is drawn.
+import Niri from '../ui/Niri';
+import { Tri } from '../ui/pafta';
+import { LevelGlyph } from '../ui/primitives';
+
+// Points in the 500x340 sheet; P is the pillar top under Niri's feet.
+const P = { x: 250, y: 236 };
+const pts = [
+  { x: 92, y: 96, tone: 'cyan', level: 'S2', label: 'Birleşen PR', d: 0.35 },
+  { x: 400, y: 74, tone: 'cyan', level: 'S2', label: 'Doğrulanan alan adı', d: 0.6 },
+  { x: 418, y: 258, tone: 'indigo', level: 'S3', label: 'Kurumun imzası', d: 0.85 },
+] as const;
+const claim = { x: 70, y: 262 };
+const pc = (v: number, of: number) => `${((v / of) * 100).toFixed(2)}%`;
+---
+
+<section id="niri" class="relative overflow-hidden border-b-2 border-line" aria-labelledby="who-title">
+  <div class="mx-auto grid max-w-[1120px] items-center gap-8 px-4 py-14 sm:px-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-12 lg:py-24">
+    <div data-reveal>
+      <h2 id="who-title" class="text-[clamp(30px,4vw,46px)] font-black leading-[1.08] tracking-[-0.025em] text-ink">
+        Ben bir <span class="text-indigo">nirengi noktasıyım.</span>
+      </h2>
+      <p class="mt-4 max-w-[46ch] text-[17px] font-medium leading-relaxed text-ink-2">
+        Haritacılar ölçmeye nirengi noktasından başlar: yeri sabit, herkesin güvendiği bir nokta. Ben de öyleyim. Yaptığın her iş haritana bir nokta olarak eklenir; ama yalnızca ölçülebiliyorsa.
+      </p>
+      <p class="mt-6 inline-flex items-center gap-3 rounded-[14px] border-2 border-indigo/40 bg-indigo-tint px-4 py-2.5 text-[clamp(22px,2.6vw,28px)] font-black tracking-[-0.02em] text-indigo">
+        <span class="block" aria-hidden="true"><Tri size={26} tone="indigo" state="done" /></span>
+        Beyan değil, kanıt.
+      </p>
+      <p class="mt-4 max-w-[46ch] text-[15px] font-semibold leading-snug text-ink-3">
+        Kesik çizgili nokta beyandır, kimse ölçmedi. Dolu noktalar ölçüldü: bir PR birleşti, bir alan adı doğrulandı, bir kurum imzaladı.
+      </p>
+    </div>
+
+    <div data-reveal style="--d:120ms" class="min-w-0">
+      <div data-narrate-hero class="relative mx-auto aspect-[500/340] w-full max-w-[560px]">
+        <svg viewBox="0 0 500 340" class="absolute inset-0 h-full w-full overflow-visible" aria-hidden="true">
+          {/* the network between the measured points */}
+          <path d={`M${pts[0].x} ${pts[0].y}L${pts[1].x} ${pts[1].y}L${pts[2].x} ${pts[2].y}`} fill="none" stroke="rgb(var(--line-2))" stroke-width="2" stroke-dasharray="2 9" stroke-linecap="round"></path>
+          {/* sight lines from the pillar */}
+          {
+            pts.map((p) => (
+              <path
+                class="who-line"
+                style={`--d:${p.d - 0.2}s`}
+                d={`M${P.x} ${P.y - 4}L${p.x} ${p.y}`}
+                pathLength="1"
+                fill="none"
+                stroke={`rgb(var(--${p.tone}) / 0.6)`}
+                stroke-width="3.5"
+                stroke-linecap="round"
+              ></path>
+            ))
+          }
+          {/* the pillar: a concrete block with its brass plate */}
+          <ellipse cx={P.x} cy="312" rx="86" ry="12" fill="rgb(var(--ink) / 0.06)"></ellipse>
+          <path d={`M${P.x - 34} ${P.y}h68l12 74h-92Z`} fill="rgb(var(--bg-3))" stroke="rgb(var(--line-2))" stroke-width="3" stroke-linejoin="round"></path>
+          <rect x={P.x - 40} y={P.y - 6} width="80" height="10" rx="5" fill="rgb(var(--line-2))"></rect>
+          <circle cx={P.x} cy={P.y + 36} r="7" fill="rgb(var(--gold))" stroke="rgb(var(--gold-lip))" stroke-width="2"></circle>
+        </svg>
+
+        {/* the claim: dashed, never sighted */}
+        <div class="who-pt absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center" style={`left:${pc(claim.x, 500)};top:${pc(claim.y, 340)};--d:1.1s`}>
+          <Tri size={38} tone="indigo" state="waiting" />
+          <span class="mt-1 whitespace-nowrap rounded-[8px] bg-bg px-1.5 text-center text-[12px] font-semibold sm:text-[13px] leading-tight text-ink-3">
+            “Excel biliyorum”<br /><span class="font-bold">ölçülmedi</span>
+          </span>
+        </div>
+
+        {
+          pts.map((p) => (
+            <div class="who-pt absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center" style={`left:${pc(p.x, 500)};top:${pc(p.y, 340)};--d:${p.d}s`}>
+              <Tri size={44} tone={p.tone} state="done">
+                <span class="block h-2 w-2 rounded-full bg-white" />
+              </Tri>
+              <span class="mt-1 flex items-center gap-1 whitespace-nowrap rounded-[8px] bg-bg px-1.5 text-[12px] font-bold sm:text-[13px] leading-tight text-ink-2">
+                <LevelGlyph level={p.level} size={13} />
+                {p.label}
+              </span>
+            </div>
+          ))
+        }
+
+        {/* Niri on the pillar: feet on the plate (sheet y 236 → 69.4%), 24% of the width wide. */}
+        <div class="absolute left-[38%] top-[33.4%] w-[24%] [&_svg]:h-auto [&_svg]:w-full">
+          <Niri client:visible mood="happy" size={132} cue="in" />
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  [data-in] .who-line {
+    animation: who-draw 0.6s cubic-bezier(0.45, 0, 0.25, 1) var(--d, 0s) both;
+  }
+  @keyframes who-draw {
+    from { stroke-dasharray: 1; stroke-dashoffset: 1; }
+    to { stroke-dasharray: 1; stroke-dashoffset: 0; }
+  }
+  [data-in] .who-pt {
+    animation: pop 420ms var(--ease-out) var(--d, 0s) both;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    [data-in] .who-line,
+    [data-in] .who-pt {
+      animation: none;
+    }
+  }
+</style>

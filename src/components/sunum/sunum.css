@@ -1,0 +1,89 @@
+/*
+ * Sunum: the stage deck. Everything is laid out on a fixed 1600×900 stage
+ * that is scaled to the screen (--s, set before paint in sunum.astro), so a
+ * projector at any resolution shows the same composition.
+ */
+
+.deck {
+  position: fixed;
+  inset: 0;
+  background: rgb(var(--bg));
+  color: rgb(var(--ink-2));
+  user-select: none;
+  -webkit-user-select: none;
+}
+.deck[data-idle] { cursor: none; }
+
+.stage {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1600px;
+  height: 900px;
+  transform: translate(-50%, -50%) scale(var(--s, 1));
+  transform-origin: center;
+}
+
+/* Projector type ramp: same voice as the app, sized for the back row. */
+.s-h {
+  color: rgb(var(--ink));
+  font-size: 64px;
+  font-weight: 800;
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+.s-t {
+  color: rgb(var(--ink));
+  font-size: 30px;
+  font-weight: 750;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+.s-p {
+  color: rgb(var(--ink-2));
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+.s-cap {
+  color: rgb(var(--ink-3));
+  font-size: 18px;
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+/* A slide's blocks rise in one after another; --d is the block's delay. */
+@keyframes s-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
+}
+.s-in { animation: s-in 520ms cubic-bezier(0.16, 1, 0.3, 1) var(--d, 0ms) both; }
+
+/* Niri walks between stage marks. */
+.narrator {
+  position: absolute;
+  transition: left 560ms cubic-bezier(0.16, 1, 0.3, 1), bottom 560ms cubic-bezier(0.16, 1, 0.3, 1), width 560ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+kbd.s-kbd {
+  display: inline-grid;
+  min-width: 34px;
+  height: 32px;
+  place-items: center;
+  padding: 0 8px;
+  border: 2px solid rgb(var(--line));
+  border-radius: 8px;
+  box-shadow: 0 2px 0 rgb(var(--line));
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+  color: rgb(var(--ink-2));
+  background: rgb(var(--bg));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .s-in { animation: none; }
+  .narrator { transition: none; }
+}

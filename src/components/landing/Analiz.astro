@@ -1,0 +1,69 @@
+---
+// Niri's weekly read of your work: where you stand in the league (five tiers on one
+// elevation line, the climbed part filled) and a short note on what to improve next.
+// Sample content, labelled as such; the real one is on /analiz.
+import { Tri } from '../ui/pafta';
+
+const tiers = ['Zemin', 'Tepe', 'Sırt', 'Doruk', 'Zirve'];
+const at = 2;
+const xs = [18, 92, 166, 240, 302];
+const ys = [74, 62, 48, 34, 20];
+const line = xs.map((x, i) => `${i ? 'L' : 'M'}${x} ${ys[i]}`).join('');
+const climbed = `M${xs[0]} 92${xs
+  .slice(0, at + 1)
+  .map((x, i) => `L${x} ${ys[i]}`)
+  .join('')}L${xs[at]} 92Z`;
+
+const notes = [
+  { tone: 'green', state: 'done', title: 'İyi giden', text: 'Hedefini üç hafta üst üste tutturdun.' },
+  { tone: 'cyan', state: 'done', title: 'Güçlü yanın', text: 'Arayüz işlerin doğrulandı; kurumlar bunu görüyor.' },
+  { tone: 'indigo', state: 'waiting', title: 'Eksik kanıt', text: 'Test yazdığını gösteren bir işin yok.' },
+  { tone: 'indigo', state: 'done', title: 'Sıradaki adım', text: '“Açık kaynakta test ekle” görevi bu eksiği kapatır.' },
+] as const;
+---
+
+<div>
+  <div class="flex items-center justify-between gap-3">
+    <p class="h-sec">Niri’nin notu</p>
+    <span class="chip">Bu hafta</span>
+  </div>
+
+  <svg viewBox="0 0 320 112" class="mt-3 w-full" role="img" aria-label={`Lig: beş kademeden ${tiers[at]} kademesindesin`}>
+    <path d={climbed} fill="rgb(var(--purple) / 0.14)"></path>
+    <path d={line} fill="none" stroke="rgb(var(--line-2))" stroke-width="3" stroke-dasharray="2 7" stroke-linecap="round"></path>
+    <path d={xs.slice(0, at + 1).map((x, i) => `${i ? 'L' : 'M'}${x} ${ys[i]}`).join('')} fill="none" stroke="rgb(var(--purple))" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"></path>
+    <ellipse class="ping-soft" cx={xs[at]} cy={ys[at]} rx="10" ry="4" fill="none" stroke="rgb(var(--purple) / 0.5)" stroke-width="2"></ellipse>
+    {
+      tiers.map((t, i) => (
+        <g>
+          <path
+            d={`M${xs[i]} ${ys[i] - 13}l9 15h-18Z`}
+            fill={i <= at ? `rgb(var(--t${i}))` : 'rgb(var(--bg-3))'}
+            stroke={i <= at ? `rgb(var(--t${i}))` : 'rgb(var(--line-2))'}
+            stroke-width="4"
+            stroke-linejoin="round"
+          />
+          <text x={xs[i]} y="108" text-anchor="middle" font-size="12.5" font-weight={i === at ? 780 : 600} fill={i === at ? 'rgb(var(--purple))' : 'rgb(var(--ink-3))'}>
+            {t}
+          </text>
+        </g>
+      ))
+    }
+  </svg>
+
+  <ul class="mt-4 space-y-3 border-t-2 border-line pt-4">
+    {
+      notes.map((n) => (
+        <li class="flex gap-3">
+          <span class="mt-0.5 block shrink-0" aria-hidden="true">
+            <Tri size={22} tone={n.tone} state={n.state} />
+          </span>
+          <p class="text-[15px] font-semibold leading-snug text-ink-2">
+            <b class="font-black text-ink">{n.title}:</b> {n.text}
+          </p>
+        </li>
+      ))
+    }
+  </ul>
+  <p class="mt-4 text-[13px] font-semibold text-ink-3">Örnek analiz, kurgusal.</p>
+</div>

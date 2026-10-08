@@ -1,0 +1,36 @@
+---
+// A path's opening page: who it is for, in one sentence, and its own door. The genç
+// chapter is warm (beacon orange allowed); the kurum chapter stays calm indigo on grey.
+// `*phrase*` in the heading takes the path's colour.
+import { Contours } from '../ui/pafta';
+
+interface Props {
+  id: string;
+  side: 'genc' | 'kurum';
+  heading: string;
+  lead: string;
+  door: { href: string; label: string };
+}
+
+const { id, side, heading, lead, door } = Astro.props;
+const parts = heading.split('*');
+const genc = side === 'genc';
+---
+
+<section id={id} data-narrate={id} class:list={['relative scroll-mt-16 overflow-hidden border-t-2 border-line', genc ? 'bg-orange-tint/45' : 'bg-bg-2']}>
+  <Contours seed={genc ? 3 : 7} x={genc ? 0.85 : 0.12} y={0.4} rings={10} step={30} color={genc ? 'orange' : 'line-2'} opacity={genc ? 0.16 : 0.55} />
+  <div class="relative mx-auto max-w-[1040px] px-4 py-14 sm:px-6 lg:py-20">
+    <div data-reveal class="max-w-[760px]">
+      <h2 class="text-[clamp(30px,4vw,46px)] font-black leading-[1.08] tracking-[-0.025em] text-ink">
+        {parts.map((t, i) => (i % 2 ? <span style={`color:rgb(var(${genc ? '--orange-ink' : '--indigo'}))`}>{t}</span> : t))}
+      </h2>
+      <p class="mt-4 max-w-[56ch] text-[18px] font-medium leading-relaxed text-ink-2">{lead}</p>
+    </div>
+    <div data-reveal style="--d:100ms" class="mt-8">
+      <slot />
+    </div>
+    <div data-reveal style="--d:160ms" class="mt-8">
+      <a href={door.href} class="btn-primary btn-lg">{door.label}</a>
+    </div>
+  </div>
+</section>

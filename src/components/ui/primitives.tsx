@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import type { Level, Person } from '../../lib/types.ts';
 import { LEVELS } from '../../lib/labels.ts';
 import { blindCode, initials } from '../../lib/format.ts';
@@ -67,7 +67,8 @@ const tone = (id: string) => TONES[[...id].reduce((a, c) => a + c.charCodeAt(0),
 /** What the viewer is allowed to see. Blind mode hides identity for the kurum side. */
 export function useIdentity(person: Person) {
   const { persona, blind, revealed } = useView();
-  const hidden = blind && persona === 'org' && !person.isDemoUser && !revealed.includes(person.id);
+  // The connected GitHub user is blind too: kurum sees the work first, the name and photo after first contact.
+  const hidden = blind && persona === 'org' && !revealed.includes(person.id);
   const code = blindCode(person.id);
   return {
     hidden,
@@ -80,6 +81,7 @@ export function useIdentity(person: Person) {
 /** `reveal` is for contexts where identity is already known to both sides (an open pilot). */
 export function Avatar({ person, size = 44, reveal = false }: { person: Person; size?: number; reveal?: boolean }) {
   const id = useIdentity(person);
+  const [broken, setBroken] = useState(false);
   if (id.hidden && !reveal)
     return (
       <span
@@ -91,6 +93,21 @@ export function Avatar({ person, size = 44, reveal = false }: { person: Person; 
           <path d="M8 2.2 14.2 13.3H1.8Z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
         </svg>
       </span>
+    );
+  // GitHub photo when there is one; initials if it fails to load (offline stage, blocked host).
+  if (person.avatar && !broken)
+    return (
+      <img
+        src={person.avatar}
+        alt=""
+        width={size}
+        height={size}
+        loading="lazy"
+        referrerPolicy="no-referrer"
+        onError={() => setBroken(true)}
+        className="shrink-0 rounded-full border-2 border-line bg-bg-2 object-cover"
+        style={{ width: size, height: size }}
+      />
     );
   return (
     <span

@@ -98,14 +98,14 @@ function Profile({ personId }: { personId: string }) {
             ) : (
               <>
                 <p className="text-[15px] font-bold text-ink-3">
-                  @{person.handle} · {person.city}
+                  {[`@${person.handle}`, person.city].filter((x) => x && x !== '—').join(' · ')}
                 </p>
                 <p className="mt-0.5 text-[16px] font-extrabold text-ink-2">{person.headline}</p>
               </>
             )}
             {!id.hidden && (
               <p className="mt-1 text-[13px] font-bold text-ink-3">
-                {person.age} yaş · {person.school} · {fmtDate(person.joinedAt)} tarihinden beri
+                {[person.age ? `${person.age} yaş` : '', person.school, `${fmtDate(person.joinedAt)} tarihinden beri`].filter((x) => x && x !== '—').join(' · ')}
               </p>
             )}
           </div>

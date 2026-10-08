@@ -82,7 +82,7 @@ export default function LiveMatch() {
             </svg>
             <Tri size={86} tone="indigo" state="done">
               <span className="grid h-6 w-6 place-items-center rounded-full bg-white">
-                <span className="block h-3 w-3 rounded-full bg-orange" />
+                <span className="block h-3 w-3 rounded-full bg-indigo" />
               </span>
             </Tri>
           </span>

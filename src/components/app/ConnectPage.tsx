@@ -140,6 +140,7 @@ function buildPerson(s: State, cur: Person | undefined, sc: Scan, picked: GhRepo
     handle: same ? base.handle : taken ? `${login}-gh` : login,
     evidence,
     links: { ...base.links, github: sc.offline ? undefined : sc.user.login },
+    avatar: sc.offline ? undefined : sc.user.avatar_url || undefined,
     isDemoUser: true,
   };
 }
@@ -388,6 +389,18 @@ export default function ConnectPage() {
     run.current++;
     go(back!, -1);
   };
+
+  // Niri's welcome hands over the handle as ?gh=…: start reading the account right away.
+  useEffect(() => {
+    const q = new URLSearchParams(location.search).get('gh');
+    if (q === null) return;
+    history.replaceState(null, '', location.pathname + location.hash);
+    const l = cleanHandle(q);
+    if (!isGitHubLogin(l)) return;
+    setHandle(l);
+    void scanFor(l, 'user');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // A long step must not leave the next one scrolled halfway.
   useEffect(() => {

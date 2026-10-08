@@ -7,7 +7,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { useView } from '../../lib/store.ts';
+import { useAppState, useView } from '../../lib/store.ts';
 import { feedback } from '../ui/kit';
 import Coach from './Coach';
 import Help from './Help';
@@ -31,11 +31,13 @@ function whenClear(run: () => void, ready: () => boolean = () => true) {
 
 const hasTargets = (steps?: CoachStep[]) => Boolean(steps?.some((s) => findTarget(s.target)));
 const home = (face: Face) => (face === 'genc' ? '/bugun' : '/kurum');
+const homeRoute = (face: Face) => (face === 'genc' ? 'bugun' : 'kurum');
 
 export default function Assistant() {
   const face: Face = useView().persona === 'org' ? 'kurum' : 'genc';
   const route = useMemo(() => routeKey(location.pathname), []);
   const steps = toursFor(face)[route];
+  const github = useAppState().people.find((p) => p.isDemoUser)?.links.github;
   const [welcome, setWelcome] = useState(false);
   const [tour, setTour] = useState<CoachStep[] | null>(null);
   const [help, setHelp] = useState(false);
@@ -52,7 +54,8 @@ export default function Assistant() {
     feedback({ tone: 'info', title: 'Burada gösterecek bir şey bulamadım', text: 'Sayfa yüklendikten sonra tekrar dene.' });
   }, [startTour]);
 
-  // First visit: welcome. Later pages: their tour, once, unless the visitor chose to look around alone.
+  // First visit: welcome. The home page then runs its tour once, unless the visitor chose to look
+  // around alone; other pages keep their tour behind "Niri'ye sor" so Niri does not talk on every page.
   useEffect(() => {
     const q = new URLSearchParams(location.search);
     if (q.get('tur') === '1') {
@@ -61,7 +64,7 @@ export default function Assistant() {
     }
     const seen = read(welcomeKey(face));
     if (!seen) return whenClear(() => setWelcome(true));
-    if (seen !== 'self' && steps && !read(tourKey(route))) return whenClear(() => void startTour(), () => hasTargets(steps));
+    if (seen !== 'self' && steps && route === homeRoute(face) && !read(tourKey(route))) return whenClear(() => void startTour(), () => hasTargets(steps));
   }, [face, route, steps, startTour]);
 
   // Switching faces in place (the mode switch): whatever was open belongs to the other face.
@@ -92,6 +95,12 @@ export default function Assistant() {
     }, 260);
   };
 
+  // The genç welcome asks for a GitHub handle: Kanıt bağla reads the account, the Bugün tour follows.
+  const connectGithub = (login: string) => {
+    write(welcomeKey(face), 'tour');
+    location.assign(`/kanit-bagla?gh=${encodeURIComponent(login)}`);
+  };
+
   const closeTour = (finished: boolean) => {
     setTour(null);
     if (finished) feedback({ tone: 'good', title: 'Tur bitti', text: 'Takılırsan “Niri’ye sor” düğmesi hep yanında.' });
@@ -99,7 +108,7 @@ export default function Assistant() {
 
   return (
     <>
-      <AnimatePresence>{welcome && <Welcome key={`welcome-${face}`} face={face} onClose={closeWelcome} />}</AnimatePresence>
+      <AnimatePresence>{welcome && <Welcome key={`welcome-${face}`} face={face} onClose={closeWelcome} onGithub={connectGithub} connected={github} />}</AnimatePresence>
       {tour && <Coach steps={tour} onClose={closeTour} />}
       {!welcome && !tour && (
         <Help

@@ -1,0 +1,42 @@
+---
+// Stage presentation for the Zemin360 final: one idea per slide, Niri narrates
+// a short line on each, the team speaks the rest. No app chrome, no external
+// resources; the deck itself lives in components/sunum/Deck.
+import '@fontsource-variable/bricolage-grotesque/opsz.css';
+import '@fontsource-variable/jetbrains-mono';
+import '../styles/global.css';
+import Deck from '../components/sunum/Deck';
+
+export const prerender = true;
+
+const title = 'Sunum · nirengi';
+const description = 'NİRENGİ sahne sunumu: beyan değil, kanıt.';
+---
+
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="robots" content="noindex" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <script is:inline>
+      (() => {
+        // A projector reads best on light: only an explicit choice switches to dark.
+        const d = document.documentElement;
+        let t;
+        try { t = localStorage.getItem('nirengi:theme'); } catch {}
+        d.dataset.theme = t === 'dark' ? 'dark' : 'light';
+        // The stage is drawn at 1600×900 and scaled to fit, so nothing reflows on the projector.
+        const fit = () => d.style.setProperty('--s', String(Math.min(innerWidth / 1600, innerHeight / 900)));
+        fit();
+        addEventListener('resize', fit);
+      })();
+    </script>
+  </head>
+  <body class="overflow-hidden">
+    <Deck client:load />
+  </body>
+</html>

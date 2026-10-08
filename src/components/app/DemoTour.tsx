@@ -119,6 +119,8 @@ export default function DemoTour() {
     try {
       localStorage.removeItem(SEEN_KEY);
       sessionStorage.removeItem(OPEN_KEY);
+      // Niri greets again: welcome and tours start over.
+      for (const k of Object.keys(localStorage)) if (k.startsWith('nirengi:asistan:')) localStorage.removeItem(k);
     } catch {
       /* ignore */
     }

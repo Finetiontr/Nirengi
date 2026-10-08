@@ -63,6 +63,8 @@ export interface Person {
   joinedAt: string;
   evidence: Evidence[];
   links: { github?: string; domain?: string; web?: string };
+  /** Profile photo URL, taken from GitHub when the account is connected. */
+  avatar?: string;
   isDemoUser?: boolean;
   /** Local days (YYYY-MM-DD) with public output read from GitHub events. */
   activity?: string[];

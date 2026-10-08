@@ -5,6 +5,7 @@ import { ChevronDown, ChevronRight } from 'lucide-react';
 import type { Need, Pilot, State } from '../../lib/types.ts';
 import { byId, currentOrg, lastActivity, setView, SILENCE_DAYS, useAppState, useView } from '../../lib/store.ts';
 import { findConflicts } from '../../lib/engine/match.ts';
+import { orgInsight } from '../../lib/engine/insight.ts';
 import { PUBLISH_THRESHOLD } from '../../lib/engine/canvas.ts';
 import { SCALE, SECTOR } from '../../lib/labels.ts';
 import { daysSince, relTime } from '../../lib/format.ts';
@@ -14,6 +15,7 @@ import { Bar, feedback, Ring, Sheet, Why } from '../ui/kit';
 import { Clipboard, Compass, Flag } from '../ui/icons';
 import { Avatar, OrgMark } from '../ui/primitives';
 import { FIT_MIN, gateNote, NeedPill, needStats, STATUS_RANK } from './NeedBits';
+import OrgWeek from './OrgWeek';
 
 type Row = { n: Need } & ReturnType<typeof needStats>;
 
@@ -165,6 +167,7 @@ export default function OrgHome() {
   const queue = buildQueue(s, rows, pilots);
   const week = radar(s, org.id, 7);
   const month = week.total ? week : radar(s, org.id, 30);
+  const ins = orgInsight(s, org.id, FIT_MIN);
   const [all, setAll] = useState(false);
   const [pick, setPick] = useState(false);
   const shown = all ? queue : queue.slice(0, 4);
@@ -188,6 +191,8 @@ export default function OrgHome() {
           <ChevronDown className="h-4 w-4" strokeWidth={3} aria-hidden="true" />
         </button>
       </header>
+
+      <OrgWeek org={org} ins={ins} radar={week} />
 
       <section data-coach="sira" className="card mt-6 p-4 sm:p-5 !border-indigo/35" aria-labelledby="sirada">
         <div className="flex items-center justify-between gap-3">
@@ -269,6 +274,7 @@ export default function OrgHome() {
             <ul data-coach="ihtiyaclar-satir" className="mt-3 space-y-3">
               {open.slice(0, 4).map((r) => {
                 const note = r.n.status === 'draft' ? gateNote(r.a) : null;
+                const cov = ins.needs.find((x) => x.need.id === r.n.id);
                 return (
                   <li key={r.n.id}>
                     <a href={`/ihtiyaclar/${r.n.id}`} className="card-press flex items-center gap-3 p-3 sm:gap-4 sm:p-4">
@@ -292,6 +298,16 @@ export default function OrgHome() {
                             )
                           ) : null}
                         </p>
+                        {cov && cov.total > 0 && (
+                          <p className="mt-1.5 flex items-center gap-2 text-[13px] font-bold text-ink-3">
+                            <span className="flex gap-[3px]" aria-hidden="true">
+                              {Array.from({ length: cov.total }, (_, k) => (
+                                <span key={k} className={`h-2.5 w-4 rounded-full ${k < cov.covered ? 'bg-green' : 'bg-line'}`} />
+                              ))}
+                            </span>
+                            {cov.total} yetkinlikten {cov.covered} tanesinde doğrulanmış iş var
+                          </p>
+                        )}
                       </div>
                       <ChevronRight className="h-6 w-6 shrink-0 text-ink-3" strokeWidth={3} aria-hidden="true" />
                     </a>

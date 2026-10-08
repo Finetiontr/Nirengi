@@ -3,7 +3,7 @@
 // few things CSS cannot do (random blinks, cursor gaze, event reactions) here.
 // Every mood has a finished static pose, which is what reduced motion shows.
 
-import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import './niri.css';
 
 export type Mood = 'idle' | 'happy' | 'cheer' | 'think' | 'wave' | 'sad' | 'point' | 'talk' | 'sleep';
@@ -22,6 +22,8 @@ interface Props {
   react?: boolean;
   /** Plays an entrance hop with a ground ripple on mount and whenever this value changes. */
   cue?: string | number;
+  /** League costume, by tier index (TIERS in engine/progress.ts). Genç side only; unset = no costume. */
+  gear?: number;
 }
 
 const c = (v: string) => `rgb(var(--${v}))`;
@@ -68,7 +70,7 @@ function armsFor(mood: Mood, point: Dir): [Arm, Arm] {
   }
 }
 
-function ArmShape({ arm, side, pointing }: { arm: Arm; side: 'l' | 'r'; pointing: boolean }) {
+function ArmShape({ arm, side, pointing, held }: { arm: Arm; side: 'l' | 'r'; pointing: boolean; held?: ReactNode }) {
   return (
     <g
       className={`n-arm n-arm-${side}${pointing ? ' n-arm-p' : ''}`}
@@ -77,10 +79,140 @@ function ArmShape({ arm, side, pointing }: { arm: Arm; side: 'l' | 'r'; pointing
       <g className="n-arm-fx">
         <rect className="n-arm-seg" x="-4.5" y="0" width="9" height="17" fill={c('indigo')} />
         <circle r="4.5" fill={c('indigo')} />
+        {/* the hand undoes the arm's angle, so a held tool stays upright in every pose */}
+        {held && (
+          <g className="n-held" style={{ transform: `translate(0px, ${arm.len}px) rotate(${-arm.a}deg)` }}>
+            {held}
+          </g>
+        )}
         <circle className="n-arm-tip" cy="17" r="4.5" fill={c('indigo')} />
       </g>
     </g>
   );
+}
+
+// ---------------------------------------------------------------- gear
+
+// One costume per league tier, all from the survey field: a flagging ribbon,
+// a field hat, a bandana with a rolled map sheet, a helmet with the ranging
+// pole, goggles with the summit flag. Headgear sits on the tip of the
+// triangle and is drawn over the face; Pack is drawn behind the body; a Tool is
+// held in the left hand, drawn around the hand's centre.
+
+const PAPER = 'rgb(255 248 228)';
+
+function Headgear({ gear }: { gear: number }) {
+  switch (gear) {
+    case 0: // Zemin: the orange flagging ribbon that marks a point, tied round the tip
+      return (
+        <g className="n-gear" strokeLinejoin="round" strokeLinecap="round">
+          <g className="n-flutter" style={{ transformOrigin: '60px 22px' }} fill="none" stroke={c('orange-lip')} strokeWidth="4.6">
+            <path d="M58 24 50.5 36" />
+            <path d="M62 24 70.5 35" />
+          </g>
+          <g fill={c('orange')} stroke={c('orange')} strokeWidth="3.6">
+            <path d="M60 22 43.5 13 44.5 30.5Z" />
+            <path d="M60 22 76.5 13 75.5 30.5Z" />
+          </g>
+          <path d="M58 21.5 47 16.5M62 21.5 73 16.5" stroke={c('orange-lip')} strokeWidth="2" opacity=".55" />
+          <circle cx="60" cy="22" r="5" fill={c('orange-lip')} />
+        </g>
+      );
+    case 1: // Tepe: a field hat with a wide brim
+      return (
+        <g className="n-gear">
+          <path d="M42.5 33C41 8 44 3 60 3s19 5 17.5 30Z" fill={c('green')} />
+          <path d="M42 25h36v7.5H42Z" fill={c('green-lip')} />
+          <path d="M60 23 64.8 31h-9.6Z" fill={c('orange')} stroke={c('orange')} strokeWidth="1.8" strokeLinejoin="round" />
+          <ellipse cx="60" cy="33.5" rx="32" ry="5.8" fill={c('green')} />
+          <path d="M29.5 33.5q30.5 6 61 0" fill="none" stroke={c('green-lip')} strokeWidth="2.2" strokeLinecap="round" opacity=".7" />
+          <path d="M50 7.5q-4.5 5-5 13" fill="none" stroke="#fff" strokeWidth="2.8" strokeLinecap="round" opacity=".35" />
+        </g>
+      );
+    case 2: // Sırt: a bandana, knotted at the side with the tails in the wind
+      return (
+        <g className="n-gear" strokeLinejoin="round" strokeLinecap="round">
+          <g className="n-flutter" style={{ transformOrigin: '38px 32px' }} fill={c('cyan')} stroke={c('cyan')} strokeWidth="3">
+            <path d="M38 31 23 23.5 24.5 32.5Z" />
+            <path d="M38 33 25 39.5 29.5 44Z" />
+          </g>
+          <path d="M43 25h34l5.2 12H37.8Z" fill={c('cyan')} stroke={c('cyan')} strokeWidth="3" />
+          <g fill="#fff" opacity=".85">
+            {[49, 60, 71].map((x) => (
+              <path key={x} d={`M${x} 28.2l2.8 4.8h-5.6Z`} />
+            ))}
+          </g>
+          <circle cx="38" cy="32" r="4.6" fill={c('cyan-lip')} />
+        </g>
+      );
+    case 3: // Doruk: a climbing helmet with a head lamp
+      return (
+        <g className="n-gear">
+          <path d="M38.5 36C36-6 84-6 81.5 36Z" fill={c('purple')} />
+          <path d="M50 8.5q-6 6.5-7 16" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" opacity=".35" />
+          <path d="M37 35.5h46" stroke={c('purple-lip')} strokeWidth="6" strokeLinecap="round" />
+          <circle className="n-lamp" cx="60" cy="23" r="6.6" fill={c('gold')} stroke={c('gold-lip')} strokeWidth="2.4" />
+          <circle cx="58.4" cy="21.4" r="2.1" fill="#fff" opacity=".9" />
+        </g>
+      );
+    case 4: // Zirve: snow goggles pushed up onto the forehead
+      return (
+        <g className="n-gear">
+          <path d="M39.5 33.5h41" stroke={INK} strokeWidth="4.4" strokeLinecap="round" />
+          <path d="M56 32h8" stroke={c('gold-lip')} strokeWidth="4.4" strokeLinecap="round" />
+          {[50, 70].map((x) => (
+            <g key={x}>
+              <circle cx={x} cy="32" r="8" fill={c('cyan')} stroke={c('gold')} strokeWidth="3.6" />
+              <path d={`M${x - 4.2} ${31}a4.6 4.6 0 0 1 4-3.6`} fill="none" stroke="#fff" strokeWidth="2.1" strokeLinecap="round" opacity=".9" />
+            </g>
+          ))}
+        </g>
+      );
+    default:
+      return null;
+  }
+}
+
+/** Sırt: a rolled map sheet (pafta) strapped on the back, poking out past the shoulder. */
+function Pack({ gear }: { gear: number }) {
+  if (gear !== 2) return null;
+  return (
+    <g className="n-gear" transform="rotate(36 86 46)">
+      <rect x="79" y="10" width="14" height="56" rx="7" fill={PAPER} stroke="rgb(214 196 150)" strokeWidth="1.6" />
+      <path d="M82.5 27q3.5-3 7 0M82.5 31q3.5-3 7 0" fill="none" stroke={c('orange')} strokeWidth="1.4" strokeLinecap="round" opacity=".8" />
+      <ellipse cx="86" cy="11.5" rx="7" ry="3.2" fill="rgb(240 226 190)" stroke="rgb(214 196 150)" strokeWidth="1.4" />
+      <path d="M86 11.5h3" stroke="rgb(180 160 110)" strokeWidth="1.3" strokeLinecap="round" />
+      <path d="M79.5 20h13M79.5 40h13" stroke={c('cyan-lip')} strokeWidth="4.2" />
+    </g>
+  );
+}
+
+function Tool({ gear }: { gear: number }) {
+  switch (gear) {
+    case 3: // the ranging pole, red and white like the real thing
+      return (
+        <g className="n-gear">
+          <path d="M-2.4 18 0 25 2.4 18Z" fill={c('ink-4')} />
+          <rect x="-2.6" y="-60" width="5.2" height="79" rx="2" fill={c('red')} stroke={c('red-lip')} strokeWidth="1.2" />
+          {[-50, -30, -10, 10].map((y) => (
+            <rect key={y} x="-2" y={y} width="4" height="10" fill="#fff" />
+          ))}
+        </g>
+      );
+    case 4: // the summit flag
+      return (
+        <g className="n-gear">
+          <rect x="-1.9" y="-62" width="3.8" height="84" rx="1.9" fill={c('indigo-lip')} />
+          <g className="n-cloth">
+            <path d="M-2 -58-28-48.5-2-39Z" fill={c('gold')} stroke={c('gold')} strokeWidth="3.4" strokeLinejoin="round" />
+            <path d="M-6.5-52.5-15-48.5-6.5-44.5Z" fill={c('orange')} stroke={c('orange')} strokeWidth="1.6" strokeLinejoin="round" />
+          </g>
+          <circle cy="-63" r="3.4" fill={c('gold-lip')} />
+        </g>
+      );
+    default:
+      return null;
+  }
 }
 
 // ---------------------------------------------------------------- face
@@ -175,7 +307,7 @@ const FOLLOWERS: Mood[] = ['idle', 'wave', 'talk'];
 const DRIFT: Partial<Record<Mood, [number, number]>> = { idle: [1.2, 0.8], wave: [1.2, 0.8], talk: [0.8, 0.4] };
 const FIXED_GAZE: Mood[] = ['think', 'sad', 'point', 'sleep'];
 
-export default function Niri({ mood = 'idle', size = 120, className = '', look, point = 'right', react, cue }: Props) {
+export default function Niri({ mood = 'idle', size = 120, className = '', look, point = 'right', react, cue, gear }: Props) {
   const reactive = react ?? size >= 64;
   const root = useRef<SVGSVGElement>(null);
   const [over, setOver] = useState<Over | null>(null);
@@ -436,7 +568,8 @@ export default function Niri({ mood = 'idle', size = 120, className = '', look, 
         <g className="n-loop">
           <g className="n-micro">
             <g className="n-breath">
-              <ArmShape arm={arms[0]} side="l" pointing={pointingArm === 0} />
+              {gear !== undefined && <Pack gear={gear} />}
+              <ArmShape arm={arms[0]} side="l" pointing={pointingArm === 0} held={gear !== undefined && gear >= 3 ? <Tool gear={gear} /> : undefined} />
               <ArmShape arm={arms[1]} side="r" pointing={pointingArm === 1} />
               {/* feet */}
               <ellipse cx="45" cy="108" rx="10" ry="6.5" fill={c('indigo-lip')} />
@@ -456,6 +589,7 @@ export default function Niri({ mood = 'idle', size = 120, className = '', look, 
               {brows && <Brows kind={brows} />}
               <Mouth mood={eff} surprised={surprised} />
               {eff === 'sad' && <path className="n-tear" d="M81 66c-3.2 4.4-3.2 7.6 0 7.6s3.2-3.2 0-7.6Z" fill={c('cyan')} />}
+              {gear !== undefined && <Headgear gear={gear} />}
             </g>
           </g>
         </g>

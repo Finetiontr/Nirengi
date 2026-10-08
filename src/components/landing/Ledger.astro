@@ -1,0 +1,59 @@
+---
+// A deneme projesi as the kurum sees it: each aşama closes only when both sides approve,
+// and every closed aşama is a ledger record chained to the one before it. Calm palette:
+// green for done, neutral for waiting, indigo for the chain. No orange on this side.
+import { Tri } from '../ui/pafta';
+
+const steps = [
+  { title: 'Kapsam ve veri erişimi', org: true, you: true, hash: 'a41f·09c2', prev: '0000·0000' },
+  { title: 'İlk sürüm teslimi', org: true, you: true, hash: '7be0·d31a', prev: 'a41f·09c2' },
+  { title: 'Pilot ölçümü', org: false, you: true, hash: null, prev: '7be0·d31a' },
+] as const;
+const ok = 'pill bg-green-tint !py-0.5 text-green-lip';
+const wait = 'pill border-2 border-dashed border-line-2 !py-0 text-ink-3';
+---
+
+<div>
+  <div class="flex items-center justify-between gap-3">
+    <p class="h-sec">Şikâyet yönlendirme</p>
+    <span class="chip whitespace-nowrap">2/3 aşama kapandı</span>
+  </div>
+
+  <div class="relative mt-5">
+    <span class="absolute bottom-10 left-[13px] top-4 border-l-[3px] border-indigo/35" aria-hidden="true"></span>
+    <ol class="space-y-4 pl-10">
+      {
+        steps.map((s, i) => (
+          <li class="led-row relative" style={`--d:${0.15 + i * 0.2}s`}>
+            <span class="absolute -left-10 top-1" aria-hidden="true">
+              <Tri size={28} tone="green" state={s.hash ? 'done' : 'waiting'}>
+                {s.hash && <span class="block h-1.5 w-1.5 rounded-full bg-white" />}
+              </Tri>
+            </span>
+            <p class="text-[16px] font-black text-ink">{s.title}</p>
+            <div class="mt-1.5 flex flex-wrap gap-1.5">
+              <span class={s.org ? ok : wait}>{s.org ? 'Kurum onayladı' : 'Kurum onayı bekleniyor'}</span>
+              <span class={s.you ? ok : wait}>Genç onayladı</span>
+            </div>
+            <p class="mono mt-1.5 text-[12.5px] text-ink-3">
+              {s.hash ? <>kayıt <span class="text-indigo">{s.hash}</span> ← önceki {s.prev}</> : <>kayıt, iki onaydan sonra yazılır</>}
+            </p>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+
+  <p class="mt-5 flex items-center gap-2 border-t-2 border-line pt-4 text-[15px] font-bold text-ink-2">
+    <svg viewBox="0 0 20 20" class="h-5 w-5 shrink-0" aria-hidden="true"><path d="M4 10.5l4 4 8-9" fill="none" stroke="rgb(var(--green-lip))" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+    Zincir sağlam: kayıtlar yazıldığı gibi duruyor.
+  </p>
+  <p class="mt-2 text-[13px] font-semibold text-ink-3">Örnek proje, kurgusal.</p>
+</div>
+
+<style is:global>
+  [data-in] .led-row { animation: rise 420ms var(--ease-out) var(--d) both; }
+  @media (prefers-reduced-motion: reduce) {
+    [data-in] .led-row { animation: none; }
+  }
+</style>

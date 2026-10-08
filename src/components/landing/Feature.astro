@@ -10,7 +10,7 @@ interface Props {
   id: string;
   heading: string;
   say: Pick<Line, 'mood' | 'text'>;
-  tone: 'orange' | 'cyan' | 'indigo' | 'purple';
+  tone: 'orange' | 'cyan' | 'indigo' | 'purple' | 'gold';
   reverse?: boolean;
   more?: { href: string; label: string };
 }
@@ -18,8 +18,8 @@ interface Props {
 const { id, heading, say, tone, reverse = false, more } = Astro.props;
 const parts = heading.split('*');
 const spoken = say.text.split('*');
-// Bright orange and cyan are too light as heading text on white: use their darker tones.
-const ink = { orange: '--orange-ink', cyan: '--cyan-lip', indigo: '--indigo', purple: '--purple' }[tone];
+// Bright orange, gold and cyan are too light as heading text on white: use their darker tones.
+const ink = { orange: '--orange-ink', gold: '--gold-ink', cyan: '--cyan-lip', indigo: '--indigo', purple: '--purple' }[tone];
 ---
 
 <section id={id} data-narrate={id} class="scroll-mt-16 border-t-2 border-line">

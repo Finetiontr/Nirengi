@@ -19,6 +19,8 @@ export interface NiriSaysProps {
   look?: Look;
   /** Hop in and grow the bubble on mount and on every new message. Default on. */
   entrance?: boolean;
+  /** League costume, passed through to Niri (genç side only). */
+  gear?: number;
   className?: string;
 }
 
@@ -59,7 +61,7 @@ function reveal(node: ReactNode, n: number): ReactNode {
   return walk(node);
 }
 
-export default function NiriSays({ mood = 'idle', size = 92, children, side = 'right', typing = false, point, look, entrance = true, className = '' }: NiriSaysProps) {
+export default function NiriSays({ mood = 'idle', size = 92, children, side = 'right', typing = false, point, look, entrance = true, gear, className = '' }: NiriSaysProps) {
   const text = textOf(children);
   const bubble = useRef<HTMLDivElement>(null);
   const seen = useRef(text);
@@ -104,7 +106,7 @@ export default function NiriSays({ mood = 'idle', size = 92, children, side = 'r
   const left = side === 'left';
   return (
     <div className={`flex items-end gap-3 ${left ? 'flex-row-reverse' : ''} ${className}`}>
-      <Niri mood={typed ? 'talk' : mood} size={size} point={point} look={look} cue={entrance ? text : undefined} />
+      <Niri mood={typed ? 'talk' : mood} size={size} point={point} look={look} cue={entrance ? text : undefined} gear={gear} />
       <div
         ref={bubble}
         className="n-bubble relative mb-4 min-w-0 flex-1 rounded-[18px] border-2 border-line bg-bg px-4 py-3"

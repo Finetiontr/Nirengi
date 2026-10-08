@@ -119,6 +119,19 @@ export const Face = ({ size = 28, className = '' }: P) =>
     </>,
   );
 
+/** Analiz — Niri's theodolite: a lens on a tripod reading your rising line. */
+export const Scope = ({ size = 28, className = '' }: P) =>
+  svg(
+    size,
+    className,
+    <>
+      <path d="M16 20.5 9 29.5M16 20.5l7 9M16 20.5v9" stroke={c('ink-3')} strokeWidth="2.4" strokeLinecap="round" />
+      <circle cx="16" cy="11.5" r="9.5" fill={c('orange')} />
+      <circle cx="16" cy="11.5" r="6.6" fill="#fff" />
+      <path d="M11.4 14.2 14.6 11l2.2 2 3.8-4.4" fill="none" stroke={c('orange-lip')} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+    </>,
+  );
+
 /** Keşfet — compass. */
 export const Compass = ({ size = 28, className = '' }: P) =>
   svg(

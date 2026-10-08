@@ -7,7 +7,8 @@ import { motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import Niri, { type Dir, type Mood } from '../ui/Niri';
 import NiriSays from '../ui/NiriSays';
-import { ArtGain, ArtGencHafta, ArtGencHos, ArtGencIs, ArtGencLig, ArtMatch, ArtNeed, ArtPilot, Pip } from './art';
+import { cleanHandle, isGitHubLogin } from '../../lib/verify.ts';
+import { ArtGain, ArtGencHos, ArtGencIs, ArtMatch, ArtNeed, ArtPilot, Pip } from './art';
 import { useTrap, type Face, type WelcomeChoice } from './util';
 
 interface Card {
@@ -16,6 +17,8 @@ interface Card {
   mood: Mood;
   point?: Dir;
   Art: () => React.JSX.Element;
+  /** The card asks for the GitHub handle instead of only talking. */
+  ask?: boolean;
 }
 
 const KURUM_CARDS: Card[] = [
@@ -46,49 +49,49 @@ const KURUM_CARDS: Card[] = [
   },
 ];
 
+// Two cards on the genç side: who Niri is, then the GitHub handle. The rest is
+// taught where it happens (the Bugün tour), not up front.
 const GENC_CARDS: Card[] = [
   {
-    title: 'Nirengi’ye hoş geldin',
-    text: 'Merhaba, ben Niri. Burada yaptığın işi biriktirirsin; kurumlar seni söylediğine değil, gösterdiğin işe bakarak bulur.',
+    title: 'Merhaba, ben Niri',
+    text: 'Burada yaptığın iş kanıta dönüşür. Kurumlar seni söylediğine değil, gerçekten ürettiğine bakarak bulur; ürettikçe serin, XP’n ve ligin ilerler.',
     mood: 'wave',
     Art: ArtGencHos,
   },
   {
-    title: 'Haftanı burada görürsün',
-    text: 'Haftada kaç gün üreteceğini sen seçersin: 1, 3 ya da 5. Hedefi tutturdukça serin uzar; hedefi düşürmek ceza değil.',
-    mood: 'point',
-    point: 'up',
-    Art: ArtGencHafta,
-  },
-  {
-    title: 'İşin böyle güçlenir',
-    text: 'Commit sayısı değil, üretim yaptığın gün sayılır. Eklediğin iş Beyan → Doğrulandı → Kurum onaylı diye güçlenir.',
-    mood: 'think',
+    title: 'Önce seni tanıyayım',
+    text: 'GitHub kullanıcı adını yaz. Depolarına bakıp hangilerinin kanıt olabileceğini birlikte seçelim.',
+    mood: 'talk',
     Art: ArtGencIs,
-  },
-  {
-    title: 'Seri, XP ve lig',
-    text: 'Benzer tempodaki gençlerle haftalık bir tırmanışa çıkarsın. XP yalnız doğrulanabilir işten gelir; sohbet sıralamayı belirlemez.',
-    mood: 'cheer',
-    Art: ArtGencLig,
-  },
-  {
-    title: 'Kurumlar seni işinle bulur',
-    text: 'Kurumlar yazdıkları ihtiyaçla seni işine bakarak eşleştirir. İsmin ilk temasa kadar gizli kalır.',
-    mood: 'happy',
-    Art: ArtMatch,
+    ask: true,
   },
 ];
 
-export default function Welcome({ face, onClose }: { face: Face; onClose: (choice: WelcomeChoice) => void }) {
+interface Props {
+  face: Face;
+  onClose: (choice: WelcomeChoice) => void;
+  /** Handle typed on the ask card; the caller takes it to Kanıt bağla. */
+  onGithub: (login: string) => void;
+  /** GitHub login already connected: the ask card says so instead of asking again. */
+  connected?: string;
+}
+
+export default function Welcome({ face, onClose, onGithub, connected }: Props) {
   const CARDS = face === 'genc' ? GENC_CARDS : KURUM_CARDS;
   const [i, setI] = useState(0);
   const [dir, setDir] = useState(1);
+  const [handle, setHandle] = useState('');
+  const [touched, setTouched] = useState(false);
   const box = useRef<HTMLDivElement>(null);
   const main = useRef<HTMLButtonElement>(null);
+  const field = useRef<HTMLInputElement>(null);
   const last = i === CARDS.length - 1;
   const card = CARDS[i];
   const Art = card.Art;
+  const asking = !!card.ask && !connected;
+  const login = cleanHandle(handle);
+  const valid = isGitHubLogin(login);
+  const submit = () => (valid ? onGithub(login) : setTouched(true));
 
   const go = (to: number) => {
     const t = Math.max(0, Math.min(CARDS.length - 1, to));
@@ -98,10 +101,11 @@ export default function Welcome({ face, onClose }: { face: Face; onClose: (choic
 
   useTrap(box, () => onClose('self'), true);
   useEffect(() => {
-    main.current?.focus({ preventScroll: true });
-  }, [i]);
+    (asking ? field.current : main.current)?.focus({ preventScroll: true });
+  }, [i, asking]);
   useEffect(() => {
     const k = (e: KeyboardEvent) => {
+      if ((e.target as HTMLElement | null)?.tagName === 'INPUT') return;
       if (e.key === 'ArrowRight') go(i + 1);
       if (e.key === 'ArrowLeft') go(i - 1);
     };
@@ -166,11 +170,52 @@ export default function Welcome({ face, onClose }: { face: Face; onClose: (choic
                 <h2 id="asistan-hos" className="mt-5 text-[22px] font-black leading-tight text-ink sm:text-[24px] [@media(max-height:700px)]:mt-0">
                   {card.title}
                 </h2>
-                <div className="mt-2 flex min-h-[150px] items-end [@media(max-height:700px)]:min-h-0">
+                <div className={`mt-2 flex items-end [@media(max-height:700px)]:min-h-0 ${card.ask ? 'min-h-[96px]' : 'min-h-[150px]'}`}>
                   <NiriSays mood={card.mood} point={card.point} size={84} typing className="w-full">
-                    <p className="text-[15.5px] font-semibold leading-relaxed text-ink-2">{card.text}</p>
+                    <p className="text-[15.5px] font-semibold leading-relaxed text-ink-2">
+                      {card.ask && connected ? `GitHub hesabın bağlı (@${connected}). İstersen sayfayı birlikte gezelim.` : card.text}
+                    </p>
                   </NiriSays>
                 </div>
+                {asking && (
+                  <form
+                    className="mt-4"
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      submit();
+                    }}
+                  >
+                    <label htmlFor="niri-gh" className="sr-only">
+                      GitHub kullanıcı adı
+                    </label>
+                    <div
+                      className={`flex items-center rounded-[14px] border-2 transition-[border-color,background-color,box-shadow] duration-150 focus-within:shadow-[0_0_0_4px_rgb(var(--indigo)/0.14)] ${
+                        touched && !valid ? 'border-red bg-red-tint' : 'border-line bg-bg-2 focus-within:border-indigo focus-within:bg-bg'
+                      }`}
+                    >
+                      <span className="pl-4 text-[16px] font-bold text-ink-3">github.com/</span>
+                      <input
+                        ref={field}
+                        id="niri-gh"
+                        value={handle}
+                        onChange={(e) => setHandle(e.target.value)}
+                        onBlur={() => handle.trim() && setTouched(true)}
+                        autoCapitalize="none"
+                        autoCorrect="off"
+                        spellCheck={false}
+                        autoComplete="username"
+                        enterKeyHint="go"
+                        placeholder="kullanici-adi"
+                        aria-invalid={touched && !valid}
+                        aria-describedby="niri-gh-note"
+                        className="min-w-0 flex-1 bg-transparent py-3.5 pl-1 pr-4 text-[18px] font-black text-ink outline-none placeholder:font-bold placeholder:text-ink-4"
+                      />
+                    </div>
+                    <p id="niri-gh-note" aria-live="polite" className="mt-2 min-h-[20px] text-[13.5px] font-bold text-red-lip">
+                      {touched && !valid ? 'Kullanıcı adı harf, rakam ve tireden oluşur; en çok 39 karakter.' : ''}
+                    </p>
+                  </form>
+                )}
               </>
             ) : (
               <div className="mt-5 flex items-end gap-3 [@media(max-height:700px)]:mt-0">
@@ -192,9 +237,9 @@ export default function Welcome({ face, onClose }: { face: Face; onClose: (choic
             ref={main}
             type="button"
             className="btn-primary btn-lg btn-block"
-            onClick={() => (last ? onClose('tour') : go(i + 1))}
+            onClick={() => (asking ? submit() : last ? onClose('tour') : go(i + 1))}
           >
-            {last ? 'Turu başlat' : 'İleri'}
+            {asking ? 'GitHub’ımı tara' : last ? 'Turu başlat' : 'İleri'}
           </button>
           <div className="mt-2 flex items-center justify-between gap-2">
             <button
@@ -206,9 +251,15 @@ export default function Welcome({ face, onClose }: { face: Face; onClose: (choic
             >
               Geri
             </button>
-            <button type="button" className="btn-quiet btn-sm !min-h-11" onClick={() => onClose('self')}>
-              Kendim bakarım
-            </button>
+            {asking ? (
+              <button type="button" className="btn-quiet btn-sm !min-h-11" onClick={() => onClose('tour')}>
+                GitHub’ım yok, örnek profille gez
+              </button>
+            ) : (
+              <button type="button" className="btn-quiet btn-sm !min-h-11" onClick={() => onClose('self')}>
+                Kendim bakarım
+              </button>
+            )}
           </div>
           <p className="mt-1 text-center text-[13px] font-bold text-ink-3 [@media(max-height:700px)]:hidden">Sonradan sağ alttaki “Niri’ye sor” düğmesiyle beni çağırabilirsin.</p>
         </div>

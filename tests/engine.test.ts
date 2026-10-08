@@ -193,3 +193,30 @@ test('growth quests name the need they move you toward', () => {
 test('dayKey is local and zero padded', () => {
   assert.equal(dayKey(new Date(2026, 0, 5, 9)), '2026-01-05');
 });
+
+test('Niri’s analysis: the closest door is one gap away and the numbers match the matcher', async () => {
+  const { personInsight } = await import('../src/lib/engine/insight.ts');
+  const { needsForPerson } = await import('../src/lib/engine/match.ts');
+  const s = buildSeed();
+  const can = s.people.find((p) => p.id === 'p-can')!;
+  const ins = personInsight(s, can);
+  if (ins.closest) {
+    const m = needsForPerson(s, can).find((x) => x.need.id === ins.closest!.match.need.id)!;
+    const g = m.gaps.find((x) => x.skill === ins.closest!.skill)!;
+    assert.equal(ins.closest.to, m.score + g.gain);
+  }
+  for (const l of ins.levers) assert.ok(l.gain > 0 && l.needs.length > 0, l.skill);
+  assert.ok(ins.advice.length > 0);
+});
+
+test('kurum analysis counts waiting approvals and skill coverage per live need', async () => {
+  const { orgInsight } = await import('../src/lib/engine/insight.ts');
+  const s = buildSeed();
+  for (const o of s.orgs) {
+    const ins = orgInsight(s, o.id, 60);
+    const waiting = s.pilots.filter((p) => p.orgId === o.id).flatMap((p) => p.milestones).filter((m) => m.state === 'submitted' && !m.approvals.org).length;
+    assert.equal(ins.waiting, waiting, o.id);
+    for (const r of ins.needs) assert.ok(r.covered <= r.total, r.need.id);
+    assert.ok(ins.answered <= ins.open, o.id);
+  }
+});
