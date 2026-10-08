@@ -10,14 +10,12 @@ interface Props {
   id: string;
   heading: string;
   say: Pick<Line, 'mood' | 'text' | 'gear'>;
-  /** The costume Niri wears before it twirls into this section's. */
-  from?: number | null;
   tone: 'orange' | 'cyan' | 'indigo' | 'purple' | 'gold';
   reverse?: boolean;
   more?: { href: string; label: string };
 }
 
-const { id, heading, say, from = null, tone, reverse = false, more } = Astro.props;
+const { id, heading, say, tone, reverse = false, more } = Astro.props;
 const parts = heading.split('*');
 // Bright orange, gold and cyan are too light as heading text on white: use their darker tones.
 const ink = { orange: '--orange-ink', gold: '--gold-ink', cyan: '--cyan-lip', indigo: '--indigo', purple: '--purple' }[tone];
@@ -30,7 +28,7 @@ const ink = { orange: '--orange-ink', gold: '--gold-ink', cyan: '--cyan-lip', in
         {parts.map((t, i) => (i % 2 ? <span style={`color:rgb(var(${ink}))`}>{t}</span> : t))}
       </h2>
       <div class="mt-5 xl:mt-7 xl:max-w-[540px]">
-        <Say client:idle mood={say.mood} text={say.text} gear={say.gear} from={from} watch="section" point="down" />
+        <Say client:idle mood={say.mood} text={say.text} gear={say.gear} point="down" />
       </div>
       {more && <a href={more.href} class="-ml-2 mt-3 inline-block rounded-full px-2 py-1 text-[15px] font-extrabold text-indigo transition-colors hover:bg-indigo-tint">{more.label}</a>}
     </div>

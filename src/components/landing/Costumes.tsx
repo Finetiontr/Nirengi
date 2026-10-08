@@ -1,12 +1,12 @@
 // A small teaser of Niri's league costumes: five tier keys, and Niri twirls into the
-// one you point at, once the pointer rests (200 ms) and one turn at a time. This card
+// one you point at once the pointer rests (200 ms), so a sweep is one quick turn. This card
 // (with its own Niri) is the phone version; on wide screens the chips sit under the
 // genç chapter's Niri instead (GencSay). The full collection lives on the league page.
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Niri from '../ui/Niri';
 import NiriTwirl from '../ui/NiriTwirl';
-import { emphasise, PACE, type Line } from './Say';
+import { emphasise, type Line } from './Say';
 
 const REST_MS = 200;
 
@@ -38,31 +38,17 @@ export function Chips({ tiers, gear, pick, className = '' }: { tiers: Line[]; ge
 
 export default function Costumes({ tiers }: { tiers: Line[] }) {
   const [picked, setPicked] = useState(2);
-  // What Niri wears; it moves on only when the pointer rests and the last turn has landed.
   const [worn, setWorn] = useState(2);
-  const turning = useRef(false);
-  const rest = useRef(0);
-  const [landings, setLandings] = useState(0);
   useEffect(() => {
-    window.clearTimeout(rest.current);
-    if (picked === worn || turning.current) return;
-    rest.current = window.setTimeout(() => {
-      turning.current = true;
-      setWorn(picked);
-    }, REST_MS);
-    return () => window.clearTimeout(rest.current);
-  }, [picked, worn, landings]);
-  // Landed: a chip picked mid-turn goes next.
-  const landed = () => {
-    turning.current = false;
-    setLandings((n) => n + 1);
-  };
+    const t = window.setTimeout(() => setWorn(picked), REST_MS);
+    return () => window.clearTimeout(t);
+  }, [picked]);
 
   return (
     <div className="rounded-[20px] border-2 border-dashed border-orange/45 bg-bg/70 p-4 sm:p-5">
       <div className="flex items-center gap-4">
         <span className="shrink-0" aria-hidden="true">
-          <NiriTwirl k={worn} pace={PACE} onDone={landed}>
+          <NiriTwirl k={worn}>
             <Niri mood={worn === 4 ? 'cheer' : 'happy'} size={84} gear={worn} />
           </NiriTwirl>
         </span>

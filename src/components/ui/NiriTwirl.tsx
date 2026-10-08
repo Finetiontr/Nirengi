@@ -4,8 +4,8 @@
 //
 //   <NiriTwirl k={`${scene}-${gear}`}><Niri mood={mood} gear={gear} /></NiriTwirl>
 //
-// `pace` stretches every beat (the landing uses a calmer, readable twirl), `turns={0}`
-// is a plain hop with no spin, and `onDone` fires once Niri has landed.
+// `pace` scales every beat (below 1 is quicker), and `turns={0}` is a plain hop with
+// no spin (the landing's greeting).
 
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useAnimate, useReducedMotion } from 'framer-motion';
@@ -16,14 +16,12 @@ interface Props {
   children: ReactNode;
   /** Full turns: 1 = one spin (default), 0.5 = a quick flip, 2 = a showy double, 0 = a hop without a spin. */
   turns?: 0 | 0.5 | 1 | 2;
-  /** Multiplies every beat's duration: 1 = the app's quick twirl (default), 1.7 ≈ 1.3 s. */
+  /** Multiplies every beat's duration: 1 = the app's twirl (default, ≈ 0.76 s), 0.6 ≈ 0.45 s. */
   pace?: number;
-  /** Called when the twirl for the current key has landed. */
-  onDone?: () => void;
   className?: string;
 }
 
-export default function NiriTwirl({ k, children, turns = 1, pace = 1, onDone, className = '' }: Props) {
+export default function NiriTwirl({ k, children, turns = 1, pace = 1, className = '' }: Props) {
   const [scope, animate] = useAnimate<HTMLSpanElement>();
   const reduce = useReducedMotion();
   // The key whose children are on screen; until the turn reaches 90° the old ones stay.
@@ -31,8 +29,6 @@ export default function NiriTwirl({ k, children, turns = 1, pace = 1, onDone, cl
   const held = useRef(children);
   if (at === k) held.current = children;
   const run = useRef(0);
-  const done = useRef(onDone);
-  done.current = onDone;
 
   useEffect(() => {
     const id = ++run.current;
@@ -52,7 +48,6 @@ export default function NiriTwirl({ k, children, turns = 1, pace = 1, onDone, cl
         if (id !== run.current) return;
         setAt(k);
         await animate(el, { opacity: 1 }, { duration: 0.18 });
-        if (id === run.current) done.current?.();
         return;
       }
       // Crouch, spring up while turning edge-on, swap, land with a little overshoot.
@@ -66,14 +61,6 @@ export default function NiriTwirl({ k, children, turns = 1, pace = 1, onDone, cl
       await animate(el, { rotateY: turns === 0.5 ? 0 : 360 * turns, y: 0, scaleY: 1, scaleX: 1 }, { duration: 0.46 * pace, ease: [0.2, 0.9, 0.3, 1.2] });
       if (id !== run.current) return;
       await animate(el, { rotateY: 0 }, { duration: 0 });
-      // The calmer pace also settles on its feet.
-      if (pace > 1) {
-        await animate(el, { scaleY: 0.92, scaleX: 1.05 }, { duration: 0.08 * pace, ease: 'easeOut' });
-        if (id !== run.current) return;
-        await animate(el, { scaleY: 1, scaleX: 1 }, { duration: 0.12 * pace, ease: 'easeOut' });
-        if (id !== run.current) return;
-      }
-      done.current?.();
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [k]);

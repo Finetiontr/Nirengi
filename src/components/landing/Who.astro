@@ -3,8 +3,8 @@
 // from; Niri stands on its pillar and sights the points of your map. Measured work is a
 // filled marker with a drawn sight line; a mere claim stays dashed and unmeasured.
 // Lines draw and markers pop once the sheet scrolls in; at rest everything is drawn.
-// Niri arrives plain and twirls into the first league's ribbon (Zemin): the climb starts here.
-import TwirlIn from './TwirlIn';
+// Niri wears the first league's ribbon (Zemin): the climb starts here.
+import Niri from '../ui/Niri';
 import { Tri } from '../ui/pafta';
 import { LevelGlyph } from '../ui/primitives';
 
@@ -38,7 +38,7 @@ const pc = (v: number, of: number) => `${((v / of) * 100).toFixed(2)}%`;
     </div>
 
     <div data-reveal style="--d:120ms" class="min-w-0">
-      <div data-who-sheet class="relative mx-auto aspect-[500/340] w-full max-w-[560px]">
+      <div class="relative mx-auto aspect-[500/340] w-full max-w-[560px]">
         <svg viewBox="0 0 500 340" class="absolute inset-0 h-full w-full overflow-visible" aria-hidden="true">
           {/* the network between the measured points */}
           <path d={`M${pts[0].x} ${pts[0].y}L${pts[1].x} ${pts[1].y}L${pts[2].x} ${pts[2].y}`} fill="none" stroke="rgb(var(--line-2))" stroke-width="2" stroke-dasharray="2 9" stroke-linecap="round"></path>
@@ -88,7 +88,7 @@ const pc = (v: number, of: number) => `${((v / of) * 100).toFixed(2)}%`;
 
         {/* Niri on the pillar: feet on the plate (sheet y 236 → 69.4%), 24% of the width wide. */}
         <div class="absolute left-[38%] top-[33.4%] w-[24%] [&_svg]:h-auto [&_svg]:w-full">
-          <TwirlIn client:idle mood="happy" size={132} gear={0} watch="[data-who-sheet]" />
+          <Niri client:visible mood="happy" size={132} gear={0} cue="in" />
         </div>
       </div>
     </div>

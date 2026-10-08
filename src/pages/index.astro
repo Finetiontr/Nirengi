@@ -13,9 +13,9 @@ import type { Line } from '../components/landing/Say';
 
 export const prerender = true;
 
-// What each section's Niri says. Genç lines are playful and Niri climbs the league
-// costumes with the story (Who wears Zemin, the receipt Tepe, the genç chapter Sırt,
-// with chips for every league; the closing band is Zirve); kurum lines are short,
+// What each section's Niri says, already dressed for it. Genç lines are playful and the
+// costumes climb with the story (Who wears Zemin, the receipt Tepe, the genç chapter
+// Sırt, with chips for every league; the closing band is Zirve); kurum lines are short,
 // factual and plain, with no costume.
 const say: Record<string, Omit<Line, 'key'>> = {
   fark: {
@@ -49,7 +49,7 @@ const tiers: Line[] = [
   <Who />
 
   <Story>
-    <Feature id="fark" tone="gold" heading="Burada her XP bir *iş makbuzudur*." say={say.fark} from={0} more={{ href: '/yontem#ilerleme', label: 'XP nereden geliyor?' }}>
+    <Feature id="fark" tone="gold" heading="Burada her XP bir *iş makbuzudur*." say={say.fark} more={{ href: '/yontem#ilerleme', label: 'XP nereden geliyor?' }}>
       <Receipt />
     </Feature>
 
@@ -59,7 +59,6 @@ const tiers: Line[] = [
       heading="Genç misin? Bu senin kariyerin, ama *oyun gibi*."
       lead="Haftalık hedef, seri, lig ve görevler. Hepsi gerçek işinle dolar; Niri de her hafta nerede güçlü olduğunu ve nasıl gelişeceğini söyler."
       say={say.genc}
-      from={1}
       tiers={tiers}
       door={{ href: '/bugun', label: 'Genç olarak başla' }}
     >
@@ -72,7 +71,6 @@ const tiers: Line[] = [
       heading="Kurum musun? Tek soru: ihtiyacını *ne ölçüde* çözer?"
       lead="İlan değil ihtiyaç yazarsın. Adayları ismiyle değil kanıtıyla görürsün. İş birliğini iki tarafın onayıyla kapatırsın."
       say={say.kurum}
-      from={null}
       door={{ href: '/kurum', label: 'Kurum olarak ihtiyaç yaz' }}
     >
       <KurumFit />
