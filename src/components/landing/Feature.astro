@@ -1,6 +1,6 @@
 ---
-// One idea per section: a sentence with one coloured phrase, Niri explaining it, and a
-// drawn sheet on the other side. A survey marker pins the sheet's corner.
+// One idea per section: a sentence with one coloured phrase, Niri explaining it and
+// pointing at the drawn sheet on the other side (below it on phones). A survey marker pins the sheet's corner.
 // `*phrase*` in the heading takes the tone; `*word*` in Niri's line is bold.
 import { Tri } from '../ui/pafta';
 import Say from './Say';
@@ -28,7 +28,7 @@ const ink = { orange: '--orange-ink', gold: '--gold-ink', cyan: '--cyan-lip', in
         {parts.map((t, i) => (i % 2 ? <span style={`color:rgb(var(${ink}))`}>{t}</span> : t))}
       </h2>
       <div class="mt-5 xl:mt-7 xl:max-w-[540px]">
-        <Say client:idle mood={say.mood} text={say.text} gear={say.gear} point="down" />
+        <Say client:idle mood={say.mood} text={say.text} gear={say.gear} point="down" wide={{ at: 1024, point: reverse ? 'left' : 'right', side: reverse ? 'right' : 'left' }} />
       </div>
       {more && <a href={more.href} class="-ml-2 mt-3 inline-block rounded-full px-2 py-1 text-[15px] font-extrabold text-indigo transition-colors hover:bg-indigo-tint">{more.label}</a>}
     </div>

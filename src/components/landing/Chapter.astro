@@ -1,6 +1,6 @@
 ---
 // A path's chapter: who it is for, in one sentence, with the chapter's own Niri beside
-// it (under it on phones), the chapter's dense body and its own door. The genç chapter
+// it (under it on phones), pointing down at the chapter's dense body and its own door. The genç chapter
 // is warm (beacon orange allowed) and its Niri carries the costume chips on wide
 // screens; the kurum chapter stays calm indigo on grey, with a plain Niri. `*phrase*` in the heading takes the path's colour.
 import { Contours } from '../ui/pafta';
@@ -39,7 +39,7 @@ const genc = side === 'genc';
           genc && tiers ? (
             <GencSay client:idle line={say} tiers={tiers} />
           ) : (
-            <Say client:idle mood={say.mood} text={say.text} gear={say.gear} point="down" />
+            <Say client:idle mood={say.mood} text={say.text} gear={say.gear} point="down" wide={{ at: 1280 }} />
           )
         }
       </div>

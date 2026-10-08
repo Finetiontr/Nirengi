@@ -1,7 +1,7 @@
 ---
 // Closing band: solid indigo with faint contours, Niri saying goodbye on a sheet laid
 // over it (Niri's indigo would vanish on the band), and the same two doors again.
-// Niri has reached the summit here (the Zirve costume) and greets with a spin.
+// Niri has reached the summit here (the Zirve costume) and points at the doors.
 import { Contours } from '../ui/pafta';
 import Say from './Say';
 ---
@@ -11,7 +11,7 @@ import Say from './Say';
 
   <div class="relative mx-auto flex max-w-[var(--frame,1120px)] flex-col items-center gap-6 px-4 py-14 text-center sm:px-6 lg:flex-row lg:gap-16 lg:py-16 lg:text-left">
     <div class="w-full max-w-[420px] shrink-0 rounded-[20px] border-2 border-line bg-bg-2 px-4 pb-1 pt-7 text-left lg:w-[400px]" style="box-shadow:0 5px 0 rgb(255 255 255 / 0.4)">
-      <Say client:idle mood="cheer" size={104} wide={112} gear={4} greet="spin" text="Dinlediğin için teşekkürler! *İlk noktayı birlikte koyalım mı?*" />
+      <Say client:idle size={104} gear={4} point="down" wide={{ at: 1024, size: 112, point: 'right', side: 'left' }} text="Dinlediğin için teşekkürler! *İlk noktayı birlikte koyalım mı?*" />
     </div>
     <div class="w-full">
       <h2 id="cta-title" class="text-[clamp(28px,3.6vw,40px)] font-black leading-[1.12] tracking-[-0.02em] !text-white">Haritan bir noktayla başlar.</h2>

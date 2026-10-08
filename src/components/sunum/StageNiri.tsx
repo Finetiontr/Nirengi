@@ -1,7 +1,8 @@
 // Niri on stage. A slide change never makes the room wait: the bubble stays up,
 // gives a small pop and starts typing the new line at once, while Niri does a quick
-// squash and half-turn (about 0.45 s) and comes back in the new mood and costume
-// at the edge-on moment. A full spin is kept for the Zirve close, and even that runs
+// squash and half-turn (about 0.45 s). The new mood is on Niri's face from the first
+// frame and stays there while the line types (no generic talking face in between, so
+// a sad slide never flashes a grin); only the costume swaps at the edge-on moment. A full spin is kept for the Zirve close, and even that runs
 // alongside the line. Fast key presses cancel the move in flight and land clean.
 // Under reduced motion everything swaps instantly and the line is shown whole.
 
@@ -29,7 +30,7 @@ const TYPE_DELAY = 40;
 export default function StageNiri({ line }: { line: StageLine }) {
   const [scope, animate] = useAnimate<HTMLSpanElement>();
   const reduce = useReducedMotion();
-  // Niri's look switches at the edge-on moment of the turn; the words switch at once.
+  // Words and mood switch at once; the costume and size at the edge-on moment of the turn.
   const [worn, setWorn] = useState(line);
   const [said, setSaid] = useState(line);
   const [n, setN] = useState(Infinity);
@@ -84,12 +85,12 @@ export default function StageNiri({ line }: { line: StageLine }) {
     return () => cancelAnimationFrame(raf);
   }, [said, reduce]);
 
-  const typing = n !== Infinity;
   const left = said.side === 'left';
   return (
     <div className={`flex items-end gap-3 ${left ? 'flex-row-reverse' : ''}`}>
       <span ref={scope} className="inline-block will-change-transform">
-        <Niri mood={typing ? 'talk' : worn.mood} size={worn.size} point={worn.point} gear={worn.gear} cue="sahne" />
+        {/* No hover or click reactions on stage: they would put a passing face on Niri. */}
+        <Niri mood={said.mood} point={said.point} size={worn.size} gear={worn.gear} react={false} cue="sahne" />
       </span>
       <div
         key={pop}

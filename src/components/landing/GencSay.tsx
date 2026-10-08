@@ -1,7 +1,7 @@
 // The genç chapter's Niri: its line, and on wide screens the five league chips under
 // the bubble. Pointing at a chip dresses this Niri in that league's costume once the
-// pointer rests (200 ms), so sweeping across the chips makes one quick turn, not five,
-// and the words swap at once. Phones get the same chips in a card of their own
+// pointer rests (200 ms), so sweeping across the chips is one soft crossfade, not
+// five, and the words swap at once. Phones get the same chips in a card of their own
 // (Costumes), further down where they are read.
 
 import { useEffect, useRef, useState } from 'react';
@@ -23,7 +23,7 @@ export default function GencSay({ line, tiers }: { line: Omit<Line, 'key'>; tier
 
   const shown = worn === null ? line : tiers[worn];
   return (
-    <Say mood={shown.mood} text={shown.text} gear={shown.gear} point="down">
+    <Say mood={shown.mood} text={shown.text} gear={shown.gear} point="down" wide={{ at: 1280 }}>
       <Chips tiers={tiers} gear={picked ?? line.gear ?? 2} pick={setPicked} className="mt-4 hidden xl:flex" />
     </Say>
   );

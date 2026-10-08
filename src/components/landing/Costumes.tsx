@@ -1,12 +1,11 @@
-// A small teaser of Niri's league costumes: five tier keys, and Niri twirls into the
-// one you point at once the pointer rests (200 ms), so a sweep is one quick turn. This card
+// A small teaser of Niri's league costumes: five tier keys, and Niri changes into the
+// one you point at once the pointer rests (200 ms), with a soft crossfade. This card
 // (with its own Niri) is the phone version; on wide screens the chips sit under the
 // genç chapter's Niri instead (GencSay). The full collection lives on the league page.
 
 import { useEffect, useState } from 'react';
 import Niri from '../ui/Niri';
-import NiriTwirl from '../ui/NiriTwirl';
-import { emphasise, type Line } from './Say';
+import { emphasise, useCrossfade, type Line } from './Say';
 
 const REST_MS = 200;
 
@@ -43,14 +42,15 @@ export default function Costumes({ tiers }: { tiers: Line[] }) {
     const t = window.setTimeout(() => setWorn(picked), REST_MS);
     return () => window.clearTimeout(t);
   }, [picked]);
+  const [dressed, fade] = useCrossfade(worn);
 
   return (
     <div className="rounded-[20px] border-2 border-dashed border-orange/45 bg-bg/70 p-4 sm:p-5">
       <div className="flex items-center gap-4">
         <span className="shrink-0" aria-hidden="true">
-          <NiriTwirl k={worn}>
-            <Niri mood={worn === 4 ? 'cheer' : 'happy'} size={84} gear={worn} />
-          </NiriTwirl>
+          <span className="block transition-opacity duration-150 ease-out" style={{ opacity: fade }}>
+            <Niri mood={dressed === 4 ? 'cheer' : 'happy'} size={84} gear={dressed} />
+          </span>
         </span>
         <div className="min-w-0 flex-1">
           <p className="text-[17px] font-black leading-snug text-ink">Ligde tırmandıkça Niri giyinir.</p>

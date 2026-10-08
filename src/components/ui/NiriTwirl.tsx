@@ -3,9 +3,6 @@
 // transformation instead of a cut. Under reduced motion it is a short crossfade.
 //
 //   <NiriTwirl k={`${scene}-${gear}`}><Niri mood={mood} gear={gear} /></NiriTwirl>
-//
-// `pace` scales every beat (below 1 is quicker), and `turns={0}` is a plain hop with
-// no spin (the landing's greeting).
 
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useAnimate, useReducedMotion } from 'framer-motion';
@@ -14,14 +11,12 @@ interface Props {
   /** Change this to trigger the twirl; the children switch at the turn. Same key = live pass-through. */
   k: string | number;
   children: ReactNode;
-  /** Full turns: 1 = one spin (default), 0.5 = a quick flip, 2 = a showy double, 0 = a hop without a spin. */
-  turns?: 0 | 0.5 | 1 | 2;
-  /** Multiplies every beat's duration: 1 = the app's twirl (default, ≈ 0.76 s), 0.6 ≈ 0.45 s. */
-  pace?: number;
+  /** Full turns: 1 = one spin (default), 0.5 = a quick flip, 2 = a showy double. */
+  turns?: 0.5 | 1 | 2;
   className?: string;
 }
 
-export default function NiriTwirl({ k, children, turns = 1, pace = 1, className = '' }: Props) {
+export default function NiriTwirl({ k, children, turns = 1, className = '' }: Props) {
   const [scope, animate] = useAnimate<HTMLSpanElement>();
   const reduce = useReducedMotion();
   // The key whose children are on screen; until the turn reaches 90° the old ones stay.
@@ -51,14 +46,14 @@ export default function NiriTwirl({ k, children, turns = 1, pace = 1, className 
         return;
       }
       // Crouch, spring up while turning edge-on, swap, land with a little overshoot.
-      await animate(el, { scaleY: 0.86, scaleX: 1.08, y: 4, transformPerspective: 600 }, { duration: 0.1 * pace, ease: 'easeOut' });
+      await animate(el, { scaleY: 0.86, scaleX: 1.08, y: 4, transformPerspective: 600 }, { duration: 0.1, ease: 'easeOut' });
       if (id !== run.current) return;
-      await animate(el, { rotateY: turns ? 90 : 0, scaleY: 1.08, scaleX: 0.94, y: -26 }, { duration: 0.2 * pace, ease: [0.3, 0, 0.6, 1] });
+      await animate(el, { rotateY: 90, scaleY: 1.08, scaleX: 0.94, y: -26 }, { duration: 0.2, ease: [0.3, 0, 0.6, 1] });
       if (id !== run.current) return;
       setAt(k);
       // A half turn would land mirrored at 180°: come back in from the other edge instead.
       if (turns === 0.5) await animate(el, { rotateY: -90 }, { duration: 0 });
-      await animate(el, { rotateY: turns === 0.5 ? 0 : 360 * turns, y: 0, scaleY: 1, scaleX: 1 }, { duration: 0.46 * pace, ease: [0.2, 0.9, 0.3, 1.2] });
+      await animate(el, { rotateY: turns === 0.5 ? 0 : 360 * turns, y: 0, scaleY: 1, scaleX: 1 }, { duration: 0.46, ease: [0.2, 0.9, 0.3, 1.2] });
       if (id !== run.current) return;
       await animate(el, { rotateY: 0 }, { duration: 0 });
     })();
