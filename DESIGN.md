@@ -299,7 +299,8 @@ One shell (`App.astro`) renders both faces; `html[data-mode="genc|kurum"]` hides
 - **Content width:** narrow 1080px for genç, wide 1240px for kurum. Genç pages centre a 600px column.
 - **Right rail (xl, 1280px+):** 340px, 48px gap. On genç it is one "Bu haftan" card (league, week, this week's route) divided by 2px seams; `omit` drops what the page already shows. Hidden below xl, so it is never the only path to anything.
 - **Rhythm:** card padding 16 to 20px; 12px between list cards; 20px between stacked blocks; 40px before a major section.
-- **Flows** (Kanıt bağla): a 560px column, a quiet "Geri" at the top, NiriSays per step, and the primary key in flow after the content. No X, no lesson progress chrome, no pinned footer.
+- **Flows** (Kanıt bağla, İhtiyaç sihirbazı): no deck; the screen is the flow's. Kanıt bağla is a 560px column, a quiet "Geri" at the top, NiriSays per step, and the primary key in flow after the content: no X, no lesson progress chrome, no pinned footer. The sihirbaz is 13 screens long, so it keeps its X (with a save-or-leave sheet) and a step bar; its keys still sit in flow.
+- **Reading screen** ("Metninden çıkardıklarım", after Taslağa dönüştür): one card of field rows, each with its value and, below in `ink-3`, the sentence of the kurum's text it came from; missing fields say "Metninde yok, soracağım". What the guard refused sits in an inset "Almadıklarım" panel with a red cross and the reason. A hint names who read the text (the model, or the rules when the model was out of reach). Suggested criteria appear only on the criteria step, under "Önerilerim", each with an "Ekle" line key and its basis sentence.
 
 ## Motion
 
@@ -309,6 +310,7 @@ Motion explains order and cause; nothing moves for decoration alone.
 - **Temperament:** genç may spring (the deck plate's leading edge, the icon hop, Niri); kurum glides on a plain ease and never hops.
 - **Data draws itself:** bars fill from empty when they appear and a glint runs along the fill once; score rings and counts count up; week days pop in one after another; contour maps draw ring by ring from the summit outwards, then drift slowly.
 - **Press physics:** keys sink onto their lip; pressable cards lift 2px on hover (lip grows to 5px) and sink on press.
+- **Waiting on the model:** the key keeps its face and says "Niri okuyor…" while a 4px white line runs along its foot, easing to 94% over 14s; Niri's bubble says what is happening. Under reduced motion the label alone carries it.
 - **Reduced motion:** every one of these is off: choreography and reveals do not hide anything, bars and contours are drawn at once.
 
 ## Elevation & Depth

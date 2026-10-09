@@ -37,8 +37,8 @@ const fullTitle = `${title} · nirengi`;
 const path = Astro.url.pathname.replace(/\.html$/, '');
 const hasRail = Astro.slots.has('rail');
 const shell = width === 'wide' ? 'max-w-[1240px]' : 'max-w-[1080px]';
-// Flows like Kanıt bağla keep the screen to themselves: no deck, their own way back at the top.
-const flow = /\/kanit-bagla\/?$/.test(path);
+// Flows like Kanıt bağla and the İhtiyaç sihirbazı keep the screen to themselves: no deck, their own way back at the top.
+const flow = /\/(kanit-bagla|ihtiyaclar\/yeni)\/?$/.test(path);
 ---
 
 <!doctype html>

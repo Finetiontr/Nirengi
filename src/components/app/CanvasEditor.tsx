@@ -1,12 +1,15 @@
 // İhtiyaç sihirbazı: the 7-field canvas as a guided, one-question-per-screen flow.
-// The score from canvas.ts is shown live; each check turns green as the answer improves.
+// The kurum's own words are read first (Niri's model, checked by engine/ground.ts, or the rules
+// offline); the score from canvas.ts is shown live and each check turns green as the answer improves.
 
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type TextareaHTMLAttributes } from 'react';
 import { AnimatePresence, motion, useReducedMotion, type Variants } from 'framer-motion';
 import { Check, Plus, X } from 'lucide-react';
 import type { Canvas, ConstraintKind } from '../../lib/types.ts';
 import { actions, byId, currentOrg, getState, useAppState, useView } from '../../lib/store.ts';
-import { assessCanvas, draftFromText, isCheckable, PUBLISH_THRESHOLD, SAMPLE_COMPLAINT, type Draft } from '../../lib/engine/canvas.ts';
+import { assessCanvas, isCheckable, PUBLISH_THRESHOLD, SAMPLE_COMPLAINT } from '../../lib/engine/canvas.ts';
+import type { Rejected, Suggestion } from '../../lib/engine/ground.ts';
+import { readComplaint, type Reading } from '../../lib/ai.ts';
 import { rankCandidates, similarNeeds } from '../../lib/engine/match.ts';
 import { CONSTRAINT, PILOT_STATUS } from '../../lib/labels.ts';
 import { uid } from '../../lib/format.ts';
@@ -29,12 +32,12 @@ const EMPTY: Canvas = {
   scope: '',
 };
 
-type StepId = 'dert' | 'current' | 'pain' | 'painMetric' | 'outcome' | 'criteria' | 'constraints' | 'decisionMaker' | 'scope' | 'skills' | 'title' | 'review';
-type Q = Exclude<StepId, 'dert' | 'review'>;
+type StepId = 'dert' | 'okuma' | 'current' | 'pain' | 'painMetric' | 'outcome' | 'criteria' | 'constraints' | 'decisionMaker' | 'scope' | 'skills' | 'title' | 'review';
+type Q = Exclude<StepId, 'dert' | 'okuma' | 'review'>;
 type TextField = 'current' | 'pain' | 'painMetric' | 'outcome' | 'decisionMaker' | 'scope';
 
 const TEXT: Q[] = ['current', 'pain', 'painMetric', 'outcome', 'decisionMaker', 'scope'];
-const ORDER: StepId[] = ['dert', 'current', 'pain', 'painMetric', 'outcome', 'criteria', 'constraints', 'decisionMaker', 'scope', 'skills', 'title', 'review'];
+const ORDER: StepId[] = ['dert', 'okuma', 'current', 'pain', 'painMetric', 'outcome', 'criteria', 'constraints', 'decisionMaker', 'scope', 'skills', 'title', 'review'];
 
 const LABEL: Record<Q, string> = {
   current: 'Mevcut durum',
@@ -145,7 +148,10 @@ export default function CanvasEditor() {
   const editId = typeof location !== 'undefined' ? (new URLSearchParams(location.search).get('id') ?? undefined) : undefined;
   const existing = byId.need(s, editId);
   const org = byId.org(s, existing?.orgId ?? currentOrg(s, view).id)!;
-  const order = existing ? ORDER.slice(1) : ORDER;
+  const [reading, setReading] = useState<Reading | null>(null);
+  const [busy, setBusy] = useState(false);
+  // "okuma" shows what was read from the text, so it exists only once there is a reading.
+  const order = existing ? ORDER.filter((x) => x !== 'dert' && x !== 'okuma') : reading ? ORDER : ORDER.filter((x) => x !== 'okuma');
   const isLive = Boolean(existing && existing.status !== 'draft');
 
   const [i, setI] = useState(0);
@@ -157,7 +163,6 @@ export default function CanvasEditor() {
     return { ...k, criteria: k.criteria.length ? k.criteria : [{ id: uid('c'), text: '' }] };
   });
   const [raw, setRaw] = useState('');
-  const [draft, setDraft] = useState<Draft | null>(null);
   const [extra, setExtra] = useState<string[]>(existing?.skills ?? []);
   const [removed, setRemoved] = useState<string[]>([]);
   const [savedId, setSavedId] = useState(existing?.id);
@@ -204,23 +209,26 @@ export default function CanvasEditor() {
     }
   };
 
-  const convert = () => {
-    const d = draftFromText(raw);
-    // The extractor prefixes constraints with their kind ("Bütçe: 40.000 TL"); the kind is shown as a pill here.
+  const convert = async () => {
+    setBusy(true);
+    const r = await readComplaint(raw);
+    setBusy(false);
+    const d = r.draft;
+    // The rule extractor prefixes constraints with their kind ("Bütçe: 40.000 TL"); the kind is shown as a pill here.
     const constraints = d.canvas.constraints.map((k) => ({ ...k, text: k.text.replace(new RegExp(`^${CONSTRAINT[k.kind]}:\\s*`, 'i'), '') }));
-    const nc: Canvas = { ...d.canvas, constraints, criteria: d.canvas.criteria.length ? d.canvas.criteria : [{ id: uid('c'), text: '' }] };
-    setDraft(d);
+    setReading(r);
     setTitle(d.title);
-    setC(nc);
-    setExtra([]);
+    setC({ ...d.canvas, constraints, criteria: d.canvas.criteria.length ? d.canvas.criteria : [{ id: uid('c'), text: '' }] });
+    setExtra(d.source === 'model' ? d.skills : []);
     setRemoved([]);
-    const failing = assessCanvas(nc, d.skills).checks.filter((k) => !k.ok);
-    const to = order.findIndex((x) => x !== 'dert' && failing.some((k) => k.field === x));
-    feedback(
-      d.extracted.length
-        ? { tone: 'good', title: 'Taslak hazır', text: `${d.extracted.length} alanı doldurdum. Eksik kalanları birlikte tamamlayalım.` }
-        : { tone: 'info', title: 'Metinden alan çıkaramadım', text: 'Sorunları tek tek yazalım.' },
-    );
+    setDir(1);
+    setI(1);
+  };
+
+  // From the reading to the first thing still missing.
+  const fill = () => {
+    const failing = a.checks.filter((k) => !k.ok);
+    const to = order.findIndex((x) => failing.some((k) => k.field === x));
     go(to > 0 ? to : order.indexOf('title'));
   };
 
@@ -258,7 +266,7 @@ export default function CanvasEditor() {
 
   if (done) return <Finished done={done} onResume={() => setDone(null)} />;
 
-  const q = id !== 'dert' && id !== 'review' ? id : null;
+  const q = id !== 'dert' && id !== 'okuma' && id !== 'review' ? id : null;
   const stepChecks = q === 'title' ? [{ id: 'title', label: 'Başlık yazıldı', ok: titleOk, points: 0, blocking: false, fix: 'En az 8 karakterlik, sonucu anlatan bir başlık yaz.' }] : q ? a.checks.filter((k) => k.field === q) : [];
   const stepOk = stepChecks.length > 0 && stepChecks.every((k) => k.ok);
 
@@ -324,7 +332,7 @@ export default function CanvasEditor() {
         data-coach="wiz-soru"
         className="mt-6 overflow-x-clip"
         onKeyDown={(e) => {
-          if (e.key !== 'Enter' || e.shiftKey || e.nativeEvent.isComposing || id === 'dert' || id === 'review') return;
+          if (e.key !== 'Enter' || e.shiftKey || e.nativeEvent.isComposing || id === 'dert' || id === 'okuma' || id === 'review') return;
           if (['BUTTON', 'A', 'SELECT'].includes((e.target as HTMLElement).tagName)) return;
           e.preventDefault();
           next();
@@ -333,7 +341,9 @@ export default function CanvasEditor() {
         <AnimatePresence mode="wait" initial={false} custom={rm ? 0 : dir}>
           <motion.div key={id} custom={rm ? 0 : dir} variants={SLIDE} initial="enter" animate="center" exit="exit" className="p-1">
             {id === 'dert' ? (
-              <DertStep raw={raw} setRaw={setRaw} />
+              <DertStep raw={raw} setRaw={setRaw} busy={busy} />
+            ) : id === 'okuma' && reading ? (
+              <ReadingStep reading={reading} />
             ) : id === 'review' ? (
               <Review
                 org={org.name}
@@ -363,7 +373,8 @@ export default function CanvasEditor() {
                 setTitle={setTitle}
                 skills={skills}
                 toggleSkill={toggleSkill}
-                fromDraft={Boolean(draft?.extracted.includes(id as keyof Canvas))}
+                quotes={reading?.draft.extracted.includes(id as keyof Canvas) ? (reading.draft.quotes[id as keyof Canvas] ?? []) : null}
+                suggestions={id === 'criteria' ? (reading?.draft.suggestions ?? []) : []}
                 onNext={next}
               />
             )}
@@ -373,11 +384,30 @@ export default function CanvasEditor() {
 
       {id === 'dert' && (
         <div data-coach="wiz-devam" className="mt-6 space-y-2 p-1">
-          <button type="button" className="btn-primary btn-lg btn-block" disabled={raw.trim().length < 30} onClick={convert}>
-            Taslağa dönüştür
+          <button
+            type="button"
+            className="btn-primary btn-lg btn-block relative overflow-hidden"
+            disabled={raw.trim().length < 30}
+            aria-busy={busy}
+            onClick={busy ? undefined : convert}
+          >
+            {busy ? 'Niri okuyor…' : 'Taslağa dönüştür'}
+            {busy && <span className="reading-fill" aria-hidden="true" />}
           </button>
-          <button type="button" className="btn-quiet btn-block" onClick={next}>
-            Atla, tek tek yazayım
+          {!busy && (
+            <button type="button" className="btn-quiet btn-block" onClick={() => go(order.indexOf('current'))}>
+              Atla, tek tek yazayım
+            </button>
+          )}
+        </div>
+      )}
+      {id === 'okuma' && (
+        <div data-coach="wiz-devam" className="mt-6 space-y-2 p-1">
+          <button type="button" className="btn-primary btn-lg btn-block" onClick={fill}>
+            Eksikleri tamamla
+          </button>
+          <button type="button" className="btn-quiet btn-block" onClick={() => go(0)}>
+            Metni düzelt
           </button>
         </div>
       )}
@@ -475,15 +505,19 @@ interface StepProps {
   setTitle: (v: string) => void;
   skills: string[];
   toggleSkill: (k: string) => void;
-  fromDraft: boolean;
+  /** Sentences of the kurum's text this field was read from; null when the field was not read. */
+  quotes: string[] | null;
+  suggestions: Suggestion[];
   onNext: () => void;
 }
 
-function StepView({ id, ok, checks, c, setC, title, setTitle, skills, toggleSkill, fromDraft, onNext }: StepProps) {
+function StepView({ id, ok, checks, c, setC, title, setTitle, skills, toggleSkill, quotes, suggestions, onNext }: StepProps) {
   const m = META[id];
   const val = id === 'title' ? title : TEXT.includes(id) ? c[id as TextField] : '';
   const put = (v: string) => (id === 'title' ? setTitle(v) : setC((p) => ({ ...p, [id]: v })));
   const single = id === 'painMetric' || id === 'decisionMaker' || id === 'title';
+  // The rules copy whole sentences, so a quote that equals the answer says nothing new.
+  const cited = (quotes ?? []).filter((q) => q.trim() !== String(val).trim());
 
   return (
     <div>
@@ -492,13 +526,21 @@ function StepView({ id, ok, checks, c, setC, title, setTitle, skills, toggleSkil
       <Coach tip={m.tip} mood={ok ? 'happy' : 'think'} />
 
       <div className="mt-2">
-        {fromDraft && val && (
-          <p className="mb-2">
+        {quotes && (val || id === 'constraints') && (
+          <div className="mb-3">
             <span className="pill !py-0.5 bg-cyan-tint text-cyan-lip">Metninden doldurdum, bir kontrol et</span>
-          </p>
+            {cited.map((q) => (
+              <p key={q} className="mt-1.5 text-[14px] font-semibold leading-snug text-ink-3">
+                <span className="font-extrabold">Metninde:</span> “{q}”
+              </p>
+            ))}
+          </div>
         )}
         {id === 'criteria' ? (
-          <Criteria c={c} setC={setC} onNext={onNext} />
+          <>
+            <Criteria c={c} setC={setC} onNext={onNext} />
+            <Suggestions all={suggestions} c={c} setC={setC} />
+          </>
         ) : id === 'constraints' ? (
           <Constraints c={c} setC={setC} onNext={onNext} />
         ) : id === 'skills' ? (
@@ -555,10 +597,10 @@ function Criteria({ c, setC, onNext }: { c: Canvas; setC: StepProps['setC']; onN
         {rows.map((k, idx) => {
           const last = idx === rows.length - 1;
           return (
-            <li key={k.id} className="flex items-center gap-2">
-              <span className="num grid h-9 w-9 shrink-0 place-items-center rounded-full bg-bg-3 text-[15px] font-black text-ink-3">{idx + 1}</span>
-              <input
-                className="field !px-3.5"
+            <li key={k.id} className="flex items-start gap-2">
+              <span className="num mt-2 grid h-9 w-9 shrink-0 place-items-center rounded-full bg-bg-3 text-[15px] font-black text-ink-3">{idx + 1}</span>
+              <GrowField
+                className="field resize-none !px-3.5"
                 value={k.text}
                 onChange={(e) => setC((p) => ({ ...p, criteria: p.criteria.map((x) => (x.id === k.id ? { ...x, text: e.target.value } : x)) }))}
                 placeholder={META.criteria.ph}
@@ -571,14 +613,14 @@ function Criteria({ c, setC, onNext }: { c: Canvas; setC: StepProps['setC']; onN
                   e.stopPropagation();
                   if (k.text.trim() && last) add();
                   else if (!k.text.trim() && last) onNext();
-                  else (e.currentTarget.closest('li')?.nextElementSibling?.querySelector('input') as HTMLInputElement | null)?.focus();
+                  else (e.currentTarget.closest('li')?.nextElementSibling?.querySelector('textarea') as HTMLTextAreaElement | null)?.focus();
                 }}
               />
-              <span className="w-5 shrink-0" title={k.text.trim() ? (isCheckable(k.text) ? 'Ölçülebilir' : 'Ölçülebilir değil') : undefined}>
+              <span className="mt-4 w-5 shrink-0" title={k.text.trim() ? (isCheckable(k.text) ? 'Ölçülebilir' : 'Ölçülebilir değil') : undefined}>
                 {k.text.trim() && <StatusIcon kind={isCheckable(k.text) ? 'ok' : 'warn'} className="!h-5 !w-5" />}
               </span>
               {rows.length > 1 && (
-                <button type="button" className="btn-quiet btn-sm !min-h-9 !px-2 !text-ink-3" aria-label={`${idx + 1}. kriteri sil`} onClick={() => setC((p) => ({ ...p, criteria: p.criteria.filter((x) => x.id !== k.id) }))}>
+                <button type="button" className="btn-quiet btn-sm mt-2 !min-h-9 !px-2 !text-ink-3" aria-label={`${idx + 1}. kriteri sil`} onClick={() => setC((p) => ({ ...p, criteria: p.criteria.filter((x) => x.id !== k.id) }))}>
                   <X className="h-5 w-5" strokeWidth={3} />
                 </button>
               )}
@@ -590,6 +632,59 @@ function Criteria({ c, setC, onNext }: { c: Canvas; setC: StepProps['setC']; onN
         <Plus className="h-4 w-4" strokeWidth={3.5} aria-hidden="true" />
         Kriter ekle
       </button>
+    </div>
+  );
+}
+
+/** One-line field that grows with its text, so a long criterion stays readable on a phone. Enter never adds a line. */
+function GrowField(props: TextareaHTMLAttributes<HTMLTextAreaElement>) {
+  const ref = useRef<HTMLTextAreaElement>(null);
+  const fit = () => {
+    const el = ref.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${el.scrollHeight + 4}px`;
+  };
+  useLayoutEffect(fit, [props.value]);
+  // The row narrows when its delete key appears; refit on width changes only, a frame later.
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    let w = el.clientWidth;
+    const ro = new ResizeObserver(() => {
+      if (el.clientWidth === w) return;
+      w = el.clientWidth;
+      requestAnimationFrame(fit);
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  return <textarea ref={ref} rows={1} {...props} />;
+}
+
+/** Criteria the model proposed. They enter the canvas only when the kurum adds them. */
+function Suggestions({ all, c, setC }: { all: Suggestion[]; c: Canvas; setC: StepProps['setC'] }) {
+  const left = all.filter((s) => !c.criteria.some((k) => k.text.trim() === s.text));
+  if (!left.length) return null;
+  const add = (s: Suggestion) => setC((p) => ({ ...p, criteria: [...p.criteria.filter((k) => k.text.trim()), { id: uid('c'), text: s.text }] }));
+  return (
+    <div className="mt-5 rounded-[16px] bg-bg-2 p-4">
+      <p className="text-[15px] font-extrabold text-ink">Önerilerim</p>
+      <p className="mt-0.5 text-[14px] font-semibold leading-snug text-ink-3">Metnindeki sorundan ve sayılardan çıkardım. Eklemediğin öneri kanvasa girmez; eşiği sen belirle.</p>
+      <ul className="mt-3 space-y-3">
+        {left.map((s) => (
+          <li key={s.text} className="flex items-start gap-3">
+            <div className="min-w-0 flex-1">
+              <p className="text-[15px] font-bold leading-snug text-ink-2">{s.text}</p>
+              <p className="mt-0.5 text-[13px] font-semibold leading-snug text-ink-3">Dayanağı: “{s.basis}”</p>
+            </div>
+            <button type="button" className="btn-line btn-sm shrink-0" onClick={() => add(s)}>
+              <Plus className="h-4 w-4" strokeWidth={3.5} aria-hidden="true" />
+              Ekle
+            </button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
@@ -641,28 +736,124 @@ function Constraints({ c, setC, onNext }: { c: Canvas; setC: StepProps['setC']; 
   );
 }
 
-function DertStep({ raw, setRaw }: { raw: string; setRaw: (v: string) => void }) {
+function DertStep({ raw, setRaw, busy }: { raw: string; setRaw: (v: string) => void; busy: boolean }) {
   const n = raw.trim().length;
   return (
     <div>
       <h1 className="text-[26px] font-black leading-tight text-ink sm:text-[30px]">Derdini kendi sözlerinle anlat</h1>
       <p className="mt-2 text-[16px] font-bold text-ink-3">Kurumunun çözmek istediği problemi yaz. Nasıl anlatıyorsan öyle: alanları ben doldururum, yalnız eksik kalanları sorarım.</p>
-      <Coach tip="Rakam, kısıt ve istediğin sonuç varsa hepsini ekle." mood="wave" />
+      <Coach
+        tip={busy ? 'Okuyorum. Her bilgiyi hangi cümlenden aldığımı göstereceğim.' : 'Rakam, kısıt ve istediğin sonuç varsa hepsini ekle.'}
+        mood={busy ? 'think' : 'wave'}
+      />
       <textarea
         className="field mt-2 min-h-[168px] resize-none"
         value={raw}
         onChange={(e) => setRaw(e.target.value)}
         placeholder="ör. Müşterilerimiz kargolarının nerede olduğunu göremiyor, çağrı merkezimiz sürekli arıyor…"
         aria-label="Derdini anlat"
+        readOnly={busy}
         autoFocus
       />
       <div className="mt-2 flex items-center justify-between gap-3">
         <span className={`num text-[13px] font-bold ${n >= 30 ? 'text-green-lip' : 'text-ink-3'}`}>{n >= 30 ? 'Yeterli' : `En az 30 karakter · ${n}`}</span>
-        <button type="button" className="btn-quiet btn-sm" onClick={() => setRaw(SAMPLE_COMPLAINT)}>
+        <button type="button" className="btn-quiet btn-sm" disabled={busy} onClick={() => setRaw(SAMPLE_COMPLAINT)}>
           Örnekle doldur
         </button>
       </div>
-      <p className="hint">Metni bu cihazda işlerim; yazdıkların dışarı gönderilmez.</p>
+      <p className="hint">Metnin, taslak için açık kaynaklı bir yapay zekâ modeline gider; Nirengi onu saklamaz. Kişisel veri yazma.</p>
+    </div>
+  );
+}
+
+const REASON: Record<Rejected['reason'], string> = {
+  quote: 'Dayandığı cümle metninde yok',
+  number: 'Metninde geçmeyen bir sayı içeriyor',
+  measurable: 'Ölçülebilir değil: eşik ya da somut teslim yok',
+};
+
+const FALLBACK: Record<NonNullable<Reading['fallback']>, string> = {
+  offline: 'Modelime şu an ulaşamadım',
+  quota: 'Modelimin bugünkü ücretsiz kotası doldu',
+  busy: 'Modelim şu an çok yoğun',
+  model: 'Modelin cevabı denetimden geçmedi',
+};
+
+const READ_ROWS: Q[] = ['current', 'pain', 'painMetric', 'outcome', 'constraints', 'decisionMaker', 'scope'];
+
+/** What was read from the text, where each piece came from, and what was refused. Nothing to edit here. */
+function ReadingStep({ reading }: { reading: Reading }) {
+  const d = reading.draft;
+  const model = d.source === 'model';
+  const missing = READ_ROWS.filter((f) => !d.extracted.includes(f as keyof Canvas)).map((f) => LABEL[f].toLocaleLowerCase('tr-TR'));
+  const n = d.extracted.length;
+  const said = [
+    model ? `${n} alanı doldurdum` : `${FALLBACK[reading.fallback ?? 'model']}, taslağı kurallarla çıkardım. ${n} alan doldu`,
+    d.suggestions.length ? `${d.suggestions.length} başarı kriteri öneriyorum` : '',
+  ]
+    .filter(Boolean)
+    .join(', ');
+  const tip = `${said}.${missing.length ? ` ${missing.slice(0, 2).join(' ve ')} metninde yok; ${missing.length > 1 ? 'onları' : 'onu'} soracağım.` : ''}`;
+
+  return (
+    <div>
+      <h1 className="text-[26px] font-black leading-tight text-ink sm:text-[30px]">Metninden çıkardıklarım</h1>
+      <p className="mt-2 text-[16px] font-bold text-ink-3">Her alanın altında hangi cümlenden aldığım yazıyor. Metninde olmayanı yazmadım.</p>
+      <Coach tip={tip.charAt(0).toLocaleUpperCase('tr-TR') + tip.slice(1)} mood={model ? 'happy' : 'think'} />
+
+      <ul className="card mt-2 divide-y-2 divide-line">
+        {READ_ROWS.map((f) => {
+          const got = d.extracted.includes(f as keyof Canvas);
+          const value = f === 'constraints' ? d.canvas.constraints.map((k) => `${CONSTRAINT[k.kind]}: ${k.text.replace(new RegExp(`^${CONSTRAINT[k.kind]}:\\s*`, 'i'), '')}`).join(' · ') : String(d.canvas[f as TextField]);
+          const quotes = (d.quotes[f as keyof Canvas] ?? []).filter((q) => q.trim() !== value.trim());
+          return (
+            <li key={f} className="flex items-start gap-3 px-4 py-3">
+              <span className="mt-1">
+                <StatusIcon kind={got ? 'ok' : 'pending'} />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="text-[13px] font-extrabold text-ink-3">{LABEL[f]}</p>
+                {got ? (
+                  <>
+                    <p className="mt-0.5 break-words text-[15px] font-bold leading-snug text-ink-2">{value}</p>
+                    {quotes.map((q) => (
+                      <p key={q} className="mt-1 break-words text-[13px] font-semibold leading-snug text-ink-3">
+                        “{q}”
+                      </p>
+                    ))}
+                  </>
+                ) : (
+                  <p className="mt-0.5 text-[15px] font-bold text-ink-3">Metninde yok, soracağım</p>
+                )}
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+
+      {d.rejected.length > 0 && (
+        <div className="mt-4 rounded-[16px] bg-bg-2 p-4">
+          <p className="text-[15px] font-extrabold text-ink">Almadıklarım</p>
+          <p className="mt-0.5 text-[14px] font-semibold leading-snug text-ink-3">Model bunları yazdı ama metninle doğrulayamadım, kanvasa koymadım.</p>
+          <ul className="mt-2 space-y-2">
+            {d.rejected.map((r, j) => (
+              <li key={j} className="flex items-start gap-2">
+                <StatusIcon kind="fail" className="mt-1" />
+                <span className="min-w-0 flex-1 text-[14px] font-bold leading-snug text-ink-2">
+                  {r.value}
+                  <span className="block text-[13px] font-semibold text-ink-3">{REASON[r.reason]}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <p className="hint">
+        {model
+          ? `Okuyan: ${reading.label}, açık ağırlıklı bir model${reading.cached ? ' (bu metin için daha önce verdiği cevap)' : ''}. Yayına model karar vermez: netlik puanını kurallar hesaplar.`
+          : 'Kural motoru cümleleri olduğu gibi alır, kriter önermez. Netlik puanı aynı kurallarla hesaplanır.'}
+      </p>
     </div>
   );
 }

@@ -21,6 +21,7 @@ const jump = [
   ['merdiven', 'Doğrulama'],
   ['eslesme', 'Eşleşme'],
   ['kanvas', 'İhtiyaç'],
+  ['yapay-zeka', 'Yapay zekâ'],
   ['defter', 'Kayıt defteri'],
   ['ilerleme', 'İlerleme'],
   ['adalet', 'Adalet'],
@@ -59,22 +60,31 @@ const fairness = [
   ['Başarısızlık da kayıttır.', 'Gerekçesiyle kapanan deneme projesinin onaylı aşamaları kanıt olarak kalır.'],
 ];
 
+const aiGuards = [
+  ['Her alan bir cümleye dayanır.', 'Model doldurduğu her alan için metinden harfi harfine bir cümle göstermek zorunda. Cümle metinde yoksa alan kanvasa girmez, kuruma soru olarak döner.'],
+  ['Metinde olmayan sayı giremez.', 'Alandaki her sayı kurumun metninde geçmeli. Metinde “6.000 arama” yazıyorsa model “8.000” diyemez; derse alan reddedilir.'],
+  ['Kriterler öneri olarak kalır.', 'Model başarı kriteri önerir; kurum “Ekle”ye basmadan kanvasa girmez. Eşik ya da somut teslim içermeyen öneri hiç gösterilmez.'],
+  ['Reddedilen gizlenmez.', 'Denetimden geçmeyen her şey “Almadıklarım” listesinde nedeniyle görünür.'],
+  ['Yedek yol hep açık.', 'Ağ, kota ya da model sorununda taslağı kural motoru çıkarır ve ekran bunu söyler. Aynı metnin cevabı tarayıcıda saklanır.'],
+] as const;
+
 const truth = [
   ['GitHub hesap sahipliği', 'Gerçek', 'GitHub API; bio ya da gist’e eklenen tek kullanımlık kod.'],
   ['Alan adı sahipliği', 'Gerçek', 'DNS TXT kaydı; Google ve Cloudflare DoH üzerinden.'],
   ['Eşleşme, netlik puanı, takım önerisi', 'Gerçek', 'Bu sayfadaki formüllerle, her görüntülemede yeniden hesaplanır.'],
   ['Kayıt defteri bütünlüğü', 'Gerçek', 'SHA-256 hash zinciri; doğrulama her kaydı yeniden hesaplar.'],
-  ['Taslak motoru', 'Kural tabanlı', 'Çevrim dışı çalışır; üretimde aynı arayüzün arkasına dil modeli konabilir.'],
+  ['İhtiyaç taslağı', 'Yapay zekâ', 'Gemma 4 26B, açık ağırlıklı bir model (Cloudflare Workers AI). Ağ ya da kota yoksa aynı işi kural motoru yapar.'],
+  ['Niri’nin analizleri ve haftalık özetleri', 'Kural tabanlı', 'Bu sayfadaki sayılardan kurallarla yazılır; model kullanılmaz.'],
   ['Kurumlar, kişiler, lig arkadaşları, S3 tasdikleri', 'Kurgusal', 'Demo ekosistemi; gerçek kurum hesaplarıyla değişecek.'],
   ['Kalıcılık', 'Tarayıcı', 'Demo verisi localStorage’da tutulur; üretimde Cloudflare D1 planlı.'],
 ] as const;
-const truthTone: Record<string, string> = { Gerçek: 'bg-green-tint text-green-lip', 'Kural tabanlı': 'bg-cyan-tint text-cyan-lip', Kurgusal: 'bg-bg-3 text-ink-2', Tarayıcı: 'bg-bg-3 text-ink-2' };
+const truthTone: Record<string, string> = { Gerçek: 'bg-green-tint text-green-lip', 'Yapay zekâ': 'bg-indigo-tint text-indigo', 'Kural tabanlı': 'bg-cyan-tint text-cyan-lip', Kurgusal: 'bg-bg-3 text-ink-2', Tarayıcı: 'bg-bg-3 text-ink-2' };
 ---
 
 <App
   title="Yöntem"
   mode="auto"
-  description="nirengi sayıları nasıl hesaplar: doğrulama basamakları, eşleşme formülü, yayın eşiği, kayıt defteri, haftalık ilerleme, XP ve ligler."
+  description="nirengi sayıları nasıl hesaplar ve yapay zekâyı nerede kullanır: doğrulama basamakları, eşleşme formülü, yayın eşiği, yapay zekâ taslağı ve denetimi, kayıt defteri, haftalık ilerleme, XP ve ligler."
 >
   <div class="mx-auto max-w-[680px]">
     <div class="relative overflow-hidden rounded-[20px] border-2 border-line px-4 pb-1 pt-5">
@@ -188,6 +198,27 @@ const truthTone: Record<string, string> = { Gerçek: 'bg-green-tint text-green-l
       </Fold>
       <Fold title="Ölçülebilir kriter ne demek?">
         <p>Bir eşik değeri (sayı, yüzde) ya da somut bir teslim içerir: “teslim edilir”, “belgelenir” gibi. “Daha iyi olsun” gibi cümleler eşiği geçemez.</p>
+      </Fold>
+    </Sec>
+
+    <Sec id="yapay-zeka" title="Yapay zekâ: tek iş, denetimli" lead="Model bir iş yapar: kurumun kendi sözleriyle yazdığı derdi okuyup ihtiyaç kartının alanlarına ayırır. Hiçbir puanı, eşleşmeyi ya da yayın kararını model vermez.">
+      <span slot="icon"><Face size={36} /></span>
+      <ul class="card divide-y-2 divide-line">
+        {
+          aiGuards.map(([k, d]) => (
+            <li class="p-4">
+              <p class="text-[15px] font-black text-ink">{k}</p>
+              <p class="mt-1 text-[14px] font-bold text-ink-3">{d}</p>
+            </li>
+          ))
+        }
+      </ul>
+      <Fold title="Hangi model, neden?" aside="Gemma 4 26B">
+        <p>Google’ın Gemma 4 26B modeli, Cloudflare Workers AI üzerinde çalışır. Ağırlıkları açık ve Apache 2.0 lisanslı: açık kaynak bir hizmetin modeli de açık, istenirse kendi sunucunda çalışır. Workers AI’ın günlük ücretsiz kotasında kalır; bir taslak yaklaşık 28 nöron, günde 350 civarı taslak eder.</p>
+        <p>Düşünme kipi kapalı, sıcaklık 0,1 ve çıktı bir JSON şemasıyla sınırlı. İstem sunucuda sabit; tarayıcıdan yalnızca metin gider.</p>
+      </Fold>
+      <Fold title="Neyi yakalamaz?">
+        <p>Kaynak cümle şartı uydurmayı yakalar, yanlış yorumu yakalamaz: model bir cümleyi yanlış alana koyabilir. Bu yüzden her alanın altında dayandığı cümle görünür ve kurum her adımda düzeltebilir.</p>
       </Fold>
     </Sec>
 
@@ -314,7 +345,7 @@ const truthTone: Record<string, string> = { Gerçek: 'bg-green-tint text-green-l
           ))
         }
       </ul>
-      <p class="px-1 text-[14px] font-bold text-ink-3">Gizlilik: demo hiçbir kişisel veriyi sunucuya göndermez. GitHub ve DNS sorguları doğrudan tarayıcından ilgili servislere gider.</p>
+      <p class="px-1 text-[14px] font-bold text-ink-3">Gizlilik: GitHub ve DNS sorguları doğrudan tarayıcından ilgili servislere gider. İhtiyaç taslağı için yazılan metin, taslak çıkarılsın diye modele gider ve saklanmaz; geri kalan demo verisi tarayıcıdan çıkmaz.</p>
     </Sec>
   </div>
 </App>

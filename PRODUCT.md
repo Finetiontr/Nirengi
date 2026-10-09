@@ -31,7 +31,7 @@ Beyan değil, kanıt. Kariyer/CV platformlarının tersine özgeçmiş, güven p
 
 ## Capabilities and Constraints
 
-- Açıklanabilir eşleşme (4 bileşen), kopya eser tespiti, takım kompozisyonu, yükselen sinyal, problemle arama, çözülebilirlik skoru + yayın eşiği (70), kural tabanlı taslak motoru, SHA-256 zincirli defter, sessizlik göstergesi.
+- Açıklanabilir eşleşme (4 bileşen), kopya eser tespiti, takım kompozisyonu, yükselen sinyal, problemle arama, çözülebilirlik skoru + yayın eşiği (70), açık modelle (Gemma 4, Workers AI) kaynak cümleye bağlı ihtiyaç taslağı ve çevrim dışı kural motoru yedeği, SHA-256 zincirli defter, sessizlik göstergesi.
 - Demo verisi tarayıcıda (localStorage); üretimde Cloudflare D1 planlı.
 - Astro 7 + React 19 + Tailwind 4; fontlar ve kütüphaneler paket içi.
 - Açık kaynak web hizmeti olmak zorunlu; lisans kararı açık.

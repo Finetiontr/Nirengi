@@ -185,20 +185,26 @@ export function draftFromText(text: string): Draft {
     scope: '',
   };
 
-  const questions: Draft['questions'] = [];
-  if (!painMetric) questions.push({ field: 'painMetric', q: 'Bu sorun bugün hangi sayıyla ölçülüyor? (süre, oran, maliyet)' });
-  questions.push({ field: 'criteria', q: 'Deneme projesi başarılı sayılırsa hangi sayı nereye gelmiş olacak?' });
-  questions.push({ field: 'decisionMaker', q: 'Kilometre taşlarını kurum adına kim onaylayacak?' });
-  questions.push({ field: 'scope', q: 'Deneme projesini en küçük hâliyle nerede yapabiliriz? (tek bölge, tek müşteri…)' });
-  if (!constraints.length) questions.push({ field: 'constraints', q: 'Bütçe, süre, veri ya da mevzuat kısıtınız var mı?' });
+  return { title, canvas, skills, questions: questionsFor(canvas), extracted: filledFields(canvas) };
+}
 
-  const extracted = (Object.keys(canvas) as (keyof Canvas)[]).filter((k) => {
-    const v = canvas[k];
+/** What is still missing, asked in the kurum's words; at most five. */
+export function questionsFor(c: Canvas): Draft['questions'] {
+  const questions: Draft['questions'] = [];
+  if (!c.painMetric) questions.push({ field: 'painMetric', q: 'Bu sorun bugün hangi sayıyla ölçülüyor? (süre, oran, maliyet)' });
+  if (!c.criteria.length) questions.push({ field: 'criteria', q: 'Deneme projesi başarılı sayılırsa hangi sayı nereye gelmiş olacak?' });
+  if (!c.decisionMaker) questions.push({ field: 'decisionMaker', q: 'Kilometre taşlarını kurum adına kim onaylayacak?' });
+  if (!c.scope) questions.push({ field: 'scope', q: 'Deneme projesini en küçük hâliyle nerede yapabiliriz? (tek bölge, tek müşteri…)' });
+  if (!c.constraints.length) questions.push({ field: 'constraints', q: 'Bütçe, süre, veri ya da mevzuat kısıtınız var mı?' });
+  return questions.slice(0, 5);
+}
+
+export const filledFields = (c: Canvas) =>
+  (Object.keys(c) as (keyof Canvas)[]).filter((k) => {
+    const v = c[k];
     return Array.isArray(v) ? v.length > 0 : Boolean(v);
   });
 
-  return { title, canvas, skills, questions: questions.slice(0, 5), extracted };
-}
 
 function makeTitle(s: string) {
   let t = s
@@ -216,4 +222,6 @@ export const SAMPLE_COMPLAINT =
   'Araçlarımızda GPS cihazı var ama konum verisi günde bir kez Excel raporuna dönüşüyor. ' +
   'Müşterilerimize araç konumlarını canlı haritada gösteren bir web paneli istiyoruz. ' +
   'Bütçemiz 40.000 TL ve 6 hafta içinde sonuç görmek istiyoruz. ' +
-  'Konum verisi KVKK kapsamında; müşteri adresleri paylaşılmayacak.';
+  'Konum verisi KVKK kapsamında; müşteri adresleri paylaşılmayacak. ' +
+  'Aşamaları operasyon direktörümüz onaylayacak. ' +
+  'İlk denemeyi yalnız Tuzla deposundan çıkan araçlar ve onların kurumsal müşterileriyle yapmak istiyoruz.';

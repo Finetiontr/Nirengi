@@ -44,4 +44,4 @@ Eski arayüz (mor SaaS şablonu, sabit kodlu sayfalar, tutarsız mock veri) `../
 
 - Demo verisi `localStorage`’da; tarayıcı/cihaz değişince başlangıç verisi yüklenir. Panelden “Sıfırla”.
 - GitHub’ın kimliksiz API sınırı saatte 60 istek (IP başına). Konferans ağında sınır dolarsa “Çevrim dışı örnek” kullan.
-- Taslak motoru kural tabanlı; üretimde aynı arayüzün arkasına dil modeli bağlanabilir.
+- İhtiyaç taslağını açık bir model (Gemma 4, Workers AI) çıkarır; ağ ya da kota yoksa kural motoru. Ayrıntı: README “Yapay zekâ kullanımı”.

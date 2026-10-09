@@ -9,3 +9,14 @@ workers_dev = true
 # Public id of the "Nirengi360" GitHub App; the secret is set with `wrangler secret put GITHUB_CLIENT_SECRET`.
 GITHUB_CLIENT_ID = "Iv23litvWL33aCeVhOt5"
 ALLOWED_ORIGINS = "https://finetiontr.github.io,http://127.0.0.1:4321,http://localhost:4321"
+
+# Workers AI runs Niri's draft reader (draft.ts). No key: the account's daily free allocation
+# applies, and on the Workers Free plan nothing is ever billed; past it the site falls back to rules.
+[ai]
+binding = "AI"
+
+# Per-visitor brake on /ai/draft. namespace_id is a label inside the account, not an account id.
+[[ratelimits]]
+name = "DRAFT_LIMIT"
+namespace_id = "1001"
+simple = { limit = 20, period = 60 }
