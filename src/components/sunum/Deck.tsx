@@ -1,5 +1,6 @@
 // The stage deck: one idea per slide, Niri on stage with one short line each.
-// Keys: →, Space, PageDown next; ←, PageUp back; Home/End; 1–9 and 0 jump;
+// Twelve slides for the talk, then the appendix for questions (→ past the close).
+// Keys: →, Space, PageDown next; ←, PageUp back; Home/End (the close); 1–9 and 0 jump;
 // F fullscreen; B blanks the screen; T flips the theme for this visit; N opens the
 // presenter window (/sunum?notlar) with the speaker notes, which follows the deck
 // and can drive it. A click anywhere but a link or key advances. The slide number
@@ -8,7 +9,7 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type MouseEvent } from 'react';
 import StageNiri from './StageNiri';
 import Presenter, { CHANNEL, type Msg } from './Presenter';
-import { SLIDES, type Mark } from './slides';
+import { FILM, MAIN, place, SLIDES, type Mark } from './slides';
 import './sunum.css';
 
 /** Where Niri stands: the box is anchored by its bottom-left corner on the 1600×900 stage. */
@@ -91,6 +92,12 @@ function Stage() {
     if (!w) say('Açılır pencere engellendi; /sunum?notlar adresini ayrı bir pencerede aç.');
   }, [i, say]);
 
+  // The film streams from the site: fetch it once early so it starts at once on stage.
+  useEffect(() => {
+    const t = window.setTimeout(() => fetch(FILM).catch(() => {}), 2000);
+    return () => window.clearTimeout(t);
+  }, []);
+
   useEffect(() => {
     const want = `#${i + 1}`;
     if (location.hash !== want) history.replaceState(null, '', want);
@@ -108,7 +115,7 @@ function Stage() {
         go(i + 1);
       } else if (k === 'ArrowLeft' || k === 'ArrowUp' || k === 'PageUp' || k === 'Backspace') go(i - 1);
       else if (k === 'Home') go(0);
-      else if (k === 'End') go(last);
+      else if (k === 'End') go(MAIN - 1);
       else if (/^[0-9]$/.test(k)) go(k === '0' ? 9 : Number(k) - 1);
       else if (k === 'f' || k === 'F') fullscreen();
       else if (k === 'n' || k === 'N') notes();
@@ -153,28 +160,29 @@ function Stage() {
   const slide = SLIDES[i];
   const View = slide.View;
   const mark = MARKS[slide.mark];
+  const bare = !!slide.bare;
 
   return (
     <div ref={root} className="deck" onClick={onClick} onContextMenu={onContext}>
       <div className="stage">
         {!blank && (
           <>
-            <section key={slide.id} className="absolute inset-0" aria-roledescription="slayt" aria-label={`${i + 1} / ${SLIDES.length}: ${slide.title}`}>
+            <section key={slide.id} className="absolute inset-0" aria-roledescription="slayt" aria-label={`${place(i)}: ${slide.title}`}>
               <View />
             </section>
 
           </>
         )}
 
-        {/* Niri stays mounted across slides (and a blank screen) so every change is a twirl. */}
-        <div className={`narrator ${blank ? 'invisible' : ''}`} style={{ left: mark.left, bottom: mark.bottom, width: mark.width }} aria-live="polite">
+        {/* Niri stays mounted across slides (a blank screen, the film) so every change is a twirl. */}
+        <div className={`narrator ${blank || bare ? 'invisible' : ''}`} style={{ left: mark.left, bottom: mark.bottom, width: mark.width }} aria-live="polite">
           <StageNiri line={{ key: slide.id, ...slide.niri, text: slide.niri.line, size: mark.size, side: mark.side }} />
         </div>
 
-        {/* A quiet counter: the route so far as small survey markers. */}
-        <div className="absolute right-[48px] top-[34px] flex items-center gap-3" aria-hidden="true">
+        {/* A quiet counter: the talk's route so far as small survey markers; the appendix shows its own count. */}
+        <div className={`absolute right-[48px] top-[34px] flex items-center gap-3 ${bare ? 'invisible' : ''}`} aria-hidden="true">
           <div className="flex items-end gap-[5px]">
-            {SLIDES.map((s, n) => (
+            {SLIDES.slice(0, MAIN).map((s, n) => (
               <svg key={s.id} viewBox="0 0 12 11" width={n === i ? 16 : 11} height={n === i ? 15 : 10} className="block">
                 <path
                   d="M6 1.2 11 10H1Z"
@@ -186,9 +194,7 @@ function Stage() {
               </svg>
             ))}
           </div>
-          <span className="mono text-[17px] font-bold text-ink-3">
-            {i + 1} / {SLIDES.length}
-          </span>
+          <span className="mono text-[17px] font-bold text-ink-3">{place(i)}</span>
         </div>
 
         {!moved && i === 0 && !blank && (

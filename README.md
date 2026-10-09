@@ -7,7 +7,7 @@
 ## Demo
 
 - **Canlı:** https://finetiontr.github.io/Nirengi/ (kurulum gerekmez; veri tarayıcıda tutulur)
-- **Sunum:** [`/sunum`](https://finetiontr.github.io/Nirengi/sunum), uygulamanın içinde Niri’nin anlattığı deste
+- **Sunum:** [`/sunum`](https://finetiontr.github.io/Nirengi/sunum), uygulamanın içinde Niri’nin anlattığı 12 slaytlık deste; yapay zekâ slaytları ürünün kendi denetimini gerçek bir model cevabı üzerinde çalıştırır
 - **Sahne akışı:** [`docs/DEMO.md`](docs/DEMO.md), 5 dakikalık demo ve yedek senaryo
 
 ## Çözdüğü problem
@@ -147,6 +147,7 @@ src/
     store.ts           tarayıcıda durum ve sekmeler arası senkron
     seed.ts            kurgusal demo ekosistemi
   styles/global.css    renk ve tipografi tokenları
+public/                favicon; sunum/ altında sunumdaki telefon ekranları
 worker/                tek sunucu parçası (Cloudflare Worker): GitHub token değişimi, yapay zekâ taslağı
 scripts/               GitHub Pages derlemesi, sunum dışa aktarımı
 tests/                 node:test testleri

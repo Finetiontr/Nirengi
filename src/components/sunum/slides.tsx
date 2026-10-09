@@ -3,24 +3,29 @@
 // on the right for the opening and the close, 'dock' bottom-left elsewhere, so
 // every slide keeps that corner (x < 760, y > 700) free.
 //
-// The arc is the one a jury and investors look for: problem, why now, solution,
-// product, trust, demo, market, competition, how it lives, where we are, what we
-// will measure, roadmap, the ask. Numbers come from docs/PAZAR-ANALIZI.md with
-// their sources on the slide; product numbers from the engine. Nothing here is
-// invented: plans are labelled as plans, and people and institutions in the demo
-// are fictional and the deck says so. No third-party brand names: categories only.
+// The twelve main slides follow the flow the organisers recommended: team, problem,
+// for whom, evidence, solution, demo (the film), what the AI does, its before and
+// after, the guard against wrong output, design decisions, done and left, close.
+// After the close come appendix slides for questions. Numbers come from
+// docs/PAZAR-ANALIZI.md with their sources on the slide; product numbers from the
+// engine, and the AI slides run a real model answer through the product's own guard.
+// Nothing here is invented: plans are labelled as plans, and people and institutions
+// in the demo are fictional and the deck says so. No third-party brand names.
 
-import type { CSSProperties, ReactNode } from 'react';
-import { Check } from 'lucide-react';
+import { useState, type CSSProperties, type ReactNode } from 'react';
+import { Check, X } from 'lucide-react';
 import type { Dir, Mood } from '../ui/Niri';
 import { Contours, Tri } from '../ui/pafta';
 import { SurveyFlag } from '../ui/kit';
 import { LevelGlyph } from '../ui/primitives';
 import { Bolt, Compass, Flame, Mark as BrandMark, Route, Shield } from '../ui/icons';
-import { PUBLISH_THRESHOLD } from '../../lib/engine/canvas.ts';
+import type { Canvas } from '../../lib/types.ts';
+import { assessCanvas, filledFields, PUBLISH_THRESHOLD, SAMPLE_COMPLAINT } from '../../lib/engine/canvas.ts';
+import { cites, readModelDraft, readRulesDraft } from '../../lib/engine/ground.ts';
 import { GENESIS, sha256, shortHash } from '../../lib/engine/ledger.ts';
 import { WEIGHTS } from '../../lib/engine/match.ts';
 import { TIERS, XP } from '../../lib/engine/progress.ts';
+import { INVENTED_DECIDER, SAMPLE_READING } from './reading.ts';
 
 export type Mark = 'hero' | 'dock';
 
@@ -28,13 +33,20 @@ export interface Slide {
   id: string;
   title: string;
   mark: Mark;
+  /** Kept for questions: shown after the close, outside the twelve-step count. */
+  appendix?: boolean;
+  /** The view owns the whole stage (the film): Niri and the counter step aside. */
+  bare?: boolean;
   /** Niri's line. `gear` is the league costume (climbing toward Zirve by the close); `turns` the twirl into it. */
   niri: { mood: Mood; line: string; point?: Dir; gear?: number; turns?: 1 | 2 };
   View: () => ReactNode;
 }
 
-/** The team fills this in before going on stage; until then the close shows a dashed placeholder. */
-const TEAM: string[] = ['Sezer Uzun', 'Emirhan Açık'];
+const TEAM = ['Sezer Uzun', 'Emirhan Açık'];
+const SITE = 'finetiontr.github.io/Nirengi';
+
+/** The promo film, served from the site; Deck fetches it early so it starts at once. */
+export const FILM = '/sunum/nirengi-tanitim-web.mp4';
 
 const d = (ms: number) => ({ '--d': `${ms}ms` }) as CSSProperties;
 const f = (n: number) => n.toLocaleString('tr-TR');
@@ -81,7 +93,16 @@ function Tag({ who, children }: { who: 'genc' | 'kurum' | 'plan'; children: Reac
   return <span className={`pill !px-[12px] !text-[17px] ${tone}`}>{children}</span>;
 }
 
-// ---------------------------------------------------------------- title
+/** A real screen of the app, captured at 390 px, in a plain device frame. */
+function Phone({ src, alt, width }: { src: string; alt: string; width: number }) {
+  return (
+    <div className="rounded-[40px] bg-[#16142a] p-[9px] ring-2 ring-line" style={{ width }}>
+      <img src={src} alt={alt} width={780} height={1688} draggable={false} className="block h-auto w-full rounded-[31px]" />
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------- 1. title and team
 
 function Title() {
   return (
@@ -100,15 +121,16 @@ function Title() {
           Gençlerin doğrulanmış işini kurumların ihtiyaçlarıyla buluşturan açık kaynak altyapı.
         </p>
       </div>
-      <p className="s-cap s-in absolute left-[112px] top-[800px]" style={d(380)}>
-        Zemin360 Hackathon finali · İstanbul · Ekim 2026
-      </p>
+      <div className="s-in absolute left-[112px] top-[730px]" style={d(380)}>
+        <p className="text-[28px] font-bold text-ink">{TEAM.join(' · ')}</p>
+        <p className="s-cap mt-[8px]">Zemin360 Hackathon finali · İstanbul · Ekim 2026</p>
+      </div>
       <SurveyFlag size={96} delay={0.6} className="absolute left-[1478px] top-[694px]" />
     </>
   );
 }
 
-// ---------------------------------------------------------------- problem: two sides, sourced
+// ---------------------------------------------------------------- 2. problem: two sides, sourced
 
 function Problem() {
   return (
@@ -158,9 +180,73 @@ function Problem() {
   );
 }
 
-// ---------------------------------------------------------------- why now: a timeline
+// ---------------------------------------------------------------- 3. for whom, and why it matters
 
-function WhyNow() {
+function ForWhom() {
+  const rows = [
+    {
+      who: 'genc' as const,
+      tag: 'Genç',
+      title: 'Üreten ama kanıtı olmayan genç',
+      text: 'Kod yazıyor, tasarlıyor; elindeki tek belge CV’deki beyan.',
+      value: '~1 milyon',
+      why: 'başvuru tek bir seçici programa; ~1.000 fellow ve mezun. Kapıdan girmeyenler de görünmeli.',
+      src: 'GİRVAK Fellow, 10. yıl açıklaması',
+      gets: ['Doğrulanmış kanıt', 'Gerçek bir kurumun ihtiyacı', 'İlk deneyim: küçük bir pilot'],
+    },
+    {
+      who: 'kurum' as const,
+      tag: 'Kurum',
+      title: 'BİT uzmanı olmayan küçük kurum',
+      text: 'KOBİ, kamu birimi, STK: ihtiyacı var, tarif edemiyor; kadro riskini alamıyor.',
+      value: '3,93 milyon',
+      why: 'girişim, %99,6’sı KOBİ. 10–49 çalışanlı girişimlerin yalnız %10,8’inde BİT uzmanı var.',
+      src: 'TÜİK, KOBİ istatistikleri 2024 · BİT bülteni 2026',
+      gets: ['Ölçülebilir bir ihtiyaç', 'Gerekçeli, isimsiz kısa liste', 'Çift onaylı pilot kaydı'],
+    },
+  ];
+  const head = 'text-[19px] font-bold text-ink-3';
+  return (
+    <>
+      <Heading width={1300}>Kim için, neden önemli?</Heading>
+      <div className="s-in absolute left-[112px] top-[196px] grid w-[1376px] grid-cols-[460px_480px_1fr] gap-x-[48px]" style={d(60)}>
+        <p className={head}>Kim</p>
+        <p className={head}>Neden önemli</p>
+        <p className={head}>Nirengi’de ne bulur</p>
+      </div>
+      {rows.map((r, n) => (
+        <div
+          key={r.tag}
+          className="s-in absolute left-[112px] grid w-[1376px] grid-cols-[460px_480px_1fr] gap-x-[48px] border-t-2 border-line pt-[22px]"
+          style={{ top: 238 + n * 232, ...d(160 + n * 160) }}
+        >
+          <div>
+            <Tag who={r.who}>{r.tag}</Tag>
+            <p className="mt-[12px] text-[30px] font-extrabold leading-[1.1] tracking-[-0.02em] text-ink">{r.title}</p>
+            <p className="mt-[8px] text-[20px] font-semibold leading-[1.32] text-ink-3">{r.text}</p>
+          </div>
+          <div>
+            <p className="num text-[52px] font-extrabold leading-none tracking-[-0.04em] text-ink">{r.value}</p>
+            <p className="mt-[10px] text-[21px] font-semibold leading-[1.32] text-ink-2">{r.why}</p>
+            <Src className="mt-[6px]">{r.src}</Src>
+          </div>
+          <ul className="flex flex-col gap-[12px] pt-[4px]">
+            {r.gets.map((g) => (
+              <li key={g} className="flex gap-[12px] text-[22px] font-bold leading-[1.25] text-ink">
+                <Check size={24} strokeWidth={3.4} className={`mt-[2px] shrink-0 ${r.who === 'genc' ? 'text-cyan-lip' : 'text-indigo'}`} />
+                {g}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </>
+  );
+}
+
+// ---------------------------------------------------------------- 4. evidence: data and our own research
+
+function Evidence() {
   const marks = [
     { when: 'Şubat 2024', value: '700’de 1', text: 'Diploma şartını kaldıran şirketlerde gerçekten değişen işe alım: bundan bile az.', src: 'Harvard Business School ve Burning Glass Institute' },
     { when: 'Ocak 2025', value: '%63', text: 'İşverenlerin dönüşümdeki 1 numaralı engeli: beceri açığı.', src: 'Dünya Ekonomik Forumu, İşlerin Geleceği 2025' },
@@ -169,7 +255,7 @@ function WhyNow() {
   const COL = 344;
   return (
     <>
-      <Heading>Neden şimdi?</Heading>
+      <Heading>Bunu nereden biliyoruz?</Heading>
       <p className="s-in absolute left-[112px] top-[180px] w-[1100px] text-[28px] font-medium leading-[1.35] text-ink-3" style={d(80)}>
         Beceriye bakma niyeti var, ölçme aracı yok. İlk deneyimin kapısı ise daralıyor.
       </p>
@@ -188,21 +274,481 @@ function WhyNow() {
           <Src className="mt-[8px]">{m.src}</Src>
         </div>
       ))}
-      <div className="s-in absolute w-[312px]" style={{ left: 112 + 3 * COL, top: 250, ...d(520) }}>
+      <div className="s-in absolute w-[344px]" style={{ left: 112 + 3 * COL, top: 250, ...d(520) }}>
         <span className="relative block w-fit">
           <Ping size={70} />
           <Tri size={52} />
         </span>
-        <p className="mt-[16px] text-[19px] font-bold text-indigo">Bugün</p>
-        <p className="mt-[8px] text-[34px] font-extrabold leading-[1.08] tracking-[-0.03em] text-ink">Taşınabilir kanıtın açık standardı hazır.</p>
-        <p className="mt-[12px] text-[21px] font-semibold leading-[1.32] text-ink-2">Open Badges 3.0, W3C doğrulanabilir kimlik bilgisi olarak.</p>
-        <p className="mt-[14px] text-[21px] font-bold leading-[1.32] text-indigo">Ölçme aracını kurmanın zamanı.</p>
+        <p className="mt-[16px] text-[19px] font-bold text-indigo">Bizim araştırmamız</p>
+        <p className="num mt-[6px] text-[76px] font-extrabold leading-none tracking-[-0.04em] text-ink">37</p>
+        <p className="mt-[12px] text-[21px] font-semibold leading-[1.32] text-ink-2">
+          platform ve program inceledik. Oyun ritmi, dışarıda doğrulanmış iş ve kurum imzası bir arada: Türkiye’de bulamadık.
+        </p>
+        <Src className="mt-[8px]">
+          Kaynaklarıyla depoda: <span className="whitespace-nowrap">docs/PAZAR-ANALIZI.md</span>
+        </Src>
       </div>
     </>
   );
 }
 
-// ---------------------------------------------------------------- solution: the one-sentence difference
+// ---------------------------------------------------------------- 5. the solution in one sentence, with its screens
+
+function Solution() {
+  const loop = [
+    { name: 'Kanıt', text: 'Genç işini bağlar' },
+    { name: 'İhtiyaç', text: 'Kurum ölçülebilir yazar' },
+    { name: 'Pilot', text: 'İkisi onaylar' },
+  ];
+  return (
+    <>
+      <p className="s-in absolute left-[112px] top-[118px] w-[660px] text-[56px] font-extrabold leading-[1.06] tracking-[-0.035em] text-ink">
+        Genç gerçek işiyle görünür, kurum ihtiyacını ölçülebilir yazar; ikisi <span className="text-indigo">küçük bir pilotta</span> buluşur.
+      </p>
+      <div className="s-in absolute left-[112px] top-[478px] w-[640px]" style={d(240)}>
+        <div className="flex items-start">
+          {loop.map((l, n) => (
+            <div key={l.name} className="flex items-start">
+              {n > 0 && <span className="mx-[14px] mt-[22px] h-[4px] w-[44px] rounded-full bg-line-2" />}
+              <div className="flex w-[160px] flex-col items-start">
+                <Tri size={52}>
+                  <span className="text-[19px] font-black leading-none text-white">{n + 1}</span>
+                </Tri>
+                <p className="mt-[10px] text-[26px] font-extrabold leading-none text-ink">{l.name}</p>
+                <p className="mt-[6px] text-[18px] font-semibold leading-[1.3] text-ink-3">{l.text}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        <p className="mt-[22px] text-[21px] font-bold leading-[1.35] text-indigo">Onaylanan her aşama gencin profiline Kurum onaylı kanıt olarak döner.</p>
+      </div>
+
+      <figure className="s-in absolute left-[850px] top-[96px] flex flex-col items-center" style={d(160)}>
+        <Phone src="/sunum/genc-bugun.webp" alt="Genç tarafı, Bugün ekranı: haftalık hedef, seri ve Şimdi şeridi" width={292} />
+        <figcaption className="mt-[14px] flex items-center gap-[10px]">
+          <Tag who="genc">Genç</Tag>
+          <span className="s-cap">Bugün</span>
+        </figcaption>
+      </figure>
+      <figure className="s-in absolute left-[1190px] top-[150px] flex flex-col items-center" style={d(300)}>
+        <Phone src="/sunum/kurum-okuma.webp" alt="Kurum tarafı, ihtiyaç sihirbazı: Niri’nin metinden çıkardıkları" width={292} />
+        <figcaption className="mt-[14px] flex items-center gap-[10px]">
+          <Tag who="kurum">Kurum</Tag>
+          <span className="s-cap">İhtiyaç taslağı</span>
+        </figcaption>
+      </figure>
+    </>
+  );
+}
+
+// ---------------------------------------------------------------- 6. the film, with the live demo as its fallback
+
+function LiveDemo() {
+  const steps = [
+    { who: 'Genç', text: 'GitHub’a bağlanır, depolarını seçer: kanıt Doğrulandı.' },
+    { who: 'Kurum', text: 'Derdini kendi sözleriyle yazar; Niri taslağa çevirir, her alanı cümlesine bağlar.' },
+    { who: 'Kurum', text: 'İsimsiz adaylara bakar, “neden bu uyum?”u okur, pilot teklif eder.' },
+    { who: 'İkisi', text: 'Genç teslim eder, kurum onaylar: aşama deftere mühürlenir.' },
+    { who: 'Genç', text: 'Onaylanan aşama profilde Kurum onaylı kanıt olarak görünür.' },
+  ];
+  const tag = (who: string) => (who === 'Kurum' ? 'bg-indigo-tint text-indigo' : who === 'Genç' ? 'bg-cyan-tint text-cyan-lip' : 'bg-bg-3 text-ink-2');
+  const windows = [
+    { name: 'Kurum penceresi', path: '/kurum', note: 'Solda: ihtiyaç, adaylar, onay' },
+    { name: 'Genç penceresi', path: '/bugun', note: 'Sağda: kanıt, teslim, profil' },
+  ];
+  return (
+    <>
+      <Heading width={600} className="!text-[58px]">Canlı gösterelim</Heading>
+      <div className="absolute left-[112px] top-[220px] flex w-[560px] flex-col gap-[18px]">
+        {windows.map((w, n) => (
+          <div key={w.path} className="s-in flex items-center justify-between gap-4 rounded-[18px] border-2 border-line px-[24px] py-[18px]" style={d(120 + n * 100)}>
+            <div>
+              <p className="text-[26px] font-bold leading-tight text-ink">
+                {w.name} <span className="mono text-[19px] font-semibold text-ink-3">{w.path}</span>
+              </p>
+              <p className="mt-[4px] text-[18px] font-semibold text-ink-3">{w.note}</p>
+            </div>
+            <a href={w.path} target="_blank" rel="noopener" className="btn-primary btn-lg shrink-0 !text-[19px]">
+              Aç
+            </a>
+          </div>
+        ))}
+        <p className="s-cap s-in mt-[4px]" style={d(320)}>
+          Demodaki kişiler ve kurumlar kurgusal; GitHub, DNS doğrulaması ve yapay zekâ taslağı gerçek.
+        </p>
+      </div>
+      <ol className="absolute left-[760px] top-[120px] flex w-[728px] flex-col gap-[14px]">
+        {steps.map((s, n) => (
+          <li key={n} className="s-in flex items-start gap-[18px] rounded-[18px] border-2 border-line px-[22px] py-[16px]" style={d(200 + n * 90)}>
+            <span className="mt-[2px] w-[30px] shrink-0 text-[28px] font-black leading-none text-indigo">{n + 1}</span>
+            <div className="min-w-0">
+              <span className={`pill !text-[16px] ${tag(s.who)}`}>{s.who}</span>
+              <p className="mt-[6px] text-[22px] font-semibold leading-[1.3] text-ink-2">{s.text}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </>
+  );
+}
+
+/** Plays on arrival and stays on its last frame. If the file can't load, the live demo panel takes its place. */
+function Film() {
+  const [failed, setFailed] = useState(false);
+  if (failed) return <LiveDemo />;
+  return (
+    <video
+      className="absolute inset-0 h-full w-full bg-bg object-contain"
+      src={FILM}
+      poster="/sunum/nirengi-tanitim.webp"
+      autoPlay
+      muted
+      playsInline
+      preload="auto"
+      onError={() => setFailed(true)}
+    />
+  );
+}
+
+// ---------------------------------------------------------------- 7–9. the AI, computed from a real model answer
+
+/** Niri's model on the sample text, through the product's guard; and the rules on the same text. */
+const READ = readModelDraft(SAMPLE_COMPLAINT, SAMPLE_READING)!;
+const RULES = readRulesDraft(SAMPLE_COMPLAINT);
+const SENTENCES = SAMPLE_COMPLAINT.split(/(?<=[.!?])\s+(?=[A-ZÇĞİÖŞÜ])/);
+
+const FIELD: [keyof Canvas, string][] = [
+  ['current', 'Mevcut durum'],
+  ['pain', 'Sorun'],
+  ['painMetric', 'Sorunun ölçüsü'],
+  ['outcome', 'Beklenen sonuç'],
+  ['criteria', 'Başarı kriterleri'],
+  ['constraints', 'Kısıtlar'],
+  ['decisionMaker', 'Karar verici'],
+  ['scope', 'Kapsam'],
+];
+
+/** Which sentences of the text (1-based) a field of the model's draft came from. */
+const sourcesOf = (key: keyof Canvas) => [...new Set((READ.quotes[key] ?? []).map((q) => SENTENCES.findIndex((s) => cites(s, q)) + 1).filter((n) => n > 0))];
+
+function Num({ n, dim = false }: { n: number; dim?: boolean }) {
+  return (
+    <span className={`mono inline-grid h-[26px] min-w-[26px] place-items-center rounded-[7px] px-[5px] text-[15px] font-bold leading-none ${dim ? 'bg-bg-3 text-ink-3' : 'bg-indigo-tint text-indigo'}`}>
+      {n}
+    </span>
+  );
+}
+
+function AiWhat() {
+  const used = new Set(FIELD.flatMap(([k]) => sourcesOf(k)));
+  const rows = FIELD.filter(([k]) => k !== 'criteria').map(([k, label]) => ({
+    key: k,
+    label,
+    value: k === 'constraints' ? READ.canvas.constraints.map((c) => c.text).join(' · ') : (READ.canvas[k] as string),
+    from: sourcesOf(k),
+  }));
+  return (
+    <>
+      <Heading width={1300}>Yapay zekâ ne yapıyor?</Heading>
+      <p className="s-in absolute left-[112px] top-[176px] w-[1340px] text-[25px] font-medium leading-[1.35] text-ink-3" style={d(80)}>
+        Kurumun kendi sözlerini okur, yedi alanlı ihtiyaç kanvasına çevirir. Her alan, metindeki cümlesine bağlı gelir.
+      </p>
+
+      <div className="s-in absolute left-[112px] top-[246px] w-[620px] rounded-[18px] border-2 border-line bg-bg-2 px-[26px] py-[20px]" style={d(160)}>
+        <p className="text-[18px] font-bold text-ink-3">Kurumun yazdığı</p>
+        <p className="mt-[10px] text-[19px] font-medium leading-[1.55] text-ink-2">
+          {SENTENCES.map((s, n) => {
+            const [first, ...rest] = s.split(' ');
+            return (
+              <span key={n}>
+                <span className="whitespace-nowrap">
+                  <Num n={n + 1} dim={!used.has(n + 1)} /> {first}
+                </span>{' '}
+                {rest.join(' ')}{' '}
+              </span>
+            );
+          })}
+        </p>
+      </div>
+
+      <div className="s-in absolute left-[790px] top-[246px] w-[698px]" style={d(320)}>
+        <div className="flex items-center justify-between gap-4">
+          <p className="text-[18px] font-bold text-ink-3">Niri’nin taslağı</p>
+          <span className="pill !text-[16px] bg-indigo-tint text-indigo">Gemma 4 26B · açık ağırlıklı model</span>
+        </div>
+        <ul className="mt-[8px]">
+          {rows.map((r) => (
+            <li key={r.key} className="flex gap-[16px] border-b-2 border-line py-[11px] last:border-b-0">
+              <span className="flex w-[62px] shrink-0 gap-[4px] pt-[2px]">
+                {r.from.map((n) => (
+                  <Num key={n} n={n} />
+                ))}
+              </span>
+              <div className="min-w-0">
+                <p className="text-[16px] font-bold text-ink-3">{r.label}</p>
+                <p className="text-[21px] font-bold leading-[1.25] text-ink">{r.value}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </>
+  );
+}
+
+function AiDiff() {
+  const added: Canvas = { ...READ.canvas, criteria: READ.suggestions.map((s, i) => ({ id: `c${i}`, text: s.text })) };
+  const filled = { rules: new Set(filledFields(RULES.canvas)), model: new Set(filledFields(READ.canvas)) };
+  const bars = [
+    { name: 'Kural motoru', note: `${filled.rules.size} alan, kriter yok`, a: assessCanvas(RULES.canvas, RULES.skills), tone: 'ink-3' },
+    { name: 'Açık model', note: `${filled.model.size} alan, ${READ.suggestions.length} kriter önerisi`, a: assessCanvas(READ.canvas, READ.skills), tone: 'indigo' },
+    { name: 'Kurum önerileri ekleyince', note: `${READ.suggestions.length} kriter, “Ekle” ile`, a: assessCanvas(added, READ.skills), tone: 'green' },
+  ];
+  const cell = (on: boolean) =>
+    on ? <Check size={26} strokeWidth={3.4} className="text-green-lip" /> : <span className="block h-[22px] w-[22px] rounded-full border-2 border-dashed border-line-2" />;
+  return (
+    <>
+      <Heading width={1300}>Aynı metin: önce kurallar, şimdi model</Heading>
+
+      <div className="s-in absolute left-[112px] top-[214px] w-[600px]" style={d(120)}>
+        <div className="grid grid-cols-[1fr_120px_120px] items-end border-b-2 border-line pb-[10px] text-[18px] font-bold text-ink-3">
+          <span>Kanvas alanı</span>
+          <span className="text-center">Kurallar</span>
+          <span className="text-center text-indigo">Model</span>
+        </div>
+        {FIELD.map(([k, label]) => (
+          <div key={k} className="grid grid-cols-[1fr_120px_120px] items-center border-b-2 border-line py-[8px] last:border-b-0">
+            <span className="text-[21px] font-semibold text-ink-2">{label}</span>
+            <span className="grid place-items-center">{cell(filled.rules.has(k))}</span>
+            <span className="grid place-items-center">
+              {k === 'criteria' && READ.suggestions.length ? (
+                <span className="pill !text-[15px] bg-indigo-tint text-indigo">{READ.suggestions.length} öneri</span>
+              ) : (
+                cell(filled.model.has(k))
+              )}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      <div className="absolute left-[800px] top-[214px] flex w-[688px] flex-col gap-[30px]">
+        {bars.map((b, n) => (
+          <div key={b.name} className="s-in" style={d(260 + n * 140)}>
+            <div className="flex items-baseline justify-between gap-4">
+              <div>
+                <p className="text-[25px] font-bold leading-tight text-ink">{b.name}</p>
+                <p className="mt-[2px] text-[18px] font-semibold text-ink-3">{b.note}</p>
+              </div>
+              <p className="num text-[56px] font-extrabold leading-none tracking-[-0.04em] text-ink">{b.a.score}</p>
+            </div>
+            <div className="relative mt-[12px] h-[18px] rounded-full bg-bg-3">
+              <div className="h-full rounded-full" style={{ width: `${b.a.score}%`, background: `rgb(var(--${b.tone}))` }} />
+              <span className="absolute top-[-8px] h-[34px] w-[4px] rounded-full bg-ink" style={{ left: `${PUBLISH_THRESHOLD}%` }} />
+            </div>
+            <p className={`mt-[8px] text-[18px] font-bold ${b.a.canPublish ? 'text-green-lip' : 'text-ink-3'}`}>{b.a.canPublish ? 'Yayımlanabilir' : 'Yayımlanamaz'}</p>
+          </div>
+        ))}
+      </div>
+      <p className="s-in absolute left-[800px] top-[760px] w-[688px] text-[19px] font-semibold leading-[1.35] text-ink-3" style={d(720)}>
+        Puanları ürünün kendi netlik kuralları verdi; çizgi {PUBLISH_THRESHOLD} yayın eşiği. Sonuçlar testte sabit.
+      </p>
+    </>
+  );
+}
+
+function AiGuard() {
+  const bent = readModelDraft(SAMPLE_COMPLAINT, INVENTED_DECIDER)!;
+  const refused = bent.rejected.find((r) => r.field === 'decisionMaker');
+  const asked = bent.questions.find((q) => q.field === 'decisionMaker');
+  const gates = [
+    { title: 'Şemaya uyuyor mu?', text: 'Bilinen alanlar, beceriler, kısıt türleri' },
+    { title: 'Alıntı metinde mi?', text: 'Her alan metinde birebir geçen bir cümleye dayanır' },
+    { title: 'Sayı metinde mi?', text: 'Alandaki her sayıyı kurum yazmış olmalı' },
+    { title: 'Kriter ölçülebilir mi?', text: 'Eşiği ya da teslimi olmayan kriter alınmaz' },
+  ];
+  const nets = [
+    { title: 'Öneri, öneri olarak kalır', text: 'Başarı kriterleri kurum “Ekle” demeden kanvasa girmez.' },
+    { title: 'Reddedilen görünür', text: 'Almadıklarım listesi: neyi neden almadığını kurum görür.' },
+    { title: 'Model susarsa', text: 'Kota dolar ya da cevap gelmezse kural motoru aynı ekranı doldurur.' },
+    { title: 'Metin saklanmaz', text: 'İstem ve şema sunucuda sabit; ekranda kişisel veri yazma uyarısı var.' },
+  ];
+  return (
+    <>
+      <Heading width={1300}>Model yanılırsa ne olur?</Heading>
+
+      {/* The pipeline: the answer passes four gates before it reaches the canvas. */}
+      <div className="s-in absolute left-[112px] top-[206px] flex w-[1376px] items-start" style={d(100)}>
+        <div className="w-[130px] shrink-0 rounded-[14px] border-2 border-dashed border-line-2 px-[14px] py-[12px]">
+          <p className="text-[19px] font-bold leading-tight text-ink">Modelin cevabı</p>
+        </div>
+        {gates.map((g, n) => (
+          <div key={g.title} className="flex items-start">
+            <span className="mx-[10px] mt-[26px] h-[4px] w-[24px] shrink-0 rounded-full bg-line-2" />
+            <div className="w-[228px]">
+              <Tri size={50}>
+                <span className="text-[18px] font-black leading-none text-white">{n + 1}</span>
+              </Tri>
+              <p className="mt-[10px] whitespace-nowrap text-[21px] font-bold leading-tight text-ink">{g.title}</p>
+              <p className="mt-[4px] text-[17px] font-semibold leading-[1.3] text-ink-3">{g.text}</p>
+            </div>
+          </div>
+        ))}
+        <span className="mx-[10px] mt-[26px] h-[4px] w-[24px] shrink-0 rounded-full bg-indigo" />
+        <div className="w-[110px] shrink-0 rounded-[14px] bg-indigo px-[14px] py-[12px]">
+          <p className="text-[19px] font-bold leading-tight text-white">Kanvas</p>
+        </div>
+      </div>
+
+      {/* A case from the guard's own tests, computed here by the same code. */}
+      <div className="s-in absolute left-[112px] top-[440px] w-[620px] rounded-[18px] border-2 border-line px-[26px] py-[20px]" style={d(300)}>
+        <p className="text-[18px] font-bold text-ink-3">Testlerden bir örnek</p>
+        <p className="mt-[10px] text-[21px] font-semibold leading-[1.35] text-ink-2">
+          Model “Karar verici: <span className="font-bold text-ink">{refused?.value}</span>” yazıyor, kaynak olarak da “{INVENTED_DECIDER.decisionMaker.quote}” cümlesini gösteriyor.
+        </p>
+        <p className="mt-[12px] flex items-center gap-[10px] text-[21px] font-bold text-red-lip">
+          <X size={24} strokeWidth={3.4} className="shrink-0" />
+          {refused?.reason === 'quote' ? 'Bu cümle metinde yok: alan boş kalır.' : 'Alan boş kalır.'}
+        </p>
+        <p className="mt-[10px] text-[21px] font-bold leading-[1.35] text-indigo">Niri sorar: “{asked?.q}”</p>
+      </div>
+
+      <ul className="absolute left-[800px] top-[440px] flex w-[688px] flex-col gap-[18px]">
+        {nets.map((n, k) => (
+          <li key={n.title} className="s-in flex gap-[14px]" style={d(420 + k * 90)}>
+            <Check size={26} strokeWidth={3.4} className="mt-[2px] shrink-0 text-green-lip" />
+            <div>
+              <p className="text-[23px] font-bold leading-tight text-ink">{n.title}</p>
+              <p className="mt-[3px] text-[19px] font-semibold leading-[1.3] text-ink-3">{n.text}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </>
+  );
+}
+
+// ---------------------------------------------------------------- 10. design decisions
+
+function Decisions() {
+  const items = [
+    { title: 'Her ekranda tek iş', text: 'İlk kez gelen kurum yöneticisi de genç de kaybolmasın: sihirbaz soruları tek tek sorar, ana eylem ilk ekranda durur.' },
+    { title: 'Önce telefon', text: 'Her ekran önce 390 piksel genişlikte tasarlandı, sonra masaüstüne büyüdü; gezinme başparmağın altında.' },
+    { title: 'Oyun yalnız genç tarafında', text: 'Genç ritim ister, kurum ölçüm. Kurum ekranında XP, lig ve seri yok; renkler de sakin.' },
+    { title: 'Temasa kadar isimsiz', text: 'Kurum önce işi görür. İsim, okul ve şehir pilot teklifiyle açılır.' },
+    { title: 'Niri yol gösterir, kimseyi bekletmez', text: 'İlk kullanımda kısa bir tur, sonra yalnız istenince. Sözü animasyonu beklemez; hareket azaltma tercihine uyar.' },
+  ];
+  return (
+    <>
+      <Heading width={1300}>Neden böyle tasarladık?</Heading>
+      <ol className="absolute left-[112px] top-[192px] w-[1376px]">
+        {items.map((it, n) => (
+          <li key={it.title} className="s-in grid grid-cols-[64px_480px_1fr] items-start gap-x-[24px] border-t-2 border-line py-[13px]" style={d(120 + n * 90)}>
+            <Tri size={44} state="waiting">
+              <span className="text-[17px] font-black leading-none text-ink-3">{n + 1}</span>
+            </Tri>
+            <p className="pt-[6px] text-[28px] font-extrabold leading-[1.12] tracking-[-0.02em] text-ink">{it.title}</p>
+            <p className="pt-[8px] text-[21px] font-semibold leading-[1.35] text-ink-3">{it.text}</p>
+          </li>
+        ))}
+      </ol>
+    </>
+  );
+}
+
+// ---------------------------------------------------------------- 11. what we finished, what we left on purpose
+
+function Done() {
+  const done = [
+    'Altı problemin altısına çalışan ekran',
+    'GitHub uygulamasıyla depo, DNS TXT ile alan adı doğrulaması',
+    'Açık modelle ihtiyaç taslağı ve onun denetimi',
+    'Eşleşme, kanvas, defter ve denetim otomatik testli',
+    'Telefon ve masaüstü, açık ve koyu tema',
+  ];
+  const left = [
+    { title: 'Kalıcı veritabanı', text: 'Veri tarayıcıda kalır; gerçek kişisel veriyi pilotla ve KVKK uyumuyla açacağız.' },
+    { title: 'Gerçek kullanıcı ve pilot', text: 'Demo kişileri ve kurumları kurgusal; ekranda öyle yazıyor.' },
+    { title: 'Kod dışı kanıt', text: 'Önce kodu doğruladık; tasarım ve yayın sırada.' },
+    { title: 'Her yerde yapay zekâ', text: 'Model yalnız ihtiyaç taslağında; analizler ve özetler kural tabanlı.' },
+  ];
+  const next = ['Kalıcılık', 'İlk ihtiyaç turu', 'Kod dışı kanıt', 'Open Badges 3.0', 'Fon verene rapor'];
+  return (
+    <>
+      <Heading width={1376}>Neyi bitirdik, neyi bilerek bıraktık?</Heading>
+      <div className="s-in absolute left-[112px] top-[206px] w-[620px]" style={d(120)}>
+        <p className="text-[19px] font-bold text-green-lip">Bitti, canlıda çalışıyor</p>
+        <ul className="mt-[14px] flex flex-col gap-[14px]">
+          {done.map((t) => (
+            <li key={t} className="flex gap-[12px] text-[23px] font-semibold leading-snug text-ink-2">
+              <Check size={26} strokeWidth={3.4} className="mt-[2px] shrink-0 text-green-lip" />
+              {t}
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div className="s-in absolute left-[800px] top-[206px] w-[688px] rounded-[18px] bg-bg-2 px-[28px] py-[20px]" style={d(260)}>
+        <p className="text-[19px] font-bold text-ink-3">Bilerek bıraktık</p>
+        <ul className="mt-[10px] flex flex-col gap-[12px]">
+          {left.map((l) => (
+            <li key={l.title}>
+              <p className="text-[22px] font-bold leading-tight text-ink">{l.title}</p>
+              <p className="mt-[2px] text-[18px] font-semibold leading-[1.3] text-ink-3">{l.text}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div className="s-in absolute left-[800px] top-[660px] w-[688px]" style={d(420)}>
+        <p className="text-[19px] font-bold text-ink-3">Finalden sonra 4 ay · plan</p>
+        <div className="relative mt-[14px] grid grid-cols-5">
+          <svg viewBox="0 0 688 10" width="688" height="10" className="absolute left-0 top-[20px]" aria-hidden="true">
+            <path d="M40 5H560" stroke="rgb(var(--line-2))" strokeWidth="4" strokeDasharray="2 12" strokeLinecap="round" />
+          </svg>
+          {next.map((t, n) => (
+            <div key={t} className="relative flex flex-col items-start">
+              <span className="rounded-[8px] bg-bg">
+                <Tri size={46} state="waiting">
+                  <span className="text-[17px] font-black leading-none text-ink-3">{n + 1}</span>
+                </Tri>
+              </span>
+              <p className="mt-[8px] pr-[8px] text-[18px] font-bold leading-[1.2] text-ink-2">{t}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+}
+
+// ---------------------------------------------------------------- 12. close: the one ask
+
+function Close() {
+  return (
+    <>
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <Contours seed={7} x={0.86} y={0.78} rings={14} step={34} opacity={0.55} />
+      </div>
+      <p className="s-in absolute left-[112px] top-[104px] w-[900px] text-[120px] font-extrabold leading-[0.98] tracking-[-0.045em] text-ink">
+        Beyan değil,
+        <br />
+        <span className="text-indigo">kanıt.</span>
+      </p>
+      <p className="s-in absolute left-[112px] top-[392px] w-[640px] text-[32px] font-bold leading-[1.25] tracking-[-0.015em] text-ink-2" style={d(200)}>
+        Tek isteğimiz: bu salondan bir kurumun gerçek bir ihtiyacı. <span className="text-indigo">İlk kanvası birlikte yazalım.</span>
+      </p>
+      <div className="s-in absolute left-[112px] top-[612px] w-[420px]" style={d(360)}>
+        <Wordmark size={44} />
+        <p className="mt-[14px] text-[26px] font-bold text-ink">{SITE}</p>
+        <p className="mt-[8px] text-[21px] font-semibold text-ink-2">{TEAM.join(' · ')}</p>
+        <p className="mt-[2px] text-[19px] font-semibold text-ink-3">Açık kaynak, MIT lisanslı</p>
+      </div>
+      <SurveyFlag size={96} delay={0.6} className="absolute left-[1478px] top-[694px]" />
+    </>
+  );
+}
+
+// ================================================================ appendix: for questions
+
+// ---------------------------------------------------------------- the difference: every XP is a work receipt
 
 function Zigzag({ flip = false }: { flip?: boolean }) {
   const teeth = 22;
@@ -522,57 +1068,6 @@ function Trust() {
   );
 }
 
-// ---------------------------------------------------------------- live demo
-
-function Demo() {
-  const steps = [
-    { who: 'Genç', text: 'GitHub hesabını bağlar, sahipliği kontrol edilir: kanıt Doğrulandı.' },
-    { who: 'Kurum', text: `İhtiyacını kanvasla yazar; çözülebilirlik ${PUBLISH_THRESHOLD}’i geçince yayımlar.` },
-    { who: 'Kurum', text: 'İsimsiz adaylara bakar, “neden bu uyum?”u okur, pilot teklif eder.' },
-    { who: 'İkisi', text: 'Genç teslim eder, kurum onaylar: aşama deftere mühürlenir.' },
-    { who: 'Genç', text: 'Onaylanan aşama profilde Kurum onaylı kanıt olarak görünür.' },
-  ];
-  const tag = (who: string) => (who === 'Kurum' ? 'bg-indigo-tint text-indigo' : who === 'Genç' ? 'bg-cyan-tint text-cyan-lip' : 'bg-bg-3 text-ink-2');
-  const windows = [
-    { name: 'Kurum penceresi', path: '/kurum', note: 'Solda: ihtiyaç, adaylar, onay' },
-    { name: 'Genç penceresi', path: '/bugun', note: 'Sağda: kanıt, teslim, profil' },
-  ];
-  return (
-    <>
-      <Heading width={600} className="!text-[58px]">Şimdi iki pencereyle canlı gösterelim</Heading>
-      <div className="absolute left-[112px] top-[332px] flex w-[560px] flex-col gap-[18px]">
-        {windows.map((w, n) => (
-          <div key={w.path} className="s-in flex items-center justify-between gap-4 rounded-[18px] border-2 border-line px-[24px] py-[18px]" style={d(120 + n * 100)}>
-            <div>
-              <p className="text-[26px] font-bold leading-tight text-ink">
-                {w.name} <span className="mono text-[19px] font-semibold text-ink-3">{w.path}</span>
-              </p>
-              <p className="mt-[4px] text-[18px] font-semibold text-ink-3">{w.note}</p>
-            </div>
-            <a href={w.path} target="_blank" rel="noopener" className="btn-primary btn-lg shrink-0 !text-[19px]">
-              Aç
-            </a>
-          </div>
-        ))}
-        <p className="s-cap s-in mt-[4px]" style={d(320)}>
-          Demodaki kişiler ve kurumlar kurgusal; GitHub ve DNS doğrulaması gerçek.
-        </p>
-      </div>
-      <ol className="absolute left-[760px] top-[120px] flex w-[728px] flex-col gap-[14px]">
-        {steps.map((s, n) => (
-          <li key={n} className="s-in flex items-start gap-[18px] rounded-[18px] border-2 border-line px-[22px] py-[16px]" style={d(200 + n * 90)}>
-            <span className="mt-[2px] w-[30px] shrink-0 text-[28px] font-black leading-none text-indigo">{n + 1}</span>
-            <div className="min-w-0">
-              <span className={`pill !text-[16px] ${tag(s.who)}`}>{s.who}</span>
-              <p className="mt-[6px] text-[22px] font-semibold leading-[1.3] text-ink-2">{s.text}</p>
-            </div>
-          </li>
-        ))}
-      </ol>
-    </>
-  );
-}
-
 // ---------------------------------------------------------------- market: who first, nested like a map inset
 
 function Market() {
@@ -735,53 +1230,6 @@ function Model() {
   );
 }
 
-// ---------------------------------------------------------------- where we are: the honest table
-
-function Today() {
-  const real = ['Gerçek GitHub hesap sahipliği ve DNS TXT doğrulaması', 'Eşleşme, kanvas ve defter motoru otomatik testlerle', 'Açık kod, MIT lisansı'];
-  const notYet = ['Gerçek kullanıcı, kurum ya da pilot: demo verisi kurgusal', 'Kalıcı veritabanı: veri şimdilik tarayıcıda', 'Kod dışı kanıt türleri'];
-  return (
-    <>
-      <Heading width={1300}>Bugün neredeyiz?</Heading>
-      <div className="s-in absolute left-[112px] top-[208px] w-[640px]" style={d(120)}>
-        <p className="text-[19px] font-bold text-green-lip">Çalışıyor</p>
-        <p className="mt-[6px] flex items-end gap-[18px]">
-          <span className="num text-[96px] font-extrabold leading-none tracking-[-0.045em] text-ink">6 / 6</span>
-          <span className="text-[23px] font-semibold leading-[1.3] text-ink-2">
-            başvurudaki problem için
-            <br />
-            çalışan ekran
-          </span>
-        </p>
-        <ul className="mt-[22px] flex flex-col gap-[12px] border-t-2 border-line pt-[18px]">
-          {real.map((t) => (
-            <li key={t} className="flex gap-[12px] text-[22px] font-semibold leading-snug text-ink-2">
-              <Check size={24} strokeWidth={3.4} className="mt-[3px] shrink-0 text-green-lip" />
-              {t}
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div className="s-in absolute left-[848px] top-[208px] w-[640px] rounded-[18px] bg-bg-2 px-[30px] py-[24px]" style={d(260)}>
-        <p className="text-[19px] font-bold text-ink-3">Henüz yok</p>
-        <ul className="mt-[14px] flex flex-col gap-[14px]">
-          {notYet.map((t) => (
-            <li key={t} className="flex gap-[12px] text-[22px] font-semibold leading-snug text-ink-2">
-              <span className="mt-[5px] shrink-0">
-                <LevelGlyph level="S1" size={22} />
-              </span>
-              {t}
-            </li>
-          ))}
-        </ul>
-      </div>
-      <p className="s-in absolute left-[848px] top-[690px] w-[640px] text-[26px] font-extrabold leading-[1.25] tracking-[-0.02em] text-ink" style={d(420)}>
-        Bir hackathon prototipi. Gerisini <span className="text-indigo">pilotta kanıtlayacağız.</span>
-      </p>
-    </>
-  );
-}
-
 // ---------------------------------------------------------------- impact: what the pilot will measure
 
 function Measure() {
@@ -820,125 +1268,32 @@ function Measure() {
   );
 }
 
-// ---------------------------------------------------------------- roadmap
-
-function Roadmap() {
-  const items = [
-    { title: 'Kalıcılık', text: 'Gerçek hesaplar, kurum hesapları, kalıcı veritabanı' },
-    { title: 'İlk ihtiyaç turu', text: 'Zemin360 ve GİRVAK ağındaki kurumlarla' },
-    { title: 'Kod dışı kanıtlar', text: 'Tasarım, yayın (DOI) ve paket doğrulaması' },
-    { title: 'Taşınabilir kanıt', text: 'Open Badges 3.0 ile platform dışına çıkan kayıt' },
-    { title: 'Fon verene pilot raporu', text: 'Fonlu projeler için hazır hesap verebilirlik çıktısı' },
-  ];
-  const ROW = 116;
-  return (
-    <>
-      <Heading width={560}>Finalden sonra: 4 ay</Heading>
-      <p className="s-in absolute left-[112px] top-[200px] w-[520px] text-[28px] font-medium leading-[1.35] text-ink-3" style={d(100)}>
-        Hackathon bir başlangıç noktası. Sıradaki beş nirengi noktası:
-      </p>
-      <svg viewBox={`0 0 60 ${ROW * 4}`} width="60" height={ROW * 4} className="absolute left-[790px] top-[150px]" aria-hidden="true">
-        <path d={`M30 0V${ROW * 4}`} stroke="rgb(var(--line-2))" strokeWidth="5" strokeDasharray="2 14" strokeLinecap="round" />
-      </svg>
-      {items.map((it, n) => (
-        <div key={it.title} className="s-in absolute flex items-center gap-[26px]" style={{ left: 790, top: 114 + n * ROW, ...d(160 + n * 100) }}>
-          <span className="rounded-[8px] bg-bg">
-            <Tri size={64} state="waiting">
-              <span className="text-[22px] font-black leading-none text-ink-3">{n + 1}</span>
-            </Tri>
-          </span>
-          <div>
-            <p className="s-t !text-[28px]">{it.title}</p>
-            <p className="mt-[2px] text-[21px] font-semibold text-ink-3">{it.text}</p>
-          </div>
-        </div>
-      ))}
-    </>
-  );
-}
-
-// ---------------------------------------------------------------- the ask
-
-function Ask() {
-  const asks = [
-    { title: 'İlk ihtiyaç turuna kurum', text: 'Gerçek bir ihtiyacını kanvasa yazacak bir KOBİ, kamu birimi ya da STK.' },
-    { title: 'Mentorluk', text: 'Kamu fonlu programların raporlaması, kurum tarafında benimseme, kişisel veri uyumu.' },
-    { title: 'Kuluçka ve hibe yolu', text: 'Pilotu taşıyacak bir program ya da fon için yönlendirme.' },
-  ];
-  return (
-    <>
-      <Heading width={560}>Sizden üç şey istiyoruz</Heading>
-      <p className="s-in absolute left-[112px] top-[262px] w-[540px] text-[28px] font-medium leading-[1.35] text-ink-3" style={d(100)}>
-        En somutu: bu salondan bir kurumun gerçek bir ihtiyacı. İlk kanvası birlikte yazalım.
-      </p>
-      {asks.map((a, n) => (
-        <div
-          key={a.title}
-          className="s-in absolute flex w-[728px] items-center gap-[28px] rounded-[18px] border-2 border-line px-[30px] py-[26px]"
-          style={{ left: 760, top: 150 + n * 196, ...d(180 + n * 120) }}
-        >
-          <span className="shrink-0">
-            <Tri size={78}>
-              <span className="text-[28px] font-black leading-none text-white">{n + 1}</span>
-            </Tri>
-          </span>
-          <div className="min-w-0">
-            <p className="s-t !text-[30px]">{a.title}</p>
-            <p className="mt-[6px] text-[22px] font-semibold leading-[1.32] text-ink-3">{a.text}</p>
-          </div>
-        </div>
-      ))}
-    </>
-  );
-}
-
-// ---------------------------------------------------------------- close
-
-function Close() {
-  return (
-    <>
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <Contours seed={7} x={0.86} y={0.78} rings={14} step={34} opacity={0.55} />
-      </div>
-      <div className="absolute left-[112px] top-[120px] w-[900px]">
-        <p className="s-in text-[124px] font-extrabold leading-[0.98] tracking-[-0.045em] text-ink">
-          Beyan değil,
-          <br />
-          <span className="text-indigo">kanıt.</span>
-        </p>
-        <div className="s-in mt-[36px]" style={d(200)}>
-          <Wordmark size={64} />
-        </div>
-      </div>
-      <div className="s-in absolute left-[112px] top-[540px] w-[600px]" style={d(360)}>
-        <p className="text-[18px] font-bold text-ink-3">Ekip</p>
-        {TEAM.length ? (
-          <p className="mt-[4px] text-[26px] font-bold text-ink">{TEAM.join(' · ')}</p>
-        ) : (
-          <p className="mt-[8px] rounded-[14px] border-2 border-dashed border-line-2 px-[18px] py-[10px] text-[22px] font-semibold text-ink-3">Ekip adları buraya</p>
-        )}
-        <p className="mt-[18px] text-[21px] font-semibold text-ink-3">Açık kaynak · MIT lisanslı</p>
-      </div>
-      <SurveyFlag size={96} delay={0.6} className="absolute left-[1478px] top-[694px]" />
-    </>
-  );
-}
-
 export const SLIDES: Slide[] = [
-  { id: 'baslik', title: 'Beyan değil, kanıt', mark: 'hero', niri: { mood: 'wave', gear: 0, line: 'Merhaba, ben Niri! Bugün size haritamı göstereceğim.' }, View: Title },
+  { id: 'baslik', title: 'Nirengi', mark: 'hero', niri: { mood: 'wave', gear: 0, line: 'Merhaba, ben Niri! Bugün size haritamı göstereceğim.' }, View: Title },
   { id: 'problem', title: 'Problem', mark: 'dock', niri: { mood: 'sad', gear: 0, line: 'Gençler görünmüyor, kurumlar emin olamıyor.' }, View: Problem },
-  { id: 'neden-simdi', title: 'Neden şimdi', mark: 'dock', niri: { mood: 'think', gear: 0, line: 'Kapı daralırken kanıt her zamankinden değerli.' }, View: WhyNow },
-  { id: 'fark', title: 'Çözüm', mark: 'dock', niri: { mood: 'happy', gear: 1, line: 'Benim XP’m boş tıklamayla gelmez.' }, View: Difference },
-  { id: 'dongu', title: 'Üç nesne, tek döngü', mark: 'dock', niri: { mood: 'think', gear: 1, line: 'İş bitince kanıtın bir basamak yükselir.' }, View: Objects },
-  { id: 'iki-yuz', title: 'Genç ve kurum', mark: 'dock', niri: { mood: 'cheer', gear: 1, line: 'Gence oyun, kuruma ölçüm; ikisi de aynı kanıttan.' }, View: Faces },
-  { id: 'guven', title: 'Neden güvenilir', mark: 'dock', niri: { mood: 'talk', gear: 2, line: 'Her puanımın nedenini sorabilirsiniz.' }, View: Trust },
-  { id: 'demo', title: 'Canlı demo', mark: 'dock', niri: { mood: 'point', point: 'up', gear: 2, line: 'Lafı bırakalım, ekrana geçelim.' }, View: Demo },
-  { id: 'pazar', title: 'Önce kim', mark: 'dock', niri: { mood: 'point', point: 'right', gear: 2, line: 'Haritayı en yakın tepeden çizmeye başlıyorum.' }, View: Market },
-  { id: 'rekabet', title: 'Rekabet', mark: 'dock', niri: { mood: 'point', point: 'right', gear: 3, line: 'İkisinin buluştuğu köşe boştu. Oraya yerleştim.' }, View: Worlds },
-  { id: 'model', title: 'Nasıl yaşar', mark: 'dock', niri: { mood: 'think', gear: 3, line: 'Gence ücret yok. Gerisini pilotta sınayacağız.' }, View: Model },
-  { id: 'bugun', title: 'Bugün neredeyiz', mark: 'dock', niri: { mood: 'happy', gear: 3, line: 'Prototipim çalışıyor. Kullanıcılarımı pilotta bulacağım.' }, View: Today },
-  { id: 'olcum', title: 'Pilotta ölçülecekler', mark: 'dock', niri: { mood: 'think', gear: 3, line: 'Rakam uydurmak yok; ölçüp size getireceğim.' }, View: Measure },
-  { id: 'yol', title: 'Yol haritası', mark: 'dock', niri: { mood: 'point', point: 'right', gear: 3, line: 'Sıradaki nirengi noktalarım bunlar.' }, View: Roadmap },
-  { id: 'istek', title: 'Sizden istediğimiz', mark: 'dock', niri: { mood: 'point', point: 'right', gear: 3, line: 'Bir ihtiyacınızı yazın, ilk pilotu birlikte kuralım.' }, View: Ask },
+  { id: 'kim-icin', title: 'Kim için', mark: 'dock', niri: { mood: 'think', gear: 0, line: 'Biri kanıt arıyor, öbürü güven.' }, View: ForWhom },
+  { id: 'kanit', title: 'Kanıt', mark: 'dock', niri: { mood: 'think', gear: 1, line: 'Rakamları uydurmadım; kaynakları altında.' }, View: Evidence },
+  { id: 'cozum', title: 'Çözüm', mark: 'dock', niri: { mood: 'happy', gear: 1, line: 'Kanıt, ihtiyaç, pilot: tek döngü.' }, View: Solution },
+  { id: 'demo', title: 'Niri anlatıyor', mark: 'dock', bare: true, niri: { mood: 'cheer', gear: 2, line: 'Sahne benim! Ürünü telefonda göstereyim.' }, View: Film },
+  { id: 'yz-ne', title: 'Yapay zekâ ne yapıyor', mark: 'dock', niri: { mood: 'talk', gear: 2, line: 'Derdini yaz, ben okuyayım. Uydurmam.' }, View: AiWhat },
+  { id: 'yz-fark', title: 'Önce ve sonra', mark: 'dock', niri: { mood: 'happy', gear: 3, line: 'Aynı metinden daha dolu bir taslak.' }, View: AiDiff },
+  { id: 'yz-onlem', title: 'Hatalı çıktıya karşı', mark: 'dock', niri: { mood: 'think', gear: 3, line: 'Metinde yoksa almam, sorarım.' }, View: AiGuard },
+  { id: 'tasarim', title: 'Tasarım kararları', mark: 'dock', niri: { mood: 'cheer', gear: 3, line: 'Gence oyun, kuruma sakin bir ölçüm.' }, View: Decisions },
+  { id: 'bitti', title: 'Bitti ve bırakılan', mark: 'dock', niri: { mood: 'happy', gear: 3, line: 'Prototipim çalışıyor. Gerisini pilotta kanıtlayacağım.' }, View: Done },
   { id: 'kapanis', title: 'Teşekkürler', mark: 'hero', niri: { mood: 'wave', gear: 4, turns: 2, line: 'Zirvedeyim! Teşekkürler, haritada görüşmek üzere.' }, View: Close },
+  // Appendix: Niri keeps the Zirve costume.
+  { id: 'fark', title: 'XP makbuzu', mark: 'dock', appendix: true, niri: { mood: 'happy', gear: 4, line: 'Benim XP’m boş tıklamayla gelmez.' }, View: Difference },
+  { id: 'dongu', title: 'Üç nesne, tek döngü', mark: 'dock', appendix: true, niri: { mood: 'think', gear: 4, line: 'İş bitince kanıtın bir basamak yükselir.' }, View: Objects },
+  { id: 'iki-yuz', title: 'Genç ve kurum', mark: 'dock', appendix: true, niri: { mood: 'cheer', gear: 4, line: 'Gence oyun, kuruma ölçüm; ikisi de aynı kanıttan.' }, View: Faces },
+  { id: 'guven', title: 'Neden güvenilir', mark: 'dock', appendix: true, niri: { mood: 'talk', gear: 4, line: 'Her puanımın nedenini sorabilirsiniz.' }, View: Trust },
+  { id: 'pazar', title: 'Önce kim', mark: 'dock', appendix: true, niri: { mood: 'point', point: 'right', gear: 4, line: 'Haritayı en yakın tepeden çizmeye başlıyorum.' }, View: Market },
+  { id: 'rekabet', title: 'Rekabet', mark: 'dock', appendix: true, niri: { mood: 'point', point: 'right', gear: 4, line: 'İkisinin buluştuğu köşe boştu. Oraya yerleştim.' }, View: Worlds },
+  { id: 'model', title: 'Nasıl yaşar', mark: 'dock', appendix: true, niri: { mood: 'think', gear: 4, line: 'Gence ücret yok. Gerisini pilotta sınayacağız.' }, View: Model },
+  { id: 'olcum', title: 'Pilotta ölçülecekler', mark: 'dock', appendix: true, niri: { mood: 'think', gear: 4, line: 'Rakam uydurmak yok; ölçüp size getireceğim.' }, View: Measure },
 ];
+
+/** How many slides the talk has; the rest are the appendix. */
+export const MAIN = SLIDES.filter((s) => !s.appendix).length;
+
+/** "3 / 12" in the talk, "Ek 2 / 8" in the appendix. */
+export const place = (i: number) => (i < MAIN ? `${i + 1} / ${MAIN}` : `Ek ${i - MAIN + 1} / ${SLIDES.length - MAIN}`);

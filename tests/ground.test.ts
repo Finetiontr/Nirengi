@@ -1,29 +1,11 @@
 // The guard between Niri's model and the canvas (src/lib/engine/ground.ts). MODEL is a real
-// answer from the draft model for SAMPLE_COMPLAINT; the other cases bend it the ways a model fails.
+// answer from the draft model for SAMPLE_COMPLAINT (shared with the deck); the other cases bend it
+// the ways a model fails.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { assessCanvas, SAMPLE_COMPLAINT } from '../src/lib/engine/canvas.ts';
 import { cites, numbersFrom, readModelDraft, readRulesDraft } from '../src/lib/engine/ground.ts';
-
-const MODEL = {
-  title: 'Canlı araç takip web paneli kurmak',
-  current: { quote: 'Araçlarımızda GPS cihazı var ama konum verisi günde bir kez Excel raporuna dönüşüyor.', value: 'GPS cihazlarından gelen veriler günde bir kez Excel raporu olarak alınıyor.' },
-  pain: { quote: 'Kurumsal müşterilerimiz kargolarının nerede olduğunu göremiyor ve sürekli çağrı merkezimizi arıyor.', value: 'Kurumsal müşterilerin kargo konumunu görememesi ve çağrı merkezini araması' },
-  painMetric: { quote: 'Çağrı merkezine gelen aramaların %40’ı “kargom nerede” sorusu, ayda yaklaşık 6.000 arama.', value: "Ayda 6.000 arama, aramaların %40'ı" },
-  outcome: { quote: 'Müşterilerimize araç konumlarını canlı haritada gösteren bir web paneli istiyoruz.', value: 'Araç konumlarını canlı haritada gösteren bir web paneli' },
-  decisionMaker: { quote: 'Aşamaları operasyon direktörümüz onaylayacak.', value: 'Operasyon direktörü' },
-  scope: { quote: 'İlk denemeyi yalnız Tuzla deposundan çıkan araçlar ve onların kurumsal müşterileriyle yapmak istiyoruz.', value: 'Tuzla deposundan çıkan araçlar ve kurumsal müşterileri' },
-  constraints: [
-    { kind: 'butce', quote: 'Bütçemiz 40.000 TL', text: '40.000 TL' },
-    { kind: 'sure', quote: '6 hafta içinde sonuç görmek istiyoruz.', text: '6 hafta içinde sonuç' },
-    { kind: 'mevzuat', quote: 'Konum verisi KVKK kapsamında; müşteri adresleri paylaşılmayacak.', text: 'KVKK kapsamında' },
-  ],
-  criteria: [
-    { basis: 'Çağrı merkezine gelen aramaların %40’ı “kargom nerede” sorusu, ayda yaklaşık 6.000 arama.', text: '“kargom nerede” aramalarının %20 oranında azalması' },
-    { basis: 'Müşterilerimize araç konumlarını canlı haritada gösteren bir web paneli istiyoruz.', text: 'Canlı konum verisini gösteren web panelinin teslim edilmesi' },
-  ],
-  skills: ['react', 'node', 'api', 'maps', 'realtime'],
-};
+import { INVENTED_DECIDER, SAMPLE_READING as MODEL } from '../src/components/sunum/reading.ts';
 
 const bend = (patch: Record<string, unknown>) => ({ ...structuredClone(MODEL), ...patch });
 
@@ -59,7 +41,7 @@ test('ground: suggested criteria stay out of the canvas until the kurum adds the
 });
 
 test('ground: a field citing a sentence that is not in the text is refused', () => {
-  const d = readModelDraft(SAMPLE_COMPLAINT, bend({ decisionMaker: { value: 'Genel Müdür', quote: 'Projeyi Genel Müdür onaylar.' } }))!;
+  const d = readModelDraft(SAMPLE_COMPLAINT, INVENTED_DECIDER)!;
   assert.equal(d.canvas.decisionMaker, '');
   assert.ok(d.questions.some((q) => q.field === 'decisionMaker'), 'asked instead of invented');
   assert.deepEqual(d.rejected, [{ field: 'decisionMaker', value: 'Genel Müdür', reason: 'quote' }]);
