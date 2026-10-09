@@ -1,6 +1,8 @@
 // S2 machine verification that runs entirely in the browser:
-//  • GitHub — account control proven by a one-time code placed in the profile
-//    bio or a public gist (Keybase-style), then repositories become evidence.
+//  • GitHub — the visitor grants a read-only, fine-grained access key for the
+//    repositories they pick on GitHub's own permission page; the key proves the
+//    account is theirs and lists those repositories, which become evidence. (The
+//    older route — a one-time code in the profile bio or a public gist — remains.)
 //  • Domain — ownership proven by a DNS TXT record, resolved over DoH.
 
 import type { Evidence, Level } from './types.ts';
@@ -33,6 +35,8 @@ export interface GhRepo {
   pushed_at: string;
   created_at: string;
   topics?: string[];
+  private?: boolean;
+  owner?: { login: string };
 }
 
 export type VerifyKind = 'notfound' | 'ratelimit' | 'network' | 'auth' | 'other';
@@ -46,7 +50,7 @@ export class VerifyError extends Error {
   }
 }
 
-/** Where the OAuth token from "GitHub ile giriş yap" is kept (see auth.ts). */
+/** Where the access key from GitHub's permission page is kept (see auth.ts). */
 export const TOKEN_KEY = 'nirengi:gh-token';
 
 export function ghToken(): string | null {
@@ -62,14 +66,14 @@ async function gh<T>(path: string): Promise<T> {
   let res: Response;
   try {
     res = await fetch(`https://api.github.com${path}`, {
-      // A signed-in visitor's token lifts the limit from 60 to 5,000 requests an hour.
+      // A connected visitor's key lifts the limit from 60 to 5,000 requests an hour.
       headers: { Accept: 'application/vnd.github+json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
       cache: 'no-store',
     });
   } catch {
     throw new VerifyError('GitHub’a ulaşılamadı. Bağlantını kontrol et ya da örnek profille devam et.', 'network');
   }
-  if (res.status === 401) throw new VerifyError('GitHub girişinin süresi dolmuş. Yeniden giriş yap.', 'auth');
+  if (res.status === 401) throw new VerifyError('GitHub anahtarı geçersiz ya da süresi dolmuş. GitHub’da yeni bir izin oluştur.', 'auth');
   if (res.status === 404) throw new VerifyError('Bu kullanıcı adıyla bir GitHub hesabı bulunamadı.', 'notfound');
   if (res.status === 403 || res.status === 429) {
     const reset = Number(res.headers.get('x-ratelimit-reset'));
@@ -94,8 +98,11 @@ export async function fetchGitHub(handle: string) {
   return { user, repos };
 }
 
-/** The account behind the stored OAuth token. */
+/** The account behind the stored access key. */
 export const fetchMe = () => gh<GhUser>('/user');
+
+/** Repositories the stored key can see: the private ones picked on GitHub plus the account's public ones. */
+export const fetchGrantedRepos = () => gh<GhRepo[]>('/user/repos?per_page=100&sort=pushed&affiliation=owner,collaborator,organization_member');
 
 export const newChallenge = () => `nirengi-${crypto.getRandomValues(new Uint32Array(1))[0].toString(36).padStart(7, '0').slice(0, 7)}`;
 
@@ -124,10 +131,10 @@ export async function checkGitHubChallenge(handle: string, code: string): Promis
 
 const DAY = 86_400_000;
 
-/** How account ownership was shown: a code in the bio or a gist, or the OAuth login itself. */
-export type GhVia = 'bio' | 'gist' | 'oauth';
+/** How account ownership was shown: a code in the bio or a gist, or a key granted on GitHub. */
+export type GhVia = 'bio' | 'gist' | 'grant';
 
-const ghVerifier = (via: GhVia | null) => (via === 'oauth' ? 'GitHub OAuth girişi' : `GitHub API · ${via === 'gist' ? 'gist' : 'bio'} sınaması`);
+const ghVerifier = (via: GhVia | null) => (via === 'grant' ? 'GitHub izni · yalnız okuma' : `GitHub API · ${via === 'gist' ? 'gist' : 'bio'} sınaması`);
 
 export const MAX_REPOS = 6;
 
@@ -140,10 +147,10 @@ export function pickRepos(repos: GhRepo[], max = MAX_REPOS): GhRepo[] {
     .slice(0, max);
 }
 
-/** Turn the strongest original repositories into evidence. */
+/** Turn the chosen original repositories into evidence. */
 export function reposToEvidence(repos: GhRepo[], verified: boolean, via: GhVia | null): Evidence[] {
   const level: Level = verified ? 'S2' : 'S1';
-  return pickRepos(repos).map((r) => {
+  return pickRepos(repos, repos.length).map((r) => {
     const skills = new Set<string>([
       ...(r.language ? LANGUAGE_SKILLS[r.language] ?? [] : []),
       ...skillsInText(`${r.name.replace(/[-_]/g, ' ')} ${r.description ?? ''} ${(r.topics ?? []).join(' ')}`),
@@ -152,11 +159,12 @@ export function reposToEvidence(repos: GhRepo[], verified: boolean, via: GhVia |
       { label: 'yıldız', value: r.stargazers_count.toLocaleString('tr-TR') },
       ...(r.forks_count ? [{ label: 'fork', value: r.forks_count.toLocaleString('tr-TR') }] : []),
       ...(r.language ? [{ label: 'dil', value: r.language }] : []),
+      ...(r.private ? [{ label: 'görünürlük', value: 'özel' }] : []),
     ];
     return {
       id: uid('e-gh'),
       title: r.description ? `${r.name} — ${r.description}` : r.name,
-      summary: r.description ?? 'Açıklama girilmemiş depo.',
+      summary: r.private ? `Özel depo: kodu gizli kalır, varlığı ve sahibi GitHub izniyle doğrulandı.${r.description ? ` ${r.description}` : ''}` : (r.description ?? 'Açıklama girilmemiş depo.'),
       source: 'github' as const,
       level,
       skills: [...skills],

@@ -7,8 +7,6 @@ import { motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import Niri, { type Dir, type Mood } from '../ui/Niri';
 import NiriSays from '../ui/NiriSays';
-import { cleanHandle, isGitHubLogin } from '../../lib/verify.ts';
-import { authReady } from '../../lib/auth.ts';
 import { GitHub } from '../ui/icons';
 import { ArtGain, ArtGencHos, ArtGencIs, ArtMatch, ArtNeed, ArtPilot, Pip } from './art';
 import { useTrap, type Face, type WelcomeChoice } from './util';
@@ -19,7 +17,7 @@ interface Card {
   mood: Mood;
   point?: Dir;
   Art: () => React.JSX.Element;
-  /** The card asks for the GitHub handle instead of only talking. */
+  /** The card ends at GitHub instead of only talking. */
   ask?: boolean;
 }
 
@@ -51,7 +49,7 @@ const KURUM_CARDS: Card[] = [
   },
 ];
 
-// Two cards on the genç side: who Niri is, then the GitHub handle. The rest is
+// Two cards on the genç side: who Niri is, then GitHub. The rest is
 // taught where it happens (the Bugün tour), not up front.
 const GENC_CARDS: Card[] = [
   {
@@ -62,7 +60,7 @@ const GENC_CARDS: Card[] = [
   },
   {
     title: 'Önce seni tanıyayım',
-    text: 'GitHub kullanıcı adını yaz. Depolarına bakıp hangilerinin kanıt olabileceğini birlikte seçelim.',
+    text: 'Kurumlara hangi depolarını göstereceğine GitHub’da sen karar ver. Yalnız okuma izni; istediğin an geri alırsın.',
     mood: 'talk',
     Art: ArtGencIs,
     ask: true,
@@ -72,7 +70,7 @@ const GENC_CARDS: Card[] = [
 interface Props {
   face: Face;
   onClose: (choice: WelcomeChoice) => void;
-  /** Handle typed on the ask card, or null for the one-click GitHub login; the caller takes it on. */
+  /** The ask card's key: the caller takes the visitor to Kanit bağla to grant access (null). */
   onGithub: (login: string | null) => void;
   /** GitHub login already connected: the ask card says so instead of asking again. */
   connected?: string;
@@ -82,20 +80,13 @@ export default function Welcome({ face, onClose, onGithub, connected }: Props) {
   const CARDS = face === 'genc' ? GENC_CARDS : KURUM_CARDS;
   const [i, setI] = useState(0);
   const [dir, setDir] = useState(1);
-  const [handle, setHandle] = useState('');
-  const [touched, setTouched] = useState(false);
   const box = useRef<HTMLDivElement>(null);
   const main = useRef<HTMLButtonElement>(null);
-  const field = useRef<HTMLInputElement>(null);
   const last = i === CARDS.length - 1;
   const card = CARDS[i];
   const Art = card.Art;
   const asking = !!card.ask && !connected;
-  /** The ask card is one GitHub key when the login service is set up; the handle field otherwise. */
-  const typing = asking && !authReady;
-  const login = cleanHandle(handle);
-  const valid = isGitHubLogin(login);
-  const submit = () => (!typing ? onGithub(null) : valid ? onGithub(login) : setTouched(true));
+  const submit = () => onGithub(null);
 
   const go = (to: number) => {
     const t = Math.max(0, Math.min(CARDS.length - 1, to));
@@ -105,8 +96,8 @@ export default function Welcome({ face, onClose, onGithub, connected }: Props) {
 
   useTrap(box, () => onClose('self'), true);
   useEffect(() => {
-    (typing ? field.current : main.current)?.focus({ preventScroll: true });
-  }, [i, typing]);
+    main.current?.focus({ preventScroll: true });
+  }, [i]);
   useEffect(() => {
     const k = (e: KeyboardEvent) => {
       if ((e.target as HTMLElement | null)?.tagName === 'INPUT') return;
@@ -177,53 +168,10 @@ export default function Welcome({ face, onClose, onGithub, connected }: Props) {
                 <div className={`mt-2 flex items-end [@media(max-height:700px)]:min-h-0 ${card.ask ? 'min-h-[96px]' : 'min-h-[150px]'}`}>
                   <NiriSays mood={card.mood} point={card.point} size={84} typing className="w-full">
                     <p className="text-[15.5px] font-semibold leading-relaxed text-ink-2">
-                      {card.ask && connected
-                        ? `GitHub hesabın bağlı (@${connected}). İstersen sayfayı birlikte gezelim.`
-                        : asking && !typing
-                          ? 'GitHub ile giriş yap, tek dokunuş. Depolarına bakıp hangilerinin kanıt olabileceğini birlikte seçelim.'
-                          : card.text}
+                      {card.ask && connected ? `GitHub hesabın bağlı (@${connected}). İstersen sayfayı birlikte gezelim.` : card.text}
                     </p>
                   </NiriSays>
                 </div>
-                {typing && (
-                  <form
-                    className="mt-4"
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      submit();
-                    }}
-                  >
-                    <label htmlFor="niri-gh" className="sr-only">
-                      GitHub kullanıcı adı
-                    </label>
-                    <div
-                      className={`flex items-center rounded-[14px] border-2 transition-[border-color,background-color,box-shadow] duration-150 focus-within:shadow-[0_0_0_4px_rgb(var(--indigo)/0.14)] ${
-                        touched && !valid ? 'border-red bg-red-tint' : 'border-line bg-bg-2 focus-within:border-indigo focus-within:bg-bg'
-                      }`}
-                    >
-                      <span className="pl-4 text-[16px] font-bold text-ink-3">github.com/</span>
-                      <input
-                        ref={field}
-                        id="niri-gh"
-                        value={handle}
-                        onChange={(e) => setHandle(e.target.value)}
-                        onBlur={() => handle.trim() && setTouched(true)}
-                        autoCapitalize="none"
-                        autoCorrect="off"
-                        spellCheck={false}
-                        autoComplete="username"
-                        enterKeyHint="go"
-                        placeholder="kullanici-adi"
-                        aria-invalid={touched && !valid}
-                        aria-describedby="niri-gh-note"
-                        className="min-w-0 flex-1 bg-transparent py-3.5 pl-1 pr-4 text-[18px] font-black text-ink outline-none placeholder:font-bold placeholder:text-ink-4"
-                      />
-                    </div>
-                    <p id="niri-gh-note" aria-live="polite" className="mt-2 min-h-[20px] text-[13.5px] font-bold text-red-lip">
-                      {touched && !valid ? 'Kullanıcı adı harf, rakam ve tireden oluşur; en çok 39 karakter.' : ''}
-                    </p>
-                  </form>
-                )}
               </>
             ) : (
               <div className="mt-5 flex items-end gap-3 [@media(max-height:700px)]:mt-0">
@@ -247,8 +195,8 @@ export default function Welcome({ face, onClose, onGithub, connected }: Props) {
             className="btn-primary btn-lg btn-block"
             onClick={() => (asking ? submit() : last ? onClose('tour') : go(i + 1))}
           >
-            {asking && !typing && <GitHub size={22} />}
-            {typing ? 'GitHub’ımı tara' : asking ? 'GitHub ile giriş yap' : last ? 'Turu başlat' : 'İleri'}
+            {asking && <GitHub size={22} />}
+            {asking ? 'GitHub’da izin ver' : last ? 'Turu başlat' : 'İleri'}
           </button>
           <div className="mt-2 flex items-center justify-between gap-2">
             <button

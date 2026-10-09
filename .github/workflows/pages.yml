@@ -24,9 +24,6 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build:pages
-        env:
-          # Worker that runs the GitHub sign-in (auth/); empty keeps the handle fallback.
-          PUBLIC_AUTH_URL: ${{ vars.PUBLIC_AUTH_URL }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist-pages

@@ -16,6 +16,7 @@ import {
   domainEvidence,
   fetchActivityDays,
   fetchGitHub,
+  fetchGrantedRepos,
   fetchMe,
   isGitHubLogin,
   MAX_REPOS,
@@ -30,13 +31,13 @@ import {
   type GhUser,
   type VerifyKind,
 } from '../../lib/verify.ts';
-import { authReady, consumeAuthHash, forgetToken, signIn, signOut } from '../../lib/auth.ts';
+import { forgetToken, getToken, grantUrl, isClassicKey, isGrantKey, saveToken, signOut } from '../../lib/auth.ts';
 import { LEVELS } from '../../lib/labels.ts';
 import { daysAgo, relTime, uid } from '../../lib/format.ts';
 import { skillLabel } from '../../lib/skills.ts';
 import { type Mood } from '../ui/Niri';
 import NiriSays from '../ui/NiriSays';
-import { celebrate, CountUp, feedback, Head, WeekDots, Why, type FeedbackMsg } from '../ui/kit';
+import { celebrate, CountUp, feedback, Head, WeekDots, Why } from '../ui/kit';
 import { CheckCircle, Flame, GitHub, Star } from '../ui/icons';
 import { Avatar, LevelBadge } from '../ui/primitives';
 import { TriMark } from '../ui/TriMark';
@@ -51,8 +52,8 @@ interface Scan {
   /** Local days with public output in the last 90 days; null when GitHub would not say. */
   days: string[] | null;
   offline: boolean;
-  /** Read after "GitHub ile giriş yap": the login itself proves the account is theirs. */
-  oauth?: boolean;
+  /** Read with a key granted on GitHub: the key itself proves the account is theirs. */
+  granted?: boolean;
 }
 
 interface Foot {
@@ -64,6 +65,8 @@ interface Foot {
   /** Called when Enter is pressed while the key is disabled. */
   blocked?: () => void;
   icon?: ReactNode;
+  /** `href` opens in a new tab (GitHub's permission page), and `onClick` still runs. */
+  external?: boolean;
   side?: { label: string; onClick?: () => void; href?: string };
 }
 
@@ -114,12 +117,12 @@ function buildPerson(s: State, cur: Person | undefined, sc: Scan, picked: GhRepo
   const same = !!cur && !sc.offline && cur.links.github?.toLowerCase() === login;
   const proven = same ? cur!.evidence.find((e) => e.source === 'github' && e.level === 'S2') : undefined;
   const kept = (same ? cur!.evidence.filter((e) => e.source === 'github' && picked.some((r) => r.html_url === e.url)) : []).map((e) =>
-    sc.oauth && e.level === 'S1' ? verifyGitHubEvidence(e, 'oauth') : e,
+    sc.granted && e.level === 'S1' ? verifyGitHubEvidence(e, 'grant') : e,
   );
   const fresh = reposToEvidence(
     picked.filter((r) => !kept.some((e) => e.url === r.html_url)),
-    !!sc.oauth || !!proven,
-    sc.oauth ? 'oauth' : proven?.verifier?.includes('gist') ? 'gist' : 'bio',
+    !!sc.granted || !!proven,
+    sc.granted ? 'grant' : proven?.verifier?.includes('gist') ? 'gist' : 'bio',
   );
   const evidence = [...fresh, ...kept, ...(cur?.evidence.filter((e) => e.source !== 'github') ?? [])];
   const taken = s.people.some((p) => !p.isDemoUser && p.handle === login);
@@ -165,8 +168,11 @@ export default function ConnectPage() {
   const reduce = !!useReducedMotion();
 
   const [step, setStep] = useState<StepId>(me ? 'home' : 'user');
-  /** The handle field instead of the one-click login (always so when the login service is not set up). */
-  const [manual, setManual] = useState(!authReady);
+  /** The handle field (Beyan only) instead of granting access on GitHub. */
+  const [manual, setManual] = useState(false);
+  /** The access key pasted from GitHub's permission page, and whether that page was opened. */
+  const [key, setKey] = useState('');
+  const [opened, setOpened] = useState(false);
   const [dir, setDir] = useState(1);
   /** Started from the "Bağlı hesap" screen: finishing returns there instead of walking the whole flow. */
   const [from, setFrom] = useState<'flow' | 'home'>('flow');
@@ -202,33 +208,44 @@ export default function ConnectPage() {
   const proven = isGhVerified(me);
   const domainDone = !!me?.links.domain;
   const afterFlow = (next: StepId) => (from === 'home' ? 'home' : next);
-  const skipProve = !!scan?.offline || !!scan?.oauth;
+  const skipProve = !!scan?.offline || !!scan?.granted || (!scan && !manual);
 
   // ------------------------------------------------------------ actions
 
-  /** `raw` null: the account behind the OAuth token, whose work counts as Doğrulandı. */
+  /** `raw` null: the account behind the granted key, whose work counts as Doğrulandı. */
   const scanFor = async (raw: string | null, back: StepId) => {
     const id = ++run.current;
-    const oauth = raw === null;
+    const granted = raw === null;
     setLoginErr(null);
     setScan(null);
-    setStage(oauth ? 'GitHub hesabını tanıyorum…' : 'Depolarını okuyorum…');
+    setStage(granted ? 'GitHub hesabını tanıyorum…' : 'Depolarını okuyorum…');
     go('found');
     try {
-      const login = oauth ? (await fetchMe()).login : raw;
-      if (id !== run.current) return;
-      if (oauth) {
-        setHandle(login);
-        setStage('Depolarını okuyorum…');
+      if (granted) {
+        const user = await fetchMe();
+        if (id !== run.current) return;
+        setHandle(user.login);
+        setStage('Seçtiğin depoları okuyorum…');
+        const all = (await fetchGrantedRepos()).filter((r) => !r.fork && !r.archived);
+        if (id !== run.current) return;
+        setStage('Etkinliğini sayıyorum…');
+        const days = await fetchActivityDays(user.login);
+        if (id !== run.current) return;
+        // Private repositories are here only because they were ticked on GitHub: they lead and start selected.
+        const chosen = all.filter((r) => r.private);
+        const open = all.filter((r) => !r.private);
+        setIncluded(new Set([...chosen, ...pickRepos(open)].map((r) => r.name)));
+        setScan({ user, repos: [...chosen, ...pickRepos(open, 20)], days, offline: false, granted });
+        return;
       }
-      const { user, repos } = await fetchGitHub(login);
+      const { user, repos } = await fetchGitHub(raw);
       if (id !== run.current) return;
       setStage('Etkinliğini sayıyorum…');
       const days = await fetchActivityDays(user.login);
       if (id !== run.current) return;
       const picked = pickRepos(repos);
       setIncluded(new Set(picked.map((r) => r.name)));
-      setScan({ user, repos: picked, days, offline: false, oauth });
+      setScan({ user, repos: picked, days, offline: false });
     } catch (e) {
       if (id !== run.current) return;
       const err = e instanceof VerifyError ? e : new VerifyError('Beklenmeyen bir hata oldu.');
@@ -242,6 +259,22 @@ export default function ConnectPage() {
   const startScan = () => {
     if (scan && !scan.offline && scan.user.login.toLowerCase() === login.toLowerCase()) return go('found');
     void scanFor(login, 'user');
+  };
+
+  /** A key pasted from GitHub's permission page: keep it in this browser and read the account behind it. */
+  const connectKey = (raw = key) => {
+    const k = raw.trim();
+    if (isClassicKey(k)) {
+      feedback({ tone: 'bad', title: 'Bu klasik bir anahtar', text: 'Klasik anahtar tüm hesabına erişir. GitHub’da yalnız seçtiğin depolar için yeni (fine-grained) bir anahtar oluştur.' });
+      return;
+    }
+    if (!isGrantKey(k)) {
+      feedback({ tone: 'bad', title: 'Anahtar tanınmadı', text: 'GitHub’ın verdiği anahtar “github_pat_” ile başlar. Tamamını kopyaladığından emin ol.' });
+      return;
+    }
+    saveToken(k);
+    setKey('');
+    void scanFor(null, from === 'home' ? 'home' : 'user');
   };
 
   const continueWithExample = () => {
@@ -263,7 +296,7 @@ export default function ConnectPage() {
     feedback({
       tone: 'good',
       title: from === 'home' ? 'Profilin güncellendi' : `${picked.length} eser eklendi`,
-      text: from === 'home' ? `${picked.length} eser profilinde.` : sc.offline ? 'Örnek veri Beyan düzeyinde kalır.' : sc.oauth ? 'GitHub ile giriş yaptığın için hepsi Doğrulandı düzeyinde.' : ok ? 'Hesabın daha önce doğrulandığı için Doğrulandı düzeyinde.' : 'Şimdilik Beyan düzeyinde; sahipliğini kanıtlayınca Doğrulandı olur.',
+      text: from === 'home' ? `${picked.length} eser profilinde.` : sc.offline ? 'Örnek veri Beyan düzeyinde kalır.' : sc.granted ? 'GitHub’da izin verdiğin için hepsi Doğrulandı düzeyinde.' : ok ? 'Hesabın daha önce doğrulandığı için Doğrulandı düzeyinde.' : 'Şimdilik Beyan düzeyinde; sahipliğini kanıtlayınca Doğrulandı olur.',
     });
     go(afterFlow('goal'));
   };
@@ -323,7 +356,8 @@ export default function ConnectPage() {
     setScan(null);
     setHandle('');
     setFrom('flow');
-    setManual(!authReady);
+    setManual(false);
+    setOpened(false);
     feedback({ tone: 'info', title: 'Çıkış yaptın', text: 'GitHub bağlantın kaldırıldı; örnek profille geziyorsun.' });
     go('user', -1);
   };
@@ -381,8 +415,12 @@ export default function ConnectPage() {
     switch (step) {
       case 'user':
         return manual
-          ? { label: 'Devam', disabled: !valid, onClick: startScan, blocked: () => setTouched(true) }
-          : { label: 'GitHub ile giriş yap', icon: <GitHub size={22} />, onClick: signIn, side: { label: 'Kullanıcı adıyla devam et', onClick: () => setManual(true) } };
+          ? { label: 'Devam', disabled: !valid, onClick: startScan, blocked: () => setTouched(true), side: { label: 'GitHub izniyle bağla', onClick: () => setManual(false) } }
+          : isGrantKey(key)
+            ? { label: 'Bağla', icon: <GitHub size={22} />, onClick: () => connectKey() }
+            : opened
+              ? { label: 'Bağla', icon: <GitHub size={22} />, disabled: true, blocked: () => document.getElementById('gh-key')?.focus() }
+              : { label: 'GitHub’da izin ver', icon: <GitHub size={22} />, href: grantUrl(), external: true, onClick: () => setOpened(true) };
       case 'found':
         return { label: 'Devam', disabled: loading || included.size === 0, onClick: saveScan };
       case 'goal':
@@ -423,28 +461,8 @@ export default function ConnectPage() {
     go(back!, -1);
   };
 
-  // Back from GitHub's login (#gh_token=… or #gh_error=…), or Niri's welcome handing over a handle as ?gh=….
+  // Niri's welcome can hand over a handle as ?gh=… (the Beyan route).
   useEffect(() => {
-    const auth = consumeAuthHash();
-    if (auth && 'token' in auth) {
-      const cur = demoUser();
-      if (cur?.links.github) setFrom('home');
-      void scanFor(null, cur ? 'home' : 'user');
-      return;
-    }
-    if (auth) {
-      const e = auth.error;
-      const msg: FeedbackMsg =
-        e === 'denied'
-          ? { tone: 'info', title: 'Giriş iptal edildi', text: 'İstediğin zaman yeniden deneyebilirsin.' }
-          : e === 'config'
-            ? { tone: 'bad', title: 'Giriş servisi henüz hazır değil', text: 'Şimdilik kullanıcı adınla devam et.' }
-            : { tone: 'bad', title: 'Giriş tamamlanamadı', text: 'GitHub’dan dönerken bir şey ters gitti. Yeniden dene ya da kullanıcı adınla devam et.' };
-      // Right after load the toast layer may not be listening yet.
-      window.setTimeout(() => feedback(msg), 600);
-      if (e === 'config') setManual(true);
-      return;
-    }
     const q = new URLSearchParams(location.search).get('gh');
     if (q === null) return;
     history.replaceState(null, '', location.pathname + location.hash);
@@ -481,7 +499,10 @@ export default function ConnectPage() {
       const f = footRef.current;
       if (f.disabled) return f.blocked?.();
       if (f.busy) return;
-      if (f.href) location.href = f.href;
+      if (f.href && f.external) {
+        window.open(f.href, '_blank', 'noreferrer');
+        f.onClick?.();
+      } else if (f.href) location.href = f.href;
       else f.onClick?.();
     };
     window.addEventListener('keydown', onKey);
@@ -491,10 +512,12 @@ export default function ConnectPage() {
   const body = (() => {
     switch (step) {
       case 'user':
+        if (!manual)
+          return (
+            <GrantBody opened={opened} onOpen={() => setOpened(true)} value={key} onValue={setKey} onPasted={(k) => connectKey(k)} onManual={() => setManual(true)} canExample={!me} onExample={continueWithExample} reduce={reduce} />
+          );
         return (
           <UserBody
-            manual={manual}
-            onOneClick={() => setManual(false)}
             handle={handle}
             onHandle={(v) => {
               setHandle(v);
@@ -568,11 +591,8 @@ export default function ConnectPage() {
               if (!gh) return;
               setFrom('home');
               setHandle(gh);
-              void scanFor(gh, 'home');
-            }}
-            onProve={() => {
-              setFrom('home');
-              go('prove');
+              // With a granted key the private repositories picked on GitHub come along too.
+              void scanFor(getToken() ? null : gh, 'home');
             }}
             onAdd={() => {
               setFrom('home');
@@ -580,6 +600,7 @@ export default function ConnectPage() {
             }}
             onConnect={() => {
               setFrom('flow');
+              setManual(false);
               go('user');
             }}
             onSignOut={leave}
@@ -633,7 +654,25 @@ export default function ConnectPage() {
 
 // ---------------------------------------------------------------- pieces
 
-function Key({ label, href, onClick, disabled, busy, icon, className }: { label: string; href?: string; onClick?: () => void; disabled?: boolean; busy?: boolean; icon?: ReactNode; className: string }) {
+function Key({
+  label,
+  href,
+  external,
+  onClick,
+  disabled,
+  busy,
+  icon,
+  className,
+}: {
+  label: string;
+  href?: string;
+  external?: boolean;
+  onClick?: () => void;
+  disabled?: boolean;
+  busy?: boolean;
+  icon?: ReactNode;
+  className: string;
+}) {
   const inner = (
     <>
       {busy ? <Loader2 className="h-5 w-5 animate-spin" strokeWidth={3} aria-hidden="true" /> : icon}
@@ -642,8 +681,9 @@ function Key({ label, href, onClick, disabled, busy, icon, className }: { label:
   );
   if (href)
     return (
-      <a href={href} className={className}>
+      <a href={href} className={className} onClick={onClick} {...(external ? { target: '_blank', rel: 'noreferrer' } : {})}>
         {inner}
+        {external && <ExternalLink className="h-4 w-4 opacity-80" strokeWidth={3} aria-hidden="true" />}
       </a>
     );
   return (
@@ -735,9 +775,213 @@ const LEVEL_WHY = (
 
 // ---------------------------------------------------------------- 1 · user
 
+/** One stop on the grant trail: a survey marker, then what to do there. */
+function Stop({ n, state, title, children }: { n: number; state: 'done' | 'current' | 'next'; title: string; children?: ReactNode }) {
+  return (
+    <li className="relative flex gap-3.5">
+      <span className="relative z-10 grid h-9 w-9 shrink-0 place-items-center" aria-hidden="true">
+        {state === 'current' && <span className="ping-soft absolute left-1/2 top-[60%] h-7 w-7 -translate-x-1/2 -translate-y-1/2 rounded-full" style={{ background: 'rgb(var(--indigo) / 0.3)' }} />}
+        {state === 'next' ? (
+          <TriMark size={32} color="ink-4" variant="outline">
+            <span className="num text-[12px] font-black text-ink-3">{n}</span>
+          </TriMark>
+        ) : (
+          <TriMark size={state === 'current' ? 34 : 32} color={state === 'done' ? 'green' : 'indigo'} lip>
+            {state === 'done' ? <Check className="h-3.5 w-3.5 text-white" strokeWidth={4.5} /> : <span className="num text-[12px] font-black text-white">{n}</span>}
+          </TriMark>
+        )}
+      </span>
+      <div className={`min-w-0 flex-1 pb-5 pt-1 ${state === 'next' ? 'opacity-60' : ''}`}>
+        <p className="text-[17px] font-black leading-snug text-ink">{title}</p>
+        {children}
+      </div>
+    </li>
+  );
+}
+
+/** A small drawing of GitHub's "Repository access" box with the right choice marked. */
+function AccessSketch({ live }: { live: boolean }) {
+  const row = (label: string, on: boolean) => (
+    <span className={`flex items-center gap-2 rounded-[10px] px-2 py-1.5 ${on ? 'bg-indigo-tint' : ''}`}>
+      <span className={`relative grid h-4 w-4 shrink-0 place-items-center rounded-full border-2 ${on ? 'border-indigo' : 'border-line-2'}`}>
+        {on && <span className="h-2 w-2 rounded-full bg-indigo" />}
+        {on && live && <span className="ping-soft absolute inset-0 rounded-full" style={{ background: 'rgb(var(--indigo) / 0.35)' }} />}
+      </span>
+      <span className={`font-mono text-[12.5px] ${on ? 'font-bold text-indigo' : 'text-ink-3'}`}>{label}</span>
+    </span>
+  );
+  return (
+    <div className="mt-3 rounded-[14px] border-2 border-line bg-bg p-2.5" aria-hidden="true">
+      <p className="px-2 pb-1 font-mono text-[12px] font-bold text-ink-2">Repository access</p>
+      {row('Public repositories', false)}
+      {row('All repositories', false)}
+      {row('Only select repositories', true)}
+      <span className="ml-8 mt-1 flex flex-wrap gap-1.5 pb-1">
+        {['proje-1', 'proje-2'].map((r) => (
+          <span key={r} className="inline-flex items-center gap-1 rounded-full border-2 border-line px-2 py-0.5 font-mono text-[11.5px] font-bold text-ink-2">
+            <Check className="h-3 w-3 text-green" strokeWidth={4} />
+            {r}
+          </span>
+        ))}
+      </span>
+    </div>
+  );
+}
+
+function GrantBody({
+  opened,
+  onOpen,
+  value,
+  onValue,
+  onPasted,
+  onManual,
+  canExample,
+  onExample,
+  reduce,
+}: {
+  opened: boolean;
+  onOpen: () => void;
+  value: string;
+  onValue: (v: string) => void;
+  onPasted: (key: string) => void;
+  onManual: () => void;
+  canExample: boolean;
+  onExample: () => void;
+  reduce: boolean;
+}) {
+  const field = useRef<HTMLInputElement>(null);
+  const ready = isGrantKey(value);
+  const classic = isClassicKey(value);
+
+  // Back from GitHub's tab: the key is on the clipboard, so the field is where the hand goes next.
+  useEffect(() => {
+    if (!opened) return;
+    const back = () => {
+      if (document.visibilityState === 'visible') field.current?.focus({ preventScroll: true });
+    };
+    document.addEventListener('visibilitychange', back);
+    window.addEventListener('focus', back);
+    return () => {
+      document.removeEventListener('visibilitychange', back);
+      window.removeEventListener('focus', back);
+    };
+  }, [opened]);
+
+  const fromClipboard = async () => {
+    try {
+      const t = (await navigator.clipboard.readText()).trim();
+      onValue(t);
+      if (isGrantKey(t) || isClassicKey(t)) onPasted(t);
+      else feedback({ tone: 'info', title: 'Panoda anahtar yok', text: 'GitHub’ın verdiği “github_pat_…” anahtarını kopyalayıp yeniden dene.' });
+    } catch {
+      field.current?.focus();
+      feedback({ tone: 'info', title: 'Panoya erişemedim', text: 'Kutuya dokunup yapıştır (Ctrl+V ya da uzun bas).' });
+    }
+  };
+
+  return (
+    <>
+      <Guide mood={opened ? 'point' : 'wave'}>
+        {opened
+          ? 'Depolarını seçip anahtarı oluşturduysan buraya yapıştırman yeterli.'
+          : 'Kurumlara hangi depolarını göstereceğine GitHub’da sen karar ver. Yalnız okuma izni; istediğin an geri alırsın.'}
+      </Guide>
+      <h1 className="h-page mt-6">GitHub’da izin ver</h1>
+
+      <ol className="relative mt-5">
+        <span
+          className="absolute bottom-8 left-[16px] top-8 w-[3px] rounded-full"
+          style={{ background: 'repeating-linear-gradient(to bottom, rgb(var(--line-2)) 0 4px, transparent 4px 10px)' }}
+          aria-hidden="true"
+        />
+        <Stop n={1} state={opened ? 'done' : 'current'} title="GitHub’ın izin sayfasını aç">
+          <p className="mt-0.5 text-[14px] font-bold text-ink-3">Ad, açıklama ve 30 günlük süre hazır gelir; yeni sekmede açılır.</p>
+          <a href={grantUrl()} target="_blank" rel="noreferrer" onClick={onOpen} className="btn-line btn-sm mt-3">
+            <GitHub size={18} />
+            {opened ? 'Yeniden aç' : 'İzin sayfasını aç'}
+            <ExternalLink className="h-4 w-4 opacity-80" strokeWidth={3} aria-hidden="true" />
+          </a>
+        </Stop>
+        <Stop n={2} state={opened ? (ready ? 'done' : 'current') : 'next'} title="Göstereceğin depoları seç">
+          <p className="mt-0.5 text-[14px] font-bold text-ink-3">
+            “Repository access” bölümünde <b className="text-ink-2">Only select repositories</b>’i seç ve kurumlara göstermek istediğin depoları işaretle. Başka izin eklemene gerek yok; sonra
+            “Generate token”a bas.
+          </p>
+          <AccessSketch live={opened && !ready && !reduce} />
+        </Stop>
+        <Stop n={3} state={ready ? 'done' : opened ? 'current' : 'next'} title="Anahtarı buraya yapıştır">
+          <label htmlFor="gh-key" className="sr-only">
+            GitHub erişim anahtarı
+          </label>
+          <div
+            className={`mt-2 flex items-center rounded-[14px] border-2 transition-[border-color,background-color,box-shadow] duration-150 focus-within:shadow-[0_0_0_4px_rgb(var(--indigo)/0.14)] ${
+              classic ? 'border-red bg-red-tint' : ready ? 'border-green bg-green-tint' : 'border-line bg-bg-2 focus-within:border-indigo focus-within:bg-bg'
+            }`}
+          >
+            <input
+              ref={field}
+              id="gh-key"
+              type="password"
+              value={value}
+              onChange={(e) => onValue(e.target.value)}
+              onPaste={(e) => {
+                const t = e.clipboardData.getData('text').trim();
+                if (!isGrantKey(t) && !isClassicKey(t)) return;
+                e.preventDefault();
+                onValue(t);
+                onPasted(t);
+              }}
+              autoComplete="off"
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
+              enterKeyHint="go"
+              placeholder="github_pat_…"
+              aria-describedby="gh-key-note"
+              aria-invalid={classic}
+              className="min-w-0 flex-1 bg-transparent py-3 pl-4 pr-2 font-mono text-[15px] font-bold text-ink outline-none placeholder:font-sans placeholder:text-ink-4"
+            />
+            <button type="button" onClick={fromClipboard} className="btn-quiet btn-sm mr-1 shrink-0 !min-h-10 !px-2.5 !text-[13px]">
+              <Copy className="h-4 w-4" strokeWidth={3} aria-hidden="true" />
+              Panodan yapıştır
+            </button>
+          </div>
+          <p id="gh-key-note" aria-live="polite" className={`mt-2 text-[13.5px] font-bold ${classic ? 'text-red-lip' : 'text-ink-3'}`}>
+            {classic
+              ? 'Bu klasik bir anahtar ve tüm hesabına erişir. Yalnız seçtiğin depolar için yeni bir anahtar oluştur.'
+              : ready
+                ? 'Anahtar hazır. “Bağla”ya dokun.'
+                : 'Anahtar yalnız bu tarayıcıda durur ve yalnız GitHub’a gider.'}
+          </p>
+        </Stop>
+      </ol>
+
+      <p className="hint !mt-0">
+        Parolanı görmeyiz, kodunu okumayız, hiçbir şeye yazamayız.{' '}
+        <Why title="Bu izin ne görür?">
+          <div className="space-y-3 text-[16px] font-bold text-ink-2">
+            <p>Yalnız GitHub’da işaretlediğin özel depoların adını ve özelliklerini, bir de herkese açık depolarını görür. Kod okuma ya da yazma izni istemiyoruz.</p>
+            <p>Kullanıcı adını herkes yazabilir; bu izni ise yalnız hesabın sahibi verebilir. Bu yüzden seçtiğin depolar hemen Doğrulandı olur ve kurumlara öyle görünür.</p>
+            <p>Sunucumuz yok: site GitHub Pages’te açık kaynak çalışır. Anahtar yalnız bu tarayıcıda saklanır ve yalnız api.github.com’a gönderilir.</p>
+            <p>Anahtar 30 gün sonra kendiliğinden biter. “Çıkış yap” onu GitHub’da da iptal eder; ayrıca GitHub ayarlarındaki “Fine-grained tokens” listesinden silebilirsin.</p>
+          </div>
+        </Why>
+      </p>
+      <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[14px] font-bold text-ink-3">
+        <button type="button" onClick={onManual} className="font-extrabold text-indigo underline-offset-2 hover:underline">
+          Kullanıcı adıyla dene (Beyan)
+        </button>
+        {canExample && (
+          <button type="button" onClick={onExample} className="font-extrabold text-indigo underline-offset-2 hover:underline">
+            Örnek profille gez
+          </button>
+        )}
+      </p>
+    </>
+  );
+}
+
 function UserBody({
-  manual,
-  onOneClick,
   handle,
   onHandle,
   onBlur,
@@ -755,43 +999,11 @@ function UserBody({
   login: string;
   canExample: boolean;
   onExample: () => void;
-  manual: boolean;
-  onOneClick: () => void;
 }) {
   const bad = showFormat || !!err;
-  if (!manual)
-    return (
-      <>
-        <Guide mood="wave">Merhaba! GitHub ile giriş yap, işlerini birlikte bulalım.</Guide>
-        <h1 className="h-page mt-6">GitHub hesabın</h1>
-        <ul className="card mt-5 divide-y-2 divide-line">
-          {[
-            ['Tek dokunuş', 'Kullanıcı adı yazmak, kod kopyalamak yok. GitHub’da onaylarsın, buraya dönersin.'],
-            ['Hemen Doğrulandı', 'Girişin hesabın senin olduğunu gösterir; eklediğin işler Beyan’da beklemez.'],
-            ['Yalnız okuma', 'Herkese açık profilin ve depoların okunur. Parola görmeyiz, hiçbir şeye yazamayız.'],
-          ].map(([t, d]) => (
-            <li key={t} className="flex items-start gap-3 px-4 py-3.5">
-              <Check className="mt-0.5 h-5 w-5 shrink-0 text-green" strokeWidth={4} aria-hidden="true" />
-              <span>
-                <span className="block text-[16px] font-black text-ink">{t}</span>
-                <span className="block text-[14px] font-bold text-ink-3">{d}</span>
-              </span>
-            </li>
-          ))}
-        </ul>
-        {canExample && (
-          <p className="hint">
-            GitHub hesabın yok mu?{' '}
-            <button type="button" onClick={onExample} className="font-extrabold text-indigo underline-offset-2 hover:underline">
-              Örnek profille devam et
-            </button>
-          </p>
-        )}
-      </>
-    );
   return (
     <>
-      <Guide mood="wave">Merhaba! Önce GitHub kullanıcı adını yaz, işlerini birlikte bulalım.</Guide>
+      <Guide mood="think">Kullanıcı adınla depolarını okurum; ama hesabın senin olduğunu bu göstermez, işlerin Beyan kalır.</Guide>
       <h1 className="h-page mt-6">GitHub kullanıcı adın</h1>
       <label htmlFor="gh" className="sr-only">
         GitHub kullanıcı adı
@@ -836,19 +1048,7 @@ function UserBody({
             )}
           </div>
         ) : (
-          <p className="hint">
-            Herkese açık GitHub verisi okunur. Parola ya da token istemiyoruz.
-            {authReady ? (
-              <>
-                {' '}
-                <button type="button" onClick={onOneClick} className="font-extrabold text-indigo underline-offset-2 hover:underline">
-                  Tek tıkla giriş yap
-                </button>
-              </>
-            ) : (
-              ' Tek tıkla giriş şu an kapalı; kullanıcı adınla devam edebilirsin.'
-            )}
-          </p>
+          <p className="hint">Herkese açık GitHub verisi okunur. Doğrulandı düzeyi için GitHub’da izin vermen gerekir. </p>
         )}
       </div>
     </>
@@ -891,7 +1091,13 @@ function FoundBody({
   const n = scan.repos.length;
   return (
     <>
-      <Guide mood={n ? 'happy' : 'think'}>{n ? 'Bunları buldum! Profiline eklemek istediklerini seç.' : 'Hesabında özgün bir depo göremedim.'}</Guide>
+      <Guide mood={n ? 'happy' : 'think'}>
+        {!n
+          ? 'Hesabında özgün bir depo göremedim.'
+          : scan.granted
+            ? 'İzin verdiğin depolar burada. Kurumlara göstermek istediklerini işaretle.'
+            : 'Bunları buldum! Profiline eklemek istediklerini seç.'}
+      </Guide>
       <h1 className="mt-6 flex items-end gap-3" aria-label={`${n} eserin bulundu`}>
         <span className="num text-[64px] font-black leading-[0.9] text-indigo" aria-hidden="true">
           <CountUp value={n} />
@@ -953,7 +1159,10 @@ function FoundBody({
                     <Check className="h-4 w-4" strokeWidth={4} />
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate text-[16px] font-black text-ink">{r.name}</span>
+                    <span className="flex min-w-0 items-center gap-2">
+                      <span className="truncate text-[16px] font-black text-ink">{r.name}</span>
+                      {r.private && <span className="pill shrink-0 bg-bg-3 !px-2 !py-0 text-[12px] text-ink-2">Özel</span>}
+                    </span>
                     <span className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[13px] font-bold text-ink-3">
                       {r.language && <span>{r.language}</span>}
                       <span className="inline-flex items-center gap-1">
@@ -1247,25 +1456,10 @@ function Row({ title, sub, onClick, accent }: { title: string; sub: string; onCl
   );
 }
 
-function HomeBody({
-  s,
-  me,
-  onRescan,
-  onProve,
-  onAdd,
-  onConnect,
-  onSignOut,
-}: {
-  s: State;
-  me?: Person;
-  onRescan: () => void;
-  onProve: () => void;
-  onAdd: () => void;
-  onConnect: () => void;
-  onSignOut: () => void;
-}) {
+function HomeBody({ s, me, onRescan, onAdd, onConnect, onSignOut }: { s: State; me?: Person; onRescan: () => void; onAdd: () => void; onConnect: () => void; onSignOut: () => void }) {
   if (!me) return null;
   const p = progress(s, me);
+  const granted = !!getToken();
   return (
     <>
       <Guide mood="idle">Hesabın bağlı. İstersen yeniden tarayabilir ya da yeni kanıt ekleyebilirsin.</Guide>
@@ -1289,13 +1483,8 @@ function HomeBody({
       </div>
       {!me.links.github && <p className="hint">Örnek profil: gerçek bir GitHub hesabına bağlı değil, her şey Beyan düzeyinde.</p>}
       <ul className="mt-6 space-y-3">
-        {hasGhBeyan(me) &&
-          (authReady ? (
-            <Row accent title="GitHub ile giriş yap" sub="Tek dokunuşla doğrula; Beyan düzeyindeki işlerin Doğrulandı olur." onClick={signIn} />
-          ) : (
-            <Row accent title="Sahipliğini kanıtla" sub="İşlerin Beyan düzeyinde; kanıtlayınca Doğrulandı olur." onClick={onProve} />
-          ))}
-        {me.links.github ? <Row title="Yeniden tara" sub="Yeni depoları ve son 90 günün etkinliğini oku." onClick={onRescan} /> : <Row accent title="Gerçek hesabını bağla" sub="Örnek yerine kendi GitHub hesabını kullan." onClick={onConnect} />}
+        {hasGhBeyan(me) && <Row accent title="GitHub’da izin ver" sub="İşlerin Beyan düzeyinde; seçtiğin depolar için izin verince Doğrulandı olur." onClick={onConnect} />}
+        {me.links.github ? <Row title="Depolarını güncelle" sub={granted ? 'Yeni depoları ve son 90 günün etkinliğini oku.' : 'Herkese açık depoları yeniden oku.'} onClick={onRescan} /> : <Row accent title="Gerçek hesabını bağla" sub="Örnek yerine kendi GitHub hesabını kullan." onClick={onConnect} />}
         <Row title="Yeni kanıt ekle" sub="Alan adı ya da kendi sözünle bir iş." onClick={onAdd} />
       </ul>
       <button type="button" onClick={onSignOut} className="btn-quiet mt-6 !text-red-lip">

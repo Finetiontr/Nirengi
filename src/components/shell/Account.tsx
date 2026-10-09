@@ -1,9 +1,9 @@
-// The genç account in the shell: who is signed in, and the way out. With no GitHub
-// account connected it offers the one-click login instead.
+// The genç account in the shell: who is connected, and the way out. With no GitHub
+// account connected it leads to Kanıt bağla, where the visitor grants access on GitHub.
 
 import { LogOut } from 'lucide-react';
 import { useAppState, useView } from '../../lib/store.ts';
-import { authReady, signIn, signOut } from '../../lib/auth.ts';
+import { signOut } from '../../lib/auth.ts';
 import { feedback } from '../ui/kit';
 import { GitHub } from '../ui/icons';
 import { Avatar } from '../ui/primitives';
@@ -19,14 +19,10 @@ export default function Account({ compact = false }: { compact?: boolean }) {
     const inner = (
       <>
         <GitHub size={20} />
-        GitHub ile giriş yap
+        GitHub’ı bağla
       </>
     );
-    return authReady ? (
-      <button type="button" onClick={signIn} className={cls}>
-        {inner}
-      </button>
-    ) : (
+    return (
       <a href="/kanit-bagla" className={cls}>
         {inner}
       </a>
@@ -35,7 +31,7 @@ export default function Account({ compact = false }: { compact?: boolean }) {
 
   const leave = () => {
     signOut();
-    feedback({ tone: 'info', title: 'Çıkış yaptın', text: 'GitHub bağlantın kaldırıldı; örnek profille geziyorsun.' });
+    feedback({ tone: 'info', title: 'Çıkış yaptın', text: 'GitHub iznin geri alındı; örnek profille geziyorsun.' });
   };
   const who = (
     <div className="flex min-w-0 flex-1 items-center gap-3">

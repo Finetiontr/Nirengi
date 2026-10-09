@@ -1,8 +1,0 @@
-name = "nirengi-auth"
-main = "worker.js"
-compatibility_date = "2026-09-01"
-workers_dev = true
-
-# Public OAuth App id; the secret is set with `wrangler secret put GITHUB_CLIENT_SECRET`.
-[vars]
-GITHUB_CLIENT_ID = ""
