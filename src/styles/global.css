@@ -206,8 +206,8 @@
   navigation: auto;
 }
 /*
- * Page changes. The shell (sidebar, top bar, tab bar) stays put; the page slides,
- * and the active nav plate and pointer glide from the old item to the new one.
+ * Page changes. The top bar and the dock stay put (the dock's plate has already
+ * glided to the new item before the page changes); the page leaves and the new one rises.
  */
 ::view-transition-old(root) {
   animation: 140ms cubic-bezier(0.4, 0, 1, 1) both vt-out;
@@ -215,27 +215,19 @@
 ::view-transition-new(root) {
   animation: 240ms cubic-bezier(0.16, 1, 0.3, 1) both vt-in;
 }
-.vt-side { view-transition-name: side; }
 .vt-top { view-transition-name: topbar; }
-.vt-tabs { view-transition-name: tabs; }
+.vt-dock { view-transition-name: dock; }
 .vt-page { view-transition-name: page; }
-.nav-plate { view-transition-name: nav-plate; }
-.nav-pointer { view-transition-name: nav-pointer; }
-.tab-plate { view-transition-name: tab-plate; }
-.tab-pointer { view-transition-name: tab-pointer; }
-::view-transition-group(side),
 ::view-transition-group(topbar),
-::view-transition-group(tabs) {
+::view-transition-group(dock) {
   animation: none;
 }
-::view-transition-old(side),
 ::view-transition-old(topbar),
-::view-transition-old(tabs) {
+::view-transition-old(dock) {
   display: none;
 }
-::view-transition-new(side),
 ::view-transition-new(topbar),
-::view-transition-new(tabs) {
+::view-transition-new(dock) {
   animation: none;
 }
 ::view-transition-old(page) {
@@ -243,26 +235,6 @@
 }
 ::view-transition-new(page) {
   animation: 380ms cubic-bezier(0.16, 1, 0.3, 1) 60ms both vt-page-in;
-}
-::view-transition-group(nav-plate),
-::view-transition-group(nav-pointer),
-::view-transition-group(tab-plate),
-::view-transition-group(tab-pointer) {
-  animation-duration: 420ms;
-  animation-timing-function: cubic-bezier(0.34, 1.36, 0.5, 1);
-}
-/* While the plate glides it sits above the new page; blending keeps the labels under it readable. */
-::view-transition-old(nav-plate),
-::view-transition-new(nav-plate),
-::view-transition-old(tab-plate),
-::view-transition-new(tab-plate) {
-  mix-blend-mode: multiply;
-}
-[data-theme="dark"]::view-transition-old(nav-plate),
-[data-theme="dark"]::view-transition-new(nav-plate),
-[data-theme="dark"]::view-transition-old(tab-plate),
-[data-theme="dark"]::view-transition-new(tab-plate) {
-  mix-blend-mode: screen;
 }
 @keyframes vt-out {
   to { opacity: 0; }
@@ -409,30 +381,84 @@
 
 /* ---------------------------------------------------------------- shell */
 
-/* Sidebar items: a tinted plate under the active one, icons that answer the pointer. */
-.nav-item { transition: color 150ms, background-color 150ms; }
-.nav-item:hover:not([aria-current]) { background: rgb(var(--bg-2)); color: rgb(var(--ink-2)); }
-.nav-plate {
+/*
+ * Dock. A floating bar at the foot of the screen: full width (12px air) on phones,
+ * centred and as wide as its items on desktop. The plate under the active item is a
+ * stretchy pill: on a tap its leading edge springs to the new item and the trailing
+ * edge follows, so it reads as one body moving, not a box jumping.
+ */
+.dock {
+  position: fixed;
+  z-index: 40;
+  left: 12px;
+  right: 12px;
+  bottom: calc(env(safe-area-inset-bottom) + 10px);
+  margin: 0 auto;
+  max-width: 520px;
+  padding: 5px;
+  border: 2px solid rgb(var(--line));
+  border-radius: 24px;
+  background: rgb(var(--bg));
+  box-shadow: 0 14px 36px -14px rgb(0 0 0 / 0.3);
+}
+@media (min-width: 1024px) {
+  .dock { left: 50%; right: auto; bottom: 16px; max-width: none; transform: translateX(-50%); }
+}
+.dock-row { position: relative; }
+.dock-blob {
+  --lead: cubic-bezier(0.34, 1.32, 0.5, 1);
+  --trail: cubic-bezier(0.6, 0, 0.2, 1);
   position: absolute;
-  inset: 0;
-  border-radius: 14px;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--i) * 100% / var(--n));
+  right: calc((var(--n) - 1 - var(--i)) * 100% / var(--n));
+  padding: 0 3px;
+  color: rgb(var(--indigo));
+  transition: left 300ms var(--trail), right 300ms var(--trail), opacity 200ms, transform 300ms var(--lead);
+}
+.dock-blob.to-r { transition: right 280ms var(--lead), left 280ms var(--trail) 30ms; }
+.dock-blob.to-l { transition: left 280ms var(--lead), right 280ms var(--trail) 30ms; }
+.dock-blob[data-off] { opacity: 0; transform: scale(0.6); }
+.dock-blob::before {
+  content: "";
+  display: block;
+  height: 100%;
+  border-radius: 17px;
   background: rgb(var(--indigo-tint));
   box-shadow: inset 0 0 0 2px rgb(var(--indigo) / 0.28);
 }
-.nav-icon, .tab-icon > span:last-child { display: inline-grid; transition: transform 260ms cubic-bezier(0.34, 1.56, 0.64, 1); }
-.nav-item:hover .nav-icon { transform: translateY(-2px) rotate(-6deg) scale(1.08); }
-.nav-item:active .nav-icon, .tab-item:active .tab-icon > span:last-child { transform: scale(0.88); }
-.nav-icon.is-on, .tab-icon.is-on > span:last-child { animation: icon-land 560ms cubic-bezier(0.34, 1.56, 0.64, 1) 120ms backwards; }
-@keyframes icon-land {
-  0% { transform: scale(0.7) translateY(4px); }
-  55% { transform: scale(1.14) translateY(-3px); }
-  100% { transform: none; }
+/* Points down at the active item from the dock's top seam. */
+.dock-pointer { position: absolute; top: -12px; left: 50%; width: 16px; height: 10px; margin-left: -8px; }
+.dock-item {
+  display: flex;
+  height: 56px;
+  margin: 0 3px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  border-radius: 17px;
+  color: rgb(var(--ink-3));
+  -webkit-tap-highlight-color: transparent;
+  transition: color 200ms, background-color 150ms;
 }
-.tab-plate {
-  position: absolute;
-  inset: 0;
-  border-radius: 9999px;
-  background: rgb(var(--indigo-tint));
+.dock-item[data-on] { color: rgb(var(--indigo)); }
+.dock-item:hover:not([data-on]) { color: rgb(var(--ink-2)); background: rgb(var(--bg-2)); }
+.dock-label { max-width: 100%; overflow: hidden; padding: 0 2px; font-size: 11px; font-weight: 800; line-height: 1.15; text-overflow: ellipsis; white-space: nowrap; }
+@media (min-width: 1024px) {
+  .dock-item { height: 60px; }
+  .dock-label { font-size: 12px; }
+}
+.dock-icon { display: inline-grid; transition: transform 260ms cubic-bezier(0.34, 1.56, 0.64, 1); }
+.dock-item:hover .dock-icon { transform: translateY(-2px) rotate(-6deg) scale(1.08); }
+.dock-item:active .dock-icon { transform: scale(0.86); }
+.dock-item.going .dock-icon { animation: dock-hop 460ms cubic-bezier(0.34, 1.4, 0.64, 1); }
+@keyframes dock-hop {
+  0% { transform: scale(0.86); }
+  35% { transform: translateY(-7px) scale(1.12, 0.94); }
+  60% { transform: translateY(0) scale(0.94, 1.06); }
+  100% { transform: none; }
 }
 
 /* Phone menu: three lines fold into a cross; the card drops in from the key. */

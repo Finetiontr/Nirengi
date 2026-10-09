@@ -43,7 +43,7 @@ const shown = (el: HTMLElement) => {
   return r.width > 0 && r.height > 0 && getComputedStyle(el).visibility !== 'hidden';
 };
 
-/** First visible match: the phone tab bar and the desktop sidebar both carry the same links. */
+/** First visible match: both faces render their own copy of the dock, one of them hidden. */
 export function findTarget(selector: string): HTMLElement | null {
   let list: NodeListOf<HTMLElement>;
   try {

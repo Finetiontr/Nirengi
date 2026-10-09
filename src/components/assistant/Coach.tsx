@@ -1,7 +1,7 @@
 // Spotlight tour: dims the page with an SVG mask, cuts a rounded hole around the
 // target and parks Niri with a bubble card next to it. One animation-frame loop
 // follows the target through scroll, resize and layout shifts, so nothing has to
-// be re-triggered by hand. On phones the card docks above the tab bar.
+// be re-triggered by hand. On phones the card docks above the nav dock.
 
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
@@ -23,11 +23,11 @@ const PAD = 8; // the hole is the target plus this much air
 const GAP = 18; // hole to card
 const M = 12; // card to viewport edge
 const CARD_W = 440; // Niri + bubble on desktop
-const TAB_BAR = 72; // phone tab bar plus a breath
+const TAB_BAR = 96; // nav dock plus a breath
 
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
 const isPhone = () => innerWidth < 640;
-const headerH = () => (innerWidth < 1024 ? 64 : 0);
+const headerH = () => (innerWidth < 1024 ? 62 : 70);
 
 /** Scroll the target into the part of the screen the card does not cover. */
 function reveal(el: HTMLElement, reserve: number, smooth: boolean) {
@@ -117,7 +117,7 @@ export default function Coach({ steps, onClose }: { steps: CoachStep[]; onClose:
       if (!c) return;
       c.style.opacity = '1';
       if (isPhone()) {
-        // Docked above the tab bar; flips to the top when the target sits under it.
+        // Docked above the nav dock; flips to the top when the target sits under it.
         const ch = c.offsetHeight;
         const under = s.y + s.h > innerHeight - TAB_BAR - ch - 6;
         const top = under && s.y > headerH() + ch + 12;

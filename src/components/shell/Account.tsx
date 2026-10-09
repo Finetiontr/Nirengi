@@ -8,23 +8,15 @@ import { feedback } from '../ui/kit';
 import { GitHub } from '../ui/icons';
 import { Avatar } from '../ui/primitives';
 
-export default function Account({ compact = false }: { compact?: boolean }) {
+export default function Account() {
   const me = useAppState().people.find((p) => p.isDemoUser);
   if (useView().persona === 'org') return null;
 
   if (!me?.links.github) {
-    const cls = compact
-      ? 'flex w-full items-center gap-2 rounded-[12px] px-3 py-2 text-left text-[15px] font-extrabold text-ink-2 hover:bg-bg-2'
-      : 'btn-line btn-sm btn-block !justify-start';
-    const inner = (
-      <>
+    return (
+      <a href="/kanit-bagla" className="flex w-full items-center gap-2 rounded-[12px] px-3 py-2 text-left text-[15px] font-extrabold text-ink-2 hover:bg-bg-2">
         <GitHub size={20} />
         GitHub’ı bağla
-      </>
-    );
-    return (
-      <a href="/kanit-bagla" className={cls}>
-        {inner}
       </a>
     );
   }
@@ -42,27 +34,13 @@ export default function Account({ compact = false }: { compact?: boolean }) {
       </div>
     </div>
   );
-  const out = (
-    <>
-      <LogOut className="h-4 w-4" strokeWidth={3} aria-hidden="true" />
-      Çıkış yap
-    </>
-  );
-  // The phone menu has the width for one row; the sidebar puts the key under the name.
-  if (compact)
-    return (
-      <div className="flex items-center gap-2 px-3 py-1">
-        {who}
-        <button type="button" onClick={leave} className="btn-quiet btn-sm shrink-0 !min-h-10 !px-2.5 !text-[13px] !text-ink-3 hover:!text-red-lip">
-          {out}
-        </button>
-      </div>
-    );
+  // The menu has the width for one row: who, and the way out beside it.
   return (
-    <div className="rounded-[14px] border-2 border-line p-2.5">
+    <div className="flex items-center gap-2 px-3 py-1">
       {who}
-      <button type="button" onClick={leave} className="btn-quiet btn-sm btn-block mt-2 !min-h-9 !text-[13px] !text-ink-3 hover:!text-red-lip">
-        {out}
+      <button type="button" onClick={leave} className="btn-quiet btn-sm shrink-0 !min-h-10 !px-2.5 !text-[13px] !text-ink-3 hover:!text-red-lip">
+        <LogOut className="h-4 w-4" strokeWidth={3} aria-hidden="true" />
+        Çıkış yap
       </button>
     </div>
   );

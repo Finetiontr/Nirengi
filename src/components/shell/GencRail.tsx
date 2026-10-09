@@ -29,7 +29,7 @@ export default function GencRail({ omit }: { omit?: 'week' | 'route' }) {
   const fresh = unread(book).length;
 
   return (
-    <div className="sticky top-6 space-y-4">
+    <div className="sticky top-[92px] space-y-4">
       <section className="card divide-y-2 divide-line" aria-label="Bu haftan">
         <a href="/lig" className="flex items-center gap-4 rounded-t-[18px] p-5 transition-colors hover:bg-bg-2">
           <Shield size={48} tier={l.tier} />

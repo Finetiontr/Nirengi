@@ -251,7 +251,7 @@ export default function NowBar() {
     <>
       <div aria-hidden="true" className="h-14 lg:h-16" />
       <div
-        className="no-print pointer-events-none fixed inset-x-0 z-[45] flex justify-center px-3 transition-[bottom] duration-200 lg:pl-[272px] lg:pr-4"
+        className="no-print pointer-events-none fixed inset-x-0 z-[45] flex justify-center px-3 transition-[bottom] duration-200"
         style={{ bottom: `calc(env(safe-area-inset-bottom) + ${bottom}px)` }}
       >
         <AnimatePresence initial={false}>
@@ -375,7 +375,7 @@ function Panel({ s, me, doors, bottom, onClose }: { s: State; me: Person; doors:
         onClick={onClose}
         aria-hidden="true"
       />
-      <div className="pointer-events-none fixed inset-x-0 z-[47] flex justify-center px-3 lg:pl-[272px] lg:pr-4" style={{ bottom: `calc(env(safe-area-inset-bottom) + ${bottom}px)` }}>
+      <div className="pointer-events-none fixed inset-x-0 z-[47] flex justify-center px-3" style={{ bottom: `calc(env(safe-area-inset-bottom) + ${bottom}px)` }}>
         <motion.div
           ref={box}
           layoutId="nowbar"

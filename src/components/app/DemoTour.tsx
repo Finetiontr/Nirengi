@@ -66,7 +66,7 @@ export default function DemoTour() {
       /* ignore */
     }
   };
-  // The sidebar and the phone menu open the tour.
+  // The menu in the top bar opens the tour.
   useEffect(() => {
     const onOpen = () => toggle(true);
     window.addEventListener('nirengi:tour', onOpen);
@@ -127,12 +127,12 @@ export default function DemoTour() {
     location.href = '/';
   };
 
-  // Opened from the sidebar or the phone menu; no edge tab, so Niri'ye sor stays the one help entry on screen.
+  // Opened from the top bar menu; no edge tab, so Niri'ye sor stays the one help entry on screen.
   if (!open) return null;
 
   return (
     <aside
-      className="no-print rise fixed inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+76px)] z-40 rounded-[22px] border-2 border-line bg-bg shadow-[0_14px_36px_-14px_rgb(0_0_0/0.35)] sm:inset-x-auto sm:right-4 sm:w-[380px] lg:bottom-4"
+      className="no-print rise fixed inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+96px)] z-40 rounded-[22px] border-2 border-line bg-bg shadow-[0_14px_36px_-14px_rgb(0_0_0/0.35)] sm:inset-x-auto sm:right-4 sm:w-[380px] lg:bottom-[108px]"
       aria-label="Demo turu"
     >
       <div className="flex items-center gap-3 px-4 pb-3 pt-3">

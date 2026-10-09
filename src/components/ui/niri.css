@@ -515,11 +515,11 @@
 
 /* ---------------------------------------------------------------- feedback toast */
 
-/* The toast dock floats bottom-centre; on phones it clears the 66px tab bar of the app shell.
-   (App.astro adds the sidebar offset on desktop.) */
+/* The toast dock floats bottom-centre; inside the app shell it clears the floating nav dock. */
 .feedback-dock { bottom: calc(env(safe-area-inset-bottom) + 20px); }
-@media (max-width: 1023.98px) {
-  html[data-mode] .feedback-dock { bottom: calc(env(safe-area-inset-bottom) + 80px); }
+html[data-mode] .feedback-dock { bottom: calc(env(safe-area-inset-bottom) + 96px); }
+@media (min-width: 1024px) {
+  html[data-mode] .feedback-dock { bottom: 108px; }
 }
 
 @keyframes fb-bar {

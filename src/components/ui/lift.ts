@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 
 /**
- * Bottom offset in px. It sits above the phone tab bar, rises above the demo
+ * Bottom offset in px. It sits above the dock, rises above the demo
  * tour panel when that is open, and steps aside while the feedback bar shows
  * (both are found in the DOM and measured, so a fresh mount gets it right too).
  */
@@ -13,7 +13,7 @@ export function useLift() {
     let raf = 0;
     const calc = () => {
       raf = 0;
-      let n = innerWidth < 1024 ? 76 : 20;
+      let n = innerWidth < 1024 ? 96 : 108;
       const panel = document.querySelector('aside[aria-label="Demo turu"]');
       if (panel) {
         const r = panel.getBoundingClientRect();

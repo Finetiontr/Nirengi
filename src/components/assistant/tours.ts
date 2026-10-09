@@ -69,7 +69,7 @@ export const TOURS: Partial<Record<RouteKey, CoachStep[]>> = {
       placement: 'left',
     },
     {
-      target: 'nav[aria-label="Sekmeler"] a[href="/ihtiyaclar"], aside[aria-label="Ana menü"] a[href="/ihtiyaclar"]',
+      target: 'nav[aria-label="Sekmeler"] a[href="/ihtiyaclar"]',
       title: 'İhtiyaçlar sekmesi',
       text: 'Bütün ihtiyaçların burada durur; yenisini de buradan yazarsın, ben de yanında olurum.',
       placement: 'right',
