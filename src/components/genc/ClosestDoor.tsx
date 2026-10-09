@@ -49,7 +49,7 @@ export default function ClosestDoor({ s, closest, more = false }: { s: State; cl
     <section className="card relative overflow-hidden p-5" aria-labelledby="kapi">
       <div className="flex items-center gap-2">
         <Tri size={20} tone="orange" state="current" />
-        <h2 id="kapi" className="text-[13px] font-extrabold uppercase tracking-[0.06em] text-orange-ink">
+        <h2 id="kapi" className="h-sec">
           En yakın kapın
         </h2>
       </div>

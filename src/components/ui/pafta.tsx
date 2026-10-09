@@ -55,9 +55,10 @@ export function Contours({
   const paths = useMemo(() => Array.from({ length: rings }, (_, i) => contourPath(x * 600, y * 300, step * (i + 1), seed + i * 0.35)), [seed, x, y, rings, step]);
   const stroke = color === 'white' ? `rgb(255 255 255 / ${opacity})` : `rgb(var(--${color}) / ${opacity})`;
   return (
-    <svg viewBox="0 0 600 300" preserveAspectRatio="xMidYMid slice" className={`pointer-events-none absolute inset-0 h-full w-full ${className}`} aria-hidden="true">
+    <svg viewBox="0 0 600 300" preserveAspectRatio="xMidYMid slice" className={`contours pointer-events-none absolute inset-0 h-full w-full ${className}`} aria-hidden="true">
+      {/* The map draws itself ring by ring from the summit outwards, then drifts slowly. */}
       {paths.map((d, i) => (
-        <path key={i} d={d} fill="none" stroke={stroke} strokeWidth={i % 4 === 3 ? 2.2 : 1.3} />
+        <path key={i} d={d} fill="none" stroke={stroke} strokeWidth={i % 4 === 3 ? 2.2 : 1.3} pathLength={1} className="contour-line" style={{ animationDelay: `${120 + i * 90}ms` }} />
       ))}
     </svg>
   );

@@ -89,7 +89,7 @@ const hasRail = Astro.slots.has('rail');
     <a href="#icerik" class="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[90] focus:rounded-[12px] focus:bg-indigo focus:px-4 focus:py-2 focus:text-white">İçeriğe geç</a>
 
     <!-- desktop sidebar -->
-    <aside class="fixed inset-y-0 left-0 z-40 hidden w-[256px] flex-col border-r-2 border-line bg-bg px-4 py-6 lg:flex" aria-label="Ana menü">
+    <aside class="vt-side fixed inset-y-0 left-0 z-40 hidden w-[256px] flex-col border-r-2 border-line bg-bg px-4 py-6 lg:flex" aria-label="Ana menü">
       <a href="/" class="mb-7 flex items-center gap-2 px-3" aria-label="nirengi ana sayfa">
         <Mark size={34} />
         <span class="text-[28px] font-black tracking-[-0.03em] text-indigo">nirengi</span>
@@ -103,18 +103,16 @@ const hasRail = Astro.slots.has('rail');
                 <a
                   href={item.href}
                   aria-current={on ? 'page' : undefined}
-                  class:list={[
-                    'relative flex items-center gap-4 rounded-[12px] px-3 py-2 text-[16px] transition-colors',
-                    on ? 'font-bold text-indigo' : 'font-semibold text-ink-3 hover:bg-bg-2',
-                  ]}
+                  class:list={['nav-item group relative flex items-center gap-4 rounded-[14px] px-3 py-2 text-[16px]', on ? 'font-bold text-indigo' : 'font-semibold text-ink-3']}
                 >
+                  {on && <span class="nav-plate" aria-hidden="true" />}
                   {on && (
-                    <svg viewBox="0 0 12 16" class="absolute -left-4 top-1/2 h-4 w-3 -translate-y-1/2" aria-hidden="true">
+                    <svg viewBox="0 0 12 16" class="nav-pointer absolute -left-4 top-1/2 h-4 w-3 -translate-y-1/2" aria-hidden="true">
                       <path d="M2.5 2.5 9.5 8l-7 5.5Z" fill="currentColor" stroke="currentColor" stroke-width="3" stroke-linejoin="round" />
                     </svg>
                   )}
-                  <NavIcon icon={item.icon} size={32} />
-                  {item.label}
+                  <span class:list={['nav-icon relative', on && 'is-on']}><NavIcon icon={item.icon} size={32} /></span>
+                  <span class="relative">{item.label}</span>
                 </a>
               );
             })}
@@ -135,14 +133,18 @@ const hasRail = Astro.slots.has('rail');
     </aside>
 
     <!-- phone top bar -->
-    <header class="sticky top-0 z-40 flex h-16 items-center justify-between border-b-2 border-line bg-bg/95 px-4 backdrop-blur lg:hidden">
+    <header class="vt-top sticky top-0 z-40 flex h-[60px] items-center justify-between border-b-2 border-line bg-bg/95 px-4 backdrop-blur lg:hidden">
       <a href="/" aria-label="nirengi ana sayfa" class="flex items-center gap-2">
         <Mark size={30} />
         <span class="text-[20px] font-black tracking-[-0.03em] text-indigo">nirengi</span>
       </a>
       <details class="relative">
-        <summary class="btn-ink btn-sm cursor-pointer list-none !min-h-10 [&::-webkit-details-marker]:hidden" aria-label="Menü">Menü</summary>
-        <div class="card absolute right-0 top-14 z-50 w-72 space-y-3 p-4 shadow-[0_12px_32px_-12px_rgb(0_0_0/0.25)]">
+        <summary class="menu-key btn-ink btn-sm cursor-pointer list-none !min-h-10 !w-11 !px-0 [&::-webkit-details-marker]:hidden" aria-label="Menü">
+          <svg viewBox="0 0 24 24" class="h-5 w-5" aria-hidden="true">
+            <path class="menu-a" d="M5 7h14" /><path class="menu-b" d="M5 12h9" /><path class="menu-c" d="M5 17h14" />
+          </svg>
+        </summary>
+        <div class="menu-pop card absolute right-0 top-14 z-50 w-72 space-y-3 p-4 shadow-[0_12px_32px_-12px_rgb(0_0_0/0.25)]">
           <ModeSwitch client:only="react" />
           <Account client:only="react" compact />
           <a href="/yontem" class="block rounded-[12px] px-3 py-2 text-[15px] font-extrabold text-ink-2 hover:bg-bg-2">Skorlar nasıl hesaplanıyor?</a>
@@ -152,15 +154,15 @@ const hasRail = Astro.slots.has('rail');
       </details>
     </header>
 
-    <main id="icerik" class="lg:pl-[256px]">
+    <main id="icerik" class="vt-page lg:pl-[256px]">
       <div class:list={['mx-auto flex gap-12 px-4 pb-32 pt-6 sm:px-6 lg:px-10 lg:pb-16 lg:pt-10', width === 'wide' ? 'max-w-[1240px]' : 'max-w-[1080px]']}>
-        <div class="min-w-0 flex-1"><slot /></div>
-        {hasRail && <aside class="hidden w-[340px] shrink-0 xl:block"><slot name="rail" /></aside>}
+        <div class="flow min-w-0 flex-1"><slot /></div>
+        {hasRail && <aside class="flow flow-rail hidden w-[340px] shrink-0 xl:block"><slot name="rail" /></aside>}
       </div>
     </main>
 
     <!-- phone tab bar -->
-    <nav class="fixed inset-x-0 bottom-0 z-40 border-t-2 border-line bg-bg pb-[env(safe-area-inset-bottom)] lg:hidden" aria-label="Sekmeler">
+    <nav class="vt-tabs fixed inset-x-0 bottom-0 z-40 border-t-2 border-line bg-bg pb-[env(safe-area-inset-bottom)] lg:hidden" aria-label="Sekmeler">
       {
         (['genc', 'kurum'] as const).map((m) => (
           <ul class={`only-${m} mx-auto flex max-w-lg gap-1 px-1.5 py-[3px]`}>
@@ -169,16 +171,19 @@ const hasRail = Astro.slots.has('rail');
               return (
                 <li class="relative min-w-0 flex-1">
                   {on && (
-                    <svg viewBox="0 0 16 10" class="absolute -top-[5px] left-1/2 h-2.5 w-4 -translate-x-1/2 text-indigo" aria-hidden="true">
+                    <svg viewBox="0 0 16 10" class="tab-pointer absolute -top-[5px] left-1/2 h-2.5 w-4 -translate-x-1/2 text-indigo" aria-hidden="true">
                       <path d="M2.5 2h11L8 8Z" fill="currentColor" stroke="currentColor" stroke-width="3" stroke-linejoin="round" />
                     </svg>
                   )}
                   <a
                     href={item.href}
                     aria-current={on ? 'page' : undefined}
-                    class:list={['flex h-[58px] flex-col items-center justify-center gap-0.5 rounded-[14px] transition-colors', on ? 'text-indigo' : 'text-ink-3']}
+                    class:list={['tab-item flex h-[58px] flex-col items-center justify-center gap-0.5 rounded-[14px] transition-colors', on ? 'text-indigo' : 'text-ink-3']}
                   >
-                    <NavIcon icon={item.icon} size={26} />
+                    <span class:list={['tab-icon relative grid h-8 w-12 place-items-center rounded-full', on && 'is-on']}>
+                      {on && <span class="tab-plate" aria-hidden="true" />}
+                      <span class="relative"><NavIcon icon={item.icon} size={26} /></span>
+                    </span>
                     <span class="max-w-full truncate px-0.5 text-[11px] font-extrabold leading-tight">{item.label}</span>
                   </a>
                 </li>
@@ -204,6 +209,33 @@ const hasRail = Astro.slots.has('rail');
             localStorage.setItem('nirengi:theme', next);
           } catch {}
         });
+      // Cards that start below the fold rise in when they scroll into view. Islands mount late,
+      // so new cards are picked up as they appear. Reduced motion: nothing is hidden.
+      if (!matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window) {
+        const main = document.getElementById('icerik');
+        const io = new IntersectionObserver(
+          (entries) => {
+            for (const e of entries) {
+              if (!e.isIntersecting) continue;
+              const el = e.target as HTMLElement;
+              io.unobserve(el);
+              el.classList.add('rv-in');
+              el.addEventListener('transitionend', () => el.classList.remove('rv', 'rv-in'), { once: true });
+            }
+          },
+          { rootMargin: '0px 0px -6% 0px' },
+        );
+        const scan = () => {
+          for (const el of main?.querySelectorAll<HTMLElement>('.card:not([data-rv]), .card-press:not([data-rv])') ?? []) {
+            el.dataset.rv = '';
+            if (el.getBoundingClientRect().top < innerHeight || el.closest('[role="dialog"]')) continue;
+            el.classList.add('rv');
+            io.observe(el);
+          }
+        };
+        if (main) new MutationObserver(scan).observe(main, { childList: true, subtree: true });
+        scan();
+      }
       for (const b of document.querySelectorAll('[data-tour-open]'))
         b.addEventListener('click', (e) => {
           (e.currentTarget as HTMLElement).closest('details')?.removeAttribute('open');

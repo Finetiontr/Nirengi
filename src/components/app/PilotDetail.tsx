@@ -144,7 +144,10 @@ function Detail({ pilot }: { pilot: Pilot }) {
               : { mood: 'think' as const, text: `${org.name} onayını bekliyoruz. Gelince burada haber veririz.` };
 
   return (
-    <div className="mx-auto max-w-[640px]">
+    // Phones and laptops read one column; on wide screens the road sits beside the summary.
+    <div className="mx-auto max-w-[640px] xl:max-w-[1180px]">
+      <div className="xl:grid xl:grid-cols-[minmax(0,560px)_minmax(0,1fr)] xl:items-start xl:gap-x-12">
+      <div>
       <a href="/pilotlar" className="inline-flex items-center gap-1 rounded-full py-1 pr-3 text-[14px] font-extrabold text-ink-3 transition-colors hover:text-ink">
         <ChevronLeft className="h-5 w-5" strokeWidth={3} />
         {persona === 'org' ? 'Projeler' : 'Projelerim'}
@@ -258,8 +261,11 @@ function Detail({ pilot }: { pilot: Pilot }) {
         </section>
       )}
 
+      </div>
+
       {/* The road */}
-      <section data-coach="proje-yol" className="mt-9" aria-label="Aşamalar">
+      <div>
+      <section data-coach="proje-yol" className="mt-9 xl:mt-10" aria-label="Aşamalar">
         <Head title="Aşamalar" action={<span className="text-[13px] font-bold text-ink-3">Bir aşamaya dokun</span>} />
         <div className={focus === 0 ? 'mt-16' : 'mt-6'}>
           <Trail
@@ -291,6 +297,8 @@ function Detail({ pilot }: { pilot: Pilot }) {
         <ChevronRight className="h-6 w-6 shrink-0 text-ink-3" strokeWidth={3} />
       </button>
       <p className="mt-8 text-[13px] font-bold text-ink-3">Kurumlar ve kişiler kurgusal demo verisidir.</p>
+      </div>
+      </div>
 
       <Sheet open={sheet !== null} onClose={() => setSheet(null)} title={sheet !== null ? `${sheet + 1}. aşama` : ''}>
         {sheet !== null && (

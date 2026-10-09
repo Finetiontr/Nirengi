@@ -6,7 +6,7 @@ import { Mail } from 'lucide-react';
 import type { Org } from '../../lib/types.ts';
 import type { OrgInsight } from '../../lib/engine/insight.ts';
 import { skillLabel } from '../../lib/skills.ts';
-import { Sheet, Why } from '../ui/kit';
+import { Bar, CountUp, Sheet, Why, type Tone } from '../ui/kit';
 import { Mark } from '../ui/primitives';
 import { FIT_MIN } from './NeedBits';
 
@@ -21,24 +21,14 @@ export default function OrgWeek({ org, ins, radar }: Props) {
   const [mail, setMail] = useState(false);
   const skills = ins.needs.reduce((n, r) => n + r.total, 0);
   const covered = ins.needs.reduce((n, r) => n + r.covered, 0);
-  const facts = [
-    {
-      value: ins.open ? `${ins.answered}/${ins.open}` : '—',
-      label: 'ihtiyacına uygun aday ya da süren proje var',
-      tone: ins.open && ins.answered === ins.open ? 'text-green-lip' : 'text-ink',
-    },
-    {
-      value: String(ins.waiting),
-      label: ins.waiting ? `aşama onayını bekliyor · en eskisi ${ins.oldestWait} gün` : 'aşama onayını bekliyor',
-      tone: ins.waiting ? 'text-indigo' : 'text-ink',
-    },
-    { value: String(ins.approvedWeek), label: 'aşama bu hafta onaylandı', tone: 'text-ink' },
-    {
-      value: skills ? `${covered}/${skills}` : '—',
-      label: 'istediğin yetkinlik doğrulanmış işle karşılanıyor',
-      tone: skills && covered === skills ? 'text-green-lip' : 'text-ink',
-    },
+  // Each fact is a count, and a share of a whole where there is one: the bar fills to it.
+  const facts: { n: number | null; of?: number; label: string; tone: Tone }[] = [
+    { n: ins.open ? ins.answered : null, of: ins.open, label: 'ihtiyacına uygun aday ya da süren proje var', tone: ins.open && ins.answered === ins.open ? 'green' : 'indigo' },
+    { n: ins.waiting, label: ins.waiting ? `aşama onayını bekliyor · en eskisi ${ins.oldestWait} gün` : 'aşama onayını bekliyor', tone: 'indigo' },
+    { n: ins.approvedWeek, label: 'aşama bu hafta onaylandı', tone: 'green' },
+    { n: skills ? covered : null, of: skills, label: 'istediğin yetkinlik doğrulanmış işle karşılanıyor', tone: skills && covered === skills ? 'green' : 'cyan' },
   ];
+  const ink = (t: Tone) => (t === 'indigo' ? 'indigo' : `${t}-lip`);
 
   return (
     <section className="card mt-6 p-4 sm:p-5" aria-labelledby="hafta-ozet">
@@ -63,9 +53,13 @@ export default function OrgWeek({ org, ins, radar }: Props) {
       </div>
       <ul className="mt-3 grid grid-cols-2 gap-3 lg:grid-cols-4">
         {facts.map((f) => (
-          <li key={f.label} className="rounded-[16px] bg-bg-2 p-3">
-            <span className={`num block text-[26px] font-black leading-none ${f.tone}`}>{f.value}</span>
-            <span className="mt-1 block text-[13.5px] font-bold leading-snug text-ink-3">{f.label}</span>
+          <li key={f.label} className="flex flex-col rounded-[16px] bg-bg-2 p-3.5">
+            <span className="num flex items-baseline gap-0.5 text-[32px] font-black leading-none" style={{ color: f.n ? `rgb(var(--${ink(f.tone)}))` : 'rgb(var(--ink))' }}>
+              {f.n === null ? '—' : <CountUp value={f.n} />}
+              {f.of ? <span className="text-[18px] text-ink-3">/{f.of}</span> : null}
+            </span>
+            <span className="mt-1.5 block flex-1 text-[13.5px] font-bold leading-snug text-ink-3">{f.label}</span>
+            {f.of ? <Bar value={(f.n ?? 0) / f.of} tone={f.tone} h={8} className="mt-3" /> : null}
           </li>
         ))}
       </ul>

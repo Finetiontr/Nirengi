@@ -205,17 +205,76 @@
 @view-transition {
   navigation: auto;
 }
+/*
+ * Page changes. The shell (sidebar, top bar, tab bar) stays put; the page slides,
+ * and the active nav plate and pointer glide from the old item to the new one.
+ */
 ::view-transition-old(root) {
   animation: 140ms cubic-bezier(0.4, 0, 1, 1) both vt-out;
 }
 ::view-transition-new(root) {
   animation: 240ms cubic-bezier(0.16, 1, 0.3, 1) both vt-in;
 }
+.vt-side { view-transition-name: side; }
+.vt-top { view-transition-name: topbar; }
+.vt-tabs { view-transition-name: tabs; }
+.vt-page { view-transition-name: page; }
+.nav-plate { view-transition-name: nav-plate; }
+.nav-pointer { view-transition-name: nav-pointer; }
+.tab-plate { view-transition-name: tab-plate; }
+.tab-pointer { view-transition-name: tab-pointer; }
+::view-transition-group(side),
+::view-transition-group(topbar),
+::view-transition-group(tabs) {
+  animation: none;
+}
+::view-transition-old(side),
+::view-transition-old(topbar),
+::view-transition-old(tabs) {
+  display: none;
+}
+::view-transition-new(side),
+::view-transition-new(topbar),
+::view-transition-new(tabs) {
+  animation: none;
+}
+::view-transition-old(page) {
+  animation: 160ms cubic-bezier(0.4, 0, 1, 1) both vt-page-out;
+}
+::view-transition-new(page) {
+  animation: 380ms cubic-bezier(0.16, 1, 0.3, 1) 60ms both vt-page-in;
+}
+::view-transition-group(nav-plate),
+::view-transition-group(nav-pointer),
+::view-transition-group(tab-plate),
+::view-transition-group(tab-pointer) {
+  animation-duration: 420ms;
+  animation-timing-function: cubic-bezier(0.34, 1.36, 0.5, 1);
+}
+/* While the plate glides it sits above the new page; blending keeps the labels under it readable. */
+::view-transition-old(nav-plate),
+::view-transition-new(nav-plate),
+::view-transition-old(tab-plate),
+::view-transition-new(tab-plate) {
+  mix-blend-mode: multiply;
+}
+[data-theme="dark"]::view-transition-old(nav-plate),
+[data-theme="dark"]::view-transition-new(nav-plate),
+[data-theme="dark"]::view-transition-old(tab-plate),
+[data-theme="dark"]::view-transition-new(tab-plate) {
+  mix-blend-mode: screen;
+}
 @keyframes vt-out {
   to { opacity: 0; }
 }
 @keyframes vt-in {
   from { opacity: 0; transform: translateY(6px); }
+}
+@keyframes vt-page-out {
+  to { opacity: 0; transform: translateY(-8px) scale(0.995); }
+}
+@keyframes vt-page-in {
+  from { opacity: 0; transform: translateY(14px); }
 }
 
 /*
@@ -301,6 +360,9 @@
     box-shadow: 0 3px 0 rgb(var(--line));
   }
   .card-press:hover { background: rgb(var(--bg-2)); }
+  @media (hover: hover) {
+    .card-press:hover { transform: translateY(-2px); box-shadow: 0 5px 0 rgb(var(--line)); border-color: rgb(var(--line-2)); }
+  }
   .card-press:active { transform: translateY(3px); box-shadow: 0 0 0 rgb(var(--line)); }
   .card-hover { @apply transition-colors duration-150 hover:bg-bg-2; }
 
@@ -343,6 +405,79 @@
     @apply bg-bg text-indigo;
     box-shadow: 0 2px 0 rgb(var(--line-2));
   }
+}
+
+/* ---------------------------------------------------------------- shell */
+
+/* Sidebar items: a tinted plate under the active one, icons that answer the pointer. */
+.nav-item { transition: color 150ms, background-color 150ms; }
+.nav-item:hover:not([aria-current]) { background: rgb(var(--bg-2)); color: rgb(var(--ink-2)); }
+.nav-plate {
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  background: rgb(var(--indigo-tint));
+  box-shadow: inset 0 0 0 2px rgb(var(--indigo) / 0.28);
+}
+.nav-icon, .tab-icon > span:last-child { display: inline-grid; transition: transform 260ms cubic-bezier(0.34, 1.56, 0.64, 1); }
+.nav-item:hover .nav-icon { transform: translateY(-2px) rotate(-6deg) scale(1.08); }
+.nav-item:active .nav-icon, .tab-item:active .tab-icon > span:last-child { transform: scale(0.88); }
+.nav-icon.is-on, .tab-icon.is-on > span:last-child { animation: icon-land 560ms cubic-bezier(0.34, 1.56, 0.64, 1) 120ms backwards; }
+@keyframes icon-land {
+  0% { transform: scale(0.7) translateY(4px); }
+  55% { transform: scale(1.14) translateY(-3px); }
+  100% { transform: none; }
+}
+.tab-plate {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: rgb(var(--indigo-tint));
+}
+
+/* Phone menu: three lines fold into a cross; the card drops in from the key. */
+.menu-key svg path { fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; transition: transform 280ms cubic-bezier(0.34, 1.4, 0.64, 1), opacity 160ms; transform-origin: 12px 12px; }
+details[open] > .menu-key .menu-a { transform: translateY(5px) rotate(45deg); }
+details[open] > .menu-key .menu-b { opacity: 0; transform: scaleX(0.2); }
+details[open] > .menu-key .menu-c { transform: translateY(-5px) rotate(-45deg); }
+details[open] > .menu-pop { animation: menu-drop 300ms cubic-bezier(0.34, 1.3, 0.64, 1) both; transform-origin: 92% 0; }
+@keyframes menu-drop {
+  from { opacity: 0; transform: translateY(-6px) scale(0.92); }
+}
+
+/*
+ * Page choreography. A page's sections arrive one after another instead of all at
+ * once; the rail follows a beat later. Cards below the fold wait (.rv) and rise as
+ * they scroll in (App.astro). Reduced motion zeroes all of it (base layer).
+ */
+.flow > astro-island > :first-child > *,
+.flow > astro-island > :first-child:has(> :only-child) > :only-child > * {
+  animation: flow-in 560ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  animation-delay: calc(var(--i, 6) * 70ms + 40ms);
+}
+/* A wrapper with one child would arrive as one block: its children are staggered instead. */
+.flow > astro-island > :first-child:has(> :only-child) > :only-child { animation: none; }
+.flow > astro-island > :first-child > :nth-child(1),
+.flow > astro-island > :first-child > :only-child > :nth-child(1) { --i: 0; }
+.flow > astro-island > :first-child > :nth-child(2),
+.flow > astro-island > :first-child > :only-child > :nth-child(2) { --i: 1; }
+.flow > astro-island > :first-child > :nth-child(3),
+.flow > astro-island > :first-child > :only-child > :nth-child(3) { --i: 2; }
+.flow > astro-island > :first-child > :nth-child(4),
+.flow > astro-island > :first-child > :only-child > :nth-child(4) { --i: 3; }
+.flow > astro-island > :first-child > :nth-child(5),
+.flow > astro-island > :first-child > :only-child > :nth-child(5) { --i: 4; }
+.flow > astro-island > :first-child > :nth-child(6),
+.flow > astro-island > :first-child > :only-child > :nth-child(6) { --i: 5; }
+.flow-rail > astro-island > :first-child > * { animation-delay: calc(var(--i, 4) * 70ms + 260ms); }
+@keyframes flow-in {
+  from { opacity: 0; transform: translateY(16px) scale(0.985); }
+}
+.rv { opacity: 0; transform: translateY(22px) scale(0.97); }
+.rv.rv-in {
+  opacity: 1;
+  transform: none;
+  transition: opacity 420ms ease-out, transform 620ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* ---------------------------------------------------------------- motion */
@@ -421,4 +556,35 @@
 @media print {
   nav, footer, .no-print { display: none !important; }
   body { background: white; }
+}
+
+/* Bars: a glint runs along the fill once it has filled. */
+.bar-glint {
+  position: absolute;
+  inset: 0;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.55), transparent);
+  transform: translateX(-120%) skewX(-20deg);
+  animation: shine 900ms cubic-bezier(0.4, 0, 0.2, 1) 950ms 1 both;
+}
+
+/* Week days pop in one after another, the way a week is lived. */
+.week-day { animation: pop 460ms cubic-bezier(0.34, 1.56, 0.64, 1) backwards; }
+
+/* Contour maps draw themselves from the summit outwards, then breathe. */
+.contour-line {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: contour-draw 1400ms cubic-bezier(0.45, 0, 0.2, 1) forwards;
+}
+@keyframes contour-draw {
+  to { stroke-dashoffset: 0; }
+}
+.contours { animation: contour-drift 18s ease-in-out 1.6s infinite alternate; transform-origin: 80% 20%; }
+@keyframes contour-drift {
+  from { transform: none; }
+  to { transform: scale(1.06) translate(-1.5%, 1%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .contour-line { stroke-dashoffset: 0; }
 }

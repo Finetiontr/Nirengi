@@ -13,6 +13,7 @@ import { AVAILABILITY } from '../../lib/labels.ts';
 import { EmptyState, feedback, Ring, Sheet, Why } from '../ui/kit';
 import { Avatar, LevelBadge, LevelGlyph, useIdentity } from '../ui/primitives.tsx';
 import { activeWeeks, calmTone, Consistency } from './matchbits.tsx';
+import { Contours } from '../ui/pafta';
 
 const EXAMPLES = [
   'yüksek trafikli dosya dağıtımını üretimde çözmüş biri',
@@ -116,12 +117,15 @@ export default function ExplorePage() {
 
   return (
     <div className="mx-auto max-w-[1000px]">
+      <section className="relative overflow-hidden rounded-[20px] bg-indigo-tint p-5 sm:p-7">
+        <Contours color="indigo" opacity={0.13} x={0.92} y={0.1} seed={7} />
+        <div className="relative">
       <h1 className="h-page">Yetenek keşfet</h1>
-      <p className="lead mt-1">Çözmek istediğin işi yaz; bu işi daha önce gerçekten yapmış gençleri, yaptıkları işle birlikte gör.</p>
+      <p className="lead mt-1 max-w-[640px] !text-ink-2">Çözmek istediğin işi yaz; bu işi daha önce gerçekten yapmış gençleri, yaptıkları işle birlikte gör.</p>
 
       <form
         data-coach="kesfet-ara"
-        className="mt-6 flex items-center gap-3 rounded-[16px] border-2 border-line bg-bg-2 px-4 transition-colors focus-within:border-indigo focus-within:bg-bg"
+        className="mt-5 flex items-center gap-3 rounded-[16px] border-2 border-indigo/25 bg-bg px-4 transition-[border-color,box-shadow] focus-within:border-indigo focus-within:shadow-[0_0_0_4px_rgb(var(--indigo)/0.14)]"
         role="search"
         onSubmit={(e) => e.preventDefault()}
       >
@@ -148,6 +152,8 @@ export default function ExplorePage() {
           ))}
         </div>
       )}
+        </div>
+      </section>
       {activeCount > 0 && (
         <div className="mt-3 flex flex-wrap items-center gap-2" role="group" aria-label="Etkin filtreler">
           {picked.map((k) => removable(skillLabel(k), () => toggle(k)))}

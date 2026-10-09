@@ -14,6 +14,7 @@ import Niri from '../ui/Niri';
 import { Bar, feedback, Ring, Sheet, Why } from '../ui/kit';
 import { Clipboard, Compass, Flag } from '../ui/icons';
 import { Avatar, OrgMark } from '../ui/primitives';
+import { Contours } from '../ui/pafta';
 import { FIT_MIN, gateNote, NeedPill, needStats, STATUS_RANK } from './NeedBits';
 import OrgWeek from './OrgWeek';
 
@@ -174,8 +175,9 @@ export default function OrgHome() {
 
   return (
     <div className="mx-auto max-w-[1040px]">
-      <header className="flex flex-wrap items-center gap-x-4 gap-y-3">
-        <div className="flex min-w-0 flex-[1_1_260px] items-center gap-4">
+      <header className="relative flex flex-wrap items-center gap-x-4 gap-y-3 overflow-hidden rounded-[20px] bg-indigo-tint p-5 sm:p-6">
+        <Contours color="indigo" opacity={0.13} x={0.9} y={0.15} seed={5} />
+        <div className="relative flex min-w-0 flex-[1_1_260px] items-center gap-4">
           <OrgMark name={org.name} size={56} />
           <div className="min-w-0">
             <h1 className="h-page">
@@ -186,7 +188,7 @@ export default function OrgHome() {
             </p>
           </div>
         </div>
-        <button type="button" onClick={() => setPick(true)} className="chip transition-colors hover:border-indigo/40 hover:text-indigo">
+        <button type="button" onClick={() => setPick(true)} className="chip relative transition-colors hover:border-indigo/40 hover:text-indigo">
           Kurumu değiştir
           <ChevronDown className="h-4 w-4" strokeWidth={3} aria-hidden="true" />
         </button>

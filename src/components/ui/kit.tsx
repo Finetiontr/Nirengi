@@ -53,16 +53,22 @@ export function CountUp({ value, ms }: { value: number; ms?: number }) {
 
 // ---------------------------------------------------------------- bars
 
-/** Thick rounded bar with a highlight stripe: progress you can feel. */
+/** Thick rounded bar with a highlight stripe: progress you can feel. It fills from empty when it appears, then a glint runs along it. */
 export function Bar({ value, tone = 'green', h = 16, className = '' }: { value: number; tone?: Tone; h?: number; className?: string }) {
   const pct = Math.max(0, Math.min(1, value)) * 100;
+  const [shown, setShown] = useState(() => (reduced() ? pct : 0));
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => setShown(pct));
+    return () => cancelAnimationFrame(raf);
+  }, [pct]);
   return (
     <div className={`relative w-full overflow-hidden rounded-full bg-bg-3 ${className}`} style={{ height: h }}>
       <div
-        className="relative h-full rounded-full transition-[width] duration-700 ease-[cubic-bezier(.16,1,.3,1)]"
-        style={{ width: `${pct}%`, minWidth: pct > 0 ? h : 0, background: `rgb(var(--${tone}))` }}
+        className="relative h-full overflow-hidden rounded-full transition-[width] duration-[900ms] ease-[cubic-bezier(.22,1.2,.36,1)]"
+        style={{ width: `${shown}%`, minWidth: shown > 0 ? h : 0, background: `rgb(var(--${tone}))` }}
       >
-        {pct > 0 && <span className="absolute left-2 right-2 rounded-full bg-white/30" style={{ top: h * 0.2, height: Math.max(3, h * 0.22) }} />}
+        {shown > 0 && <span className="absolute left-2 right-2 rounded-full bg-white/30" style={{ top: h * 0.2, height: Math.max(3, h * 0.22) }} />}
+        {shown > 0 && <span className="bar-glint" aria-hidden="true" />}
       </div>
     </div>
   );
@@ -101,8 +107,8 @@ export function Ring({ value, size = 64, tone, label }: { value: number; size?: 
 export function WeekDots({ days }: { days: { key: string; name: string; active: boolean; today: boolean; future: boolean }[] }) {
   return (
     <ol className="grid grid-cols-7 gap-1.5" aria-label="Bu haftanın günleri">
-      {days.map((d) => (
-        <li key={d.key} className="flex flex-col items-center gap-1.5" aria-label={`${d.name}: ${d.active ? 'üretim var' : d.future ? 'henüz gelmedi' : 'üretim yok'}`}>
+      {days.map((d, i) => (
+        <li key={d.key} className="week-day flex flex-col items-center gap-1.5" style={{ animationDelay: `${120 + i * 60}ms` }} aria-label={`${d.name}: ${d.active ? 'üretim var' : d.future ? 'henüz gelmedi' : 'üretim yok'}`}>
           <span className={`text-[13px] font-bold ${d.today ? 'text-orange-ink' : 'text-ink-3'}`}>{d.name}</span>
           {/* A survey marker per day: lit when something was produced, dashed while today is still open */}
           {d.active ? (
