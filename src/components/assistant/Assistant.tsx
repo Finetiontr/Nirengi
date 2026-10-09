@@ -9,6 +9,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useAppState, useView } from '../../lib/store.ts';
 import { feedback } from '../ui/kit';
+import { signIn } from '../../lib/auth.ts';
 import Coach from './Coach';
 import Help from './Help';
 import Welcome from './Welcome';
@@ -95,10 +96,12 @@ export default function Assistant() {
     }, 260);
   };
 
-  // The genç welcome asks for a GitHub handle: Kanıt bağla reads the account, the Bugün tour follows.
-  const connectGithub = (login: string) => {
+  // The genç welcome ends at GitHub: one-click login (null) or a typed handle. Either way
+  // Kanıt bağla reads the account and the Bugün tour follows.
+  const connectGithub = (login: string | null) => {
     write(welcomeKey(face), 'tour');
-    location.assign(`/kanit-bagla?gh=${encodeURIComponent(login)}`);
+    if (login === null) signIn();
+    else location.assign(`/kanit-bagla?gh=${encodeURIComponent(login)}`);
   };
 
   const closeTour = (finished: boolean) => {

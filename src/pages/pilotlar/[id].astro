@@ -1,6 +1,14 @@
 ---
 import App from '../../layouts/App.astro';
 import PilotDetail from '../../components/app/PilotDetail';
+import { buildSeed } from '../../lib/seed.ts';
+
+// Static build only (GitHub Pages): seeded ids plus `_`, which the 404 page uses for
+// anything created at runtime. The server build renders every id on request.
+export function getStaticPaths() {
+  const s = buildSeed();
+  return [...s.pilots.map((p) => p.id), '_'].map((id) => ({ params: { id } }));
+}
 
 const { id = '' } = Astro.params;
 ---

@@ -390,6 +390,13 @@
 }
 .ping-soft { animation: ping-soft 2.2s cubic-bezier(0, 0, 0.2, 1) infinite; transform-origin: center; transform-box: fill-box; }
 
+/* Şimdi bar: the dwell line fills, and its end turns the bar to the next line. */
+@keyframes nowbar-fill {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+.nowbar-fill { animation: nowbar-fill linear forwards; }
+
 /* Mascot: blink and bob, both stop when reduced motion is on (global rule). */
 @keyframes blink {
   0%, 92%, 100% { transform: scaleY(1); }

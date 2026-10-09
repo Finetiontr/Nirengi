@@ -35,7 +35,7 @@ export interface GhRepo {
   topics?: string[];
 }
 
-export type VerifyKind = 'notfound' | 'ratelimit' | 'network' | 'other';
+export type VerifyKind = 'notfound' | 'ratelimit' | 'network' | 'auth' | 'other';
 
 /** `kind` lets a screen pick the right recovery (retry, wait, example data). */
 export class VerifyError extends Error {
@@ -46,21 +46,35 @@ export class VerifyError extends Error {
   }
 }
 
+/** Where the OAuth token from "GitHub ile giriş yap" is kept (see auth.ts). */
+export const TOKEN_KEY = 'nirengi:gh-token';
+
+export function ghToken(): string | null {
+  try {
+    return localStorage.getItem(TOKEN_KEY);
+  } catch {
+    return null;
+  }
+}
+
 async function gh<T>(path: string): Promise<T> {
+  const token = ghToken();
   let res: Response;
   try {
     res = await fetch(`https://api.github.com${path}`, {
-      headers: { Accept: 'application/vnd.github+json' },
+      // A signed-in visitor's token lifts the limit from 60 to 5,000 requests an hour.
+      headers: { Accept: 'application/vnd.github+json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
       cache: 'no-store',
     });
   } catch {
     throw new VerifyError('GitHub’a ulaşılamadı. Bağlantını kontrol et ya da örnek profille devam et.', 'network');
   }
+  if (res.status === 401) throw new VerifyError('GitHub girişinin süresi dolmuş. Yeniden giriş yap.', 'auth');
   if (res.status === 404) throw new VerifyError('Bu kullanıcı adıyla bir GitHub hesabı bulunamadı.', 'notfound');
   if (res.status === 403 || res.status === 429) {
     const reset = Number(res.headers.get('x-ratelimit-reset'));
     const mins = reset ? Math.max(1, Math.ceil((reset * 1000 - Date.now()) / 60000)) : 60;
-    throw new VerifyError(`GitHub’ın kimliksiz sorgu sınırı (saatte 60) doldu. Yaklaşık ${mins} dk sonra yeniden deneyin.`, 'ratelimit');
+    throw new VerifyError(`GitHub’ın ${token ? 'saatlik' : 'kimliksiz'} sorgu sınırı (saatte ${token ? '5.000' : '60'}) doldu. Yaklaşık ${mins} dk sonra yeniden deneyin.`, 'ratelimit');
   }
   if (!res.ok) throw new VerifyError(`GitHub beklenmeyen bir yanıt verdi (${res.status}).`);
   return res.json() as Promise<T>;
@@ -79,6 +93,9 @@ export async function fetchGitHub(handle: string) {
   const repos = await gh<GhRepo[]>(`/users/${login}/repos?per_page=100&sort=pushed&type=owner`);
   return { user, repos };
 }
+
+/** The account behind the stored OAuth token. */
+export const fetchMe = () => gh<GhUser>('/user');
 
 export const newChallenge = () => `nirengi-${crypto.getRandomValues(new Uint32Array(1))[0].toString(36).padStart(7, '0').slice(0, 7)}`;
 
@@ -107,7 +124,10 @@ export async function checkGitHubChallenge(handle: string, code: string): Promis
 
 const DAY = 86_400_000;
 
-const ghVerifier = (via: 'bio' | 'gist' | null) => `GitHub API · ${via === 'gist' ? 'gist' : 'bio'} sınaması`;
+/** How account ownership was shown: a code in the bio or a gist, or the OAuth login itself. */
+export type GhVia = 'bio' | 'gist' | 'oauth';
+
+const ghVerifier = (via: GhVia | null) => (via === 'oauth' ? 'GitHub OAuth girişi' : `GitHub API · ${via === 'gist' ? 'gist' : 'bio'} sınaması`);
 
 export const MAX_REPOS = 6;
 
@@ -121,7 +141,7 @@ export function pickRepos(repos: GhRepo[], max = MAX_REPOS): GhRepo[] {
 }
 
 /** Turn the strongest original repositories into evidence. */
-export function reposToEvidence(repos: GhRepo[], verified: boolean, via: 'bio' | 'gist' | null): Evidence[] {
+export function reposToEvidence(repos: GhRepo[], verified: boolean, via: GhVia | null): Evidence[] {
   const level: Level = verified ? 'S2' : 'S1';
   return pickRepos(repos).map((r) => {
     const skills = new Set<string>([
@@ -150,7 +170,7 @@ export function reposToEvidence(repos: GhRepo[], verified: boolean, via: 'bio' |
 }
 
 /** Lift a Beyan item to Doğrulandı once the account's ownership check passed; keeps its id. */
-export const verifyGitHubEvidence = (e: Evidence, via: 'bio' | 'gist'): Evidence => ({
+export const verifyGitHubEvidence = (e: Evidence, via: GhVia): Evidence => ({
   ...e,
   level: 'S2',
   verifiedAt: new Date().toISOString(),

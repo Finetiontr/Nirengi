@@ -2,6 +2,14 @@
 import App from '../../layouts/App.astro';
 import ProfilePage from '../../components/app/ProfilePage';
 import { Loading } from '../../components/ui/primitives';
+import { buildSeed } from '../../lib/seed.ts';
+
+// Static build only (GitHub Pages): seeded handles plus `_`, which the 404 page uses for
+// anything created at runtime. The server build renders every handle on request.
+export function getStaticPaths() {
+  const s = buildSeed();
+  return [...new Set([...s.people.map((p) => p.handle), '_'])].map((handle) => ({ params: { handle } }));
+}
 
 const { handle = '' } = Astro.params;
 ---

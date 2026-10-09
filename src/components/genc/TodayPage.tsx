@@ -162,6 +162,34 @@ export default function TodayPage() {
         </div>
       )}
 
+      {/* Doors */}
+      <section id="ihtiyaclar" data-coach="g-ihtiyaclar" className="mt-8 scroll-mt-6">
+        <Head title="Sana uyan ihtiyaçlar" action={<span className="text-[13px] font-bold text-ink-3">Kurumlar kurgusal demo</span>} />
+        <ul className="mt-4 space-y-3">
+          {matches.map((m) => {
+            const org = s.orgs.find((o) => o.id === m.need.orgId)!;
+            const gap = [...m.gaps].sort((a, b) => b.gain - a.gain)[0];
+            return (
+              <li key={m.need.id}>
+                <a href={`/ihtiyaclar/${m.need.id}`} className="card-press flex items-center gap-4 p-4">
+                  <Ring value={m.score} size={58} />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[16px] font-extrabold leading-snug text-ink">{m.need.title}</p>
+                    <p className="text-[13px] font-bold text-ink-3">{org.name}</p>
+                    {gap && gap.gain > 0 && (
+                      <p className="mt-1 text-[14px] font-bold text-ink-3">
+                        {skillLabel(gap.skill)} alanında bir iş eklersen <b className="text-green-lip">+{gap.gain}</b>
+                      </p>
+                    )}
+                  </div>
+                  <ChevronRight className="h-6 w-6 shrink-0 text-ink-3" strokeWidth={3} />
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+
       {/* The pafta: every verified step is a point on your own map, climbing to the summit */}
       <section data-coach="g-pafta" className="card mt-10 p-4 sm:p-5" aria-labelledby="pafta">
         <h2 id="pafta" className="h-sec">
@@ -194,34 +222,6 @@ export default function TodayPage() {
             }))}
           />
         </div>
-      </section>
-
-      {/* Doors */}
-      <section id="ihtiyaclar" data-coach="g-ihtiyaclar" className="mt-12 scroll-mt-6">
-        <Head title="Sana uyan ihtiyaçlar" action={<span className="text-[13px] font-bold text-ink-3">Kurumlar kurgusal demo</span>} />
-        <ul className="mt-4 space-y-3">
-          {matches.map((m) => {
-            const org = s.orgs.find((o) => o.id === m.need.orgId)!;
-            const gap = [...m.gaps].sort((a, b) => b.gain - a.gain)[0];
-            return (
-              <li key={m.need.id}>
-                <a href={`/ihtiyaclar/${m.need.id}`} className="card-press flex items-center gap-4 p-4">
-                  <Ring value={m.score} size={58} />
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[16px] font-extrabold leading-snug text-ink">{m.need.title}</p>
-                    <p className="text-[13px] font-bold text-ink-3">{org.name}</p>
-                    {gap && gap.gain > 0 && (
-                      <p className="mt-1 text-[14px] font-bold text-ink-3">
-                        {skillLabel(gap.skill)} alanında bir iş eklersen <b className="text-green-lip">+{gap.gain}</b>
-                      </p>
-                    )}
-                  </div>
-                  <ChevronRight className="h-6 w-6 shrink-0 text-ink-3" strokeWidth={3} />
-                </a>
-              </li>
-            );
-          })}
-        </ul>
       </section>
 
       <GoalSheet open={goalOpen} onClose={() => setGoalOpen(false)} me={me} goal={p.goal} rest={p.rest} />

@@ -10,6 +10,7 @@ import { journey, progress, TIERS, XP, type Step } from '../../lib/engine/progre
 import { AVAILABILITY, LEVELS, PILOT_STATUS } from '../../lib/labels.ts';
 import { fmtDate } from '../../lib/format.ts';
 import { skillLabel } from '../../lib/skills.ts';
+import { routeId } from '../../lib/route.ts';
 import { Avatar, LevelBadge, LevelGlyph, LEVEL_NAME, OrgMark, useIdentity } from '../ui/primitives.tsx';
 import { CountUp, feedback, Head, EmptyState, Why } from '../ui/kit';
 import { Bolt, Building, CheckCircle, Flag, Flame, GitHub, Lock, Star } from '../ui/icons';
@@ -23,7 +24,7 @@ const LEVEL_ORDER: Level[] = ['S3', 'S2', 'S1'];
 export default function ProfilePage({ handle }: { handle?: string }) {
   const s = useAppState();
   const view = useView();
-  const person = handle ? byId.handle(s, handle) : currentMe(s);
+  const person = handle ? byId.handle(s, routeId(handle)) : currentMe(s);
   if (!person)
     return (
       <div className="mx-auto max-w-[680px] py-6">
@@ -71,7 +72,7 @@ function Profile({ personId }: { personId: string }) {
     .slice(0, 6);
 
   const copy = () => {
-    const url = `${location.origin}/profil/${person.handle}`;
+    const url = new URL(`/profil/${person.handle}`, location.origin).href;
     navigator.clipboard?.writeText(url).then(
       () => feedback({ tone: 'good', title: 'Bağlantı kopyalandı', text: 'Kanıt kartını istediğin yere yapıştırabilirsin.' }),
       () => feedback({ tone: 'bad', title: 'Kopyalanamadı', text: 'Tarayıcı izin vermedi. Adres çubuğundan kopyalayabilirsin.' }),

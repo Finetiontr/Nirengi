@@ -8,6 +8,7 @@ import type { LogEntry, Milestone, Org, Persona, Person, Pilot } from '../../lib
 import { GENESIS, shortHash, verifyChain } from '../../lib/engine/ledger.ts';
 import { PILOT_STATUS } from '../../lib/labels.ts';
 import { daysSince, fmtDate, fmtDateTime, relTime } from '../../lib/format.ts';
+import { routeId } from '../../lib/route.ts';
 import NiriSays from '../ui/NiriSays';
 import { Bar, EmptyState, feedback, Head, Sheet, Why, celebrate } from '../ui/kit';
 import { Avatar, LevelBadge, OrgMark } from '../ui/primitives';
@@ -33,7 +34,7 @@ const STATUS_TONE = { active: 'bg-indigo-tint text-indigo', succeeded: 'bg-green
 
 export default function PilotDetail({ id }: { id: string }) {
   const s = useAppState();
-  const pilot = byId.pilot(s, id);
+  const pilot = byId.pilot(s, routeId(id));
   if (!pilot)
     return (
       <div className="mx-auto max-w-[640px] pt-6">

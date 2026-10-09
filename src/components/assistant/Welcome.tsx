@@ -8,6 +8,8 @@ import { X } from 'lucide-react';
 import Niri, { type Dir, type Mood } from '../ui/Niri';
 import NiriSays from '../ui/NiriSays';
 import { cleanHandle, isGitHubLogin } from '../../lib/verify.ts';
+import { authReady } from '../../lib/auth.ts';
+import { GitHub } from '../ui/icons';
 import { ArtGain, ArtGencHos, ArtGencIs, ArtMatch, ArtNeed, ArtPilot, Pip } from './art';
 import { useTrap, type Face, type WelcomeChoice } from './util';
 
@@ -70,8 +72,8 @@ const GENC_CARDS: Card[] = [
 interface Props {
   face: Face;
   onClose: (choice: WelcomeChoice) => void;
-  /** Handle typed on the ask card; the caller takes it to Kanıt bağla. */
-  onGithub: (login: string) => void;
+  /** Handle typed on the ask card, or null for the one-click GitHub login; the caller takes it on. */
+  onGithub: (login: string | null) => void;
   /** GitHub login already connected: the ask card says so instead of asking again. */
   connected?: string;
 }
@@ -89,9 +91,11 @@ export default function Welcome({ face, onClose, onGithub, connected }: Props) {
   const card = CARDS[i];
   const Art = card.Art;
   const asking = !!card.ask && !connected;
+  /** The ask card is one GitHub key when the login service is set up; the handle field otherwise. */
+  const typing = asking && !authReady;
   const login = cleanHandle(handle);
   const valid = isGitHubLogin(login);
-  const submit = () => (valid ? onGithub(login) : setTouched(true));
+  const submit = () => (!typing ? onGithub(null) : valid ? onGithub(login) : setTouched(true));
 
   const go = (to: number) => {
     const t = Math.max(0, Math.min(CARDS.length - 1, to));
@@ -101,8 +105,8 @@ export default function Welcome({ face, onClose, onGithub, connected }: Props) {
 
   useTrap(box, () => onClose('self'), true);
   useEffect(() => {
-    (asking ? field.current : main.current)?.focus({ preventScroll: true });
-  }, [i, asking]);
+    (typing ? field.current : main.current)?.focus({ preventScroll: true });
+  }, [i, typing]);
   useEffect(() => {
     const k = (e: KeyboardEvent) => {
       if ((e.target as HTMLElement | null)?.tagName === 'INPUT') return;
@@ -173,11 +177,15 @@ export default function Welcome({ face, onClose, onGithub, connected }: Props) {
                 <div className={`mt-2 flex items-end [@media(max-height:700px)]:min-h-0 ${card.ask ? 'min-h-[96px]' : 'min-h-[150px]'}`}>
                   <NiriSays mood={card.mood} point={card.point} size={84} typing className="w-full">
                     <p className="text-[15.5px] font-semibold leading-relaxed text-ink-2">
-                      {card.ask && connected ? `GitHub hesabın bağlı (@${connected}). İstersen sayfayı birlikte gezelim.` : card.text}
+                      {card.ask && connected
+                        ? `GitHub hesabın bağlı (@${connected}). İstersen sayfayı birlikte gezelim.`
+                        : asking && !typing
+                          ? 'GitHub ile giriş yap, tek dokunuş. Depolarına bakıp hangilerinin kanıt olabileceğini birlikte seçelim.'
+                          : card.text}
                     </p>
                   </NiriSays>
                 </div>
-                {asking && (
+                {typing && (
                   <form
                     className="mt-4"
                     onSubmit={(e) => {
@@ -239,7 +247,8 @@ export default function Welcome({ face, onClose, onGithub, connected }: Props) {
             className="btn-primary btn-lg btn-block"
             onClick={() => (asking ? submit() : last ? onClose('tour') : go(i + 1))}
           >
-            {asking ? 'GitHub’ımı tara' : last ? 'Turu başlat' : 'İleri'}
+            {asking && !typing && <GitHub size={22} />}
+            {typing ? 'GitHub’ımı tara' : asking ? 'GitHub ile giriş yap' : last ? 'Turu başlat' : 'İleri'}
           </button>
           <div className="mt-2 flex items-center justify-between gap-2">
             <button

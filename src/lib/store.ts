@@ -151,6 +151,29 @@ export const actions = {
     });
   },
 
+  /** Forget the connected account and everything it did, so the tab falls back to the sample profile. */
+  signOut() {
+    const me = getState().people.find((p) => p.isDemoUser);
+    if (!me) return;
+    const id = me.id;
+    commit((s) => {
+      const gone = new Set(s.pilots.filter((p) => p.personId === id).map((p) => p.id));
+      for (const p of s.pilots) if (gone.has(p.id)) {
+        const need = s.needs.find((n) => n.id === p.needId);
+        if (need?.status === 'piloting') need.status = 'published';
+      }
+      s.pilots = s.pilots.filter((p) => !gone.has(p.id));
+      s.people = s.people.filter((p) => p.id !== id);
+      s.quests = s.quests.filter((q) => q.personId !== id);
+      s.posts = s.posts
+        .filter((p) => p.personId !== id)
+        .map((p) => ({ ...p, supports: p.supports.filter((x) => x !== id), replies: p.replies.filter((r) => r.personId !== id) }));
+      s.events = s.events.filter((e) => e.personId !== id && !(e.pilotId && gone.has(e.pilotId)));
+    });
+    const v = getView();
+    if (v.revealed.includes(id)) setView({ revealed: v.revealed.filter((x) => x !== id) });
+  },
+
   addEvidence(personId: string, ev: Evidence) {
     commit((s) => {
       const p = s.people.find((x) => x.id === personId)!;

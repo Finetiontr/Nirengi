@@ -6,7 +6,7 @@ import { appendEntry } from './engine/ledger.ts';
 import { daysAgo, daysFromNow } from './format.ts';
 import { dayKey, weekKey } from './engine/progress.ts';
 
-export const STATE_VERSION = 5;
+export const STATE_VERSION = 6;
 export const ROUND = '2026·Ç4';
 
 type EvInput = Omit<Evidence, 'producedAt' | 'verifiedAt'> & { ago: number; verifiedAgo?: number };
@@ -690,6 +690,90 @@ function needs(): Need[] {
         ],
         decisionMaker: 'Müşteri Deneyimi Direktörü',
         scope: 'Yalnız kredi kartı ürün ailesine gelen şikâyetler.',
+      },
+    },
+    {
+      id: 'n-hatirlatma',
+      orgId: 'o-sifa',
+      title: 'Randevu hatırlatmalarını 2 saniyede hastanın telefonuna ulaştırmak',
+      status: 'published',
+      createdAt: daysAgo(1),
+      publishedAt: daysAgo(0.2),
+      round: ROUND,
+      skills: ['go', 'api', 'distributed', 'flutter'],
+      canvas: {
+        current: 'Ankara’daki 38 aile hekimliğinin randevu hatırlatmaları gece 02.00’de toplu bir betikle SMS olarak gönderiliyor.',
+        pain: 'Hatırlatma geç ya da hiç ulaşmayınca hasta gelmiyor, boş kalan randevu başka hastaya verilemiyor.',
+        painMetric: 'Gelmeyen hasta oranı %19; hatırlatmaların %12’si teslim edilemiyor',
+        outcome: 'Randevu değişince bildirimi anında gönderen, teslimi izleyen ve başarısızda SMS’e düşen bir servis.',
+        criteria: [
+          crit('c-hat-1', 'Bildirim randevu değişikliğinden sonra 2 saniye içinde telefona ulaşır'),
+          crit('c-hat-2', 'Teslim edilemeyen bildirimlerin %95’i 1 dakika içinde SMS ile yeniden denenir'),
+          crit('c-hat-3', 'Deneme hekimliklerinde gelmeyen hasta oranı %12’nin altına iner'),
+        ],
+        constraints: [
+          { kind: 'mevzuat', text: 'KVKK: bildirimde tanı ya da bölüm bilgisi yer almaz' },
+          { kind: 'teknoloji', text: 'Mevcut REST randevu API’si ve Flutter uygulaması korunur' },
+          { kind: 'sure', text: '6 hafta' },
+        ],
+        decisionMaker: 'Kurucu ortak · Ürün',
+        scope: 'Çankaya’daki 5 aile hekimliği ile sınırlı.',
+      },
+    },
+    {
+      id: 'n-telemetri',
+      orgId: 'o-anka',
+      title: 'Oyun içi olay verisini ertesi sabah değil 5 dakikada panelde görmek',
+      status: 'published',
+      createdAt: daysAgo(3),
+      publishedAt: daysAgo(2),
+      round: ROUND,
+      skills: ['data', 'postgres', 'realtime', 'go'],
+      canvas: {
+        current: 'İki mobil oyundan günde 9 milyon olay geliyor; veriler gece bir kez dışa aktarılıp tablolara işleniyor.',
+        pain: 'Yeni bir bölüm ya da fiyat değişikliği bozulduğunda ekip bunu ancak ertesi gün fark ediyor.',
+        painMetric: 'Sorunu fark etme süresi ortalama 14 saat; son güncellemede 2 günlük gelir kaybı',
+        outcome: 'Olayları 5 dakika içinde işleyen ve 6 temel göstergeyi canlı gösteren bir panel.',
+        criteria: [
+          crit('c-tel-1', 'Bir olay en geç 5 dakika içinde panelde görünür'),
+          crit('c-tel-2', 'Saatte 1 milyon olayda veri kaybı %0,1’in altında kalır'),
+          crit('c-tel-3', '6 temel gösterge için eşik aşımında uyarı gönderilir'),
+        ],
+        constraints: [
+          { kind: 'butce', text: 'Aylık altyapı maliyeti 150 doları geçmez' },
+          { kind: 'veri', text: 'Anonim oyuncu kimlikleriyle 30 günlük örnek veri sağlanır' },
+          { kind: 'sure', text: '8 hafta' },
+        ],
+        decisionMaker: 'Teknik direktör',
+        scope: 'Yalnız stüdyonun en çok oynanan oyunu.',
+      },
+    },
+    {
+      id: 'n-vitrin',
+      orgId: 'o-atolye',
+      title: 'El dokuması ürünleri telefonda 3 saniyede açılan bir vitrinle satmak',
+      status: 'published',
+      createdAt: daysAgo(2),
+      publishedAt: daysAgo(1),
+      round: ROUND,
+      skills: ['react', 'uiux', 'perf', 'visual'],
+      canvas: {
+        current: 'Kooperatif 420 ürünü bir sosyal medya hesabından ve telefonla sipariş alarak satıyor; ürün sayfası yok.',
+        pain: 'Alıcı ürünü ve fiyatı tek yerde göremiyor; üyeler her siparişi tek tek mesajla takip ediyor.',
+        painMetric: 'Haftada 60 sipariş sorusunun yalnız 14’ü satışa dönüyor',
+        outcome: 'Üyelerin telefondan ürün ekleyebildiği, hızlı açılan ve sipariş toplayan bir çevrim içi vitrin.',
+        criteria: [
+          crit('c-vit-1', 'Vitrin orta segment telefonda 3 saniyenin altında açılır'),
+          crit('c-vit-2', 'Bir üye yeni ürünü telefondan 5 dakikada yayımlar'),
+          crit('c-vit-3', 'Deneme ayında sipariş sorularının en az %30’u satışa dönüşür'),
+        ],
+        constraints: [
+          { kind: 'butce', text: 'Barındırma ücretsiz ya da ayda 10 doların altında' },
+          { kind: 'teknoloji', text: 'Ödeme mevcut banka sanal POS’u ile alınır' },
+          { kind: 'sure', text: '6 hafta' },
+        ],
+        decisionMaker: 'Kooperatif başkanı',
+        scope: 'İlk aşamada 40 ürünlük peştemal koleksiyonu.',
       },
     },
     {

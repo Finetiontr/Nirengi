@@ -13,6 +13,7 @@ import { progress, type WeekState } from '../../lib/engine/progress.ts';
 import { CONSTRAINT, PILOT_STATUS, SCALE, SECTOR } from '../../lib/labels.ts';
 import { fmtDate } from '../../lib/format.ts';
 import { skillLabel } from '../../lib/skills.ts';
+import { routeId } from '../../lib/route.ts';
 import NiriSays from '../ui/NiriSays';
 import { Bar, celebrate, EmptyState, feedback, Head, Ring, Sheet, Why } from '../ui/kit';
 import { CheckCircle, Clipboard } from '../ui/icons';
@@ -29,7 +30,7 @@ const STATUS_PILL: Record<NeedStatus, string> = {
 
 export default function NeedDetail({ id }: { id: string }) {
   const s = useAppState();
-  const need = byId.need(s, id);
+  const need = byId.need(s, routeId(id));
   if (!need)
     return (
       <div className="mx-auto max-w-[720px]">

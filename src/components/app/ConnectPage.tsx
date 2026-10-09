@@ -4,7 +4,7 @@
 
 import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { Check, ChevronLeft, ChevronRight, Copy, ExternalLink, Loader2 } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight, Copy, ExternalLink, Loader2, LogOut } from 'lucide-react';
 import type { Evidence, Level, Person, State, WeeklyGoal } from '../../lib/types.ts';
 import { actions, getState, useAppState } from '../../lib/store.ts';
 import { progress, totalXp, XP } from '../../lib/engine/progress.ts';
@@ -16,6 +16,7 @@ import {
   domainEvidence,
   fetchActivityDays,
   fetchGitHub,
+  fetchMe,
   isGitHubLogin,
   MAX_REPOS,
   pickRepos,
@@ -29,13 +30,14 @@ import {
   type GhUser,
   type VerifyKind,
 } from '../../lib/verify.ts';
+import { authReady, consumeAuthHash, forgetToken, signIn, signOut } from '../../lib/auth.ts';
 import { LEVELS } from '../../lib/labels.ts';
 import { daysAgo, relTime, uid } from '../../lib/format.ts';
 import { skillLabel } from '../../lib/skills.ts';
 import { type Mood } from '../ui/Niri';
 import NiriSays from '../ui/NiriSays';
-import { celebrate, CountUp, feedback, Head, WeekDots, Why } from '../ui/kit';
-import { CheckCircle, Flame, Star } from '../ui/icons';
+import { celebrate, CountUp, feedback, Head, WeekDots, Why, type FeedbackMsg } from '../ui/kit';
+import { CheckCircle, Flame, GitHub, Star } from '../ui/icons';
 import { Avatar, LevelBadge } from '../ui/primitives';
 import { TriMark } from '../ui/TriMark';
 
@@ -49,6 +51,8 @@ interface Scan {
   /** Local days with public output in the last 90 days; null when GitHub would not say. */
   days: string[] | null;
   offline: boolean;
+  /** Read after "GitHub ile giriş yap": the login itself proves the account is theirs. */
+  oauth?: boolean;
 }
 
 interface Foot {
@@ -59,6 +63,7 @@ interface Foot {
   busy?: boolean;
   /** Called when Enter is pressed while the key is disabled. */
   blocked?: () => void;
+  icon?: ReactNode;
   side?: { label: string; onClick?: () => void; href?: string };
 }
 
@@ -88,6 +93,7 @@ const ERR_TITLE: Record<VerifyKind, string> = {
   notfound: 'Bu hesabı bulamadık',
   ratelimit: 'GitHub bir süre durdurdu',
   network: 'GitHub’a ulaşamadık',
+  auth: 'Girişin süresi dolmuş',
   other: 'Bir şey ters gitti',
 };
 
@@ -107,11 +113,13 @@ function buildPerson(s: State, cur: Person | undefined, sc: Scan, picked: GhRepo
   const login = sc.user.login.toLowerCase();
   const same = !!cur && !sc.offline && cur.links.github?.toLowerCase() === login;
   const proven = same ? cur!.evidence.find((e) => e.source === 'github' && e.level === 'S2') : undefined;
-  const kept = same ? cur!.evidence.filter((e) => e.source === 'github' && picked.some((r) => r.html_url === e.url)) : [];
+  const kept = (same ? cur!.evidence.filter((e) => e.source === 'github' && picked.some((r) => r.html_url === e.url)) : []).map((e) =>
+    sc.oauth && e.level === 'S1' ? verifyGitHubEvidence(e, 'oauth') : e,
+  );
   const fresh = reposToEvidence(
     picked.filter((r) => !kept.some((e) => e.url === r.html_url)),
-    !!proven,
-    proven?.verifier?.includes('gist') ? 'gist' : 'bio',
+    !!sc.oauth || !!proven,
+    sc.oauth ? 'oauth' : proven?.verifier?.includes('gist') ? 'gist' : 'bio',
   );
   const evidence = [...fresh, ...kept, ...(cur?.evidence.filter((e) => e.source !== 'github') ?? [])];
   const taken = s.people.some((p) => !p.isDemoUser && p.handle === login);
@@ -157,6 +165,8 @@ export default function ConnectPage() {
   const reduce = !!useReducedMotion();
 
   const [step, setStep] = useState<StepId>(me ? 'home' : 'user');
+  /** The handle field instead of the one-click login (always so when the login service is not set up). */
+  const [manual, setManual] = useState(!authReady);
   const [dir, setDir] = useState(1);
   /** Started from the "Bağlı hesap" screen: finishing returns there instead of walking the whole flow. */
   const [from, setFrom] = useState<'flow' | 'home'>('flow');
@@ -192,29 +202,39 @@ export default function ConnectPage() {
   const proven = isGhVerified(me);
   const domainDone = !!me?.links.domain;
   const afterFlow = (next: StepId) => (from === 'home' ? 'home' : next);
+  const skipProve = !!scan?.offline || !!scan?.oauth;
 
   // ------------------------------------------------------------ actions
 
-  const scanFor = async (raw: string, back: StepId) => {
+  /** `raw` null: the account behind the OAuth token, whose work counts as Doğrulandı. */
+  const scanFor = async (raw: string | null, back: StepId) => {
     const id = ++run.current;
+    const oauth = raw === null;
     setLoginErr(null);
     setScan(null);
-    setStage('Depolarını okuyorum…');
+    setStage(oauth ? 'GitHub hesabını tanıyorum…' : 'Depolarını okuyorum…');
     go('found');
     try {
-      const { user, repos } = await fetchGitHub(raw);
+      const login = oauth ? (await fetchMe()).login : raw;
+      if (id !== run.current) return;
+      if (oauth) {
+        setHandle(login);
+        setStage('Depolarını okuyorum…');
+      }
+      const { user, repos } = await fetchGitHub(login);
       if (id !== run.current) return;
       setStage('Etkinliğini sayıyorum…');
       const days = await fetchActivityDays(user.login);
       if (id !== run.current) return;
       const picked = pickRepos(repos);
       setIncluded(new Set(picked.map((r) => r.name)));
-      setScan({ user, repos: picked, days, offline: false });
+      setScan({ user, repos: picked, days, offline: false, oauth });
     } catch (e) {
       if (id !== run.current) return;
       const err = e instanceof VerifyError ? e : new VerifyError('Beklenmeyen bir hata oldu.');
+      if (err.kind === 'auth') forgetToken();
       setLoginErr(err);
-      feedback({ tone: 'bad', title: ERR_TITLE[err.kind], text: err.kind === 'notfound' ? `GitHub’da “${cleanHandle(raw)}” diye bir hesap yok. Yazımı kontrol et.` : err.message });
+      feedback({ tone: 'bad', title: ERR_TITLE[err.kind], text: err.kind === 'notfound' ? `GitHub’da “${cleanHandle(raw ?? '')}” diye bir hesap yok. Yazımı kontrol et.` : err.message });
       go(back, -1);
     }
   };
@@ -243,7 +263,7 @@ export default function ConnectPage() {
     feedback({
       tone: 'good',
       title: from === 'home' ? 'Profilin güncellendi' : `${picked.length} eser eklendi`,
-      text: from === 'home' ? `${picked.length} eser profilinde.` : sc.offline ? 'Örnek veri Beyan düzeyinde kalır.' : ok ? 'Hesabın daha önce doğrulandığı için Doğrulandı düzeyinde.' : 'Şimdilik Beyan düzeyinde; sahipliğini kanıtlayınca Doğrulandı olur.',
+      text: from === 'home' ? `${picked.length} eser profilinde.` : sc.offline ? 'Örnek veri Beyan düzeyinde kalır.' : sc.oauth ? 'GitHub ile giriş yaptığın için hepsi Doğrulandı düzeyinde.' : ok ? 'Hesabın daha önce doğrulandığı için Doğrulandı düzeyinde.' : 'Şimdilik Beyan düzeyinde; sahipliğini kanıtlayınca Doğrulandı olur.',
     });
     go(afterFlow('goal'));
   };
@@ -253,7 +273,7 @@ export default function ConnectPage() {
     if (!cur) return;
     actions.setWeeklyGoal(cur.id, goal);
     feedback({ tone: 'good', title: 'Hedefin kaydedildi', text: `Haftada ${goal} gün üretim. İstediğin zaman değiştirebilirsin.` });
-    go(scan?.offline ? 'domain' : 'prove');
+    go(skipProve ? 'domain' : 'prove');
   };
 
   const copy = async (text: string, key: string, note: string) => {
@@ -297,7 +317,18 @@ export default function ConnectPage() {
     }
   };
 
-  const skipProve = () => {
+  const leave = () => {
+    signOut();
+    run.current++;
+    setScan(null);
+    setHandle('');
+    setFrom('flow');
+    setManual(!authReady);
+    feedback({ tone: 'info', title: 'Çıkış yaptın', text: 'GitHub bağlantın kaldırıldı; örnek profille geziyorsun.' });
+    go('user', -1);
+  };
+
+  const skipProveStep = () => {
     feedback({ tone: 'info', title: 'Şimdilik Beyan olarak kalıyor', text: 'Doğrulanmayan işler profilinde görünür ama eşleşmede düşük ağırlık taşır. Sonra tekrar deneyebilirsin.' });
     go(afterFlow('domain'));
   };
@@ -349,7 +380,9 @@ export default function ConnectPage() {
   const foot: Foot = (() => {
     switch (step) {
       case 'user':
-        return { label: 'Devam', disabled: !valid, onClick: startScan, blocked: () => setTouched(true) };
+        return manual
+          ? { label: 'Devam', disabled: !valid, onClick: startScan, blocked: () => setTouched(true) }
+          : { label: 'GitHub ile giriş yap', icon: <GitHub size={22} />, onClick: signIn, side: { label: 'Kullanıcı adıyla devam et', onClick: () => setManual(true) } };
       case 'found':
         return { label: 'Devam', disabled: loading || included.size === 0, onClick: saveScan };
       case 'goal':
@@ -357,7 +390,7 @@ export default function ConnectPage() {
       case 'prove':
         return proven
           ? { label: 'Devam', onClick: () => go(afterFlow('domain')) }
-          : { label: 'Kontrol et', busy: busy === 'verify', onClick: verifyOwnership, side: { label: 'Şimdilik atla', onClick: skipProve } };
+          : { label: 'Kontrol et', busy: busy === 'verify', onClick: verifyOwnership, side: { label: 'Şimdilik atla', onClick: skipProveStep } };
       case 'domain':
         return domainDone
           ? { label: 'Devam', onClick: () => go(afterFlow('done')) }
@@ -381,7 +414,7 @@ export default function ConnectPage() {
           : step === 'prove'
             ? 'goal'
             : step === 'domain'
-              ? scan?.offline
+              ? skipProve
                 ? 'goal'
                 : 'prove'
               : null;
@@ -390,8 +423,28 @@ export default function ConnectPage() {
     go(back!, -1);
   };
 
-  // Niri's welcome hands over the handle as ?gh=…: start reading the account right away.
+  // Back from GitHub's login (#gh_token=… or #gh_error=…), or Niri's welcome handing over a handle as ?gh=….
   useEffect(() => {
+    const auth = consumeAuthHash();
+    if (auth && 'token' in auth) {
+      const cur = demoUser();
+      if (cur?.links.github) setFrom('home');
+      void scanFor(null, cur ? 'home' : 'user');
+      return;
+    }
+    if (auth) {
+      const e = auth.error;
+      const msg: FeedbackMsg =
+        e === 'denied'
+          ? { tone: 'info', title: 'Giriş iptal edildi', text: 'İstediğin zaman yeniden deneyebilirsin.' }
+          : e === 'config'
+            ? { tone: 'bad', title: 'Giriş servisi henüz hazır değil', text: 'Şimdilik kullanıcı adınla devam et.' }
+            : { tone: 'bad', title: 'Giriş tamamlanamadı', text: 'GitHub’dan dönerken bir şey ters gitti. Yeniden dene ya da kullanıcı adınla devam et.' };
+      // Right after load the toast layer may not be listening yet.
+      window.setTimeout(() => feedback(msg), 600);
+      if (e === 'config') setManual(true);
+      return;
+    }
     const q = new URLSearchParams(location.search).get('gh');
     if (q === null) return;
     history.replaceState(null, '', location.pathname + location.hash);
@@ -402,13 +455,21 @@ export default function ConnectPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Signed out from the menu while this page is open: there is no account to show any more.
+  useEffect(() => {
+    if (!me && step === 'home') go('user', -1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [me, step]);
+
   // A long step must not leave the next one scrolled halfway.
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [step]);
 
-  const idx = FLOW.indexOf(step);
-  const reached = step === 'done' ? FLOW.length : idx >= 0 ? idx : null;
+  // After a one-click login (or with the example profile) there is nothing to prove.
+  const flow = skipProve ? FLOW.filter((x) => x !== 'prove') : FLOW;
+  const idx = flow.indexOf(step);
+  const reached = step === 'done' ? flow.length : idx >= 0 ? idx : null;
 
   // Enter acts like the big key unless it already means something where the focus is.
   const footRef = useRef(foot);
@@ -432,6 +493,8 @@ export default function ConnectPage() {
       case 'user':
         return (
           <UserBody
+            manual={manual}
+            onOneClick={() => setManual(false)}
             handle={handle}
             onHandle={(v) => {
               setHandle(v);
@@ -519,6 +582,7 @@ export default function ConnectPage() {
               setFrom('flow');
               go('user');
             }}
+            onSignOut={leave}
           />
         );
     }
@@ -540,7 +604,7 @@ export default function ConnectPage() {
             Profil
           </a>
         )}
-        {reached !== null && <Steps reached={reached} />}
+        {reached !== null && <Steps flow={flow} reached={reached} />}
       </div>
 
       <div className="overflow-x-clip pt-4">
@@ -569,10 +633,10 @@ export default function ConnectPage() {
 
 // ---------------------------------------------------------------- pieces
 
-function Key({ label, href, onClick, disabled, busy, className }: { label: string; href?: string; onClick?: () => void; disabled?: boolean; busy?: boolean; className: string }) {
+function Key({ label, href, onClick, disabled, busy, icon, className }: { label: string; href?: string; onClick?: () => void; disabled?: boolean; busy?: boolean; icon?: ReactNode; className: string }) {
   const inner = (
     <>
-      {busy && <Loader2 className="h-5 w-5 animate-spin" strokeWidth={3} aria-hidden="true" />}
+      {busy ? <Loader2 className="h-5 w-5 animate-spin" strokeWidth={3} aria-hidden="true" /> : icon}
       {busy ? 'Kontrol ediliyor…' : label}
     </>
   );
@@ -590,10 +654,10 @@ function Key({ label, href, onClick, disabled, busy, className }: { label: strin
 }
 
 /** Survey markers joined by a line: done = filled with a check, current = filled with a ripple, next = outline. */
-function Steps({ reached }: { reached: number }) {
+function Steps({ flow, reached }: { flow: StepId[]; reached: number }) {
   return (
-    <div className="flex min-w-0 flex-1 items-center" role="progressbar" aria-label="Adımlar" aria-valuemin={0} aria-valuemax={FLOW.length} aria-valuenow={reached}>
-      {FLOW.map((id, i) => {
+    <div className="flex min-w-0 flex-1 items-center" role="progressbar" aria-label="Adımlar" aria-valuemin={0} aria-valuemax={flow.length} aria-valuenow={reached}>
+      {flow.map((id, i) => {
         const done = i < reached;
         const current = i === reached;
         return (
@@ -672,6 +736,8 @@ const LEVEL_WHY = (
 // ---------------------------------------------------------------- 1 · user
 
 function UserBody({
+  manual,
+  onOneClick,
   handle,
   onHandle,
   onBlur,
@@ -689,8 +755,40 @@ function UserBody({
   login: string;
   canExample: boolean;
   onExample: () => void;
+  manual: boolean;
+  onOneClick: () => void;
 }) {
   const bad = showFormat || !!err;
+  if (!manual)
+    return (
+      <>
+        <Guide mood="wave">Merhaba! GitHub ile giriş yap, işlerini birlikte bulalım.</Guide>
+        <h1 className="h-page mt-6">GitHub hesabın</h1>
+        <ul className="card mt-5 divide-y-2 divide-line">
+          {[
+            ['Tek dokunuş', 'Kullanıcı adı yazmak, kod kopyalamak yok. GitHub’da onaylarsın, buraya dönersin.'],
+            ['Hemen Doğrulandı', 'Girişin hesabın senin olduğunu gösterir; eklediğin işler Beyan’da beklemez.'],
+            ['Yalnız okuma', 'Herkese açık profilin ve depoların okunur. Parola görmeyiz, hiçbir şeye yazamayız.'],
+          ].map(([t, d]) => (
+            <li key={t} className="flex items-start gap-3 px-4 py-3.5">
+              <Check className="mt-0.5 h-5 w-5 shrink-0 text-green" strokeWidth={4} aria-hidden="true" />
+              <span>
+                <span className="block text-[16px] font-black text-ink">{t}</span>
+                <span className="block text-[14px] font-bold text-ink-3">{d}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
+        {canExample && (
+          <p className="hint">
+            GitHub hesabın yok mu?{' '}
+            <button type="button" onClick={onExample} className="font-extrabold text-indigo underline-offset-2 hover:underline">
+              Örnek profille devam et
+            </button>
+          </p>
+        )}
+      </>
+    );
   return (
     <>
       <Guide mood="wave">Merhaba! Önce GitHub kullanıcı adını yaz, işlerini birlikte bulalım.</Guide>
@@ -738,7 +836,19 @@ function UserBody({
             )}
           </div>
         ) : (
-          <p className="hint">Herkese açık GitHub verisi okunur. Parola ya da token istemiyoruz.</p>
+          <p className="hint">
+            Herkese açık GitHub verisi okunur. Parola ya da token istemiyoruz.
+            {authReady ? (
+              <>
+                {' '}
+                <button type="button" onClick={onOneClick} className="font-extrabold text-indigo underline-offset-2 hover:underline">
+                  Tek tıkla giriş yap
+                </button>
+              </>
+            ) : (
+              ' Tek tıkla giriş şu an kapalı; kullanıcı adınla devam edebilirsin.'
+            )}
+          </p>
         )}
       </div>
     </>
@@ -1137,7 +1247,23 @@ function Row({ title, sub, onClick, accent }: { title: string; sub: string; onCl
   );
 }
 
-function HomeBody({ s, me, onRescan, onProve, onAdd, onConnect }: { s: State; me?: Person; onRescan: () => void; onProve: () => void; onAdd: () => void; onConnect: () => void }) {
+function HomeBody({
+  s,
+  me,
+  onRescan,
+  onProve,
+  onAdd,
+  onConnect,
+  onSignOut,
+}: {
+  s: State;
+  me?: Person;
+  onRescan: () => void;
+  onProve: () => void;
+  onAdd: () => void;
+  onConnect: () => void;
+  onSignOut: () => void;
+}) {
   if (!me) return null;
   const p = progress(s, me);
   return (
@@ -1163,10 +1289,20 @@ function HomeBody({ s, me, onRescan, onProve, onAdd, onConnect }: { s: State; me
       </div>
       {!me.links.github && <p className="hint">Örnek profil: gerçek bir GitHub hesabına bağlı değil, her şey Beyan düzeyinde.</p>}
       <ul className="mt-6 space-y-3">
-        {hasGhBeyan(me) && <Row accent title="Sahipliğini kanıtla" sub="İşlerin Beyan düzeyinde; kanıtlayınca Doğrulandı olur." onClick={onProve} />}
+        {hasGhBeyan(me) &&
+          (authReady ? (
+            <Row accent title="GitHub ile giriş yap" sub="Tek dokunuşla doğrula; Beyan düzeyindeki işlerin Doğrulandı olur." onClick={signIn} />
+          ) : (
+            <Row accent title="Sahipliğini kanıtla" sub="İşlerin Beyan düzeyinde; kanıtlayınca Doğrulandı olur." onClick={onProve} />
+          ))}
         {me.links.github ? <Row title="Yeniden tara" sub="Yeni depoları ve son 90 günün etkinliğini oku." onClick={onRescan} /> : <Row accent title="Gerçek hesabını bağla" sub="Örnek yerine kendi GitHub hesabını kullan." onClick={onConnect} />}
         <Row title="Yeni kanıt ekle" sub="Alan adı ya da kendi sözünle bir iş." onClick={onAdd} />
       </ul>
+      <button type="button" onClick={onSignOut} className="btn-quiet mt-6 !text-red-lip">
+        <LogOut className="h-5 w-5" strokeWidth={3} aria-hidden="true" />
+        Çıkış yap
+      </button>
+      <p className="hint !mt-1">{me.links.github ? `@${me.links.github} bağlantısı ve bu tarayıcıdaki ilerlemen silinir; örnek profile dönersin.` : 'Örnek profil ve bu tarayıcıdaki ilerlemen silinir.'}</p>
     </>
   );
 }

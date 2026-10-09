@@ -2,9 +2,24 @@
 import Layout from '../layouts/Layout.astro';
 import Niri from '../components/ui/Niri';
 import { Contours, Tri } from '../components/ui/pafta';
+
+// GitHub Pages serves this file for every missing path. Detail pages for ids made at
+// runtime have no file of their own: hand them to the `_` page with the id in ?id=.
+const base = process.env.PAGES === '1' ? (process.env.PAGES_BASE ?? '/Nirengi') : '';
 ---
 
 <Layout title="Sayfa bulunamadı" description="Aradığın sayfa bu haritada yok.">
+  {
+    base && (
+      <script is:inline define:vars={{ base }}>
+        (() => {
+          const p = location.pathname.startsWith(base) ? location.pathname.slice(base.length) : location.pathname;
+          const m = p.match(/^\/(ihtiyaclar|kart|pilotlar|profil)\/([^/]+)\/?$/);
+          if (m && m[2] !== '_') location.replace(base + '/' + m[1] + '/_?id=' + encodeURIComponent(decodeURIComponent(m[2])) + location.hash);
+        })();
+      </script>
+    )
+  }
   <section class="relative overflow-hidden">
     <Contours seed={4} x={0.5} y={0.5} rings={9} step={30} opacity={0.45} />
     <div class="relative mx-auto flex max-w-[560px] flex-col items-center px-4 py-14 text-center sm:py-20">

@@ -1,13 +1,14 @@
 // "Niri'ye sor": the one small help button of either face. It opens a sheet with
 // what this page is for, a way to replay the tour, and the glossary.
 
-import { useEffect, useState } from 'react';
 import { Sheet } from '../ui/kit';
 import Niri from '../ui/Niri';
 import { NiriFace, Pip } from './art';
 import { glossaryFor, helpFor, type RouteKey } from './tours';
 import type { Face } from './util';
 import { openDefter } from '../genc/defter';
+import { nowBarOn } from '../genc/NowBar';
+import { useLift } from '../ui/lift';
 
 interface Props {
   face: Face;
@@ -23,59 +24,25 @@ interface Props {
   onWelcome: () => void;
 }
 
-/**
- * Bottom offset in px. It sits above the phone tab bar, rises above the demo
- * tour panel when that is open, and steps aside while the feedback bar shows
- * (both are found in the DOM and measured, so a fresh mount gets it right too).
- */
-function useLift() {
-  const [bottom, setBottom] = useState(20);
-  useEffect(() => {
-    let raf = 0;
-    const calc = () => {
-      raf = 0;
-      let n = innerWidth < 1024 ? 76 : 20;
-      const panel = document.querySelector('aside[aria-label="Demo turu"]');
-      if (panel) {
-        const r = panel.getBoundingClientRect();
-        if (r.width > 0) n = Math.max(n, innerHeight - r.top + 12);
-      }
-      // The feedback bar is anchored to the bottom whatever its height or offset: clear its layout top.
-      const bar = document.querySelector<HTMLElement>('.feedback-dock');
-      if (bar && bar.offsetHeight) n = Math.max(n, innerHeight - bar.offsetTop + 12);
-      setBottom(n);
-    };
-    const schedule = () => {
-      if (!raf) raf = requestAnimationFrame(calc);
-    };
-    const mo = new MutationObserver(schedule);
-    mo.observe(document.body, { childList: true, subtree: true });
-    window.addEventListener('resize', schedule);
-    schedule();
-    return () => {
-      mo.disconnect();
-      window.removeEventListener('resize', schedule);
-      if (raf) cancelAnimationFrame(raf);
-    };
-  }, []);
-  return bottom;
-}
-
 export default function Help({ face, route, open, onOpen, onClose, hasTour, home, onTour, onWelcome }: Props) {
   const bottom = useLift();
+  // On genç pages the Şimdi bar carries the way in, so the key steps back there.
+  const key = !(face === 'genc' && nowBarOn());
   return (
     <>
-      <button
-        type="button"
-        onClick={onOpen}
-        data-assistant
-        aria-haspopup="dialog"
-        className="no-print btn-line btn-sm fixed right-4 z-[44] !min-h-11 !gap-1.5 !pl-2.5 !pr-3.5 transition-[bottom] duration-200"
-        style={{ bottom: `calc(env(safe-area-inset-bottom) + ${bottom}px)` }}
-      >
-        <NiriFace size={26} />
-        Niri’ye sor
-      </button>
+      {key && (
+        <button
+          type="button"
+          onClick={onOpen}
+          data-assistant
+          aria-haspopup="dialog"
+          className="no-print btn-line btn-sm fixed right-4 z-[44] !min-h-11 !gap-1.5 !pl-2.5 !pr-3.5 transition-[bottom] duration-200"
+          style={{ bottom: `calc(env(safe-area-inset-bottom) + ${bottom}px)` }}
+        >
+          <NiriFace size={26} />
+          Niri’ye sor
+        </button>
+      )}
 
       <Sheet open={open} onClose={onClose} title="Niri’ye sor">
         <div className="flex items-end gap-3">

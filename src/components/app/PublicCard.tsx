@@ -7,6 +7,7 @@ import { shortHash, verifyChain } from '../../lib/engine/ledger.ts';
 import { PILOT_STATUS, SCALE, SECTOR } from '../../lib/labels.ts';
 import { fmtDate } from '../../lib/format.ts';
 import type { Pilot } from '../../lib/types.ts';
+import { routeId } from '../../lib/route.ts';
 import { EmptyState, feedback, Why } from '../ui/kit';
 import { CheckCircle } from '../ui/icons';
 import { Avatar, LevelBadge, Mark, OrgMark } from '../ui/primitives';
@@ -32,7 +33,7 @@ function Gate({ title, children }: { title: string; children: string }) {
 
 export default function PublicCard({ id }: { id: string }) {
   const s = useAppState();
-  const p = byId.pilot(s, id);
+  const p = byId.pilot(s, routeId(id));
   if (!p) return <Gate title="Bu kart bulunamadı">Bağlantı eski olabilir ya da kart bu cihazda yok.</Gate>;
   if (p.status === 'active') return <Gate title="Bu proje henüz kapanmadı">Kart yalnız kapanmış projeler için hazırlanır.</Gate>;
   if (!p.closure?.publicConsent.person || !p.closure.publicConsent.org) return <Gate title="Taraflar yayın onayı vermedi">Kart, iki taraf da onay verirse yayımlanır.</Gate>;
