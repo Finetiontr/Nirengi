@@ -1,3 +1,4 @@
+/// <reference types="astro/client" />
 // "GitHub ile giriş yap": a real OAuth round trip through the nirengi-auth worker
 // (auth/worker.js). The worker swaps GitHub's code for a token and sends the visitor
 // back with #gh_token=… in the fragment. The token asks for no scopes: it proves the
@@ -29,9 +30,30 @@ export function basePath() {
 // Built from parts so the Pages build's path rewrite does not prefix them twice.
 const pageUrl = (name: string) => `${location.origin}${basePath()}/${name}`;
 
+// A sign-in this tab started carries a one-time nonce through the round trip, so a
+// crafted link with someone else's #gh_token cannot sign the visitor into that account.
+const NONCE_KEY = 'nirengi:gh-nonce';
+
 export function signIn() {
   if (!authReady) return;
-  location.assign(`${AUTH_URL}/login?return=${encodeURIComponent(pageUrl('kanit-bagla'))}`);
+  const nonce = crypto.getRandomValues(new Uint32Array(2)).join('');
+  try {
+    sessionStorage.setItem(NONCE_KEY, nonce);
+  } catch {
+    /* private mode: the token will be refused on return */
+  }
+  location.assign(`${AUTH_URL}/login?return=${encodeURIComponent(`${pageUrl('kanit-bagla')}?n=${nonce}`)}`);
+}
+
+function takeNonce(got: string | null) {
+  let want: string | null = null;
+  try {
+    want = sessionStorage.getItem(NONCE_KEY);
+    sessionStorage.removeItem(NONCE_KEY);
+  } catch {
+    /* no storage */
+  }
+  return !!want && got === want;
 }
 
 export type AuthReturn = { token: string } | { error: string } | null;
@@ -42,8 +64,12 @@ export function consumeAuthHash(): AuthReturn {
   const token = h.get('gh_token');
   const error = h.get('gh_error');
   if (!token && !error) return null;
-  history.replaceState(null, '', location.pathname + location.search);
+  const q = new URLSearchParams(location.search);
+  const nonce = q.get('n');
+  q.delete('n');
+  history.replaceState(null, '', location.pathname + (q.size ? `?${q}` : ''));
   if (token) {
+    if (!takeNonce(nonce)) return { error: 'state' };
     setToken(token);
     return { token };
   }
