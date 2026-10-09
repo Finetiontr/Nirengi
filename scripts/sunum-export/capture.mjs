@@ -1,8 +1,10 @@
-// Renders every slide of /sunum as layers for the PowerPoint export (see README.md).
-// Per slide: the full frame (reference), the background (all `s-in` blocks and Niri
-// hidden), every top-level `s-in` block alone on transparency, Niri alone and the
-// bubble alone. Frames are 1920×1080 at 2× so the stage (1600×900, scaled 1.2) fills
-// them exactly; build.py trims each layer to its alpha box and places it.
+// Renders every slide of /sunum, the appendix included, as layers for the PowerPoint
+// export (see README.md). Per slide: the full frame (reference), the background (all
+// `s-in` blocks and Niri hidden), every top-level `s-in` block alone on transparency,
+// Niri alone and the bubble alone. The film slide has no Niri: it is shot on the
+// video's poster and build.py embeds the video itself. Frames are 1920×1080 at 2× so
+// the stage (1600×900, scaled 1.2) fills them exactly; build.py trims each layer to
+// its alpha box and places it.
 //
 //   node capture.mjs [--url http://127.0.0.1:4321/sunum] [--out <dir>]
 // Env: PLAYWRIGHT_DIR (folder holding node_modules/playwright), CHROME_PATH.
@@ -68,8 +70,9 @@ await page.addStyleTag({
   `,
 });
 
-const count = await page.evaluate(() => Number(document.querySelector('[aria-roledescription="slayt"]').getAttribute('aria-label').match(/\/\s*(\d+)/)[1]));
+// notes.ts lists every slide in deck order.
 const slideIds = Object.keys(NOTES);
+const count = slideIds.length;
 const manifest = { width: 3840, height: 2160, stage: { width: 1600, height: 900 }, slides: [] };
 
 for (let n = 1; n <= count; n++) {
@@ -78,6 +81,22 @@ for (let n = 1; n <= count; n++) {
   // Let late pieces (the survey flag, fonts in new weights) settle.
   await page.evaluate(() => document.fonts.ready);
   await page.waitForTimeout(1600);
+
+  // The film slide: note the video's length, stop it and show its poster (a src-less load does that).
+  const film = await page.evaluate(() => {
+    if (getComputedStyle(document.querySelector('.narrator')).visibility !== 'hidden') return null;
+    const v = document.querySelector('.stage section video');
+    const ms = v && Number.isFinite(v.duration) ? Math.round(v.duration * 1000) : 0;
+    if (v) {
+      v.pause();
+      v.removeAttribute('src');
+      v.load();
+    }
+    return { ms };
+  });
+  const bare = !!film;
+  if (bare) await page.waitForTimeout(600);
+  const appendix = await page.evaluate(() => document.querySelector('[aria-roledescription="slayt"]').getAttribute('aria-label').startsWith('Ek '));
 
   const dir = join(OUT, String(n).padStart(2, '0'));
   mkdirSync(dir, { recursive: true });
@@ -117,8 +136,10 @@ for (let n = 1; n <= count; n++) {
     await page.evaluate((sel) => document.querySelector(sel).removeAttribute('data-x-show'), sel);
   };
   for (const l of info.layers) await only(`[data-x-layer="${l.k}"]`, `l${l.k}.png`);
-  await only('[data-x-niri]', 'niri.png');
-  await only('[data-x-bubble]', 'bubble.png');
+  if (!bare) {
+    await only('[data-x-niri]', 'niri.png');
+    await only('[data-x-bubble]', 'bubble.png');
+  }
 
   await page.evaluate(() => {
     document.documentElement.classList.remove('x-clear');
@@ -130,7 +151,7 @@ for (let n = 1; n <= count; n++) {
   });
 
   const id = slideIds[n - 1];
-  manifest.slides.push({ n, id, title: info.title, line: info.line, notes: NOTES[id] ?? null, layers: info.layers.map((l) => ({ ...l, file: `l${l.k}.png` })) });
+  manifest.slides.push({ n, id, bare, appendix, film_ms: film?.ms || null, title: info.title, line: info.line, notes: NOTES[id] ?? null, layers: info.layers.map((l) => ({ ...l, file: `l${l.k}.png` })) });
   console.log(`${n}/${count} ${info.title}: ${info.layers.length} layers`);
 }
 

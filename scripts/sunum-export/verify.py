@@ -36,10 +36,13 @@ def check(ok, msg):
 manifest = json.loads((LAYERS / "manifest.json").read_text(encoding="utf-8"))
 prs = Presentation(PPTX)
 W, H = prs.slide_width, prs.slide_height
-check(len(prs.slides) == len(manifest["slides"]) == 16, f"slide count {len(prs.slides)}")
+check(len(prs.slides) == len(manifest["slides"]), f"slide count {len(prs.slides)}")
 for n, slide in enumerate(prs.slides, 1):
     names = [s.name for s in slide.shapes]
-    check(names.count("!!niri") == 1 and names.count("!!bubble") == 1, f"{n}: niri/bubble names {names}")
+    if manifest["slides"][n - 1].get("bare"):
+        check(any(x.endswith("tanıtım videosu") for x in names), f"{n}: film missing {names}")
+    else:
+        check(names.count("!!niri") == 1 and names.count("!!bubble") == 1, f"{n}: niri/bubble names {names}")
     check(len(set(names)) == len(names), f"{n}: duplicate names")
     for s in slide.shapes:
         check(s.left >= 0 and s.top >= 0 and s.left + s.width <= W and s.top + s.height <= H, f"{n}: {s.name} out of bounds")
@@ -94,7 +97,7 @@ for rec in placed["slides"]:
     ImageDraw.Draw(pair).text((8, 6), f"{n}  web | pptx layers", fill=(200, 0, 120))
     thumbs.append(pair)
 
-sheet = Image.new("RGB", (thumbs[0].width * 2 + 12, (thumbs[0].height + 12) * 8), (40, 40, 40))
+sheet = Image.new("RGB", (thumbs[0].width * 2 + 12, (thumbs[0].height + 12) * ((len(thumbs) + 1) // 2)), (40, 40, 40))
 for k, t in enumerate(thumbs):
     sheet.paste(t, ((k % 2) * (t.width + 12), (k // 2) * (t.height + 12)))
 sheet.save(LAYERS / "contact.png")

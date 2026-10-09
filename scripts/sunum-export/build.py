@@ -5,8 +5,10 @@
 Every layer is a picture at its exact stage position, so a slide matches the web
 deck. Blocks enter with Fade + a 16 px rise in their `--d` order (all automatic);
 Niri and the bubble keep the names `!!niri` / `!!bubble` on every slide and the
-slides change with Morph (Fade fallback), so Niri glides between marks. Speaker
-notes from notes.ts go into each slide's notes pane. Needs python-pptx and Pillow.
+slides change with Morph (Fade fallback), so Niri glides between marks. The film
+slide carries the promo video (public/sunum), full-frame on its poster, and starts
+it on its own as the slide opens. Speaker notes from notes.ts go into each slide's
+notes pane. Needs python-pptx and Pillow.
 """
 
 import json
@@ -21,6 +23,7 @@ from pptx.util import Emu
 LAYERS = Path(sys.argv[1])
 OUT = Path(sys.argv[2])
 WORK = LAYERS / "_trim"
+FILM = Path(__file__).resolve().parents[2] / "public" / "sunum" / "nirengi-tanitim-web.mp4"
 
 SLIDE_W, SLIDE_H = 12192000, 6858000  # 13.333 x 7.5 in
 RISE = 16 / 900  # the web's translateY(16px) as a fraction of slide height
@@ -53,6 +56,7 @@ class Timing:
     def __init__(self):
         self.next_id = 5  # 1 tmRoot, 2 mainSeq, 3 and 4 the click group that starts on its own
         self.effects = []
+        self.media = None
 
     def nid(self):
         self.next_id += 1
@@ -134,9 +138,20 @@ class Timing:
             return out
         self._effect(6, "emph", delay, body)
 
+    def play(self, spid, ms):
+        """Start a video as the slide opens (PowerPoint's Start: Automatically)."""
+        self.media = spid
+        self._effect(1, "mediacall", 0, lambda: (
+            f'<p:cmd type="call" cmd="playFrom(0.0)"><p:cBhvr><p:cTn id="{self.nid()}" dur="{ms}" fill="hold"/>'
+            f'<p:tgtEl><p:spTgt spid="{spid}"/></p:tgtEl></p:cBhvr></p:cmd>'))
+
     def xml(self):
         if not self.effects:
             return None
+        media = "" if self.media is None else (
+            f'<p:video><p:cMediaNode vol="80000"><p:cTn id="{self.nid()}" fill="hold" display="0">'
+            '<p:stCondLst><p:cond delay="indefinite"/></p:stCondLst></p:cTn>'
+            f'<p:tgtEl><p:spTgt spid="{self.media}"/></p:tgtEl></p:cMediaNode></p:video>')
         return (
             f'<p:timing xmlns:p="{NS["p"]}"><p:tnLst><p:par><p:cTn id="1" dur="indefinite" restart="never" nodeType="tmRoot"><p:childTnLst>'
             f'<p:seq concurrent="1" nextAc="seek"><p:cTn id="2" dur="indefinite" nodeType="mainSeq"><p:childTnLst>'
@@ -147,7 +162,8 @@ class Timing:
             + '</p:childTnLst></p:cTn></p:par></p:childTnLst></p:cTn></p:par>'
             '</p:childTnLst></p:cTn><p:prevCondLst><p:cond evt="onPrev" delay="0"><p:tgtEl><p:sldTgt/></p:tgtEl></p:cond></p:prevCondLst>'
             '<p:nextCondLst><p:cond evt="onNext" delay="0"><p:tgtEl><p:sldTgt/></p:tgtEl></p:cond></p:nextCondLst></p:seq>'
-            '</p:childTnLst></p:cTn></p:par></p:tnLst></p:timing>'
+            + media
+            + '</p:childTnLst></p:cTn></p:par></p:tnLst></p:timing>'
         )
 
 
@@ -173,7 +189,7 @@ def main():
     prs.slide_width, prs.slide_height = Emu(SLIDE_W), Emu(SLIDE_H)
     blank = prs.slide_layouts[6]
     placed = {"slides": []}
-    last = len(manifest["slides"])
+    close = max(x["n"] for x in manifest["slides"] if not x.get("appendix"))
 
     for s in manifest["slides"]:
         n, src = s["n"], LAYERS / f"{s['n']:02d}"
@@ -205,8 +221,19 @@ def main():
             p = put(layer["file"], f"s{n} blok {layer['k'] + 1}")
             if p is not None:
                 blocks.append((layer["delay"], layer["k"], p.shape_id))
-        niri = put("niri.png", "!!niri")
-        bubble = put("bubble.png", "!!bubble")
+        if s.get("bare"):
+            # The film: full frame on its poster, started by our own timing below.
+            niri = bubble = None
+            if FILM.exists():
+                movie = shapes.add_movie(str(FILM), 0, 0, Emu(SLIDE_W), Emu(SLIDE_H), poster_frame_image=str(dst / "bg.png"), mime_type="video/mp4")
+                movie.name = f"s{n} tanıtım videosu"
+                old = slide._element.find(P + "timing")
+                if old is not None:
+                    old.getparent().remove(old)
+                t.play(movie.shape_id, int(s.get("film_ms") or 90000))
+        else:
+            niri = put("niri.png", "!!niri")
+            bubble = put("bubble.png", "!!bubble")
 
         # Blocks in their --d order; the first carries no wait after the transition.
         for delay, _, spid in sorted(blocks):
@@ -216,7 +243,7 @@ def main():
             t.pop_in(niri.shape_id, 150)
             t.wave(niri.shape_id, 520)
             t.pop_in(bubble.shape_id, 420, dur=300, start=0.92)
-        elif n == last:
+        elif n == close:
             t.cheer(niri.shape_id, 250)
 
         sld = slide._element
