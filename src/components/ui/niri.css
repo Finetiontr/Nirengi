@@ -312,7 +312,7 @@
   72% { transform: scale(1.1); }
 }
 .niri[data-act='spin'] .n-shadow { animation: n-shadow-spin 0.95s linear both; }
-.niri[data-act='spin'] .n-ground { animation: n-ground 0.8s ease-out 0.66s both; }
+.niri[data-act='spin'] .n-ground { animation: n-ground 0.8s ease-out 0.66s forwards; }
 
 /* Lively idle set (genç screens and the saha defteri only, see the lively prop). */
 
@@ -428,13 +428,13 @@
 }
 .niri[data-mood='cheer'] .n-shadow { animation: n-shadow-cheer 1.8s linear infinite; }
 
-/* A survey ping off the belly dot when Niri lands. */
+/* A survey ping off the belly dot when Niri lands. Rings fill forwards, not both: nothing shows while Niri is still in the air. */
 .n-ping { transform-box: fill-box; transform-origin: center; opacity: 0; }
 @keyframes n-ping {
   0% { transform: scale(1); opacity: 0.85; }
   100% { transform: scale(3.2); opacity: 0; }
 }
-.niri[data-act='hop'] .n-ping { animation: n-ping 0.7s ease-out 0.46s both; }
+.niri[data-act='hop'] .n-ping { animation: n-ping 0.7s ease-out 0.46s forwards; }
 @keyframes n-ping-loop {
   0%, 49% { transform: scale(1); opacity: 0; }
   50% { transform: scale(1); opacity: 0.85; }
@@ -463,8 +463,8 @@
   0% { transform: scale(1); opacity: 0.8; }
   100% { transform: scale(3, 2.4); opacity: 0; }
 }
-.niri[data-act='enter'] .n-ground { animation: n-ground 0.9s ease-out 0.58s both; }
-.niri[data-act='enter'] .n-ping { animation: n-ping 0.7s ease-out 0.58s both; }
+.niri[data-act='enter'] .n-ground { animation: n-ground 0.9s ease-out 0.58s forwards; }
+.niri[data-act='enter'] .n-ping { animation: n-ping 0.7s ease-out 0.58s forwards; }
 
 /* NiriSays bubble: grows out of its tail. */
 @keyframes n-bubble-in {
@@ -515,9 +515,11 @@
 
 /* ---------------------------------------------------------------- feedback toast */
 
-/* The toast dock floats bottom-centre; inside the app shell it clears the deck (--deck is its top edge). */
+/* The toast dock floats bottom-centre; inside the app shell it clears the deck (--deck is its top edge).
+   Flow screens keep their keys at the foot, so there the toast drops in from the top. */
 .feedback-dock { bottom: calc(env(safe-area-inset-bottom) + 20px); transition: bottom 200ms; }
 html[data-mode] .feedback-dock { bottom: calc(var(--deck, 96px) + 10px); }
+html[data-flow] .feedback-dock { top: calc(env(safe-area-inset-top) + 12px); bottom: auto; }
 
 @keyframes fb-bar {
   from { transform: scaleX(1); }

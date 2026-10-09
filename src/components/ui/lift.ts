@@ -21,8 +21,9 @@ export function useLift() {
         if (r.width > 0) n = Math.max(n, innerHeight - r.top + 12);
       }
       // The feedback bar is anchored to the bottom whatever its height or offset: clear its layout top.
+      // On flow screens it hangs from the top instead and leaves the foot alone.
       const bar = document.querySelector<HTMLElement>('.feedback-dock');
-      if (bar && bar.offsetHeight) n = Math.max(n, innerHeight - bar.offsetTop + 12);
+      if (bar && bar.offsetHeight && !document.documentElement.hasAttribute('data-flow')) n = Math.max(n, innerHeight - bar.offsetTop + 12);
       setBottom(n);
     };
     const schedule = () => {

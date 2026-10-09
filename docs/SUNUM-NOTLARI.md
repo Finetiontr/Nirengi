@@ -1,6 +1,6 @@
 # Sunum notları
 
-*Zemin360 finali · 12 slayt ve 8 ek · planlanan süre 5:50 (video 1:20, konuşma 4:30)*
+*Zemin360 finali · 12 slayt ve 8 ek · planlanan süre 5:49 (video 1:19, konuşma 4:30)*
 
 Bu dosya `src/components/sunum/notes.ts` dosyasından üretildi; notları orada düzeltin. Sunum sırasında aynı notlar konuşmacı penceresinde görünür: sunumda **N** tuşu ya da `/sunum?notlar` adresi. Pencere sunumu izler, ok tuşlarıyla sunumu yönetir, **R** süreyi sıfırlar.
 
@@ -51,7 +51,7 @@ Slaytlardaki her sayı `docs/PAZAR-ANALIZI.md` içindeki kaynağıyla birlikte s
 
 ## 6. Niri anlatıyor
 
-*2:00 – 3:20 · Niri: “Sahne benim! Ürünü telefonda göstereyim.”*
+*2:00 – 3:19 · Niri: “Sahne benim! Ürünü telefonda göstereyim.”*
 
 - (Video oynar; konuşma yok. Bitince → ile devam.)
 - Süre kalırsa canlı göster: hazır kurum penceresinde Örnekle doldur → Taslağa dönüştür → Metninden çıkardıklarım.
@@ -59,7 +59,7 @@ Slaytlardaki her sayı `docs/PAZAR-ANALIZI.md` içindeki kaynağıyla birlikte s
 
 ## 7. Yapay zekâ ne yapıyor
 
-*3:20 – 3:50 · Niri: “Derdini yaz, ben okuyayım. Uydurmam.”*
+*3:19 – 3:49 · Niri: “Derdini yaz, ben okuyayım. Uydurmam.”*
 
 - Videoda gördüğünüz yapay zekâ adımı şu: kurum derdini kendi sözleriyle yazıyor.
 - Açık ağırlıklı bir model, Gemma 4, bu metni yedi alanlı ihtiyaç kanvasına çeviriyor: mevcut durum, sorun, sorunun ölçüsü, hedef, kısıtlar, karar verici ve kapsam.
@@ -67,7 +67,7 @@ Slaytlardaki her sayı `docs/PAZAR-ANALIZI.md` içindeki kaynağıyla birlikte s
 
 ## 8. Önce ve sonra
 
-*3:50 – 4:15 · Niri: “Aynı metinden daha dolu bir taslak.”*
+*3:49 – 4:14 · Niri: “Aynı metinden daha dolu bir taslak.”*
 
 - Fark ne? Aynı metni önceki kural motorumuz da okuyordu.
 - Kural motoru beş alan buldu: netlik 60, yayımlanamaz.
@@ -76,7 +76,7 @@ Slaytlardaki her sayı `docs/PAZAR-ANALIZI.md` içindeki kaynağıyla birlikte s
 
 ## 9. Hatalı çıktıya karşı
 
-*4:15 – 4:45 · Niri: “Metinde yoksa almam, sorarım.”*
+*4:14 – 4:44 · Niri: “Metinde yoksa almam, sorarım.”*
 
 - Model yanılırsa? Cevabını doğrudan kullanmıyoruz; dört kapıdan geçiyor.
 - Şemaya uymalı, her alanın alıntısı metinde birebir geçmeli, alandaki her sayı metinde yazmalı, her kriter ölçülebilir olmalı.
@@ -85,7 +85,7 @@ Slaytlardaki her sayı `docs/PAZAR-ANALIZI.md` içindeki kaynağıyla birlikte s
 
 ## 10. Tasarım kararları
 
-*4:45 – 5:10 · Niri: “Gence oyun, kuruma sakin bir ölçüm.”*
+*4:44 – 5:09 · Niri: “Gence oyun, kuruma sakin bir ölçüm.”*
 
 - Tasarımda beş karar verdik.
 - Her ekranda tek iş, ve önce telefon.
@@ -95,7 +95,7 @@ Slaytlardaki her sayı `docs/PAZAR-ANALIZI.md` içindeki kaynağıyla birlikte s
 
 ## 11. Bitti ve bırakılan
 
-*5:10 – 5:35 · Niri: “Prototipim çalışıyor. Gerisini pilotta kanıtlayacağım.”*
+*5:09 – 5:34 · Niri: “Prototipim çalışıyor. Gerisini pilotta kanıtlayacağım.”*
 
 - Altı problemin altısına çalışan bir ekranımız var. GitHub ve DNS doğrulaması, yapay zekâ taslağı ve denetimi canlıda.
 - Bilerek bıraktıklarımız da belli: kalıcı veritabanı yok, veri tarayıcıda. Demo kişileri kurgusal ve ekranda öyle yazıyor.
@@ -103,7 +103,7 @@ Slaytlardaki her sayı `docs/PAZAR-ANALIZI.md` içindeki kaynağıyla birlikte s
 
 ## 12. Teşekkürler
 
-*5:35 – 5:50 · Niri: “Zirvedeyim! Teşekkürler, haritada görüşmek üzere.”*
+*5:34 – 5:49 · Niri: “Zirvedeyim! Teşekkürler, haritada görüşmek üzere.”*
 
 - Tek bir isteğimiz var: bu salondan bir kurumun gerçek bir ihtiyacı. İlk kanvası birlikte yazalım.
 - Beyan değil, kanıt. Teşekkürler; sorularınızı bekliyoruz.

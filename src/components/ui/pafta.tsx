@@ -239,6 +239,8 @@ export function ClimbMap({ zones }: { zones: MapZone[] }) {
   useLayoutEffect(() => {
     const el = box.current;
     if (!el) return;
+    // Measure before the first paint so the trail never draws at the placeholder width.
+    setW(el.clientWidth);
     const ro = new ResizeObserver(([e]) => setW(e.contentRect.width));
     ro.observe(el);
     return () => ro.disconnect();
@@ -267,7 +269,7 @@ export function ClimbMap({ zones }: { zones: MapZone[] }) {
   const rings = useMemo(() => Array.from({ length: 14 }, (_, k) => contourPath(w / 2, TOP * 0.35, 34 + k * (h / 11), 2 + k * 0.4, 36)), [w, h]);
 
   return (
-    <div ref={box} className="relative" style={{ height: h }}>
+    <div ref={box} className="relative overflow-x-clip" style={{ height: h }}>
       <svg width={w} height={h} className="pointer-events-none absolute inset-0" aria-hidden="true">
         {rings.map((d, k) => (
           <path key={k} d={d} fill="none" stroke={`rgb(var(--line-2) / ${k % 4 === 3 ? 0.7 : 0.45})`} strokeWidth={k % 4 === 3 ? 1.8 : 1.1} />

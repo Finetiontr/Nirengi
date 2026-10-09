@@ -42,7 +42,7 @@ const flow = /\/(kanit-bagla|ihtiyaclar\/yeni)\/?$/.test(path);
 ---
 
 <!doctype html>
-<html lang="tr" data-mode={mode === 'auto' ? 'genc' : mode}>
+<html lang="tr" data-mode={mode === 'auto' ? 'genc' : mode} data-flow={flow ? '' : undefined}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />

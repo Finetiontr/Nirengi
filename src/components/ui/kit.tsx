@@ -454,21 +454,23 @@ function Toast({ item, newest, onDone }: { item: ToastItem; newest: boolean; onD
 
   const mood = msg.tone === 'bad' ? 'sad' : msg.tone === 'info' ? 'talk' : rich && (msg.xp || msg.streak) ? 'cheer' : 'happy';
   const col = TONE_OF[msg.tone];
+  // On flow screens the dock hangs from the top (niri.css): enter, leave and swipe away upwards.
+  const dir = document.documentElement.hasAttribute('data-flow') ? -1 : 1;
   return (
     <motion.div
       layout
       role="status"
       className="feedback-toast pointer-events-auto relative w-full max-w-[440px] rounded-[18px] border-2 border-line bg-bg shadow-[0_14px_36px_-12px_rgb(0_0_0/0.3),0_2px_8px_-2px_rgb(0_0_0/0.12)]"
-      initial={{ y: 56, opacity: 0, scale: 0.94 }}
+      initial={{ y: 56 * dir, opacity: 0, scale: 0.94 }}
       animate={{ y: 0, opacity: newest ? 1 : 0.88, scale: newest ? 1 : 0.96, ...(msg.tone === 'bad' && newest ? { x: [0, -7, 6, -4, 2, 0] } : {}) }}
-      exit={{ y: 28, opacity: 0, scale: 0.96, transition: { duration: 0.16 } }}
+      exit={{ y: 28 * dir, opacity: 0, scale: 0.96, transition: { duration: 0.16 } }}
       transition={{ type: 'spring', stiffness: 460, damping: 26, x: { duration: 0.42, ease: 'easeOut', delay: 0.12 } }}
       drag="y"
       dragConstraints={{ top: 0, bottom: 0 }}
-      dragElastic={{ top: 0, bottom: 0.5 }}
+      dragElastic={dir > 0 ? { top: 0, bottom: 0.5 } : { top: 0.5, bottom: 0 }}
       dragSnapToOrigin
       onDragEnd={(_, i) => {
-        if (i.offset.y > 36 || i.velocity.y > 450) onDone(id);
+        if (i.offset.y * dir > 36 || i.velocity.y * dir > 450) onDone(id);
       }}
       onHoverStart={() => setHover(true)}
       onHoverEnd={() => setHover(false)}

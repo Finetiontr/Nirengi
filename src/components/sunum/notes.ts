@@ -53,7 +53,7 @@ export const NOTES: Record<string, Note> = {
     ],
   },
   demo: {
-    sec: 80,
+    sec: 79,
     say: [
       '(Video oynar; konuşma yok. Bitince → ile devam.)',
       'Süre kalırsa canlı göster: hazır kurum penceresinde Örnekle doldur → Taslağa dönüştür → Metninden çıkardıklarım.',
