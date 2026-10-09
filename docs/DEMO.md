@@ -5,7 +5,7 @@ Kenardaki **Demo turu** paneli adımları gerçek durum değişikliklerinden iş
 ## Hazırlık (sunumdan önce)
 
 - [ ] `npm run build && npm run preview` ile üretim derlemesini aç (dev sunucusu değil).
-- [ ] Sunumda bağlanacak GitHub hesabının bio’suna `/kanit-bagla` akışının 4. adımında verilen kodu **önceden** ekle. Kod sekme açık kaldıkça aynı kalır (sessionStorage); gist yöntemi de çalışır. GitHub önbelleği ~1 dk gecikebilir.
+- [ ] Sunumda bağlanacak GitHub hesabında tarayıcıda oturum açık olsun. Nirengi uygulaması o hesaba daha önce kurulduysa GitHub’da **Configure** ile göstereceğin depoları (bir özel depo dahil) hazırla.
 - [ ] İki tarayıcı penceresi: solda **Kurum**, sağda **Genç** (sol menüdeki Genç/Kurum seçimi sekme başınadır, veri anında senkronlanır).
 - [ ] İnternet ya da GitHub sorgu sınırı sorunu olursa: `/kanit-bagla` → **Örnek profille devam et** (örnek veri olarak etiketlenir).
 
@@ -14,7 +14,7 @@ Kenardaki **Demo turu** paneli adımları gerçek durum değişikliklerinden iş
 | Süre | Ekran | Söylenecek |
 |------|-------|------------|
 | 0:00 | `/bugun` (Genç) | Haftalık hedef, haftalık seri, sıradaki adım ve yol. “Commit sayısı değil, üretim yaptığın gün sayılır.” |
-| 0:40 | `/kanit-bagla` | GitHub kullanıcı adı → “N eserin bulundu” → haftalık hedef → **Kontrol et** ile sahiplik → Doğrulandı + kutlama. |
+| 0:40 | `/kanit-bagla` | **GitHub’a bağlan** → GitHub’ın kendi sayfasında **Only select repositories** → depoları seç → **Install** → geri dönüş: “N eserin bulundu”, özel depo “Özel” etiketiyle, hepsi Doğrulandı. “Kod kopyalamadık, anahtar yapıştırmadık; hangi depoyu göstereceğine genç karar verdi.” |
 | 1:30 | `/kurum` → `/ihtiyaclar/yeni` (Kurum) | “Sırada ne var” kartı. Sihirbazda **Örnekle doldur** → **Taslağa dönüştür**; çözülebilirlik çubuğu 70 eşiğini geçince **Yayımla** açılır. |
 | 2:30 | `/ihtiyaclar/:id#adaylar` | Kör keşif: isim yok, iş var. Adaya dokun → “Neden bu uyum?” dört parça ve eksikler. **Pilot teklif et** → kimlik açılır. |
 | 3:20 | `/pilotlar/:id` | Kriterler aşamalara dönüştü. Genç pencerede **Teslim et**, kurum penceresinde **Onayla** → mühür. Defter: **Zinciri doğrula** → **Kurcalamayı dene** → zincir kırılır. |

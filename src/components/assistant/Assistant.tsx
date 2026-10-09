@@ -8,6 +8,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useAppState, useView } from '../../lib/store.ts';
+import { appReady, installUrl } from '../../lib/auth.ts';
 import { feedback } from '../ui/kit';
 import Coach from './Coach';
 import Help from './Help';
@@ -95,11 +96,12 @@ export default function Assistant() {
     }, 260);
   };
 
-  // The genç welcome ends at GitHub: Kanıt bağla walks through granting access (null)
-  // or reads a typed handle. Either way the Bugün tour follows.
+  // The genç welcome ends at GitHub: straight to the app's install page (null), which
+  // returns to Kanıt bağla, or Kanıt bağla reads a typed handle. Either way the Bugün tour follows.
   const connectGithub = (login: string | null) => {
     write(welcomeKey(face), 'tour');
-    location.assign(login === null ? '/kanit-bagla' : `/kanit-bagla?gh=${encodeURIComponent(login)}`);
+    if (login === null) location.assign(appReady() ? installUrl() : '/kanit-bagla');
+    else location.assign(`/kanit-bagla?gh=${encodeURIComponent(login)}`);
   };
 
   const closeTour = (finished: boolean) => {

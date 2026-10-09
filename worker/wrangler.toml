@@ -1,0 +1,11 @@
+# No account_id here on purpose: wrangler takes the logged-in account (or CLOUDFLARE_ACCOUNT_ID),
+# so the same config deploys to any Cloudflare account. See README.md.
+name = "nirengi-api"
+main = "index.ts"
+compatibility_date = "2026-09-01"
+workers_dev = true
+
+[vars]
+# Public id of the "Nirengi360" GitHub App; the secret is set with `wrangler secret put GITHUB_CLIENT_SECRET`.
+GITHUB_CLIENT_ID = "Iv23litvWL33aCeVhOt5"
+ALLOWED_ORIGINS = "https://finetiontr.github.io,http://127.0.0.1:4321,http://localhost:4321"

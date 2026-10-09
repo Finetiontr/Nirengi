@@ -11,3 +11,5 @@ dist-pages/
 .impeccable/review/
 .impeccable/build/
 .claude/skills
+.dev.vars
+.wrangler/

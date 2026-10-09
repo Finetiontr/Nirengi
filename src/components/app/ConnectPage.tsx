@@ -16,7 +16,7 @@ import {
   domainEvidence,
   fetchActivityDays,
   fetchGitHub,
-  fetchGrantedRepos,
+  fetchInstalledRepos,
   fetchMe,
   isGitHubLogin,
   MAX_REPOS,
@@ -31,7 +31,7 @@ import {
   type GhUser,
   type VerifyKind,
 } from '../../lib/verify.ts';
-import { forgetToken, getToken, grantUrl, isClassicKey, isGrantKey, saveToken, signOut } from '../../lib/auth.ts';
+import { appReady, completeReturn, forgetToken, getToken, installUrl, manageUrl, signInUrl, signOut, type ReturnResult } from '../../lib/auth.ts';
 import { LEVELS } from '../../lib/labels.ts';
 import { daysAgo, relTime, uid } from '../../lib/format.ts';
 import { skillLabel } from '../../lib/skills.ts';
@@ -52,7 +52,7 @@ interface Scan {
   /** Local days with public output in the last 90 days; null when GitHub would not say. */
   days: string[] | null;
   offline: boolean;
-  /** Read with a key granted on GitHub: the key itself proves the account is theirs. */
+  /** Read through the Nirengi GitHub App: only the account's owner can install it, so it proves the account is theirs. */
   granted?: boolean;
 }
 
@@ -65,7 +65,7 @@ interface Foot {
   /** Called when Enter is pressed while the key is disabled. */
   blocked?: () => void;
   icon?: ReactNode;
-  /** `href` opens in a new tab (GitHub's permission page), and `onClick` still runs. */
+  /** `href` opens in a new tab, and `onClick` still runs. */
   external?: boolean;
   side?: { label: string; onClick?: () => void; href?: string };
 }
@@ -105,6 +105,8 @@ const GOALS: { g: WeeklyGoal; name: string; text: string }[] = [
   { g: 3, name: 'Düzenli', text: 'Çoğu kişi için en sürdürülebilir tempo.' },
   { g: 5, name: 'Yoğun', text: 'Bir şeyi hızla büyütürken.' },
 ];
+
+const RETRY_KEY = 'nirengi:gh-retry';
 
 const demoUser = () => getState().people.find((p) => p.isDemoUser);
 const isGhVerified = (p?: Person) => !!p?.evidence.some((e) => e.source === 'github' && e.level === 'S2');
@@ -168,11 +170,8 @@ export default function ConnectPage() {
   const reduce = !!useReducedMotion();
 
   const [step, setStep] = useState<StepId>(me ? 'home' : 'user');
-  /** The handle field (Beyan only) instead of granting access on GitHub. */
-  const [manual, setManual] = useState(false);
-  /** The access key pasted from GitHub's permission page, and whether that page was opened. */
-  const [key, setKey] = useState('');
-  const [opened, setOpened] = useState(false);
+  /** The handle field (Beyan only) instead of connecting the GitHub App. */
+  const [manual, setManual] = useState(!appReady());
   const [dir, setDir] = useState(1);
   /** Started from the "Bağlı hesap" screen: finishing returns there instead of walking the whole flow. */
   const [from, setFrom] = useState<'flow' | 'home'>('flow');
@@ -212,7 +211,7 @@ export default function ConnectPage() {
 
   // ------------------------------------------------------------ actions
 
-  /** `raw` null: the account behind the granted key, whose work counts as Doğrulandı. */
+  /** `raw` null: the account behind the GitHub App token, whose work counts as Doğrulandı. */
   const scanFor = async (raw: string | null, back: StepId) => {
     const id = ++run.current;
     const granted = raw === null;
@@ -226,14 +225,15 @@ export default function ConnectPage() {
         if (id !== run.current) return;
         setHandle(user.login);
         setStage('Seçtiğin depoları okuyorum…');
-        const all = (await fetchGrantedRepos()).filter((r) => !r.fork && !r.archived);
+        const all = (await fetchInstalledRepos()).filter((r) => !r.fork && !r.archived);
         if (id !== run.current) return;
         setStage('Etkinliğini sayıyorum…');
         const days = await fetchActivityDays(user.login);
         if (id !== run.current) return;
-        // Private repositories are here only because they were ticked on GitHub: they lead and start selected.
-        const chosen = all.filter((r) => r.private);
-        const open = all.filter((r) => !r.private);
+        // Their own private repositories are here only because they were ticked on GitHub: they lead and start selected.
+        const mine = (r: GhRepo) => !r.owner || r.owner.login.toLowerCase() === user.login.toLowerCase();
+        const chosen = all.filter((r) => r.private && mine(r));
+        const open = all.filter((r) => !chosen.includes(r));
         setIncluded(new Set([...chosen, ...pickRepos(open)].map((r) => r.name)));
         setScan({ user, repos: [...chosen, ...pickRepos(open, 20)], days, offline: false, granted });
         return;
@@ -261,20 +261,45 @@ export default function ConnectPage() {
     void scanFor(login, 'user');
   };
 
-  /** A key pasted from GitHub's permission page: keep it in this browser and read the account behind it. */
-  const connectKey = (raw = key) => {
-    const k = raw.trim();
-    if (isClassicKey(k)) {
-      feedback({ tone: 'bad', title: 'Bu klasik bir anahtar', text: 'Klasik anahtar tüm hesabına erişir. GitHub’da yalnız seçtiğin depolar için yeni (fine-grained) bir anahtar oluştur.' });
+  /** Back from GitHub's install or sign-in page: finish the connection, or say plainly why not. */
+  const onReturn = (r: ReturnResult) => {
+    if (r.kind === 'none') return;
+    if (r.kind === 'ok') {
+      try {
+        sessionStorage.removeItem(RETRY_KEY);
+      } catch {
+        /* private mode */
+      }
+      const back = me?.links.github ? 'home' : 'user';
+      setFrom(back === 'home' ? 'home' : 'flow');
+      void scanFor(null, back);
       return;
     }
-    if (!isGrantKey(k)) {
-      feedback({ tone: 'bad', title: 'Anahtar tanınmadı', text: 'GitHub’ın verdiği anahtar “github_pat_” ile başlar. Tamamını kopyaladığından emin ol.' });
+    go(me ? 'home' : 'user', -1);
+    if (r.kind === 'unverified') {
+      // Installed from GitHub's own page, or the tab changed on the way: one silent sign-in finishes it.
+      let retried = true;
+      try {
+        retried = sessionStorage.getItem(RETRY_KEY) === '1';
+        sessionStorage.setItem(RETRY_KEY, '1');
+      } catch {
+        /* private mode: ask instead of looping */
+      }
+      if (!retried && appReady()) return location.replace(signInUrl());
+      feedback({ tone: 'info', title: 'GitHub’dan döndün', text: 'Bağlantıyı tamamlamak için “GitHub’a bağlan”a bir kez daha dokun.' });
       return;
     }
-    saveToken(k);
-    setKey('');
-    void scanFor(null, from === 'home' ? 'home' : 'user');
+    if (r.kind === 'requested') {
+      feedback({ tone: 'info', title: 'Onay bekleniyor', text: 'Bu GitHub kuruluşunun yöneticisi kurulumu onaylayınca depoların görünür.' });
+      return;
+    }
+    const text = {
+      denied: 'GitHub’da bağlantıyı iptal ettin. İstediğin zaman yeniden deneyebilirsin.',
+      expired: 'GitHub’ın verdiği tek kullanımlık kodun süresi doldu. Bir kez daha dene.',
+      network: 'Nirengi sunucusuna ulaşamadık. Bağlantını kontrol edip yeniden dene.',
+      config: 'GitHub bağlantısı bu kurulumda henüz açık değil. Şimdilik kullanıcı adınla devam edebilirsin.',
+    }[r.reason];
+    feedback({ tone: r.reason === 'denied' ? 'info' : 'bad', title: r.reason === 'denied' ? 'Bağlantı iptal edildi' : 'Bağlanamadık', text });
   };
 
   const continueWithExample = () => {
@@ -296,7 +321,7 @@ export default function ConnectPage() {
     feedback({
       tone: 'good',
       title: from === 'home' ? 'Profilin güncellendi' : `${picked.length} eser eklendi`,
-      text: from === 'home' ? `${picked.length} eser profilinde.` : sc.offline ? 'Örnek veri Beyan düzeyinde kalır.' : sc.granted ? 'GitHub’da izin verdiğin için hepsi Doğrulandı düzeyinde.' : ok ? 'Hesabın daha önce doğrulandığı için Doğrulandı düzeyinde.' : 'Şimdilik Beyan düzeyinde; sahipliğini kanıtlayınca Doğrulandı olur.',
+      text: from === 'home' ? `${picked.length} eser profilinde.` : sc.offline ? 'Örnek veri Beyan düzeyinde kalır.' : sc.granted ? 'GitHub’da sen seçtiğin için hepsi Doğrulandı düzeyinde.' : ok ? 'Hesabın daha önce doğrulandığı için Doğrulandı düzeyinde.' : 'Şimdilik Beyan düzeyinde; sahipliğini kanıtlayınca Doğrulandı olur.',
     });
     go(afterFlow('goal'));
   };
@@ -356,8 +381,7 @@ export default function ConnectPage() {
     setScan(null);
     setHandle('');
     setFrom('flow');
-    setManual(false);
-    setOpened(false);
+    setManual(!appReady());
     feedback({ tone: 'info', title: 'Çıkış yaptın', text: 'GitHub bağlantın kaldırıldı; örnek profille geziyorsun.' });
     go('user', -1);
   };
@@ -415,12 +439,8 @@ export default function ConnectPage() {
     switch (step) {
       case 'user':
         return manual
-          ? { label: 'Devam', disabled: !valid, onClick: startScan, blocked: () => setTouched(true), side: { label: 'GitHub izniyle bağla', onClick: () => setManual(false) } }
-          : isGrantKey(key)
-            ? { label: 'Bağla', icon: <GitHub size={22} />, onClick: () => connectKey() }
-            : opened
-              ? { label: 'Bağla', icon: <GitHub size={22} />, disabled: true, blocked: () => document.getElementById('gh-key')?.focus() }
-              : { label: 'GitHub’da izin ver', icon: <GitHub size={22} />, href: grantUrl(), external: true, onClick: () => setOpened(true) };
+          ? { label: 'Devam', disabled: !valid, onClick: startScan, blocked: () => setTouched(true), side: appReady() ? { label: 'GitHub’a bağlan', onClick: () => setManual(false) } : undefined }
+          : { label: 'GitHub’a bağlan', icon: <GitHub size={22} />, onClick: () => location.assign(installUrl()) };
       case 'found':
         return { label: 'Devam', disabled: loading || included.size === 0, onClick: saveScan };
       case 'goal':
@@ -460,6 +480,16 @@ export default function ConnectPage() {
     run.current++;
     go(back!, -1);
   };
+
+  // GitHub sends the visitor back here (?code&state…) after installing the app or signing in.
+  useEffect(() => {
+    if (!/[?&](code|setup_action|error)=/.test(location.search)) return;
+    setStage('GitHub’dan dönüyorum…');
+    setScan(null);
+    go('found');
+    void completeReturn().then(onReturn);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Niri's welcome can hand over a handle as ?gh=… (the Beyan route).
   useEffect(() => {
@@ -514,7 +544,7 @@ export default function ConnectPage() {
       case 'user':
         if (!manual)
           return (
-            <GrantBody opened={opened} onOpen={() => setOpened(true)} value={key} onValue={setKey} onPasted={(k) => connectKey(k)} onManual={() => setManual(true)} canExample={!me} onExample={continueWithExample} reduce={reduce} />
+            <ConnectBody onSignIn={() => location.assign(signInUrl())} onManual={() => setManual(true)} canExample={!me} onExample={continueWithExample} reduce={reduce} />
           );
         return (
           <UserBody
@@ -591,7 +621,7 @@ export default function ConnectPage() {
               if (!gh) return;
               setFrom('home');
               setHandle(gh);
-              // With a granted key the private repositories picked on GitHub come along too.
+              // Connected through the app, the private repositories picked on GitHub come along too.
               void scanFor(getToken() ? null : gh, 'home');
             }}
             onAdd={() => {
@@ -600,9 +630,10 @@ export default function ConnectPage() {
             }}
             onConnect={() => {
               setFrom('flow');
-              setManual(false);
+              setManual(!appReady());
               go('user');
             }}
+            onSignIn={() => location.assign(signInUrl())}
             onSignOut={leave}
           />
         );
@@ -775,7 +806,7 @@ const LEVEL_WHY = (
 
 // ---------------------------------------------------------------- 1 · user
 
-/** One stop on the grant trail: a survey marker, then what to do there. */
+/** One stop on the connect trail: a survey marker, then what happens there. */
 function Stop({ n, state, title, children }: { n: number; state: 'done' | 'current' | 'next'; title: string; children?: ReactNode }) {
   return (
     <li className="relative flex gap-3.5">
@@ -799,7 +830,7 @@ function Stop({ n, state, title, children }: { n: number; state: 'done' | 'curre
   );
 }
 
-/** A small drawing of GitHub's "Repository access" box with the right choice marked. */
+/** A small drawing of the repository choice on GitHub's install page, with the right option marked. */
 function AccessSketch({ live }: { live: boolean }) {
   const row = (label: string, on: boolean) => (
     <span className={`flex items-center gap-2 rounded-[10px] px-2 py-1.5 ${on ? 'bg-indigo-tint' : ''}`}>
@@ -813,11 +844,10 @@ function AccessSketch({ live }: { live: boolean }) {
   return (
     <div className="mt-3 rounded-[14px] border-2 border-line bg-bg p-2.5" aria-hidden="true">
       <p className="px-2 pb-1 font-mono text-[12px] font-bold text-ink-2">Repository access</p>
-      {row('Public repositories', false)}
       {row('All repositories', false)}
       {row('Only select repositories', true)}
       <span className="ml-8 mt-1 flex flex-wrap gap-1.5 pb-1">
-        {['proje-1', 'proje-2'].map((r) => (
+        {['proje-1', 'ozel-proje'].map((r) => (
           <span key={r} className="inline-flex items-center gap-1 rounded-full border-2 border-line px-2 py-0.5 font-mono text-[11.5px] font-bold text-ink-2">
             <Check className="h-3 w-3 text-green" strokeWidth={4} />
             {r}
@@ -828,65 +858,24 @@ function AccessSketch({ live }: { live: boolean }) {
   );
 }
 
-function GrantBody({
-  opened,
-  onOpen,
-  value,
-  onValue,
-  onPasted,
+function ConnectBody({
+  onSignIn,
   onManual,
   canExample,
   onExample,
   reduce,
 }: {
-  opened: boolean;
-  onOpen: () => void;
-  value: string;
-  onValue: (v: string) => void;
-  onPasted: (key: string) => void;
+  onSignIn: () => void;
   onManual: () => void;
   canExample: boolean;
   onExample: () => void;
   reduce: boolean;
 }) {
-  const field = useRef<HTMLInputElement>(null);
-  const ready = isGrantKey(value);
-  const classic = isClassicKey(value);
-
-  // Back from GitHub's tab: the key is on the clipboard, so the field is where the hand goes next.
-  useEffect(() => {
-    if (!opened) return;
-    const back = () => {
-      if (document.visibilityState === 'visible') field.current?.focus({ preventScroll: true });
-    };
-    document.addEventListener('visibilitychange', back);
-    window.addEventListener('focus', back);
-    return () => {
-      document.removeEventListener('visibilitychange', back);
-      window.removeEventListener('focus', back);
-    };
-  }, [opened]);
-
-  const fromClipboard = async () => {
-    try {
-      const t = (await navigator.clipboard.readText()).trim();
-      onValue(t);
-      if (isGrantKey(t) || isClassicKey(t)) onPasted(t);
-      else feedback({ tone: 'info', title: 'Panoda anahtar yok', text: 'GitHub’ın verdiği “github_pat_…” anahtarını kopyalayıp yeniden dene.' });
-    } catch {
-      field.current?.focus();
-      feedback({ tone: 'info', title: 'Panoya erişemedim', text: 'Kutuya dokunup yapıştır (Ctrl+V ya da uzun bas).' });
-    }
-  };
-
+  const link = 'font-extrabold text-indigo underline-offset-2 hover:underline';
   return (
     <>
-      <Guide mood={opened ? 'point' : 'wave'}>
-        {opened
-          ? 'Depolarını seçip anahtarı oluşturduysan buraya yapıştırman yeterli.'
-          : 'Kurumlara hangi depolarını göstereceğine GitHub’da sen karar ver. Yalnız okuma izni; istediğin an geri alırsın.'}
-      </Guide>
-      <h1 className="h-page mt-6">GitHub’da izin ver</h1>
+      <Guide mood="wave">Nirengi’yi GitHub’a bağla; kurumlara hangi depolarını göstereceğini orada sen seç.</Guide>
+      <h1 className="h-page mt-6">GitHub’a bağlan</h1>
 
       <ol className="relative mt-5">
         <span
@@ -894,85 +883,39 @@ function GrantBody({
           style={{ background: 'repeating-linear-gradient(to bottom, rgb(var(--line-2)) 0 4px, transparent 4px 10px)' }}
           aria-hidden="true"
         />
-        <Stop n={1} state={opened ? 'done' : 'current'} title="GitHub’ın izin sayfasını aç">
-          <p className="mt-0.5 text-[14px] font-bold text-ink-3">Ad, açıklama ve 30 günlük süre hazır gelir; yeni sekmede açılır.</p>
-          <a href={grantUrl()} target="_blank" rel="noreferrer" onClick={onOpen} className="btn-line btn-sm mt-3">
-            <GitHub size={18} />
-            {opened ? 'Yeniden aç' : 'İzin sayfasını aç'}
-            <ExternalLink className="h-4 w-4 opacity-80" strokeWidth={3} aria-hidden="true" />
-          </a>
+        <Stop n={1} state="current" title="GitHub’da Nirengi’yi kur">
+          <p className="mt-0.5 text-[14px] font-bold text-ink-3">“GitHub’a bağlan” GitHub’ın kendi sayfasını açar; hesabını seçersin.</p>
         </Stop>
-        <Stop n={2} state={opened ? (ready ? 'done' : 'current') : 'next'} title="Göstereceğin depoları seç">
+        <Stop n={2} state="next" title="Göstereceğin depoları seç">
           <p className="mt-0.5 text-[14px] font-bold text-ink-3">
-            “Repository access” bölümünde <b className="text-ink-2">Only select repositories</b>’i seç ve kurumlara göstermek istediğin depoları işaretle. Başka izin eklemene gerek yok; sonra
-            “Generate token”a bas.
+            <b className="text-ink-2">Only select repositories</b>’i seçip kurumlara göstermek istediğin depoları işaretle. Özel depoların da olur.
           </p>
-          <AccessSketch live={opened && !ready && !reduce} />
+          <AccessSketch live={!reduce} />
         </Stop>
-        <Stop n={3} state={ready ? 'done' : opened ? 'current' : 'next'} title="Anahtarı buraya yapıştır">
-          <label htmlFor="gh-key" className="sr-only">
-            GitHub erişim anahtarı
-          </label>
-          <div
-            className={`mt-2 flex items-center rounded-[14px] border-2 transition-[border-color,background-color,box-shadow] duration-150 focus-within:shadow-[0_0_0_4px_rgb(var(--indigo)/0.14)] ${
-              classic ? 'border-red bg-red-tint' : ready ? 'border-green bg-green-tint' : 'border-line bg-bg-2 focus-within:border-indigo focus-within:bg-bg'
-            }`}
-          >
-            <input
-              ref={field}
-              id="gh-key"
-              type="password"
-              value={value}
-              onChange={(e) => onValue(e.target.value)}
-              onPaste={(e) => {
-                const t = e.clipboardData.getData('text').trim();
-                if (!isGrantKey(t) && !isClassicKey(t)) return;
-                e.preventDefault();
-                onValue(t);
-                onPasted(t);
-              }}
-              autoComplete="off"
-              autoCapitalize="none"
-              autoCorrect="off"
-              spellCheck={false}
-              enterKeyHint="go"
-              placeholder="github_pat_…"
-              aria-describedby="gh-key-note"
-              aria-invalid={classic}
-              className="min-w-0 flex-1 bg-transparent py-3 pl-4 pr-2 font-mono text-[15px] font-bold text-ink outline-none placeholder:font-sans placeholder:text-ink-4"
-            />
-            <button type="button" onClick={fromClipboard} className="btn-quiet btn-sm mr-1 shrink-0 !min-h-10 !px-2.5 !text-[13px]">
-              <Copy className="h-4 w-4" strokeWidth={3} aria-hidden="true" />
-              Panodan yapıştır
-            </button>
-          </div>
-          <p id="gh-key-note" aria-live="polite" className={`mt-2 text-[13.5px] font-bold ${classic ? 'text-red-lip' : 'text-ink-3'}`}>
-            {classic
-              ? 'Bu klasik bir anahtar ve tüm hesabına erişir. Yalnız seçtiğin depolar için yeni bir anahtar oluştur.'
-              : ready
-                ? 'Anahtar hazır. “Bağla”ya dokun.'
-                : 'Anahtar yalnız bu tarayıcıda durur ve yalnız GitHub’a gider.'}
-          </p>
+        <Stop n={3} state="next" title="“Install”a bas, buraya dönersin">
+          <p className="mt-0.5 text-[14px] font-bold text-ink-3">Depoların kendiliğinden gelir. Kopyalanacak kod ya da anahtar yok.</p>
         </Stop>
       </ol>
 
       <p className="hint !mt-0">
-        Parolanı görmeyiz, kodunu okumayız, hiçbir şeye yazamayız.{' '}
-        <Why title="Bu izin ne görür?">
+        Kodunu okumayız, hiçbir şeye yazamayız.{' '}
+        <Why title="Nirengi neyi görür?">
           <div className="space-y-3 text-[16px] font-bold text-ink-2">
-            <p>Yalnız GitHub’da işaretlediğin özel depoların adını ve özelliklerini, bir de herkese açık depolarını görür. Kod okuma ya da yazma izni istemiyoruz.</p>
-            <p>Kullanıcı adını herkes yazabilir; bu izni ise yalnız hesabın sahibi verebilir. Bu yüzden seçtiğin depolar hemen Doğrulandı olur ve kurumlara öyle görünür.</p>
-            <p>Sunucumuz yok: site GitHub Pages’te açık kaynak çalışır. Anahtar yalnız bu tarayıcıda saklanır ve yalnız api.github.com’a gönderilir.</p>
-            <p>Anahtar 30 gün sonra kendiliğinden biter. “Çıkış yap” onu GitHub’da da iptal eder; ayrıca GitHub ayarlarındaki “Fine-grained tokens” listesinden silebilirsin.</p>
+            <p>Yalnız işaretlediğin depoların adını, açıklamasını, dilini, yıldızını ve son güncelleme tarihini görür. Kod okuma ya da yazma izni istemez.</p>
+            <p>Kullanıcı adını herkes yazabilir; Nirengi’yi bir hesaba ise yalnız o hesabın sahibi kurabilir. Bu yüzden seçtiğin depolar hemen Doğrulandı olur. Özel depoların kodu gizli kalır, kurumlar yalnız var olduğunu ve senin olduğunu görür.</p>
+            <p>Giriş birkaç saat geçerlidir ve yalnız bu tarayıcıda durur. “Çıkış yap” onu GitHub’da da iptal eder. Depo seçimini ya da kurulumu GitHub ayarlarındaki Applications bölümünden istediğin an değiştirirsin.</p>
           </div>
         </Why>
       </p>
       <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[14px] font-bold text-ink-3">
-        <button type="button" onClick={onManual} className="font-extrabold text-indigo underline-offset-2 hover:underline">
+        <button type="button" onClick={onSignIn} className={link}>
+          Daha önce bağladım
+        </button>
+        <button type="button" onClick={onManual} className={link}>
           Kullanıcı adıyla dene (Beyan)
         </button>
         {canExample && (
-          <button type="button" onClick={onExample} className="font-extrabold text-indigo underline-offset-2 hover:underline">
+          <button type="button" onClick={onExample} className={link}>
             Örnek profille gez
           </button>
         )}
@@ -1048,7 +991,7 @@ function UserBody({
             )}
           </div>
         ) : (
-          <p className="hint">Herkese açık GitHub verisi okunur. Doğrulandı düzeyi için GitHub’da izin vermen gerekir. </p>
+          <p className="hint">Herkese açık GitHub verisi okunur. Doğrulandı düzeyi için Nirengi’yi GitHub’a bağlaman gerekir.</p>
         )}
       </div>
     </>
@@ -1095,7 +1038,7 @@ function FoundBody({
         {!n
           ? 'Hesabında özgün bir depo göremedim.'
           : scan.granted
-            ? 'İzin verdiğin depolar burada. Kurumlara göstermek istediklerini işaretle.'
+            ? 'GitHub’da seçtiğin depolar burada. Kurumlara göstermek istediklerini işaretle.'
             : 'Bunları buldum! Profiline eklemek istediklerini seç.'}
       </Guide>
       <h1 className="mt-6 flex items-end gap-3" aria-label={`${n} eserin bulundu`}>
@@ -1456,7 +1399,7 @@ function Row({ title, sub, onClick, accent }: { title: string; sub: string; onCl
   );
 }
 
-function HomeBody({ s, me, onRescan, onAdd, onConnect, onSignOut }: { s: State; me?: Person; onRescan: () => void; onAdd: () => void; onConnect: () => void; onSignOut: () => void }) {
+function HomeBody({ s, me, onRescan, onAdd, onConnect, onSignIn, onSignOut }: { s: State; me?: Person; onRescan: () => void; onAdd: () => void; onConnect: () => void; onSignIn: () => void; onSignOut: () => void }) {
   if (!me) return null;
   const p = progress(s, me);
   const granted = !!getToken();
@@ -1483,7 +1426,9 @@ function HomeBody({ s, me, onRescan, onAdd, onConnect, onSignOut }: { s: State; 
       </div>
       {!me.links.github && <p className="hint">Örnek profil: gerçek bir GitHub hesabına bağlı değil, her şey Beyan düzeyinde.</p>}
       <ul className="mt-6 space-y-3">
-        {hasGhBeyan(me) && <Row accent title="GitHub’da izin ver" sub="İşlerin Beyan düzeyinde; seçtiğin depolar için izin verince Doğrulandı olur." onClick={onConnect} />}
+        {hasGhBeyan(me) && appReady() && <Row accent title="GitHub’a bağlan" sub="İşlerin Beyan düzeyinde; Nirengi’yi GitHub’a bağlayınca seçtiğin depolar Doğrulandı olur." onClick={onConnect} />}
+        {!granted && isGhVerified(me) && appReady() && <Row accent title="GitHub ile yeniden gir" sub="Giriş süren doldu; özel depolarını yeniden okumak için tek dokunuş." onClick={onSignIn} />}
+        {granted && <Row title="Depo seçimini değiştir" sub="GitHub’da depo ekle ya da çıkar, sonra “Depolarını güncelle”." onClick={() => window.open(manageUrl(), '_blank', 'noreferrer')} />}
         {me.links.github ? <Row title="Depolarını güncelle" sub={granted ? 'Yeni depoları ve son 90 günün etkinliğini oku.' : 'Herkese açık depoları yeniden oku.'} onClick={onRescan} /> : <Row accent title="Gerçek hesabını bağla" sub="Örnek yerine kendi GitHub hesabını kullan." onClick={onConnect} />}
         <Row title="Yeni kanıt ekle" sub="Alan adı ya da kendi sözünle bir iş." onClick={onAdd} />
       </ul>

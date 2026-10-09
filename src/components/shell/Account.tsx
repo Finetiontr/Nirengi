@@ -1,5 +1,5 @@
 // The genç account in the shell: who is connected, and the way out. With no GitHub
-// account connected it leads to Kanıt bağla, where the visitor grants access on GitHub.
+// account connected it leads to Kanıt bağla, where the visitor connects the GitHub App.
 
 import { LogOut } from 'lucide-react';
 import { useAppState, useView } from '../../lib/store.ts';
@@ -31,7 +31,7 @@ export default function Account({ compact = false }: { compact?: boolean }) {
 
   const leave = () => {
     signOut();
-    feedback({ tone: 'info', title: 'Çıkış yaptın', text: 'GitHub iznin geri alındı; örnek profille geziyorsun.' });
+    feedback({ tone: 'info', title: 'Çıkış yaptın', text: 'GitHub bağlantın kapatıldı; örnek profille geziyorsun.' });
   };
   const who = (
     <div className="flex min-w-0 flex-1 items-center gap-3">

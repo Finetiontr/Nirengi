@@ -60,7 +60,7 @@ const GENC_CARDS: Card[] = [
   },
   {
     title: 'Önce seni tanıyayım',
-    text: 'Kurumlara hangi depolarını göstereceğine GitHub’da sen karar ver. Yalnız okuma izni; istediğin an geri alırsın.',
+    text: 'Nirengi’yi GitHub’a bağla; kurumlara hangi depolarını göstereceğini orada sen seç. Yalnız okur, istediğin an kaldırırsın.',
     mood: 'talk',
     Art: ArtGencIs,
     ask: true,
@@ -196,7 +196,7 @@ export default function Welcome({ face, onClose, onGithub, connected }: Props) {
             onClick={() => (asking ? submit() : last ? onClose('tour') : go(i + 1))}
           >
             {asking && <GitHub size={22} />}
-            {asking ? 'GitHub’da izin ver' : last ? 'Turu başlat' : 'İleri'}
+            {asking ? 'GitHub’a bağlan' : last ? 'Turu başlat' : 'İleri'}
           </button>
           <div className="mt-2 flex items-center justify-between gap-2">
             <button

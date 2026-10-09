@@ -24,6 +24,9 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build:pages
+        env:
+          # worker/ address for "GitHub'a bağlan"; a repository variable, so moving the worker needs no commit.
+          PUBLIC_API_URL: ${{ vars.PUBLIC_API_URL }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist-pages

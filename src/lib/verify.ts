@@ -1,8 +1,9 @@
 // S2 machine verification that runs entirely in the browser:
-//  • GitHub — the visitor grants a read-only, fine-grained access key for the
-//    repositories they pick on GitHub's own permission page; the key proves the
-//    account is theirs and lists those repositories, which become evidence. (The
-//    older route — a one-time code in the profile bio or a public gist — remains.)
+//  • GitHub — the visitor installs the Nirengi GitHub App on the repositories they
+//    pick on GitHub's install page (see auth.ts); the resulting read-only token proves
+//    the account is theirs and lists exactly those repositories, private ones included,
+//    which become evidence. (The older route — a one-time code in the profile bio or a
+//    public gist — remains.)
 //  • Domain — ownership proven by a DNS TXT record, resolved over DoH.
 
 import type { Evidence, Level } from './types.ts';
@@ -50,7 +51,7 @@ export class VerifyError extends Error {
   }
 }
 
-/** Where the access key from GitHub's permission page is kept (see auth.ts). */
+/** Where the GitHub App token is kept (see auth.ts). */
 export const TOKEN_KEY = 'nirengi:gh-token';
 
 export function ghToken(): string | null {
@@ -73,7 +74,7 @@ async function gh<T>(path: string): Promise<T> {
   } catch {
     throw new VerifyError('GitHub’a ulaşılamadı. Bağlantını kontrol et ya da örnek profille devam et.', 'network');
   }
-  if (res.status === 401) throw new VerifyError('GitHub anahtarı geçersiz ya da süresi dolmuş. GitHub’da yeni bir izin oluştur.', 'auth');
+  if (res.status === 401) throw new VerifyError('GitHub bağlantının süresi doldu. GitHub ile yeniden giriş yap.', 'auth');
   if (res.status === 404) throw new VerifyError('Bu kullanıcı adıyla bir GitHub hesabı bulunamadı.', 'notfound');
   if (res.status === 403 || res.status === 429) {
     const reset = Number(res.headers.get('x-ratelimit-reset'));
@@ -98,11 +99,15 @@ export async function fetchGitHub(handle: string) {
   return { user, repos };
 }
 
-/** The account behind the stored access key. */
+/** The account behind the stored token. */
 export const fetchMe = () => gh<GhUser>('/user');
 
-/** Repositories the stored key can see: the private ones picked on GitHub plus the account's public ones. */
-export const fetchGrantedRepos = () => gh<GhRepo[]>('/user/repos?per_page=100&sort=pushed&affiliation=owner,collaborator,organization_member');
+/** Exactly the repositories picked when the Nirengi app was installed, across the accounts it is installed on. */
+export async function fetchInstalledRepos(): Promise<GhRepo[]> {
+  const { installations } = await gh<{ installations: { id: number }[] }>('/user/installations?per_page=100');
+  const lists = await Promise.all(installations.map((i) => gh<{ repositories: GhRepo[] }>(`/user/installations/${i.id}/repositories?per_page=100`)));
+  return lists.flatMap((l) => l.repositories).sort((a, b) => Date.parse(b.pushed_at) - Date.parse(a.pushed_at));
+}
 
 export const newChallenge = () => `nirengi-${crypto.getRandomValues(new Uint32Array(1))[0].toString(36).padStart(7, '0').slice(0, 7)}`;
 
@@ -131,10 +136,10 @@ export async function checkGitHubChallenge(handle: string, code: string): Promis
 
 const DAY = 86_400_000;
 
-/** How account ownership was shown: a code in the bio or a gist, or a key granted on GitHub. */
+/** How account ownership was shown: a code in the bio or a gist, or the Nirengi GitHub App. */
 export type GhVia = 'bio' | 'gist' | 'grant';
 
-const ghVerifier = (via: GhVia | null) => (via === 'grant' ? 'GitHub izni · yalnız okuma' : `GitHub API · ${via === 'gist' ? 'gist' : 'bio'} sınaması`);
+const ghVerifier = (via: GhVia | null) => (via === 'grant' ? 'GitHub uygulaması · yalnız okuma' : `GitHub API · ${via === 'gist' ? 'gist' : 'bio'} sınaması`);
 
 export const MAX_REPOS = 6;
 
