@@ -515,12 +515,9 @@
 
 /* ---------------------------------------------------------------- feedback toast */
 
-/* The toast dock floats bottom-centre; inside the app shell it clears the floating nav dock. */
-.feedback-dock { bottom: calc(env(safe-area-inset-bottom) + 20px); }
-html[data-mode] .feedback-dock { bottom: calc(env(safe-area-inset-bottom) + 96px); }
-@media (min-width: 1024px) {
-  html[data-mode] .feedback-dock { bottom: 108px; }
-}
+/* The toast dock floats bottom-centre; inside the app shell it clears the deck (--deck is its top edge). */
+.feedback-dock { bottom: calc(env(safe-area-inset-bottom) + 20px); transition: bottom 200ms; }
+html[data-mode] .feedback-dock { bottom: calc(var(--deck, 96px) + 10px); }
 
 @keyframes fb-bar {
   from { transform: scaleX(1); }

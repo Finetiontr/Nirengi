@@ -1,8 +1,10 @@
-// Şimdi şeridi: the genç face's live bar at the foot of every page. Niri turns
-// through what is open today (institution needs first, then your project and
-// your week) one line at a time; a tap grows the bar into today's full list.
+// Şimdi şeridi: the genç face's live line, riding in the deck at the foot of every
+// page (App.astro's #dock-live). Niri turns through what is open today (institution
+// needs first, then your project and your week) one line at a time; a tap grows the
+// line into today's full list.
 
 import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { AnimatePresence, motion, useDragControls, useReducedMotion } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
 import { currentMe, useAppState, useView } from '../../lib/store.ts';
@@ -21,6 +23,8 @@ import { useWorn } from './defter';
 /** How long one line stays before the next slides in (ms). */
 const DWELL = 4800;
 const FRESH_MS = 3 * 86_400_000;
+/** The line on screen, so the next page's deck starts from it instead of from a blank. */
+const NOW_KEY = 'nirengi:now';
 
 /** Flows keep the screen to themselves: no bar there. */
 export const nowBarOn = () => !/\/kanit-bagla(\.html)?\/?$/.test(location.pathname);
@@ -218,7 +222,14 @@ export default function NowBar() {
   const bottom = useLift();
   const reduce = useReducedMotion();
   const [open, setOpen] = useState(false);
-  const [i, setI] = useState(0);
+  const [i, setI] = useState<number>(() => {
+    try {
+      return Number(JSON.parse(sessionStorage.getItem(NOW_KEY) || '{}').i) || 0;
+    } catch {
+      return 0;
+    }
+  });
+  const [slot] = useState(() => document.getElementById('dock-live'));
   const [dir, setDir] = useState(1);
   const [paused, setPaused] = useState(false);
   const pill = useRef<HTMLButtonElement>(null);
@@ -245,15 +256,24 @@ export default function NowBar() {
     }
   }, [open]);
 
-  if (persona === 'org' || !nowBarOn()) return null;
+  // The live line takes over from the deck's stand-in (which holds the place again while the
+  // panel is open), and leaves its own line for the next page.
+  useEffect(() => {
+    slot?.toggleAttribute('data-ready', !open);
+  }, [slot, open]);
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(NOW_KEY, JSON.stringify({ i: i % lines.length, title: cur.title, sub: cur.sub, count: cur.kind === 'summary' ? cur.count : null }));
+    } catch {
+      /* ignore */
+    }
+  }, [cur.key, i]);
+
+  if (persona === 'org' || !nowBarOn() || !slot) return null;
 
   return (
     <>
-      <div aria-hidden="true" className="h-14 lg:h-16" />
-      <div
-        className="no-print pointer-events-none fixed inset-x-0 z-[45] flex justify-center px-3 transition-[bottom] duration-200"
-        style={{ bottom: `calc(env(safe-area-inset-bottom) + ${bottom}px)` }}
-      >
+      {createPortal(
         <AnimatePresence initial={false}>
           {!open && (
             <motion.button
@@ -272,10 +292,10 @@ export default function NowBar() {
               aria-haspopup="dialog"
               aria-expanded={false}
               aria-label={`Bugün: ${lines[0].title}. ${lines[0].sub}. Listeyi aç.`}
-              className="pointer-events-auto relative flex w-full max-w-[520px] items-center gap-3 overflow-hidden border-2 border-line bg-bg py-1.5 pl-1.5 pr-2.5 text-left shadow-[0_12px_32px_-12px_rgb(0_0_0/0.3)] transition-colors hover:border-indigo/40"
-              style={{ borderRadius: 30 }}
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
+              className="no-print relative flex h-[52px] w-full items-center gap-3 overflow-hidden py-1 pl-1 pr-2 text-left transition-colors hover:bg-bg-2"
+              style={{ borderRadius: 18 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={spring}
               whileTap={{ scale: 0.98 }}
@@ -323,7 +343,7 @@ export default function NowBar() {
 
               {/* Dwell line: when it fills, the next line comes in. Hover or focus holds it. */}
               {!reduce && lines.length > 1 && (
-                <span aria-hidden="true" className="pointer-events-none absolute inset-x-6 bottom-[3px] h-[3px] overflow-hidden rounded-full bg-bg-3">
+                <span aria-hidden="true" className="pointer-events-none absolute bottom-[2px] left-[60px] right-14 h-[3px] overflow-hidden rounded-full bg-bg-3">
                   <span
                     key={`${cur.key}-${i}`}
                     className="nowbar-fill block h-full origin-left rounded-full bg-indigo/45"
@@ -334,8 +354,9 @@ export default function NowBar() {
               )}
             </motion.button>
           )}
-        </AnimatePresence>
-      </div>
+        </AnimatePresence>,
+        slot,
+      )}
 
       <AnimatePresence>{open && <Panel key="panel" s={s} me={me} doors={doors} bottom={bottom} onClose={() => setOpen(false)} />}</AnimatePresence>
     </>

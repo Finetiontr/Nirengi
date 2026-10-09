@@ -170,9 +170,9 @@ function Composer({
           Ne paylaşmak istersin?
         </h2>
       </div>
-      <div data-coach="g-topluluk-tur" className="seg mt-4 !grid w-full grid-cols-2 sm:grid-cols-4" role="group" aria-label="Paylaşım türü">
+      <div data-coach="g-topluluk-tur" className="seg mt-4 !grid w-full grid-cols-2 sm:!flex" role="group" aria-label="Paylaşım türü">
         {KINDS.map((k) => (
-          <button key={k} type="button" aria-pressed={kind === k} onClick={() => setKind(k)} className="inline-flex items-center justify-center gap-1.5 !px-2 text-center !text-[13px] leading-tight">
+          <button key={k} type="button" aria-pressed={kind === k} onClick={() => setKind(k)} className="inline-flex items-center justify-center gap-1.5 whitespace-nowrap !px-2 text-center !text-[13px] leading-tight sm:flex-auto">
             <TriMark size={12} color={KIND_TONE[k]} lip={false} variant={kind === k ? 'filled' : 'outline'} />
             {POST_KIND[k]}
           </button>

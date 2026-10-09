@@ -382,10 +382,13 @@
 /* ---------------------------------------------------------------- shell */
 
 /*
- * Dock. A floating bar at the foot of the screen: full width (12px air) on phones,
- * centred and as wide as its items on desktop. The plate under the active item is a
- * stretchy pill: on a tap its leading edge springs to the new item and the trailing
- * edge follows, so it reads as one body moving, not a box jumping.
+ * Deck. One floating object at the foot of the screen: full width (12px air) on
+ * phones, centred on desktop. On genç pages it carries the Şimdi line too: above
+ * the tabs on phones (it tucks away while reading down), beside them on desktop,
+ * where the deck takes the content's width so its edges line up with the page.
+ * The plate under the active tab is a stretchy pill: on a tap its leading edge
+ * springs to the new tab and the trailing edge follows, so it moves as one body.
+ * Kurum is calm: the plate glides on a plain ease and the icon does not hop.
  */
 .dock {
   position: fixed;
@@ -393,6 +396,8 @@
   left: 12px;
   right: 12px;
   bottom: calc(env(safe-area-inset-bottom) + 10px);
+  display: flex;
+  flex-direction: column;
   margin: 0 auto;
   max-width: 520px;
   padding: 5px;
@@ -401,8 +406,29 @@
   background: rgb(var(--bg));
   box-shadow: 0 14px 36px -14px rgb(0 0 0 / 0.3);
 }
+.dock-live {
+  display: grid;
+  grid-template-rows: 1fr;
+  margin-bottom: 5px;
+  padding-bottom: 5px;
+  border-bottom: 2px solid rgb(var(--line));
+  transition: grid-template-rows 320ms cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms, margin 320ms, padding 320ms, border-color 200ms;
+}
+.dock-live-in { min-height: 52px; overflow: hidden; }
+.dock-live-in[data-ready] > .dock-live-ph { display: none; }
+.dock-live-ph { display: flex; height: 52px; align-items: center; gap: 12px; padding: 4px 8px 4px 4px; }
+.dock-live-ph [data-now-title]:empty,
+.dock-live-ph [data-now-sub]:empty { height: 11px; margin: 3px 0; border-radius: 6px; background: rgb(var(--bg-3)); }
+.dock-live-ph [data-now-title]:empty { width: 60%; }
+.dock-live-ph [data-now-sub]:empty { width: 40%; }
+.dock-live-ph [data-now-count]:empty { display: none; }
+.dock[data-tuck] .dock-live { grid-template-rows: 0fr; opacity: 0; margin-bottom: 0; padding-bottom: 0; border-bottom-color: transparent; }
+.dock[data-tuck] .dock-live-in { min-height: 0; }
 @media (min-width: 1024px) {
-  .dock { left: 50%; right: auto; bottom: 16px; max-width: none; transform: translateX(-50%); }
+  .dock { left: 50%; right: auto; bottom: 16px; flex-direction: row; max-width: none; transform: translateX(-50%); }
+  html[data-mode="genc"] .dock { width: min(1000px, 100vw - 48px); }
+  .dock-live { flex: 1; min-width: 0; align-items: center; margin: 0 6px 0 0; padding: 0 6px 0 0; border-bottom: 0; border-right: 2px solid rgb(var(--line)); }
+  .dock-live-in { min-height: 0; }
 }
 .dock-row { position: relative; }
 .dock-blob {
@@ -419,6 +445,8 @@
 }
 .dock-blob.to-r { transition: right 280ms var(--lead), left 280ms var(--trail) 30ms; }
 .dock-blob.to-l { transition: left 280ms var(--lead), right 280ms var(--trail) 30ms; }
+html[data-mode="kurum"] .dock-blob.to-r,
+html[data-mode="kurum"] .dock-blob.to-l { transition: left 260ms cubic-bezier(0.2, 0.8, 0.2, 1), right 260ms cubic-bezier(0.2, 0.8, 0.2, 1); }
 .dock-blob[data-off] { opacity: 0; transform: scale(0.6); }
 .dock-blob::before {
   content: "";
@@ -428,8 +456,8 @@
   background: rgb(var(--indigo-tint));
   box-shadow: inset 0 0 0 2px rgb(var(--indigo) / 0.28);
 }
-/* Points down at the active item from the dock's top seam. */
-.dock-pointer { position: absolute; top: -12px; left: 50%; width: 16px; height: 10px; margin-left: -8px; }
+/* Sits across the seam above the tabs and points down at the active one. */
+.dock-pointer { position: absolute; top: -11px; left: 50%; width: 16px; height: 10px; margin-left: -8px; }
 .dock-item {
   display: flex;
   height: 56px;
@@ -453,7 +481,7 @@
 .dock-icon { display: inline-grid; transition: transform 260ms cubic-bezier(0.34, 1.56, 0.64, 1); }
 .dock-item:hover .dock-icon { transform: translateY(-2px) rotate(-6deg) scale(1.08); }
 .dock-item:active .dock-icon { transform: scale(0.86); }
-.dock-item.going .dock-icon { animation: dock-hop 460ms cubic-bezier(0.34, 1.4, 0.64, 1); }
+html[data-mode="genc"] .dock-item.going .dock-icon { animation: dock-hop 460ms cubic-bezier(0.34, 1.4, 0.64, 1); }
 @keyframes dock-hop {
   0% { transform: scale(0.86); }
   35% { transform: translateY(-7px) scale(1.12, 0.94); }
@@ -472,38 +500,14 @@ details[open] > .menu-pop { animation: menu-drop 300ms cubic-bezier(0.34, 1.3, 0
 }
 
 /*
- * Page choreography. A page's sections arrive one after another instead of all at
- * once; the rail follows a beat later. Cards below the fold wait (.rv) and rise as
- * they scroll in (App.astro). Reduced motion zeroes all of it (base layer).
+ * Page arrival. The view transition already carries the change of page; the
+ * content (React islands mount a beat after the HTML) settles in once, as one
+ * block, instead of every section making its own entrance. Rail a beat later.
  */
-.flow > astro-island > :first-child > *,
-.flow > astro-island > :first-child:has(> :only-child) > :only-child > * {
-  animation: flow-in 560ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
-  animation-delay: calc(var(--i, 6) * 70ms + 40ms);
-}
-/* A wrapper with one child would arrive as one block: its children are staggered instead. */
-.flow > astro-island > :first-child:has(> :only-child) > :only-child { animation: none; }
-.flow > astro-island > :first-child > :nth-child(1),
-.flow > astro-island > :first-child > :only-child > :nth-child(1) { --i: 0; }
-.flow > astro-island > :first-child > :nth-child(2),
-.flow > astro-island > :first-child > :only-child > :nth-child(2) { --i: 1; }
-.flow > astro-island > :first-child > :nth-child(3),
-.flow > astro-island > :first-child > :only-child > :nth-child(3) { --i: 2; }
-.flow > astro-island > :first-child > :nth-child(4),
-.flow > astro-island > :first-child > :only-child > :nth-child(4) { --i: 3; }
-.flow > astro-island > :first-child > :nth-child(5),
-.flow > astro-island > :first-child > :only-child > :nth-child(5) { --i: 4; }
-.flow > astro-island > :first-child > :nth-child(6),
-.flow > astro-island > :first-child > :only-child > :nth-child(6) { --i: 5; }
-.flow-rail > astro-island > :first-child > * { animation-delay: calc(var(--i, 4) * 70ms + 260ms); }
+.flow > astro-island > :first-child { animation: flow-in 280ms cubic-bezier(0.16, 1, 0.3, 1) backwards; }
+.flow-rail > astro-island > :first-child { animation-delay: 60ms; }
 @keyframes flow-in {
-  from { opacity: 0; transform: translateY(16px) scale(0.985); }
-}
-.rv { opacity: 0; transform: translateY(22px) scale(0.97); }
-.rv.rv-in {
-  opacity: 1;
-  transform: none;
-  transition: opacity 420ms ease-out, transform 620ms cubic-bezier(0.16, 1, 0.3, 1);
+  from { opacity: 0; transform: translateY(6px); }
 }
 
 /* ---------------------------------------------------------------- motion */

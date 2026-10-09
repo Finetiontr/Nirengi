@@ -1,7 +1,7 @@
 // Spotlight tour: dims the page with an SVG mask, cuts a rounded hole around the
 // target and parks Niri with a bubble card next to it. One animation-frame loop
 // follows the target through scroll, resize and layout shifts, so nothing has to
-// be re-triggered by hand. On phones the card docks above the nav dock.
+// be re-triggered by hand. On phones the card docks above the deck.
 
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
@@ -23,11 +23,12 @@ const PAD = 8; // the hole is the target plus this much air
 const GAP = 18; // hole to card
 const M = 12; // card to viewport edge
 const CARD_W = 440; // Niri + bubble on desktop
-const TAB_BAR = 96; // nav dock plus a breath
 
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
 const isPhone = () => innerWidth < 640;
 const headerH = () => (innerWidth < 1024 ? 62 : 70);
+/** The deck's top edge plus a breath (App.astro keeps --deck current). */
+const deckH = () => (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--deck')) || 88) + 8;
 
 /** Scroll the target into the part of the screen the card does not cover. */
 function reveal(el: HTMLElement, reserve: number, smooth: boolean) {
@@ -109,7 +110,7 @@ export default function Coach({ steps, onClose }: { steps: CoachStep[]; onClose:
     };
     if (el) {
       measure(el);
-      reveal(el, isPhone() ? TAB_BAR + (card.current?.offsetHeight ?? 240) + 12 : 0, !snap);
+      reveal(el, isPhone() ? deckH() + (card.current?.offsetHeight ?? 240) + 12 : 0, !snap);
     }
 
     const place = (s: Rect) => {
@@ -117,9 +118,9 @@ export default function Coach({ steps, onClose }: { steps: CoachStep[]; onClose:
       if (!c) return;
       c.style.opacity = '1';
       if (isPhone()) {
-        // Docked above the nav dock; flips to the top when the target sits under it.
+        // Docked above the deck; flips to the top when the target sits under it.
         const ch = c.offsetHeight;
-        const under = s.y + s.h > innerHeight - TAB_BAR - ch - 6;
+        const under = s.y + s.h > innerHeight - deckH() - ch - 6;
         const top = under && s.y > headerH() + ch + 12;
         if (top !== dockTop.current) {
           dockTop.current = top;
@@ -259,7 +260,7 @@ export default function Coach({ steps, onClose }: { steps: CoachStep[]; onClose:
           aria-labelledby="coach-title"
           aria-describedby="coach-text"
           data-assistant
-          className="fixed inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+72px)] rounded-[22px] border-2 border-line bg-bg p-4 opacity-0 shadow-[0_14px_36px_-14px_rgb(0_0_0/0.4)]"
+          className="fixed inset-x-3 bottom-[calc(var(--deck,88px)+8px)] rounded-[22px] border-2 border-line bg-bg p-4 opacity-0 shadow-[0_14px_36px_-14px_rgb(0_0_0/0.4)]"
         >
           <div className="flex items-start gap-3">
             <Niri mood={mood} point="up" look={mood === 'point' ? undefined : 'up'} size={56} className="-mt-1" cue={step.title} />

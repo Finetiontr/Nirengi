@@ -1,7 +1,8 @@
 ---
-// App shell: a top bar and a floating dock at the foot of the screen, the same on
-// phones and desktop. Both faces (genç / kurum) are rendered; html[data-mode]
-// shows one, so the right nav is there before any script runs.
+// App shell: a top bar and a floating deck at the foot of the screen, the same on
+// phones and desktop. The deck is the page navigation plus, on genç pages, the
+// Şimdi line. Both faces (genç / kurum) are rendered; html[data-mode] shows one,
+// so the right nav is there before any script runs.
 import '@fontsource-variable/bricolage-grotesque/opsz.css';
 import '@fontsource-variable/jetbrains-mono';
 import '../styles/global.css';
@@ -35,6 +36,9 @@ const fullTitle = `${title} · nirengi`;
 // The static Pages build renders /lig as lig.html.
 const path = Astro.url.pathname.replace(/\.html$/, '');
 const hasRail = Astro.slots.has('rail');
+const shell = width === 'wide' ? 'max-w-[1240px]' : 'max-w-[1080px]';
+// Flows like Kanıt bağla keep the screen to themselves: no deck, their own way back at the top.
+const flow = /\/kanit-bagla\/?$/.test(path);
 ---
 
 <!doctype html>
@@ -82,15 +86,16 @@ const hasRail = Astro.slots.has('rail');
   <body class="min-h-dvh">
     <a href="#icerik" class="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[90] focus:rounded-[12px] focus:bg-indigo focus:px-4 focus:py-2 focus:text-white">İçeriğe geç</a>
 
-    <!-- top bar: wordmark, the Genç/Kurum switch on desktop, and the menu key -->
+    <!-- top bar: wordmark on the content's left edge; the Genç/Kurum switch (desktop), Niri and the menu on the right -->
     <header class="vt-top sticky top-0 z-40 border-b-2 border-line bg-bg/95 backdrop-blur">
-      <div class="mx-auto flex h-[60px] max-w-[1240px] items-center justify-between gap-4 px-4 sm:px-6 lg:h-[68px] lg:px-10">
+      <div class:list={['mx-auto flex h-[60px] items-center justify-between gap-4 px-4 sm:px-6 lg:h-[68px] lg:px-10', shell]}>
         <a href="/" aria-label="nirengi ana sayfa" class="flex items-center gap-2">
           <Mark size={32} />
           <span class="text-[22px] font-black tracking-[-0.03em] text-indigo lg:text-[24px]">nirengi</span>
         </a>
         <div class="flex items-center gap-3">
           <div class="hidden w-[200px] lg:block"><ModeSwitch client:only="react" /></div>
+          <span id="niri-key" class="contents"></span>
           <details class="relative">
             <summary class="menu-key btn-ink btn-sm cursor-pointer list-none !min-h-10 !w-11 !px-0 [&::-webkit-details-marker]:hidden" aria-label="Menü">
               <svg viewBox="0 0 24 24" class="h-5 w-5" aria-hidden="true">
@@ -110,43 +115,82 @@ const hasRail = Astro.slots.has('rail');
     </header>
 
     <main id="icerik" class="vt-page">
-      <div class:list={['mx-auto flex gap-12 px-4 pb-36 pt-6 sm:px-6 lg:px-10 lg:pt-10', width === 'wide' ? 'max-w-[1240px]' : 'max-w-[1080px]']}>
+      <div class:list={['mx-auto flex gap-12 px-4 pt-6 sm:px-6 lg:px-10 lg:pt-10', flow ? 'pb-16' : 'pb-40 lg:pb-32', shell]}>
         <div class="flow min-w-0 flex-1"><slot /></div>
         {hasRail && <aside class="flow flow-rail hidden w-[340px] shrink-0 xl:block"><slot name="rail" /></aside>}
       </div>
     </main>
 
     <!--
-      Dock: one floating bar at the foot of every screen. The plate under the active
-      item is placed by --i / --n (equal slots), so it is right before any script runs;
-      a tap glides it to the new item, then the page changes (script below).
+      Deck: one floating object at the foot of every screen but a flow. On genç pages the Şimdi
+      line sits beside the tabs (desktop) or above them (phones); NowBar renders into
+      #dock-live, and until it mounts a copy of the last line it showed stands in.
+      The plate under the active tab is placed by --i / --n (equal slots), so it is
+      right before any script runs; a tap glides it, then the page changes.
     -->
-    <nav class="vt-dock dock" aria-label="Sekmeler">
-      {
-        (['genc', 'kurum'] as const).map((m) => {
-          const at = NAV[m].findIndex((item) => isActive(item, path));
-          return (
-            <div class={`only-${m} dock-row`} style={`--n:${NAV[m].length};--i:${Math.max(at, 0)}`} data-dock data-at={at}>
-              <span class="dock-blob" data-off={at < 0 ? '' : undefined} aria-hidden="true">
-                <svg viewBox="0 0 16 10" class="dock-pointer">
-                  <path d="M2.5 2h11L8 8Z" fill="currentColor" stroke="currentColor" stroke-width="3" stroke-linejoin="round" />
-                </svg>
-              </span>
-              <ul class="relative flex">
-                {NAV[m].map((item, i) => (
-                  <li class="min-w-0 flex-1 lg:w-[92px] lg:flex-none">
-                    <a href={item.href} data-i={i} data-on={i === at ? '' : undefined} aria-current={i === at ? 'page' : undefined} class="dock-item">
-                      <span class="dock-icon"><NavIcon icon={item.icon} size={28} /></span>
-                      <span class="dock-label">{item.label}</span>
-                    </a>
-                  </li>
-                ))}
-              </ul>
+    {
+      !flow && (
+        <div class="vt-dock dock">
+          <div class="only-genc dock-live">
+            <div id="dock-live" class="dock-live-in">
+              <div class="dock-live-ph" aria-hidden="true">
+                <span class="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-indigo-tint">
+                  <svg viewBox="0 0 32 32" width="32" height="32">
+                    <path d="M16 4.5 28 26H4Z" fill="rgb(var(--indigo))" stroke="rgb(var(--indigo))" stroke-width="4" stroke-linejoin="round" />
+                    <circle cx="12.6" cy="17.4" r="3.1" fill="#fff" /><circle cx="19.4" cy="17.4" r="3.1" fill="#fff" />
+                    <circle cx="13.1" cy="17.8" r="1.5" fill="#252338" /><circle cx="19.9" cy="17.8" r="1.5" fill="#252338" />
+                    <circle cx="9.3" cy="22" r="1.7" fill="rgb(var(--orange))" opacity=".6" /><circle cx="22.7" cy="22" r="1.7" fill="rgb(var(--orange))" opacity=".6" />
+                  </svg>
+                </span>
+                <span class="flex min-w-0 flex-1 flex-col justify-center">
+                  <span data-now-title class="truncate text-[15px] font-extrabold leading-tight text-ink"></span>
+                  <span data-now-sub class="truncate text-[13px] font-bold leading-tight text-ink-3"></span>
+                </span>
+                <span data-now-count class="num grid h-10 min-w-10 shrink-0 place-items-center rounded-full bg-indigo px-2 text-[17px] font-black text-white"></span>
+              </div>
             </div>
-          );
-        })
-      }
-    </nav>
+          </div>
+          <script is:inline>
+            (() => {
+              try {
+                const n = JSON.parse(sessionStorage.getItem('nirengi:now') || 'null');
+                if (!n) return;
+                const ph = document.querySelector('.dock-live-ph');
+                ph.querySelector('[data-now-title]').textContent = n.title;
+                ph.querySelector('[data-now-sub]').textContent = n.sub;
+                ph.querySelector('[data-now-count]').textContent = n.count ?? '';
+              } catch {}
+            })();
+          </script>
+          <nav class="dock-tabs" aria-label="Sekmeler">
+            {(['genc', 'kurum'] as const).map((m) => {
+              const at = NAV[m].findIndex((item) => isActive(item, path));
+              return (
+                <div class={`only-${m} dock-row`} style={`--n:${NAV[m].length};--i:${Math.max(at, 0)}`} data-dock data-at={at}>
+                  <span class="dock-blob" data-off={at < 0 ? '' : undefined} aria-hidden="true">
+                    <svg viewBox="0 0 16 10" class="dock-pointer">
+                      <path d="M2.5 2h11L8 8Z" fill="currentColor" stroke="currentColor" stroke-width="3" stroke-linejoin="round" />
+                    </svg>
+                  </span>
+                  <ul class="relative flex">
+                    {NAV[m].map((item, i) => (
+                      <li class="min-w-0 flex-1 lg:w-[92px] lg:flex-none">
+                        <a href={item.href} data-i={i} data-on={i === at ? '' : undefined} aria-current={i === at ? 'page' : undefined} class="dock-item">
+                          <span class="dock-icon">
+                            <NavIcon icon={item.icon} size={28} />
+                          </span>
+                          <span class="dock-label">{item.label}</span>
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })}
+          </nav>
+        </div>
+      )
+    }
 
     <Overlays client:only="react" />
     <DemoTour client:only="react" />
@@ -163,33 +207,6 @@ const hasRail = Astro.slots.has('rail');
             localStorage.setItem('nirengi:theme', next);
           } catch {}
         });
-      // Cards that start below the fold rise in when they scroll into view. Islands mount late,
-      // so new cards are picked up as they appear. Reduced motion: nothing is hidden.
-      if (!matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window) {
-        const main = document.getElementById('icerik');
-        const io = new IntersectionObserver(
-          (entries) => {
-            for (const e of entries) {
-              if (!e.isIntersecting) continue;
-              const el = e.target as HTMLElement;
-              io.unobserve(el);
-              el.classList.add('rv-in');
-              el.addEventListener('transitionend', () => el.classList.remove('rv', 'rv-in'), { once: true });
-            }
-          },
-          { rootMargin: '0px 0px -6% 0px' },
-        );
-        const scan = () => {
-          for (const el of main?.querySelectorAll<HTMLElement>('.card:not([data-rv]), .card-press:not([data-rv])') ?? []) {
-            el.dataset.rv = '';
-            if (el.getBoundingClientRect().top < innerHeight || el.closest('[role="dialog"]')) continue;
-            el.classList.add('rv');
-            io.observe(el);
-          }
-        };
-        if (main) new MutationObserver(scan).observe(main, { childList: true, subtree: true });
-        scan();
-      }
       // Dock: a tap glides the plate to the new item (the leading edge first, the
       // trailing edge catching up), the icon hops, and only then the page changes, so
       // the motion finishes before the next page takes over. Targets are prefetched.
@@ -255,6 +272,32 @@ const hasRail = Astro.slots.has('rail');
             pending = window.setTimeout(() => location.assign(a.href), still ? 0 : 320);
           });
         }
+        // The deck's top edge, for everything that floats above it (toasts, tour, coach, Şimdi panel).
+        const deck = document.querySelector<HTMLElement>('.dock');
+        if (deck) {
+          const mark = () => document.documentElement.style.setProperty('--deck', `${Math.round(innerHeight - deck.getBoundingClientRect().top)}px`);
+          new ResizeObserver(mark).observe(deck);
+          addEventListener('resize', mark);
+          mark();
+          // Phones: the Şimdi line tucks away while reading down and comes back on the way up.
+          // Only the reader's own scrolling counts, not a page scrolling itself into place.
+          let lastY = scrollY;
+          let armed = false;
+          for (const t of ['touchstart', 'wheel', 'keydown']) addEventListener(t, () => (armed = true), { once: true, passive: true });
+          addEventListener(
+            'scroll',
+            () => {
+              const y = scrollY;
+              if (!armed || Math.abs(y - lastY) < 10) {
+                if (!armed) lastY = y;
+                return;
+              }
+              deck.toggleAttribute('data-tuck', innerWidth < 1024 && y > lastY && y > 140);
+              lastY = y;
+            },
+            { passive: true },
+          );
+        } else document.documentElement.style.setProperty('--deck', '0px');
         // Back/forward restores this page from the cache with the plate where the tap left it.
         addEventListener('pageshow', (e) => e.persisted && reset());
         const idle = window.requestIdleCallback ?? ((f: () => void) => setTimeout(f, 1200));

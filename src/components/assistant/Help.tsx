@@ -8,7 +8,7 @@ import { glossaryFor, helpFor, type RouteKey } from './tours';
 import type { Face } from './util';
 import { openDefter } from '../genc/defter';
 import { nowBarOn } from '../genc/NowBar';
-import { useLift } from '../ui/lift';
+import { createPortal } from 'react-dom';
 
 interface Props {
   face: Face;
@@ -25,24 +25,20 @@ interface Props {
 }
 
 export default function Help({ face, route, open, onOpen, onClose, hasTour, home, onTour, onWelcome }: Props) {
-  const bottom = useLift();
-  // On genç pages the Şimdi bar carries the way in, so the key steps back there.
+  // The key lives in the top bar. On genç pages the Şimdi line carries the way in, so it steps back there.
+  const slot = typeof document === 'undefined' ? null : document.getElementById('niri-key');
   const key = !(face === 'genc' && nowBarOn());
   return (
     <>
-      {key && (
-        <button
-          type="button"
-          onClick={onOpen}
-          data-assistant
-          aria-haspopup="dialog"
-          className="no-print btn-line btn-sm fixed right-4 z-[44] !min-h-11 !gap-1.5 !pl-2.5 !pr-3.5 transition-[bottom] duration-200"
-          style={{ bottom: `calc(env(safe-area-inset-bottom) + ${bottom}px)` }}
-        >
-          <NiriFace size={26} />
-          Niri’ye sor
-        </button>
-      )}
+      {key &&
+        slot &&
+        createPortal(
+          <button type="button" onClick={onOpen} data-assistant aria-haspopup="dialog" className="no-print btn-line btn-sm !min-h-10 !gap-1.5 !pl-2 !pr-3">
+            <NiriFace size={24} />
+            Niri’ye sor
+          </button>,
+          slot,
+        )}
 
       <Sheet open={open} onClose={onClose} title="Niri’ye sor">
         <div className="flex items-end gap-3">
