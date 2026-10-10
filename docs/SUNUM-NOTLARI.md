@@ -4,7 +4,7 @@
 
 Bu dosya `src/components/sunum/notes.ts` dosyasından üretildi; notları orada düzeltin. Sunum sırasında aynı notlar konuşmacı penceresinde görünür: sunumda **N** tuşu ya da `/sunum?notlar` adresi. Pencere sunumu izler, ok tuşlarıyla sunumu yönetir, **R** süreyi sıfırlar.
 
-Konuşma, organizasyonun önerdiği 12 adımı izler ve beş dakikaya sığar. 5. slayt ne çözdüğümüzü (beş durak, altı problem) ve ürünün bir web sitesi olduğunu (tarayıcıda ve telefona yüklü) gösterir; 6. slaytta tanıtım filmi müziğiyle oynar, Niri ve sayaç o sırada çekilir; 7. slayt jürinin en sevdiği eşleşmeyi gerçek ekranıyla açar; 11. slayt her problemden bir gerçek ekranla bitenleri gösterir. Kapanıştan sonra konuşmanın dışında 7 ek sayfa var: filmin öbür sahneleri gerçek ekranı ve üç mekanizmasıyla; soru gelince açılır, paylaşılan PDF’te de durur. Kısa cevaplar aşağıda ve kapanıştan itibaren konuşmacı penceresinde.
+Konuşma, organizasyonun önerdiği 12 adımı izler ve beş dakikaya sığar. 5. slayt ne çözdüğümüzü (beş durak, altı problem) ve ürünün bir web sitesi olduğunu (tarayıcıda ve telefona yüklü) gösterir; 6. slaytta tanıtım filmi müziğiyle oynar, Niri ve sayaç o sırada çekilir; 7. slayt jürinin en sevdiği eşleşmeyi gerçek ekranıyla açar; 11. slayt bitenleri web sitesinin gerçek sayfalarıyla, yanında telefondaki hâliyle gösterir. Kapanıştan sonra konuşmanın dışında 7 ek sayfa var: filmin öbür sahneleri gerçek ekranı ve üç mekanizmasıyla; soru gelince açılır, paylaşılan PDF’te de durur. Kısa cevaplar aşağıda ve kapanıştan itibaren konuşmacı penceresinde.
 
 Slaytlardaki her sayı `docs/PAZAR-ANALIZI.md` içindeki kaynağıyla birlikte slaytın üzerinde yazar ya da ürünün kendi kodundan gelir (XP tablosu, uyum ağırlıkları, kanıt düzeylerinin ağırlığı, yayın eşiği); yapay zekâ slaytlarındaki sonuçları ürünün kendi kodu, gerçek bir model cevabıyla hesaplar. Planlar plan olarak etiketli; kullanıcı, pilot ya da gelir rakamı yok.
 
@@ -13,7 +13,7 @@ Slaytlardaki her sayı `docs/PAZAR-ANALIZI.md` içindeki kaynağıyla birlikte s
 *0:00 – 0:12 · Niri: “Merhaba, ben Niri! Bugün size haritamı göstereceğim.”*
 
 - Merhaba, biz Nirengi: Sezer Uzun ve Emirhan Açık.
-- Nirengi noktası, haritacının güvenle ölçtüğü sabit noktadır. Biz gençlerin işi için o noktayı kuruyoruz: web’de ve telefonda çalışan açık kaynak bir uygulama.
+- Nirengi noktası, haritacının güvenle ölçtüğü sabit noktadır. Biz gençlerin işi için o noktayı kuruyoruz: açık kaynak bir web sitesi, telefonda da uygulama olarak çalışıyor.
 
 ## 2. Problem
 
@@ -45,7 +45,7 @@ Slaytlardaki her sayı `docs/PAZAR-ANALIZI.md` içindeki kaynağıyla birlikte s
 
 - Ne çözüyoruz? Gencin yaptığı işi ve kurumun ihtiyacını beyandan kanıta çeviriyoruz; ikisi küçük bir pilotta buluşuyor.
 - Beş durak var ve yarışmanın altı problemi bu duraklarda, her biri çalışan bir ekranla.
-- Ve bu bir web sitesi: tarayıcıda açılıyor, telefona uygulama olarak yükleniyor, internetsiz de çalışıyor. Şimdi 48 saniyelik filmle gezelim.
+- Ve Nirengi bir web sitesi: adresi açan hemen kullanıyor, kurum genelde masaüstünden çalışıyor. Telefonda da var: aynı adres ana ekrana yükleniyor, internetsiz açılıyor. Filmde telefondan gezeceğiz; aynı sayfalar masaüstünde de.
 
 ## 6. Tanıtım filmi
 
@@ -91,7 +91,7 @@ Slaytlardaki her sayı `docs/PAZAR-ANALIZI.md` içindeki kaynağıyla birlikte s
 
 *3:48 – 4:10 · Niri: “Prototipim çalışıyor. Gerisini pilotta kanıtlayacağım.”*
 
-- Bunların hepsi canlıda çalışıyor: her problemin kendi ekranı var, ekrandakiler ürünün gerçek görüntüleri. GitHub ve DNS doğrulaması gerçek, motor 55 testle sınanıyor.
+- Bunların hepsi web sitemizde canlı: her problemin kendi sayfası var, ekrandakiler sitenin gerçek görüntüleri; aynı site telefonda uygulama olarak da açılıyor. GitHub ve DNS doğrulaması gerçek, motor 55 testle sınanıyor.
 - Bilerek bıraktıklarımız: kalıcı veritabanı, gerçek kullanıcı ve pilot, kod dışı işte makine doğrulaması, bildirim ve mağaza sürümü.
 - Finalden sonraki dört ay: kalıcılık, ilk ihtiyaç turu, kod dışı doğrulama ve pilot raporu.
 
@@ -99,7 +99,7 @@ Slaytlardaki her sayı `docs/PAZAR-ANALIZI.md` içindeki kaynağıyla birlikte s
 
 *4:10 – 4:24 · Niri: “Zirvedeyim! İlk noktayı birlikte koyalım.”*
 
-- Tek bir isteğimiz var: bu salondan bir girişimin ya da kurumun gerçek bir ihtiyacı. İlk kanvası birlikte yazalım.
+- Adresimiz ekranda; sitemiz şu an açık, deneyebilirsiniz. Tek bir isteğimiz var: bu salondan bir girişimin ya da kurumun gerçek bir ihtiyacı. İlk kanvası birlikte yazalım.
 - Beyan değil, kanıt. Teşekkürler.
 
 ## Ek sayfalar (konuşmanın dışında)

@@ -16,7 +16,7 @@ export const NOTES: Record<string, Note> = {
     sec: 12,
     say: [
       'Merhaba, biz Nirengi: Sezer Uzun ve Emirhan Açık.',
-      'Nirengi noktası, haritacının güvenle ölçtüğü sabit noktadır. Biz gençlerin işi için o noktayı kuruyoruz: web’de ve telefonda çalışan açık kaynak bir uygulama.',
+      'Nirengi noktası, haritacının güvenle ölçtüğü sabit noktadır. Biz gençlerin işi için o noktayı kuruyoruz: açık kaynak bir web sitesi, telefonda da uygulama olarak çalışıyor.',
     ],
   },
   problem: {
@@ -48,7 +48,7 @@ export const NOTES: Record<string, Note> = {
     say: [
       'Ne çözüyoruz? Gencin yaptığı işi ve kurumun ihtiyacını beyandan kanıta çeviriyoruz; ikisi küçük bir pilotta buluşuyor.',
       'Beş durak var ve yarışmanın altı problemi bu duraklarda, her biri çalışan bir ekranla.',
-      'Ve bu bir web sitesi: tarayıcıda açılıyor, telefona uygulama olarak yükleniyor, internetsiz de çalışıyor. Şimdi 48 saniyelik filmle gezelim.',
+      'Ve Nirengi bir web sitesi: adresi açan hemen kullanıyor, kurum genelde masaüstünden çalışıyor. Telefonda da var: aynı adres ana ekrana yükleniyor, internetsiz açılıyor. Filmde telefondan gezeceğiz; aynı sayfalar masaüstünde de.',
     ],
   },
   demo: {
@@ -94,7 +94,7 @@ export const NOTES: Record<string, Note> = {
   bitti: {
     sec: 22,
     say: [
-      'Bunların hepsi canlıda çalışıyor: her problemin kendi ekranı var, ekrandakiler ürünün gerçek görüntüleri. GitHub ve DNS doğrulaması gerçek, motor 55 testle sınanıyor.',
+      'Bunların hepsi web sitemizde canlı: her problemin kendi sayfası var, ekrandakiler sitenin gerçek görüntüleri; aynı site telefonda uygulama olarak da açılıyor. GitHub ve DNS doğrulaması gerçek, motor 55 testle sınanıyor.',
       'Bilerek bıraktıklarımız: kalıcı veritabanı, gerçek kullanıcı ve pilot, kod dışı işte makine doğrulaması, bildirim ve mağaza sürümü.',
       'Finalden sonraki dört ay: kalıcılık, ilk ihtiyaç turu, kod dışı doğrulama ve pilot raporu.',
     ],
@@ -102,7 +102,7 @@ export const NOTES: Record<string, Note> = {
   kapanis: {
     sec: 14,
     say: [
-      'Tek bir isteğimiz var: bu salondan bir girişimin ya da kurumun gerçek bir ihtiyacı. İlk kanvası birlikte yazalım.',
+      'Adresimiz ekranda; sitemiz şu an açık, deneyebilirsiniz. Tek bir isteğimiz var: bu salondan bir girişimin ya da kurumun gerçek bir ihtiyacı. İlk kanvası birlikte yazalım.',
       'Beyan değil, kanıt. Teşekkürler.',
     ],
   },

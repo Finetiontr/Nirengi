@@ -10,8 +10,8 @@
 // the six problems, and the same product in a browser and on a phone), demo (the film), the
 // match (the part the jury liked most, on its real screens), what the AI does (with the open
 // model it runs on and its before and after), the guard against wrong output, design
-// decisions (a game for the genç, a measure for the kurum), done (a wall of the real screens,
-// one per problem) and left, close. After the close an appendix holds the film's other shots
+// decisions (a game for the genç, a measure for the kurum), done (the website's real pages,
+// one per problem, and the same app on a phone) and left, close (the ask beside the website). After the close an appendix holds the film's other shots
 // one page each, for questions and for the shared PDF; it is not part of the talk. Numbers come from
 // docs/PAZAR-ANALIZI.md with their sources on the slide; product numbers from the engine,
 // and the AI slides run a real model answer through the product's own guard. Nothing here
@@ -140,7 +140,7 @@ function Title() {
           Beyan değil, kanıt.
         </p>
         <p className="s-in mt-[30px] max-w-[760px] text-[30px] font-medium leading-[1.35] text-ink-3" style={d(260)}>
-          Gençlerin doğrulanmış işini girişimlerin ve kurumların ihtiyaçlarıyla buluşturan açık kaynak uygulama. Web’de ve telefonda.
+          Gençlerin doğrulanmış işini girişimlerin ve kurumların ihtiyaçlarıyla buluşturan açık kaynak bir web sitesi. Telefonda da uygulama olarak çalışır.
         </p>
       </div>
       <div className="s-in absolute left-[112px] top-[730px]" style={d(380)}>
@@ -304,7 +304,7 @@ function Solution() {
       <figure className="s-in absolute" style={{ left: 846, top: 232, ...d(200) }}>
         <Browser src="/sunum/dk-home.webp" alt="Nirengi masaüstü tarayıcıda: Yaptığın işle fark edil" route="" width={620} />
         <figcaption className="mt-[12px] w-[440px] text-[19px] font-bold leading-[1.3] text-ink-2">
-          Bir web sitesi: tarayıcıda açılır, telefona uygulama olarak yüklenir, internetsiz de çalışır.
+          <span className="text-ink">Bir web sitesi:</span> adresi açan hemen kullanır. <span className="text-ink">Telefonda da:</span> ana ekrana yüklenir, internetsiz açılır.
         </figcaption>
       </figure>
       <figure className="s-in absolute" style={{ left: 1300, top: 420, ...d(480) }}>
@@ -342,6 +342,23 @@ function Browser({ src, alt, route, width, who, mark }: { src: string; alt: stri
           style={{ left: mark.x * k - 5, top: 38 + mark.y * k - 5, width: mark.w * k + 10, height: mark.h * k + 10, boxShadow: '0 0 0 4px rgb(var(--indigo))', ...d(700) }}
         />
       )}
+    </div>
+  );
+}
+
+/** The same window at thumbnail size, for a wall of the site's pages. */
+function MiniBrowser({ src, alt, route, width }: { src: string; alt: string; route: string; width: number }) {
+  return (
+    <div className="overflow-hidden rounded-[12px] bg-bg ring-2 ring-line" style={{ width }}>
+      <div className="flex h-[22px] items-center gap-[5px] border-b-2 border-line bg-bg-2 px-[10px]">
+        {[0, 1, 2].map((n) => (
+          <span key={n} className="h-[7px] w-[7px] shrink-0 rounded-full bg-line-2" />
+        ))}
+        <span className="mono ml-[6px] min-w-0 flex-1 truncate text-[11px] font-semibold text-ink-3">
+          {SITE}/{route}
+        </span>
+      </div>
+      <img src={src} alt={alt} width={1536} height={960} draggable={false} className="block h-auto w-full" />
     </div>
   );
 }
@@ -879,42 +896,53 @@ function Decisions() {
 // ---------------------------------------------------------------- 11. what we finished, what we left on purpose
 
 function Done() {
-  const wall: { code: string; who: 'genc' | 'kurum'; src: string; alt: string }[] = [
-    { code: '02', who: 'genc', src: '/sunum/ph-dogrulandi.webp', alt: 'Profil: GitHub ile doğrulanmış işler' },
-    { code: '05', who: 'kurum', src: '/sunum/kurum-okuma.webp', alt: 'İhtiyaç: Niri kurumun metnini alanlara ayırdı' },
-    { code: '01', who: 'kurum', src: '/sunum/kurum-kesfet.webp', alt: 'Keşif: problemi yaz, isimsiz profiller' },
-    { code: '03', who: 'kurum', src: '/sunum/kurum-neden.webp', alt: 'Eşleşme: neden bu uyum, dört parça' },
-    { code: '06', who: 'kurum', src: '/sunum/kurum-pilot.webp', alt: 'Pilot: aşamalar ve onay bekleyen teslim' },
-    { code: '04', who: 'genc', src: '/sunum/genc-bugun.webp', alt: 'Ağ: gencin haftası, seri ve günün ihtiyaçları' },
+  const W = 304;
+  const pages: { code: string; who: 'genc' | 'kurum'; src: string; route: string; alt: string }[] = [
+    { code: '02', who: 'genc', src: '/sunum/dk-profil.webp', route: 'profil/emirhanacik', alt: 'Profil masaüstünde: doğrulanmış işler ve hafta serisi' },
+    { code: '05', who: 'kurum', src: '/sunum/dk-yaz.webp', route: 'ihtiyaclar/yeni', alt: 'İhtiyaç yazma masaüstünde: derdini kendi sözleriyle anlat' },
+    { code: '01', who: 'kurum', src: '/sunum/dk-kesfet.webp', route: 'kesfet', alt: 'Yetenek keşfi masaüstünde: problemle arama, isimsiz profiller' },
+    { code: '03', who: 'kurum', src: '/sunum/dk-adaylar.webp', route: 'ihtiyaclar/n-rota', alt: 'Uyan adaylar masaüstünde: isimsiz liste ve puanlar' },
+    { code: '06', who: 'kurum', src: '/sunum/dk-pilot.webp', route: 'pilotlar/pl-rota', alt: 'Deneme projesi masaüstünde: aşamalar ve onay' },
+    { code: '04', who: 'genc', src: '/sunum/dk-topluluk.webp', route: 'topluluk', alt: 'Topluluk masaüstünde: soru ve işe yarayan cevap' },
   ];
   const left = ['Kalıcı veritabanı', 'Gerçek kullanıcı ve pilot', 'Kod dışı işte makine doğrulaması', 'Bildirim ve mağaza sürümü'];
   const next = ['Kalıcılık', 'İlk ihtiyaç turu', 'Kod dışı doğrulama', 'Pilot raporu'];
   return (
     <>
       <Heading width={1376}>Neyi bitirdik, neyi bilerek bıraktık?</Heading>
-      <p className="s-in absolute left-[112px] top-[176px] flex items-center gap-[10px] text-[22px] font-bold text-green-ink" style={d(80)}>
+      <p className="s-in absolute left-[112px] top-[172px] flex items-center gap-[10px] text-[21px] font-bold text-green-ink" style={d(80)}>
         <Check size={24} strokeWidth={3.4} className="shrink-0" />
-        Altı problemin altısı canlıda çalışıyor; motor 55 otomatik testle sınanıyor.
+        Web sitesinde altı problemin altısı canlıda çalışıyor; motor 55 otomatik testle sınanıyor.
       </p>
-      {wall.map((w, n) => (
-        <figure key={w.code} className="s-in absolute w-[196px]" style={{ left: 112 + n * 236, top: 226, ...d(160 + n * 90) }}>
-          <Phone src={w.src} alt={w.alt} width={196} />
-          <figcaption className="mt-[10px] text-[16px] font-bold leading-[1.25] text-ink-2">
-            <span className="num text-indigo">{w.code}</span> {PROBLEM[w.code]}
+      {pages.map((pg, n) => (
+        <figure key={pg.code} className="s-in absolute" style={{ left: 112 + (n % 3) * (W + 24), top: 214 + Math.floor(n / 3) * 244, width: W, ...d(160 + n * 80) }}>
+          <MiniBrowser src={pg.src} alt={pg.alt} route={pg.route} width={W} />
+          <figcaption className="mt-[6px] truncate text-[16px] font-bold text-ink-2">
+            <span className="num text-indigo">{pg.code}</span> {PROBLEM[pg.code]}
           </figcaption>
         </figure>
       ))}
-      <div className="s-in absolute left-[800px] top-[704px] w-[688px]" style={d(760)}>
-        <p className="text-[17px] font-bold text-ink-3">Bilerek bıraktık</p>
-        <p className="mt-[4px] text-[20px] font-bold leading-[1.3] text-ink-2">{left.join(' · ')}</p>
-        <p className="mt-[12px] text-[17px] font-bold text-ink-3">Finalden sonra 4 ay · plan</p>
-        <p className="mt-[4px] text-[20px] font-bold leading-[1.3] text-ink-2">{next.map((t, i) => `${i + 1}. ${t}`).join('   ')}</p>
+
+      {/* The same site on a phone: installed from the browser, no store. */}
+      <figure className="s-in absolute left-[1318px] top-[214px]" style={d(700)}>
+        <Phone src="/sunum/genc-bugun.webp" alt="Aynı site telefonda uygulama olarak: gencin Bugün ekranı" width={170} />
+      </figure>
+      <div className="s-in absolute left-[1104px] top-[226px] w-[196px]" style={d(760)}>
+        <p className="text-[22px] font-extrabold leading-tight text-ink">Telefonda da</p>
+        <p className="mt-[6px] text-[18px] font-semibold leading-[1.35] text-ink-2">Aynı adres ana ekrana yüklenir, tam ekran ve internetsiz açılır. Mağaza gerekmez.</p>
+      </div>
+
+      <div className="s-in absolute left-[800px] top-[712px] w-[688px]" style={d(840)}>
+        <p className="text-[16px] font-bold text-ink-3">Bilerek bıraktık</p>
+        <p className="mt-[2px] text-[19px] font-bold leading-[1.3] text-ink-2">{left.join(' · ')}</p>
+        <p className="mt-[10px] text-[16px] font-bold text-ink-3">Finalden sonra 4 ay · plan</p>
+        <p className="mt-[2px] text-[19px] font-bold leading-[1.3] text-ink-2">{next.map((t, i) => `${i + 1}. ${t}`).join('   ')}</p>
       </div>
     </>
   );
 }
 
-// ---------------------------------------------------------------- 12. close: the one ask
+// ---------------------------------------------------------------- 12. close: the one ask, beside the website
 
 function Close() {
   return (
@@ -936,6 +964,9 @@ function Close() {
         <p className="mt-[8px] text-[21px] font-semibold text-ink-2">{TEAM.join(' · ')}</p>
         <p className="mt-[2px] text-[19px] font-semibold text-ink-3">Açık kaynak, MIT lisanslı · web’de ve telefonda</p>
       </div>
+      <figure className="s-in absolute left-[928px] top-[104px]" style={d(480)}>
+        <Browser src="/sunum/dk-home.webp" alt="nirengi web sitesi: Yaptığın işle fark edil" route="" width={560} />
+      </figure>
       <SurveyFlag size={96} delay={0.6} className="absolute left-[1478px] top-[694px]" />
     </>
   );
