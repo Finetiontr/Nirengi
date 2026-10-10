@@ -61,7 +61,8 @@ export function Mark({ className = 'h-8 w-8' }: { className?: string }) {
 
 // ---------------------------------------------------------------- identity
 
-const TONES = ['indigo', 'orange', 'cyan', 'purple', 'green', 'red', 'gold-lip', 'cyan-lip'];
+// No orange: the same initials show on the kurum side, which never uses it.
+const TONES = ['indigo', 'green-lip', 'cyan', 'purple', 'green', 'red', 'gold-lip', 'cyan-lip'];
 const tone = (id: string) => TONES[[...id].reduce((a, c) => a + c.charCodeAt(0), 0) % TONES.length];
 
 /** What the viewer is allowed to see. Blind mode hides identity for the kurum side. */
