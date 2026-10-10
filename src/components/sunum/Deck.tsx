@@ -1,5 +1,5 @@
 // The stage deck: one idea per slide, Niri on stage with one short line each.
-// Twelve slides in the organisers' order; questions are answered from the notes.
+// The organisers' twelve steps, the solution walked stop by stop; questions are answered from the notes.
 // Keys: →, Space, PageDown next; ←, PageUp back; Home/End (the close); 1–9 and 0 jump;
 // F fullscreen; B blanks the screen; T flips the theme for this visit; N opens the
 // presenter window (/sunum?notlar) with the speaker notes, which follows the deck

@@ -8,10 +8,10 @@
 
 ![Niri kurumun metnini açık bir modelle okur; her alan metindeki bir cümleye dayanır](docs/nirengi-demo.gif)
 
-- **Tanıtım filmi:** [48 saniye, müzikli](https://finetiontr.github.io/Nirengi/sunum/nirengi-film.mp4); her özelliği ürünün gerçek ekranlarıyla gösterir, sunumun 6. slaytında oynar. Müziği kodla bestelendi, lisansı bize ait. Uzun anlatım: [79 saniye, sessiz](https://finetiontr.github.io/Nirengi/sunum/nirengi-tanitim-web.mp4), Niri ekranları telefonda gezdirir.
+- **Tanıtım filmi:** [48 saniye, müzikli](https://finetiontr.github.io/Nirengi/sunum/nirengi-film.mp4); her özelliği ürünün gerçek ekranlarıyla gösterir; sunumda her sahnesi ayrı bir sayfa olarak açılır, film kapanıştan önce oynar. Müziği kodla bestelendi, lisansı bize ait. Uzun anlatım: [79 saniye, sessiz](https://finetiontr.github.io/Nirengi/sunum/nirengi-tanitim-web.mp4), Niri ekranları telefonda gezdirir.
 - **Canlı:** https://finetiontr.github.io/Nirengi/ (kurulum gerekmez; veri tarayıcıda tutulur)
 - **Telefona yükle:** [`/uygulama`](https://finetiontr.github.io/Nirengi/uygulama) ya da sunumun son slaytındaki QR kodu. Mağaza gerekmez: Android’de tek dokunuşla, iPhone’da Paylaş → Ana Ekrana Ekle ile yüklenir; ana ekrandan tam ekran açılır, internetsiz de çalışır.
-- **Sunum:** [`/sunum`](https://finetiontr.github.io/Nirengi/sunum), uygulamanın içinde Niri’nin anlattığı 12 slaytlık deste; yapay zekâ slaytları ürünün kendi denetimini gerçek bir model cevabı üzerinde çalıştırır
+- **Sunum:** [`/sunum`](https://finetiontr.github.io/Nirengi/sunum), uygulamanın içinde Niri’nin anlattığı 22 slaytlık deste: ne çözdüğümüz, web’de ve telefonda aynı ürün, filmin her sahnesi gerçek ekranıyla bir sayfa; yapay zekâ slaytları ürünün kendi denetimini gerçek bir model cevabı üzerinde çalıştırır
 - **Sahne akışı:** [`docs/DEMO.md`](docs/DEMO.md), 5 dakikalık demo ve yedek senaryo
 
 ## Çözdüğü problem
@@ -168,7 +168,7 @@ src/
     seed.ts            kurgusal demo ekosistemi
   styles/global.css    renk ve tipografi tokenları
   sw.js                service worker: sayfaları ve dosyaları telefonda tutar (Pages derlemesi)
-public/                favicon, manifest.webmanifest; pwa/ altında uygulama ikonları ve QR kodu; sunum/ altında tanıtım filmi ve posteri, uzun anlatım videosu, telefon ekranları
+public/                favicon, manifest.webmanifest; pwa/ altında uygulama ikonları ve QR kodu; sunum/ altında tanıtım filmi ve posteri, uzun anlatım videosu, sunum sayfalarının telefon ve masaüstü ekranları ile öne çıkarılan kesitleri
 worker/                tek sunucu parçası (Cloudflare Worker): GitHub token değişimi, yapay zekâ taslağı
 scripts/               GitHub Pages derlemesi, service worker'ın dosya listesi, sunum dışa aktarımı
 tests/                 node:test testleri

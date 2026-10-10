@@ -13,99 +13,156 @@ export interface Note {
 
 export const NOTES: Record<string, Note> = {
   baslik: {
-    sec: 12,
+    sec: 8,
     say: [
       'Merhaba, biz Nirengi: Sezer Uzun ve Emirhan Açık.',
-      'Nirengi noktası, haritacının güvenle ölçtüğü sabit noktadır. Biz gençlerin işi için o noktayı kuruyoruz.',
+      'Nirengi noktası, haritacının güvenle ölçtüğü sabit noktadır; biz gençlerin işi için o noktayı kuruyoruz.',
     ],
   },
   problem: {
-    sec: 20,
+    sec: 12,
     say: [
-      'Deneyim yoksa iş yok, iş yoksa deneyim yok.',
-      'Her 100 gençten 23’ü ne okulda ne işte.',
-      'Öbür tarafta, BİT uzmanı almakta zorlanan her 100 şirketten 71’i aynı şeyi söylüyor: ilgili iş deneyimi yok.',
+      'Deneyim yoksa iş yok, iş yoksa deneyim yok. Her 100 gençten 23’ü ne okulda ne işte.',
+      'BİT uzmanı almakta zorlanan her 100 girişimden 71’i aynı şeyi söylüyor: ilgili iş deneyimi yok.',
     ],
   },
   'kim-icin': {
-    sec: 20,
+    sec: 13,
     say: [
-      'İki kullanıcımız var.',
-      'Birincisi, üreten ama kanıtı olmayan genç: tek bir seçici programa bir milyon başvuru geliyor, kapıda kalan görünmüyor.',
-      'İkincisi, BİT uzmanı olmayan küçük kurum: ihtiyacı var ama tarif edemiyor, kadro riskini alamıyor.',
+      'Odağımız girişim ekosistemi. Bir yanda üreten ama kanıtı olmayan genç: tek bir seçici programa bir milyon başvuru geliyor.',
+      'Öbür yanda ekip kuran erken aşama girişim: İK’sı yok, yanlış işe alımı kaldıramaz. İlk tur Zemin360 ve GİRVAK ağı.',
     ],
   },
   kanit: {
-    sec: 20,
+    sec: 10,
     say: [
-      'Bunu nereden biliyoruz?',
       'Diploma şartını kaldıran şirketlerde bile işe alım 700’de 1’den az değişti: niyet var, ölçme aracı yok.',
-      '37 platform ve programı inceledik; doğrulanmış işi ve kurum imzasını bir arada sunanı Türkiye’de bulamadık.',
+      '37 platformu inceledik; doğrulanmış işi ve kurum imzasını birlikte sunanı bulamadık.',
     ],
   },
   cozum: {
-    sec: 20,
+    sec: 12,
     say: [
-      'Çözümümüz tek cümle: genç gerçek işiyle görünür, kurum ihtiyacını ölçülebilir yazar, ikisi küçük bir pilotta buluşur.',
-      'Onaylanan her aşama, gencin profiline kurum onaylı kanıt olarak döner.',
-      'Ürünü 48 saniyelik filmle gösterelim.',
+      'Ne çözüyoruz? Gencin yaptığı işi ve kurumun ihtiyacını beyandan kanıta çeviriyoruz; ikisi küçük bir pilotta buluşuyor.',
+      'Yarışmanın altı problemi bu beş durakta, her biri çalışan bir ekranla.',
+    ],
+  },
+  web: {
+    sec: 12,
+    say: [
+      'Nirengi bir web sitesi: tarayıcıda açılıyor, kurulum yok. Aynı adres telefona uygulama olarak yükleniyor ve internetsiz çalışıyor.',
+      'Şimdi videomuzdaki her sahneyi yavaşça açalım. Hikâyenin genci Emirhan: adı bizden, profil kurgusal.',
+    ],
+  },
+  'sayfa-dogrulama': {
+    sec: 13,
+    say: [
+      'Önce kanıt. Emirhan GitHub’da hangi depoları göstereceğini kendisi seçiyor; hepsi Doğrulandı geliyor, yanında doğrulayanı yazıyor.',
+      'Behance ya da ArtStation’daki iş dürüstçe Beyan yazıyor; eşleşmede de daha az sayılıyor.',
+    ],
+  },
+  'sayfa-xp': {
+    sec: 13,
+    say: [
+      'Oyunlaştırma burada: haftalık hedef, seri, lig, görevler ve Niri’nin kostümleri.',
+      'Ama XP yalnız gerçek işten geliyor; her XP bir iş makbuzu. Kurum tarafında oyun yok.',
+    ],
+  },
+  'sayfa-analiz': {
+    sec: 12,
+    say: [
+      'Niri her hafta gencin haftasını okuyor ve en yakın kapıyı gösteriyor: Flutter’da bir doğrulanmış iş eklersen uyumun 63’ten 72’ye çıkar.',
+      'Eşleşmeyen genç neyin eksik olduğunu biliyor.',
+    ],
+  },
+  'sayfa-topluluk': {
+    sec: 12,
+    say: [
+      'Gençler yalnız kurumlarla değil, birbirleriyle de çalışıyor: Baran soruyor, Emirhan cevaplıyor.',
+      'Baran “İşe yaradı” deyince Emirhan 15 XP kazanıyor; yardım da üretim sayılıyor.',
+    ],
+  },
+  'sayfa-ihtiyac': {
+    sec: 12,
+    say: [
+      'Şimdi kurum tarafı. Kuzey Lojistik ilan yazmıyor, derdini anlatıyor: “kargom nerede” aramaları ayda 6.000.',
+      'Niri bunu yedi alanlı kanvasa çeviriyor; netlik 70’i geçmeden ihtiyaç yayına çıkmıyor.',
+    ],
+  },
+  'sayfa-aday': {
+    sec: 13,
+    say: [
+      'Kurum adayları isimsiz görüyor: Aday 9C03, iki Kurum onaylı iş, 86 puan.',
+      'Puanın dört parçası açık, her birinin gerekçesi yazıyor. Kimlik ancak deneme projesi teklif edilince açılıyor.',
+    ],
+  },
+  'sayfa-defter': {
+    sec: 13,
+    say: [
+      'Deneme projesinde kriterler aşamaya dönüşüyor: Emirhan teslim ediyor, Kuzey Lojistik onaylıyor.',
+      'Her kaydın özeti bir sonrakine yazılıyor; biri sonradan tek harf değiştirse zincir tam orada kırılıyor.',
+    ],
+  },
+  'sayfa-donus': {
+    sec: 11,
+    say: [
+      'Onaylanan aşama Emirhan’ın profiline Kurum onaylı kanıt olarak dönüyor, imzalayanıyla.',
+      'Döngü kapanıyor; Emirhan bir sonraki ihtiyaca daha yakın.',
+    ],
+  },
+  'yz-ne': {
+    sec: 13,
+    say: [
+      'Kurumun metnini kim okuyor? Açık ağırlıklı bir model, Gemma 4.',
+      'Metni yedi alana ayırıyor ve her alanı metindeki bir cümleye bağlıyor: “ayda 6.000 arama” sorunun ölçüsü oluyor.',
+    ],
+  },
+  'yz-model': {
+    sec: 13,
+    say: [
+      'Neden Gemma? Açık ağırlıklı ve Apache lisanslı; denediğimiz dört açık model içinde Türkçeyi doğru ayıran en hızlısı oydu.',
+      'Ücretsiz kotada çalışıyor. Model okuyor ve öneriyor; yayın kararı, puan ve sıralama kurallarda.',
+    ],
+  },
+  'yz-fark': {
+    sec: 10,
+    say: [
+      'Aynı metni kural motoru okuyunca netlik 60, yayımlanamıyor. Modelle 75; kurum önerileri ekleyince 100.',
+      'Bu sayıları ürünün kendi kuralları hesaplıyor.',
+    ],
+  },
+  'yz-onlem': {
+    sec: 12,
+    say: [
+      'Model yanılırsa? Cevap dört kapıdan geçiyor: şema, alıntı, sayı, ölçülebilirlik.',
+      'Metinde olmayan bir karar verici uydurursa alan boş kalıyor, Niri kuruma soruyor. Model susarsa kural motoru devralıyor.',
+    ],
+  },
+  tasarim: {
+    sec: 8,
+    say: [
+      'Tasarımda kararımız net: her ekranda tek iş, önce telefon; oyun yalnız gençte, kurum ekranı sakin; aday temasa kadar isimsiz.',
+    ],
+  },
+  bitti: {
+    sec: 13,
+    say: [
+      'Gördüğünüz her şey canlıda çalışıyor; motor 55 testle sınanıyor.',
+      'Bilerek bıraktıklarımız: kalıcı veritabanı, gerçek kullanıcı ve pilot, kod dışı işte makine doğrulaması. Sonraki dört ay bunlar.',
     ],
   },
   demo: {
     sec: 48,
     say: [
-      '(Film müzikle oynar; konuşma yok. Bitince → ile devam.)',
+      '(Süre darsa bu slaytı → ile geç: sayfalar filmin sahneleri. Oynarsa müzikle oynar, konuşma yok; bitince → ile devam.)',
       'Ses gelmezse filme bir kez tıkla.',
       'Film açılmazsa slayt kendiliğinden canlı demo paneline döner; Sunum klasöründeki mp4 de yedekte.',
     ],
   },
-  'yz-ne': {
-    sec: 20,
-    say: [
-      'Filmdeki yapay zekâ adımı şu: kurum derdini kendi sözleriyle yazıyor.',
-      'Açık ağırlıklı bir model, Gemma 4, bu metni yedi alanlı ihtiyaç kanvasına çeviriyor.',
-      'Her alan metindeki bir cümleye dayanıyor: “ayda 6.000 arama” sorunun ölçüsü oluyor.',
-    ],
-  },
-  'yz-fark': {
-    sec: 18,
-    say: [
-      'Aynı metni kural motorumuz da okuyor: beş alan, netlik 60, yayımlanamaz.',
-      'Model yedi alanı dolduruyor ve iki ölçülebilir kriter öneriyor: 75. Kurum önerileri ekleyince 100.',
-      'Bu sayıları ürünün kendi kuralları hesaplıyor.',
-    ],
-  },
-  'yz-onlem': {
-    sec: 24,
-    say: [
-      'Model yanılırsa? Cevabı dört kapıdan geçiyor: şema, alıntı, sayı, ölçülebilirlik.',
-      'Model “Genel Müdür onaylar” diye uydurursa, bu cümle metinde olmadığı için alan boş kalır; Niri kuruma sorar.',
-      'Yayın kararını model değil, kurallar veriyor. Model hiç cevap vermezse kural motoru devralır.',
-    ],
-  },
-  tasarim: {
-    sec: 18,
-    say: [
-      'Tasarımda beş karar verdik.',
-      'Her ekranda tek iş, ve önce telefon.',
-      'Oyun yalnız genç tarafında; kurum ekranı sakin.',
-      'Kurum adayı temasa kadar isimsiz görür. Niri yol gösterir ama kimseyi bekletmez.',
-    ],
-  },
-  bitti: {
-    sec: 30,
-    say: [
-      'Altı problemin altısına çalışan bir ekranımız var. GitHub ve DNS doğrulaması, yapay zekâ taslağı canlıda; eşleşme ve kayıt defteri testli.',
-      'Yalnız yazılımcılar için değil: tasarımcı da çevirmen de LinkedIn, Behance, ArtStation bağlantılarıyla profilini kuruyor.',
-      'Nirengi telefona yüklenen bir uygulama: ana ekrandan açılır, internet olmadan da çalışır.',
-      'Bilerek bıraktıklarımız: kalıcı veritabanı, gerçek kullanıcı ve pilot. Kod dışı bağlantıları makineyle doğrulamıyoruz, Beyan diyoruz. Bildirim ve mağaza sürümü yok. Demo kişileri kurgusal, ekranda da öyle yazıyor.',
-      'Finalden sonraki dört ay: kalıcılık, ilk ihtiyaç turu, kod dışı doğrulama ve pilot raporu.',
-    ],
-  },
   kapanis: {
-    sec: 16,
+    sec: 10,
     say: [
-      'Tek bir isteğimiz var: bu salondan bir kurumun gerçek bir ihtiyacı. İlk kanvası birlikte yazalım.',
+      'Tek bir isteğimiz var: bu salondan bir girişimin ya da kurumun gerçek bir ihtiyacı. İlk kanvası birlikte yazalım.',
       'Ekrandaki kodu okutursanız Nirengi şimdi telefonunuza gelir.',
       'Beyan değil, kanıt. Teşekkürler.',
     ],
@@ -188,8 +245,8 @@ export const QA: Answer[] = [
   {
     q: 'İlk pazarınız kim?',
     say: [
+      'Odak girişim ekosistemi. İlk tur: Zemin360 ve GİRVAK ağındaki girişimler ve gençler. Sonra BİT uzmanı olmayan küçük işletmeler, kamu birimleri ve STK’lar.',
       'Bağımsız bir mikro staj pazar büyüklüğü bulamadık; uydurma bir rakam vermiyoruz.',
-      'İlk tur: Zemin360 ve GİRVAK ağındaki kurumlar ve gençler. Sonra BİT uzmanı olmayan küçük işletmeler, kamu birimleri ve STK’lar.',
     ],
   },
   {
