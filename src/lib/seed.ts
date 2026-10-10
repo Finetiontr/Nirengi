@@ -6,7 +6,7 @@ import { appendEntry } from './engine/ledger.ts';
 import { daysAgo, daysFromNow } from './format.ts';
 import { dayKey, weekKey } from './engine/progress.ts';
 
-export const STATE_VERSION = 7;
+export const STATE_VERSION = 8;
 export const ROUND = '2026·Ç4';
 /** A closed pilot both sides agreed to publish: the public card the demo shows before its own project closes. */
 export const SAMPLE_CARD = 'pl-shader';
@@ -76,9 +76,9 @@ const orgs: Org[] = [
 function people(): Person[] {
   return [
     {
-      id: 'p-can',
-      handle: 'canaksoy',
-      name: 'Can Aksoy',
+      id: 'p-emirhan',
+      handle: 'emirhanacik',
+      name: 'Emirhan Açık',
       headline: 'Backend geliştirici · Go',
       city: 'İstanbul',
       age: 24,
@@ -87,17 +87,17 @@ function people(): Person[] {
       availability: 'open',
       weeklyHours: 20,
       joinedAt: daysAgo(210),
-      links: { github: 'canaksoy', domain: 'canaksoy.dev' },
-      profiles: [{ platform: 'linkedin', url: 'https://www.linkedin.com/in/nirengi-demo-can-aksoy' }],
+      links: { github: 'emirhanacik', domain: 'emirhanacik.dev' },
+      profiles: [{ platform: 'linkedin', url: 'https://www.linkedin.com/in/nirengi-demo-emirhan-acik' }],
       evidence: [
         ev({
-          id: 'e-can-1',
+          id: 'e-emirhan-1',
           title: 'edge-mirror — yüksek trafikli dosya dağıtım katmanı',
           summary: 'Go ile yazılmış, 3 bölgede çalışan, günde 2,1 TB trafik taşıyan dosya dağıtım ve önbellek katmanı.',
           source: 'github',
           level: 'S2',
           skills: ['go', 'distributed', 'perf'],
-          url: 'https://github.com/canaksoy/edge-mirror',
+          url: 'https://github.com/emirhanacik/edge-mirror',
           metrics: [
             { label: 'yıldız', value: '612' },
             { label: 'commit', value: '1.140' },
@@ -107,13 +107,13 @@ function people(): Person[] {
           ago: 60,
         }),
         ev({
-          id: 'e-can-2',
+          id: 'e-emirhan-2',
           title: 'tunnelq — Go ile dağıtık iş kuyruğu',
           summary: 'Tekrar denemeli, önceliklendirilmiş iş kuyruğu. REST ve gRPC uçları var.',
           source: 'github',
           level: 'S2',
           skills: ['go', 'distributed', 'api'],
-          url: 'https://github.com/canaksoy/tunnelq',
+          url: 'https://github.com/emirhanacik/tunnelq',
           metrics: [
             { label: 'yıldız', value: '412' },
             { label: 'commit', value: '380' },
@@ -122,18 +122,18 @@ function people(): Person[] {
           ago: 140,
         }),
         ev({
-          id: 'e-can-3',
-          title: 'canaksoy.dev — teknik yazılar',
+          id: 'e-emirhan-3',
+          title: 'emirhanacik.dev — teknik yazılar',
           summary: 'Kuyruk teorisi ve Go performans ölçümü üzerine 18 yazı.',
           source: 'domain',
           level: 'S2',
           skills: ['docs', 'go'],
-          url: 'https://canaksoy.dev',
+          url: 'https://emirhanacik.dev',
           verifier: 'DNS TXT kaydı',
           ago: 300,
         }),
         ev({
-          id: 'e-can-4',
+          id: 'e-emirhan-4',
           title: 'Kilometre taşı: 3.000 noktalık rota 5 dakikanın altında',
           summary: 'Kuzey Lojistik deneme projesinde ilk başarı kriteri karşılandı: ölçülen süre 3 dk 40 sn.',
           source: 'pilot',
@@ -146,7 +146,7 @@ function people(): Person[] {
           verifiedAgo: 8,
         }),
         ev({
-          id: 'e-can-5',
+          id: 'e-emirhan-5',
           title: 'Rust ile rota motoru denemeleri',
           summary: 'Kişisel deneme projesi; henüz yayımlanmadı.',
           source: 'claim',
@@ -222,9 +222,9 @@ function people(): Person[] {
       ],
     },
     {
-      id: 'p-mert',
-      handle: 'mertkilic',
-      name: 'Mert Kılıç',
+      id: 'p-sezer',
+      handle: 'sezeruzun',
+      name: 'Sezer Uzun',
       headline: 'Oyun geliştirici · Unity & shader',
       city: 'İzmir',
       age: 27,
@@ -233,10 +233,10 @@ function people(): Person[] {
       availability: 'partial',
       weeklyHours: 10,
       joinedAt: daysAgo(330),
-      links: { github: 'mertkilic' },
+      links: { github: 'sezeruzun' },
       evidence: [
         ev({
-          id: 'e-mert-1',
+          id: 'e-sezer-1',
           title: 'Pilot: düşük segment Android’de 60 FPS su sahnesi',
           summary: 'Anka Oyun ile 3 kilometre taşının tamamı çift onaylı. Test cihazında 58 FPS ölçüldü.',
           source: 'pilot',
@@ -248,19 +248,19 @@ function people(): Person[] {
           ago: 70,
         }),
         ev({
-          id: 'e-mert-2',
+          id: 'e-sezer-2',
           title: 'Dalga — mobil su shader paketi (URP)',
           summary: 'Kırılma, köpük ve sıçrama efektli; tek geçişte çizilen su shader’ı.',
           source: 'github',
           level: 'S2',
           skills: ['unity', 'shader', 'perf'],
-          url: 'https://github.com/mertkilic/dalga',
+          url: 'https://github.com/sezeruzun/dalga',
           metrics: [{ label: 'yıldız', value: '530' }],
           verifier: 'GitHub API · hesap sahipliği',
           ago: 200,
         }),
         ev({
-          id: 'e-mert-3',
+          id: 'e-sezer-3',
           title: 'Kule Savunması: Ege',
           summary: 'Google Play’de yayımlanan strateji oyunu. Geliştirici hesabı doğrulandı.',
           source: 'store',
@@ -997,7 +997,7 @@ function pilots(): Pilot[] {
       id: 'pl-rota',
       needId: 'n-rota',
       orgId: 'o-kuzey',
-      personId: 'p-can',
+      personId: 'p-emirhan',
       title: 'Eşzamanlı rota servisi — Tuzla deposu',
       status: 'active',
       startedAt: daysAgo(24),
@@ -1050,7 +1050,7 @@ function pilots(): Pilot[] {
       id: 'pl-shader',
       needId: 'n-shader',
       orgId: 'o-anka',
-      personId: 'p-mert',
+      personId: 'p-sezer',
       title: 'Mobil su shader’ı — Anka su parkı sahnesi',
       status: 'succeeded',
       startedAt: daysAgo(110),
@@ -1121,15 +1121,15 @@ function events(): NetEvent[] {
     e(1, 'evidence_verified', 'İrem Koç’un kanıtı “iremkoc.dev” DNS TXT ile doğrulandı.', { personId: 'p-irem' }),
     e(2, 'micro', 'Defne Arslan, Şifa Dijital Sağlık’ın taslak ihtiyacına erişilebilirlik incelemesi bıraktı.', { personId: 'p-defne', orgId: 'o-sifa' }),
     e(7, 'need_published', 'Pera Finans Lab yeni ihtiyaç yayımladı: “Müşteri şikâyetlerini ilk 10 dakikada doğru ekibe yönlendirmek”.', { orgId: 'o-pera', needId: 'n-sikayet' }),
-    e(8, 'milestone_approved', 'Kuzey Lojistik × Can Aksoy: “3.000 noktalık rota 5 dakikanın altında” çift onaylandı.', { orgId: 'o-kuzey', personId: 'p-can', pilotId: 'pl-rota' }),
+    e(8, 'milestone_approved', 'Kuzey Lojistik × Emirhan Açık: “3.000 noktalık rota 5 dakikanın altında” çift onaylandı.', { orgId: 'o-kuzey', personId: 'p-emirhan', pilotId: 'pl-rota' }),
     e(10, 'need_published', 'Marmara Akıllı Şehir Lab. yeni ihtiyaç yayımladı: “Otopark doluluk verisini canlı haritada göstermek”.', { orgId: 'o-marmara', needId: 'n-otopark' }),
     e(20, 'evidence_verified', 'Baran Öztürk’ün “parkla” deposu GitHub ile doğrulandı.', { personId: 'p-baran' }),
-    e(24, 'pilot_opened', 'Kuzey Lojistik × Can Aksoy deneme projesi açıldı.', { orgId: 'o-kuzey', personId: 'p-can', pilotId: 'pl-rota' }),
+    e(24, 'pilot_opened', 'Kuzey Lojistik × Emirhan Açık deneme projesi açıldı.', { orgId: 'o-kuzey', personId: 'p-emirhan', pilotId: 'pl-rota' }),
     e(30, 'pilot_opened', 'Marmara Akıllı Şehir Lab. × İrem Koç deneme projesi açıldı.', { orgId: 'o-marmara', personId: 'p-irem', pilotId: 'pl-docs' }),
     e(32, 'person_joined', 'İrem Koç NİRENGİ’ye katıldı ve ilk kanıtını bağladı.', { personId: 'p-irem' }),
     e(40, 'pilot_closed', 'Atölye Kooperatifi × Defne Arslan deneme projesi gerekçesiyle kapandı (1/3 kriter).', { orgId: 'o-atolye', personId: 'p-defne', pilotId: 'pl-kimlik' }),
     e(40, 'person_joined', 'Baran Öztürk NİRENGİ’ye katıldı.', { personId: 'p-baran' }),
-    e(70, 'pilot_closed', 'Anka Oyun × Mert Kılıç deneme projesi başarıyla kapandı (3/3 kriter).', { orgId: 'o-anka', personId: 'p-mert', pilotId: 'pl-shader' }),
+    e(70, 'pilot_closed', 'Anka Oyun × Sezer Uzun deneme projesi başarıyla kapandı (3/3 kriter).', { orgId: 'o-anka', personId: 'p-sezer', pilotId: 'pl-shader' }),
   ];
 }
 
@@ -1156,9 +1156,9 @@ interface Pace {
 }
 
 const PACE: Record<string, Pace> = {
-  'p-can': { pace: 4, tier: 2, goal: 3, thisWeek: [0, 1] },
+  'p-emirhan': { pace: 4, tier: 2, goal: 3, thisWeek: [0, 1] },
   'p-elif': { pace: 5, tier: 2, goal: 5, thisWeek: [0, 1, 2] },
-  'p-mert': { pace: 2, tier: 2, goal: 1, thisWeek: [1], off: [4] },
+  'p-sezer': { pace: 2, tier: 2, goal: 1, thisWeek: [1], off: [4] },
   'p-zeynep': { pace: 4, tier: 2, goal: 3, thisWeek: [0, 2] },
   'p-baran': { pace: 3, tier: 0, goal: 3, thisWeek: [0, 1, 2], off: [6, 9] },
   'p-defne': { pace: 3, tier: 2, goal: 3, thisWeek: [1], rest: [3] },
@@ -1244,11 +1244,11 @@ function posts(): Post[] {
     },
     {
       id: 'post-can-rota',
-      personId: 'p-can',
+      personId: 'p-emirhan',
       kind: 'calisiyorum',
       text: 'Kuzey Lojistik pilotunda ikinci kilometre taşındayım: rota mesafesini mevcut çözümün en fazla %2 üstünde tutmam gerekiyor. 2-opt sonrası or-opt deniyorum, ilk ölçümde %3,1.',
       at: at(1, 2),
-      supports: ['p-mert', 'p-zeynep', 'p-kaan'],
+      supports: ['p-sezer', 'p-zeynep', 'p-kaan'],
       replies: [
         {
           id: 'r-can-1',
@@ -1264,11 +1264,11 @@ function posts(): Post[] {
       kind: 'soru',
       text: 'ESP32’de LoRa paketleri ara ara kayboluyor. Yeniden deneme mi eklemeliyim, yoksa ACK mekanizması mı kurmalıyım? Pil ömrü kritik.',
       at: at(2, 5),
-      supports: ['p-can'],
+      supports: ['p-emirhan'],
       replies: [
         {
           id: 'r-baran-1',
-          personId: 'p-can',
+          personId: 'p-emirhan',
           text: 'Pil kritikse önce ACK’siz, sıra numaralı gönderim dene ve alıcıda eksik numaraları say. Kayıp oranını ölçmeden yeniden deneme eklemek pili boşa harcar.',
           at: at(2, 3),
           helpful: true,
@@ -1288,7 +1288,7 @@ function posts(): Post[] {
       text: 'kart-ui 2.0 yayında. Bütün bileşenler ekran okuyucuyla test edildi ve ilk dış katkımızı aldık.',
       at: at(3, 4),
       evidenceId: 'e-elif-1',
-      supports: ['p-defne', 'p-irem', 'p-can', 'p-selin', 'p-kaan'],
+      supports: ['p-defne', 'p-irem', 'p-emirhan', 'p-selin', 'p-kaan'],
       replies: [
         {
           id: 'r-elif-1',
@@ -1309,11 +1309,11 @@ function posts(): Post[] {
     },
     {
       id: 'post-mert-tesekkur',
-      personId: 'p-mert',
+      personId: 'p-sezer',
       kind: 'tesekkur',
       text: 'Anka Oyun pilotundaki shader optimizasyonunun ilk ipucunu burada Kaan’dan almıştım. Pilot başarıyla kapandı, teşekkürler.',
       at: at(5, 1),
-      supports: ['p-kaan', 'p-can', 'p-elif'],
+      supports: ['p-kaan', 'p-emirhan', 'p-elif'],
       replies: [],
     },
     {

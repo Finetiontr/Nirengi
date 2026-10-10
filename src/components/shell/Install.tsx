@@ -1,5 +1,5 @@
-// "Uygulamayı yükle" wherever the site asks for it: the landing, the closing band, the app menu
-// and /uygulama. Where the browser has its own install prompt the key raises it; elsewhere it
+// "Uygulamayı yükle" wherever the site asks for it: the landing's app section, the app menu and
+// /uygulama. Where the browser has its own install prompt the key raises it; elsewhere it
 // opens the steps for that browser (iPhone Safari, a browser inside another app, a menu), and
 // on a computer without a prompt it shows the QR code that opens /uygulama on the phone.
 // Running from the home screen, none of this renders.
@@ -10,11 +10,10 @@ import { promptInstall, useInstallWay, type InstallWay } from '../../lib/install
 import { feedback, Sheet } from '../ui/kit';
 import { Tri } from '../ui/pafta';
 
-type Variant = 'primary' | 'band' | 'menu';
+type Variant = 'primary' | 'menu';
 
 const KEY: Record<Variant, string> = {
   primary: 'btn-primary btn-lg btn-block',
-  band: 'inline-flex min-h-[54px] w-full items-center justify-center gap-2 rounded-[12px] bg-white px-7 text-[17px] font-bold text-indigo transition-transform duration-100 active:translate-y-[3px] sm:w-auto',
   menu: 'flex w-full items-center gap-2 rounded-[12px] px-3 py-2 text-left text-[15px] font-extrabold text-ink-2 hover:bg-bg-2',
 };
 
@@ -40,7 +39,6 @@ export default function InstallKey({ variant = 'primary', label = 'Uygulamayı y
       <button
         type="button"
         className={KEY[variant]}
-        style={variant === 'band' ? { boxShadow: '0 3px 0 rgb(255 255 255 / 0.45)' } : undefined}
         onClick={async () => setSteps(await start(way))}
       >
         {done ? <Check className="h-5 w-5" strokeWidth={3} aria-hidden="true" /> : <Download className="h-5 w-5" strokeWidth={3} aria-hidden="true" />}
@@ -154,14 +152,14 @@ export function InstallSteps({ way }: { way: InstallWay }) {
 }
 
 /** The QR code that opens /uygulama on a phone. It stays dark on white in both themes, so cameras read it. */
-export function QrBlock({ big = false, onBand = false }: { big?: boolean; onBand?: boolean }) {
+export function QrBlock({ big = false }: { big?: boolean }) {
   const size = big ? 200 : 112;
   return (
     <div className={`flex items-center gap-4 ${big ? 'flex-col text-center' : ''}`}>
-      <img src="/pwa/qr.svg" width={size} height={size} alt="nirengi uygulamasını açan QR kodu" className={`shrink-0 rounded-[14px] bg-white p-1.5 ${onBand ? '' : 'border-2 border-line'}`} />
+      <img src="/pwa/qr.svg" width={size} height={size} alt="nirengi uygulamasını açan QR kodu" className="shrink-0 rounded-[14px] border-2 border-line bg-white p-1.5" />
       <div className="min-w-0">
-        <p className={`font-black leading-tight ${big ? 'text-[19px]' : 'text-[17px]'} ${onBand ? 'text-white' : 'text-ink'}`}>Telefonunun kamerasıyla okut</p>
-        <p className={`mt-1 text-[14px] font-bold ${onBand ? 'text-white/80' : 'text-ink-3'}`}>Açılan sayfada Uygulamayı yükle’ye dokun. Mağaza gerekmez.</p>
+        <p className={`font-black leading-tight ${big ? 'text-[19px]' : 'text-[17px]'} text-ink`}>Telefonunun kamerasıyla okut</p>
+        <p className="mt-1 text-[14px] font-bold text-ink-3">Açılan sayfada Uygulamayı yükle’ye dokun. Mağaza gerekmez.</p>
       </div>
     </div>
   );
@@ -170,17 +168,17 @@ export function QrBlock({ big = false, onBand = false }: { big?: boolean; onBand
 const onPhone = () => typeof navigator !== 'undefined' && (/Android|iPhone|iPad|iPod|Mobi/.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1));
 
 /** The landing on a computer: the QR code for the phone, and this computer's own install where the browser offers it. */
-export function QrInstall({ onBand = false }: { onBand?: boolean }) {
+export function QrInstall() {
   const way = useInstallWay();
   if (way === 'app') return null;
   return (
     <div>
-      <QrBlock onBand={onBand} />
+      <QrBlock />
       {way === 'prompt' && !onPhone() && (
         <button
           type="button"
           onClick={() => void start(way)}
-          className={`mt-3 inline-flex items-center gap-1.5 rounded-[10px] px-2 py-1 text-[14px] font-extrabold ${onBand ? 'text-white hover:bg-white/10' : 'text-indigo hover:bg-indigo-tint'}`}
+          className="mt-3 inline-flex items-center gap-1.5 rounded-[10px] px-2 py-1 text-[14px] font-extrabold text-indigo hover:bg-indigo-tint"
         >
           <Download className="h-4 w-4" strokeWidth={3} aria-hidden="true" />
           Bu bilgisayara yükle

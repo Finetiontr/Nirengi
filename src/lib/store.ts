@@ -436,8 +436,8 @@ export const byId = {
   pilot: (s: State, id?: string) => s.pilots.find((p) => p.id === id),
 };
 
-/** The young person this tab acts as: the connected demo user, else the seeded Can Aksoy. */
-export const currentMe = (s: State) => s.people.find((p) => p.isDemoUser) ?? s.people.find((p) => p.id === 'p-can')!;
+/** The young person this tab acts as: the connected demo user, else the seeded Emirhan Açık. */
+export const currentMe = (s: State) => s.people.find((p) => p.isDemoUser) ?? s.people.find((p) => p.id === 'p-emirhan')!;
 
 /** The institution this tab acts as on the kurum side. */
 export const currentOrg = (s: State, v: View) => s.orgs.find((o) => o.id === v.orgId) ?? s.orgs[0];

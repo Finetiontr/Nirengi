@@ -39,8 +39,8 @@ test('unverified claims can never reach verified weight', () => {
   const s = buildSeed();
   const org = s.orgs[0];
   const need = { ...s.needs[0], skills: ['rust'] };
-  const can = s.people.find((p) => p.id === 'p-can')!; // Rust only as S1 claim
-  const m = scoreMatch(can, need, org, s.pilots);
+  const emirhan = s.people.find((p) => p.id === 'p-emirhan')!; // Rust only as S1 claim
+  const m = scoreMatch(emirhan, need, org, s.pilots);
   assert.equal(m.coverage[0].score, 0.3);
   assert.equal(m.gaps[0].kind, 'claim');
   assert.ok(m.gaps[0].gain > 0);
@@ -55,7 +55,7 @@ test('copy-portfolio detection flags the weaker claimant', () => {
 
 test('problem search finds work, not titles', () => {
   const hits = searchByProblem(buildSeed(), 'yüksek trafikli dosya dağıtımını üretimde çözmüş biri');
-  assert.equal(hits[0].person.id, 'p-can');
+  assert.equal(hits[0].person.id, 'p-emirhan');
 });
 
 test('team composition covers more surface than any single person', () => {
@@ -116,7 +116,7 @@ test('weeks run Monday to Sunday', () => {
 
 test('weekly goal counts days with output, not volume', () => {
   const s = buildSeed();
-  const p = structuredClone(s.people.find((x) => x.id === 'p-can')!);
+  const p = structuredClone(s.people.find((x) => x.id === 'p-emirhan')!);
   p.evidence = [];
   p.weeklyGoal = 3;
   // Ten pushes on one day are still one day.
@@ -133,7 +133,7 @@ test('weekly goal counts days with output, not volume', () => {
 
 test('a rest week pauses the streak instead of breaking it', () => {
   const s = { ...buildSeed(), quests: [], posts: [] };
-  const p = structuredClone(s.people.find((x) => x.id === 'p-can')!);
+  const p = structuredClone(s.people.find((x) => x.id === 'p-emirhan')!);
   p.evidence = [];
   p.weeklyGoal = 1;
   // Weeks of 14 Sep and 28 Sep met, week of 21 Sep empty.
@@ -148,7 +148,7 @@ test('a rest week pauses the streak instead of breaking it', () => {
 
 test('daily XP is capped so one night cannot buy a week', () => {
   const s = buildSeed();
-  const p = structuredClone(s.people.find((x) => x.id === 'p-can')!);
+  const p = structuredClone(s.people.find((x) => x.id === 'p-emirhan')!);
   p.activity = [];
   p.evidence = Array.from({ length: 10 }, (_, i) => ({
     id: `e${i}`, title: `repo ${i}`, summary: '', source: 'github' as const, level: 'S2' as const, skills: [],
@@ -161,7 +161,7 @@ test('daily XP is capped so one night cannot buy a week', () => {
 
 test('chatter earns a little XP but never counts as a productive day', () => {
   const s = buildSeed();
-  const p = structuredClone(s.people.find((x) => x.id === 'p-can')!);
+  const p = structuredClone(s.people.find((x) => x.id === 'p-emirhan')!);
   p.activity = [];
   p.evidence = [];
   const st = { ...s, quests: [], posts: [{ id: 'x', personId: p.id, kind: 'calisiyorum' as const, text: 't', at: '2026-10-06T10:00:00', supports: ['a', 'b'], replies: [] }] };
@@ -172,7 +172,7 @@ test('chatter earns a little XP but never counts as a productive day', () => {
 
 test('league groups by tier, ranks by weekly XP and marks the zones', () => {
   const s = buildSeed();
-  const me = s.people.find((x) => x.id === 'p-can')!;
+  const me = s.people.find((x) => x.id === 'p-emirhan')!;
   const l = league(s, me);
   assert.equal(l.name, TIERS[me.tier!]);
   assert.ok(l.rows.length >= 15);
@@ -183,7 +183,7 @@ test('league groups by tier, ranks by weekly XP and marks the zones', () => {
 
 test('growth quests name the need they move you toward', () => {
   const s = buildSeed();
-  const q = questsFor(s, s.people.find((x) => x.id === 'p-can')!);
+  const q = questsFor(s, s.people.find((x) => x.id === 'p-emirhan')!);
   assert.equal(q.filter((x) => x.kind === 'haftalik').length, 3);
   const growth = q.filter((x) => x.kind === 'gelisim');
   assert.ok(growth.length > 0);
@@ -198,10 +198,10 @@ test('Niri’s analysis: the closest door is one gap away and the numbers match 
   const { personInsight } = await import('../src/lib/engine/insight.ts');
   const { needsForPerson } = await import('../src/lib/engine/match.ts');
   const s = buildSeed();
-  const can = s.people.find((p) => p.id === 'p-can')!;
-  const ins = personInsight(s, can);
+  const emirhan = s.people.find((p) => p.id === 'p-emirhan')!;
+  const ins = personInsight(s, emirhan);
   if (ins.closest) {
-    const m = needsForPerson(s, can).find((x) => x.need.id === ins.closest!.match.need.id)!;
+    const m = needsForPerson(s, emirhan).find((x) => x.need.id === ins.closest!.match.need.id)!;
     const g = m.gaps.find((x) => x.skill === ins.closest!.skill)!;
     assert.equal(ins.closest.to, m.score + g.gain);
   }

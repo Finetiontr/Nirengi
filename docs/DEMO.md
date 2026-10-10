@@ -38,4 +38,4 @@ Jüri “telefonda var mı?” derse: kapanış slaytındaki QR’ı okutsunlar 
 
 ## Yedek senaryo
 
-Canlı akış takılırsa: `/pilotlar/pl-rota` hazır bekler; bir aşama kurum onayı bekliyor. Kurum rolünde **Onayla** → `/profil/canaksoy` yeni Kurum onaylı kanıtı gösterir.
+Canlı akış takılırsa: `/pilotlar/pl-rota` hazır bekler; bir aşama kurum onayı bekliyor. Kurum rolünde **Onayla** → `/profil/emirhanacik` yeni Kurum onaylı kanıtı gösterir.
