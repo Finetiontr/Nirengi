@@ -797,13 +797,16 @@ function ReadingStep({ reading }: { reading: Reading }) {
   ]
     .filter(Boolean)
     .join(', ');
-  const tip = `${said}.${missing.length ? ` ${missing.slice(0, 2).join(' ve ')} metninde yok; ${missing.length > 1 ? 'onları' : 'onu'} soracağım.` : ''}`;
+  const cap = (s: string) => s.charAt(0).toLocaleUpperCase('tr-TR') + s.slice(1);
+  const tip = `${said}.${missing.length ? ` ${cap(missing.slice(0, 2).join(' ve '))} eksik; ${missing.length > 1 ? 'onları' : 'onu'} soracağım.` : ''}`;
+  // A field the model filled but the guard refused is in the text; it is asked again, not "missing from the text".
+  const refused = new Set<string>(d.rejected.map((r) => r.field));
 
   return (
     <div>
       <h1 className="text-[26px] font-black leading-tight text-ink sm:text-[30px]">Metninden çıkardıklarım</h1>
       <p className="mt-2 text-[16px] font-bold text-ink-3">Her alanın altında hangi cümlenden aldığım yazıyor. Metninde olmayanı yazmadım.</p>
-      <Coach tip={tip.charAt(0).toLocaleUpperCase('tr-TR') + tip.slice(1)} mood={model ? 'happy' : 'think'} />
+      <Coach tip={cap(tip)} mood={model ? 'happy' : 'think'} />
 
       <ul className="card mt-2 divide-y-2 divide-line">
         {READ_ROWS.map((f) => {
@@ -827,7 +830,7 @@ function ReadingStep({ reading }: { reading: Reading }) {
                     ))}
                   </>
                 ) : (
-                  <p className="mt-0.5 text-[15px] font-bold text-ink-3">Metninde yok, soracağım</p>
+                  <p className="mt-0.5 text-[15px] font-bold text-ink-3">{refused.has(f) ? 'Doğrulayamadım, soracağım' : 'Metninde yok, soracağım'}</p>
                 )}
               </div>
             </li>
