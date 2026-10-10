@@ -10,6 +10,7 @@ import { journey, progress, TIERS, XP, type Step } from '../../lib/engine/progre
 import { AVAILABILITY, LEVELS, PILOT_STATUS } from '../../lib/labels.ts';
 import { fmtDate } from '../../lib/format.ts';
 import { skillLabel } from '../../lib/skills.ts';
+import { PLATFORMS, shortUrl } from '../../lib/platforms.ts';
 import { routeId } from '../../lib/route.ts';
 import { Avatar, LevelBadge, LevelGlyph, LEVEL_NAME, OrgMark, useIdentity } from '../ui/primitives.tsx';
 import { CountUp, feedback, Head, EmptyState, Why } from '../ui/kit';
@@ -130,6 +131,14 @@ function Profile({ personId }: { personId: string }) {
               {person.links.domain}
             </a>
           )}
+          {!id.hidden &&
+            person.profiles
+              ?.filter((l) => !(l.platform === 'github' && person.links.github))
+              .map((l) => (
+                <a key={l.url} className="chip hover:bg-bg-2" href={l.url} target="_blank" rel="noreferrer" title={shortUrl(l.url, 80)}>
+                  {l.platform === 'web' ? shortUrl(l.url, 28) : PLATFORMS[l.platform].label}
+                </a>
+              ))}
           {m.rising && (
             <span className="inline-flex items-center">
               <span className="chip !border-green !bg-green-tint !text-green-lip">
@@ -429,7 +438,7 @@ function Stats({ kurum, person, streak, xp, verified, s3, pilots }: { kurum: boo
 
 const GLYPH = 'h-[26px] w-[26px] text-white';
 const BADGE: Record<string, { name: string; cond: string; icon: ReactNode }> = {
-  bagla: { name: 'Bağlandı', cond: 'GitHub ya da alan adını bağlamak', icon: <Link2 className={GLYPH} strokeWidth={3} /> },
+  bagla: { name: 'Bağlandı', cond: 'GitHub’ını, bir profilini ya da alan adını bağlamak', icon: <Link2 className={GLYPH} strokeWidth={3} /> },
   dogrula: { name: 'Doğrulandı', cond: 'İlk işini makineyle doğrulatmak', icon: <BadgeCheck className={GLYPH} strokeWidth={3} /> },
   seri: { name: 'Düzenli', cond: 'Haftalık hedefini tutturmak', icon: <CalendarCheck className={GLYPH} strokeWidth={3} /> },
   yardim: { name: 'Yardımsever', cond: 'Cevabı “İşe yaradı” seçilmek', icon: <HandHelping className={GLYPH} strokeWidth={3} /> },

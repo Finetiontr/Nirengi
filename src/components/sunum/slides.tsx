@@ -519,9 +519,9 @@ function Decisions() {
 // ---------------------------------------------------------------- 11. what we finished, what we left on purpose
 
 function Done() {
-  const done = ['Altı problemin altısına ekran', 'GitHub ve DNS ile doğrulama', 'Açık modelle ihtiyaç taslağı', 'Testli eşleşme, defter, denetim'];
-  const left = ['Kalıcı veritabanı', 'Gerçek kullanıcı ve pilot', 'Kod dışı kanıt'];
-  const next = ['Kalıcılık', 'İlk ihtiyaç turu', 'Kod dışı kanıt', 'Pilot raporu'];
+  const done = ['Altı problemin altısına ekran', 'GitHub ve DNS ile doğrulama', 'Her alandan profil ve eser', 'Açık modelle ihtiyaç taslağı', 'Testli eşleşme, defter, denetim'];
+  const left = ['Kalıcı veritabanı', 'Gerçek kullanıcı ve pilot', 'Kod dışı işte makine doğrulaması'];
+  const next = ['Kalıcılık', 'İlk ihtiyaç turu', 'Kod dışı doğrulama', 'Pilot raporu'];
   return (
     <>
       <Heading width={1376}>Neyi bitirdik, neyi bilerek bıraktık?</Heading>

@@ -13,9 +13,10 @@ import { readComplaint, type Reading } from '../../lib/ai.ts';
 import { rankCandidates, similarNeeds } from '../../lib/engine/match.ts';
 import { CONSTRAINT, PILOT_STATUS } from '../../lib/labels.ts';
 import { uid } from '../../lib/format.ts';
-import { SKILLS, skillLabel, skillsInText } from '../../lib/skills.ts';
+import { skillLabel, skillsInText } from '../../lib/skills.ts';
 import { type Mood } from '../ui/Niri';
 import NiriSays from '../ui/NiriSays';
+import SkillPicker from '../ui/SkillPicker';
 import { Bar, celebrate, CountUp, feedback, Ring, Sheet, Why } from '../ui/kit';
 import { CheckCircle } from '../ui/icons';
 import { OrgMark, StatusIcon } from '../ui/primitives';
@@ -562,23 +563,7 @@ function StepView({ id, ok, checks, c, setC, title, setTitle, skills, toggleSkil
         ) : id === 'constraints' ? (
           <Constraints c={c} setC={setC} onNext={onNext} />
         ) : id === 'skills' ? (
-          <div className="flex flex-wrap gap-2">
-            {Object.entries(SKILLS).map(([k, d]) => {
-              const on = skills.includes(k);
-              return (
-                <button
-                  key={k}
-                  type="button"
-                  aria-pressed={on}
-                  onClick={() => toggleSkill(k)}
-                  className={`chip !py-1.5 transition-colors ${on ? '!border-indigo !bg-indigo-tint !text-indigo' : 'hover:border-line-2 hover:bg-bg-2'}`}
-                >
-                  {on && <Check className="h-4 w-4" strokeWidth={3.5} aria-hidden="true" />}
-                  {d.label}
-                </button>
-              );
-            })}
-          </div>
+          <SkillPicker value={skills} onToggle={toggleSkill} />
         ) : single ? (
           <input className="field" value={val} onChange={(e) => put(e.target.value)} placeholder={m.ph} aria-label={m.q} autoFocus enterKeyHint="next" />
         ) : (

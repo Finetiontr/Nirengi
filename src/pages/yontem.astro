@@ -72,6 +72,7 @@ const aiGuards = [
 const truth = [
   ['GitHub hesap sahipliği', 'Gerçek', 'GitHub API; bio ya da gist’e eklenen tek kullanımlık kod.'],
   ['Alan adı sahipliği', 'Gerçek', 'DNS TXT kaydı; Google ve Cloudflare DoH üzerinden.'],
+  ['LinkedIn, Behance, ArtStation… bağlantıları', 'Beyan', 'Adres denetlenir, sahiplik doğrulanmaz; kurum onayıyla güçlenir.'],
   ['Eşleşme, netlik puanı, takım önerisi', 'Gerçek', 'Bu sayfadaki formüllerle, her görüntülemede yeniden hesaplanır.'],
   ['Kayıt defteri bütünlüğü', 'Gerçek', 'SHA-256 hash zinciri; doğrulama her kaydı yeniden hesaplar.'],
   ['İhtiyaç taslağı', 'Yapay zekâ', 'Gemma 4 26B, açık ağırlıklı bir model (Cloudflare Workers AI). Ağ ya da kota yoksa aynı işi kural motoru yapar.'],
@@ -79,7 +80,7 @@ const truth = [
   ['Kurumlar, kişiler, lig arkadaşları, S3 tasdikleri', 'Kurgusal', 'Demo ekosistemi; gerçek kurum hesaplarıyla değişecek.'],
   ['Kalıcılık', 'Tarayıcı', 'Demo verisi localStorage’da tutulur; üretimde Cloudflare D1 planlı.'],
 ] as const;
-const truthTone: Record<string, string> = { Gerçek: 'bg-green-tint text-green-lip', 'Yapay zekâ': 'bg-indigo-tint text-indigo', 'Kural tabanlı': 'bg-cyan-tint text-cyan-lip', Kurgusal: 'bg-bg-3 text-ink-2', Tarayıcı: 'bg-bg-3 text-ink-2' };
+const truthTone: Record<string, string> = { Gerçek: 'bg-green-tint text-green-lip', Beyan: 'bg-bg-3 text-ink-2', 'Yapay zekâ': 'bg-indigo-tint text-indigo', 'Kural tabanlı': 'bg-cyan-tint text-cyan-lip', Kurgusal: 'bg-bg-3 text-ink-2', Tarayıcı: 'bg-bg-3 text-ink-2' };
 ---
 
 <App
@@ -130,6 +131,10 @@ const truthTone: Record<string, string> = { Gerçek: 'bg-green-tint text-green-l
           </div>
         ))
       }
+      <Fold title="Kod dışı işler" aside={`ağırlık ${f(LEVELS.S1.weight)}`}>
+        <p>Tasarım, animasyon, video, çeviri ya da içerik işi çoğu zaman LinkedIn, Behance, ArtStation, YouTube gibi sitelerde durur. Bu sitelerde bir hesabın kime ait olduğunu dışarıdan kontrol etmenin açık bir yolu yok; bu yüzden bu profiller ve onlarla eklenen eserler Beyan kalır. Adresler yalnız http(s) bağlantısı olarak kaydedilir.</p>
+        <p>Kendi alan adı olan, onu DNS kaydıyla Doğrulandı yapar. En güçlü kanıt her alanda aynıdır: kurumla yapılan deneme projesinde onaylanan her aşama Kurum onaylı olur.</p>
+      </Fold>
       <Fold title="Kopya eser" aside="ağırlık 0">
         <p>Aynı eseri daha güçlü doğrulamayla sahiplenen biri varsa diğer iddia işaretlenir ve eşleşmede sayılmaz. Doğrulanabilir sahip, eseri kendi adına tutar.</p>
       </Fold>

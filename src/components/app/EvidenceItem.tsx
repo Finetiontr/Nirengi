@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { ExternalLink } from 'lucide-react';
 import type { Evidence, Person } from '../../lib/types.ts';
 import { SOURCE } from '../../lib/labels.ts';
+import { PLATFORMS } from '../../lib/platforms.ts';
 import { fmtDate } from '../../lib/format.ts';
 import { skillLabel } from '../../lib/skills.ts';
 import type { Conflict } from '../../lib/engine/match.ts';
@@ -36,7 +37,7 @@ export function EvidenceItem({
     <article className={`card p-4 sm:p-5 ${fresh ? 'rise !border-indigo/50' : ''} ${ev.dispute ? '!border-red/50' : ''}`}>
       <div className="flex flex-wrap items-center gap-2">
         <LevelBadge level={ev.level} />
-        {ev.source !== 'claim' && <span className="chip">{SOURCE[ev.source]}</span>}
+        {ev.source !== 'claim' && <span className="chip">{ev.platform ? PLATFORMS[ev.platform].label : SOURCE[ev.source]}</span>}
         {fresh && <span className="pill bg-indigo !py-0.5 text-white">Yeni</span>}
         {ev.dispute && <span className="pill bg-red-tint !py-0.5 text-red-lip">İtiraz var</span>}
         <span className="ml-auto text-[13px] font-bold text-ink-3">{fmtDate(ev.producedAt)}</span>
@@ -76,7 +77,7 @@ export function EvidenceItem({
       <div className="mt-3 flex items-center gap-x-3 border-t-2 border-line pt-3 text-[13px] font-bold text-ink-3">
         <LevelGlyph level={ev.level} size={14} />
         {ev.level === 'S1' ? (
-          <span className="min-w-0 flex-1">Kişisel beyan · doğrulama bekliyor</span>
+          <span className="min-w-0 flex-1">{ev.source === 'github' ? 'Kişisel beyan · doğrulama bekliyor' : 'Kişisel beyan · kurum onayıyla güçlenir'}</span>
         ) : (
           <span className="min-w-0 flex-1">
             Doğrulayan: {ev.verifier}

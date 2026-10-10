@@ -88,7 +88,7 @@ export default function DemoTour() {
         { title: 'Görevlere göz at', hint: 'Haftalık, gelişim ve açık kaynak görevleri.', href: '/gorevler', done: visited('/gorevler') },
         { title: 'Ligde yerini gör', hint: 'Benzer seviyedekilerle haftalık XP sıralaması.', href: '/lig', done: visited('/lig') },
         { title: 'Topluluğa uğra', hint: 'Bir soru sor, bir paylaşıma destek ver.', href: '/topluluk', done: visited('/topluluk') },
-        { title: 'Kanıtını bağla', hint: 'GitHub hesabını ya da alan adını gerçekten doğrula.', href: '/kanit-bagla', done: s.people.some((p) => p.isDemoUser) },
+        { title: 'Kanıtını bağla', hint: 'GitHub, LinkedIn, Behance ya da kendi siten: işini profiline bağla.', href: '/kanit-bagla', done: s.people.some((p) => p.isDemoUser) },
       ],
       kurum: [
         { title: 'Kurum ana sayfası', hint: 'Onay bekleyenler ve açık ihtiyaçlar.', href: '/kurum', done: visited('/kurum') },

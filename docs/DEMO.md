@@ -9,14 +9,14 @@ Kenardaki **Demo turu** paneli adımları gerçek durum değişikliklerinden iş
 - [ ] Sunumda bağlanacak GitHub hesabında tarayıcıda oturum açık olsun. Nirengi uygulaması o hesaba daha önce kurulduysa GitHub’da **Configure** ile göstereceğin depoları (bir özel depo dahil) hazırla.
 - [ ] İki tarayıcı penceresi: solda **Kurum**, sağda **Genç** (sol menüdeki Genç/Kurum seçimi sekme başınadır, veri anında senkronlanır).
 - [ ] Sahneden önce `/sunum`’u bir kez aç: tanıtım filmi iki saniye sonra arka planda iner, 6. slaytta beklemeden oynar. Film müziklidir: bilgisayarın sesi salona bağlı olsun ve sunum penceresinde başta bir kez **F**’ye bas ya da tıkla (tarayıcı sesi ancak bir dokunuştan sonra açar; yine sessiz başlarsa filme bir kez tıkla). Film açılmazsa o slayt canlı demo paneline döner; mp4’ün yerel bir kopyası da sunum bilgisayarında dursun.
-- [ ] İnternet ya da GitHub sorgu sınırı sorunu olursa: `/kanit-bagla` → **Örnek profille devam et** (örnek veri olarak etiketlenir).
+- [ ] İnternet ya da GitHub sorgu sınırı sorunu olursa: `/kanit-bagla` → **Örnek profille gez** (örnek veri olarak etiketlenir).
 
 ## Akış
 
 | Süre | Ekran | Söylenecek |
 |------|-------|------------|
 | 0:00 | `/bugun` (Genç) | Haftalık hedef, haftalık seri, sıradaki adım ve yol. “Commit sayısı değil, üretim yaptığın gün sayılır.” |
-| 0:40 | `/kanit-bagla` | **GitHub’a bağlan** → GitHub’ın kendi sayfasında **Only select repositories** → depoları seç → **Install** → geri dönüş: “N eserin bulundu”, özel depo “Özel” etiketiyle, hepsi Doğrulandı. “Kod kopyalamadık, anahtar yapıştırmadık; hangi depoyu göstereceğine genç karar verdi.” |
+| 0:40 | `/kanit-bagla` | İlk ekran işin nerede durduğunu sorar: “Kod yazmayan da buradan başlar; LinkedIn, Behance, ArtStation.” **Kodum GitHub’da** → **Devam** → **GitHub’a bağlan** → GitHub’ın kendi sayfasında **Only select repositories** → depoları seç → **Install** → geri dönüş: “N eserin bulundu”, özel depo “Özel” etiketiyle, hepsi Doğrulandı. “Kod kopyalamadık, anahtar yapıştırmadık; hangi depoyu göstereceğine genç karar verdi.” |
 | 1:30 | `/kurum` → `/ihtiyaclar/yeni` (Kurum) | “Sırada ne var” kartı. Sihirbazda **Örnekle doldur** → **Taslağa dönüştür**: Niri metni açık modeliyle okur. **Metninden çıkardıklarım**: yedi alan, her birinin altında metindeki cümlesi. “Uydurmasın diye her alanı metindeki cümleye ve sayıya bağlıyoruz; tutmayanı almıyoruz.” **Eksikleri tamamla** → kriter adımında iki öneriye **Ekle** → netlik 100 → **Özeti gör** → **Yayımla**. |
 | 2:30 | `/ihtiyaclar/:id#adaylar` | Kör keşif: isim yok, iş var. Adaya dokun → “Neden bu uyum?” dört parça ve eksikler. **Pilot teklif et** → kimlik açılır. |
 | 3:20 | `/pilotlar/:id` | Kriterler aşamalara dönüştü. Genç pencerede **Teslim et**, kurum penceresinde **Onayla** → mühür. Defter: **Zinciri doğrula** → **Kurcalamayı dene** → zincir kırılır. |
@@ -26,6 +26,10 @@ Kenardaki **Demo turu** paneli adımları gerçek durum değişikliklerinden iş
 ## Soru gelirse: eksik alanlara öneri
 
 Jüri “metin eksik olursa?” derse sihirbazda kısa ve belirsiz bir metin yaz (ör. *Kafemizde stok takibini defterle yapıyoruz, sık sık süt ve kahve çekirdeği bitiyor, müşteri kaçırıyoruz.*) → **Taslağa dönüştür**. **Metninden çıkardıklarım** eksik alanların altında “Önerim” gösterir; **Eksikleri tamamla** → sorunun ölçüsü adımında kutuda soluk “Niri’nin önerisi” durur. **Öneriyi kullan** → imleç “…” üzerine gelir, rakamı yaz. “Model metinde olmayanı öneri olarak getirir ama sayı uydurmaz; rakamı kurum yazar.”
+
+## Soru gelirse: kod yazmayan genç
+
+Jüri “yalnız yazılımcılar için mi?” derse: `/profil/eceyildiz` (animasyon ve illüstrasyon; LinkedIn, ArtStation, YouTube bağlantıları Beyan, bir sağlık kurumunun onayı Kurum onaylı). Kurum tarafında `/ihtiyaclar/n-asi` (aşı hatırlatması için bir dakikalık animasyon) adaylarında ilk sırada odur. Akışı göstermek için genç penceresinde `/kanit-bagla` → **İşim başka yerlerde** → ad ve “ne üretiyorsun” → **LinkedIn** çipi adresi başlatır → bir ArtStation bağlantısıyla ilk eser; beceriler başlıktan gelir. “Bu sitelerde sahipliği dışarıdan kontrol edemiyoruz; o yüzden Beyan diyoruz. Güçlendiren şey kurum onayı, her alanda aynı.”
 
 ## Yedek senaryo
 

@@ -6,7 +6,7 @@ import { appendEntry } from './engine/ledger.ts';
 import { daysAgo, daysFromNow } from './format.ts';
 import { dayKey, weekKey } from './engine/progress.ts';
 
-export const STATE_VERSION = 6;
+export const STATE_VERSION = 7;
 export const ROUND = '2026·Ç4';
 
 type EvInput = Omit<Evidence, 'producedAt' | 'verifiedAt'> & { ago: number; verifiedAgo?: number };
@@ -86,6 +86,7 @@ function people(): Person[] {
       weeklyHours: 20,
       joinedAt: daysAgo(210),
       links: { github: 'canaksoy', domain: 'canaksoy.dev' },
+      profiles: [{ platform: 'linkedin', url: 'https://www.linkedin.com/in/nirengi-demo-can-aksoy' }],
       evidence: [
         ev({
           id: 'e-can-1',
@@ -387,29 +388,33 @@ function people(): Person[] {
       availability: 'partial',
       weeklyHours: 12,
       joinedAt: daysAgo(150),
-      links: { web: 'behance.net/defnearslan' },
+      links: {},
+      profiles: [
+        { platform: 'linkedin', url: 'https://www.linkedin.com/in/nirengi-demo-defne-arslan' },
+        { platform: 'behance', url: 'https://www.behance.net/nirengi-demo-defne' },
+      ],
       evidence: [
         ev({
           id: 'e-def-1',
           title: 'Pusula — açık kaynak tasarım sistemi',
           summary: 'Figma Community’de yayımlanan, token tabanlı, kontrast denetimli tasarım sistemi.',
-          source: 'figma',
-          level: 'S2',
+          source: 'link',
+          platform: 'figma',
+          level: 'S1',
           skills: ['uiux', 'figma', 'a11y'],
           url: 'https://www.figma.com/community/file/pusula',
           metrics: [{ label: 'kopya', value: '2,8 bin' }],
-          verifier: 'Figma · yayıncı hesabı',
           ago: 80,
         }),
         ev({
           id: 'e-def-2',
           title: 'Kooperatif ambalaj ve kimlik serisi',
           summary: 'Üç yerel üretici için logo, ambalaj ve etiket sistemi.',
-          source: 'behance',
-          level: 'S2',
+          source: 'link',
+          platform: 'behance',
+          level: 'S1',
           skills: ['brand', 'visual'],
-          url: 'https://www.behance.net/defnearslan',
-          verifier: 'Behance · hesap bağlantısı',
+          url: 'https://www.behance.net/nirengi-demo-defne',
           ago: 120,
         }),
         ev({
@@ -598,6 +603,61 @@ function people(): Person[] {
           skills: ['data', 'optimization'],
           context: { sector: 'lojistik' },
           ago: 400,
+        }),
+      ],
+    },
+    {
+      id: 'p-ece',
+      handle: 'eceyildiz',
+      name: 'Ece Yıldız',
+      headline: 'Animasyon ve illüstrasyon · eğitim içeriği',
+      city: 'Eskişehir',
+      age: 21,
+      school: 'Anadolu Üniversitesi Animasyon Bölümü',
+      bio: 'Karmaşık bir konuyu bir dakikada anlatan kısa animasyonlar çiziyorum. Kodla işim yok; işim izleyenin anlaması.',
+      availability: 'open',
+      weeklyHours: 15,
+      joinedAt: daysAgo(90),
+      links: {},
+      profiles: [
+        { platform: 'linkedin', url: 'https://www.linkedin.com/in/nirengi-demo-ece-yildiz' },
+        { platform: 'artstation', url: 'https://www.artstation.com/nirengi-demo-ece' },
+        { platform: 'youtube', url: 'https://www.youtube.com/@nirengi-demo-ece' },
+      ],
+      evidence: [
+        ev({
+          id: 'e-ece-1',
+          title: 'Deprem çantası: 60 saniyelik bilgilendirme animasyonu',
+          summary: 'Bir gönüllü afet ekibi için senaryo, çizim ve kurgu; çocuklar için seslendirmeli.',
+          source: 'link',
+          platform: 'youtube',
+          level: 'S1',
+          skills: ['animation', 'video', 'teaching'],
+          url: 'https://www.youtube.com/@nirengi-demo-ece',
+          metrics: [{ label: 'izlenme', value: '18 bin' }],
+          ago: 40,
+        }),
+        ev({
+          id: 'e-ece-2',
+          title: 'Çocuk kitabı için karakter ve sahne seti',
+          summary: '12 karakter, 8 sahne; baskıya hazır dosyalarla teslim edildi.',
+          source: 'link',
+          platform: 'artstation',
+          level: 'S1',
+          skills: ['illustration', 'visual'],
+          url: 'https://www.artstation.com/nirengi-demo-ece',
+          ago: 110,
+        }),
+        ev({
+          id: 'e-ece-3',
+          title: 'Aile hekimliği bekleme salonu için el yıkama animasyonu',
+          summary: 'Üç aile sağlığı merkezinin ekranlarında dönen 45 saniyelik animasyon; rolü ve teslimi kurumca imzalandı.',
+          source: 'endorsement',
+          level: 'S3',
+          skills: ['animation', 'illustration'],
+          verifier: 'Şifa Dijital Sağlık · Ürün Lideri',
+          context: { sector: 'saglik', scale: 'girisim' },
+          ago: 70,
         }),
       ],
     },
@@ -873,6 +933,32 @@ function needs(): Need[] {
         scope: '',
       },
     },
+    {
+      id: 'n-asi',
+      orgId: 'o-sifa',
+      title: 'Aşı hatırlatmalarına gelmeyen aileleri bir dakikalık animasyonla geri kazanmak',
+      status: 'published',
+      createdAt: daysAgo(4),
+      publishedAt: daysAgo(3),
+      round: ROUND,
+      skills: ['animation', 'illustration', 'video'],
+      canvas: {
+        current: 'Uygulama aşı gününden 3 gün önce yalnız metin bildirimi gönderiyor.',
+        pain: 'Aileler bildirimi okumadan geçiyor; randevusu kaçan çocuğun aşısı haftalarca gecikiyor.',
+        painMetric: 'Hatırlatılan randevuların %38’ine gelinmiyor',
+        outcome: 'Bildirimden açılan, aşının neden önemli olduğunu anlatan 60 saniyelik animasyon.',
+        criteria: [
+          crit('c-asi-1', '60 saniyelik animasyon altyazılı olarak teslim edilir'),
+          crit('c-asi-2', 'Deneme ayında gelinmeyen randevu oranı %25’in altına iner'),
+        ],
+        constraints: [
+          { kind: 'sure', text: '5 hafta' },
+          { kind: 'mevzuat', text: 'Sağlık Bakanlığı aşı takvimine birebir uyulur' },
+        ],
+        decisionMaker: 'Ürün Lideri',
+        scope: 'Ankara’daki iki aile hekimliğinin 0–2 yaş randevuları.',
+      },
+    },
   ];
 }
 
@@ -1078,6 +1164,7 @@ const PACE: Record<string, Pace> = {
   'p-irem': { pace: 3, tier: 0, goal: 3, thisWeek: [0, 2], off: [7] },
   'p-kaan': { pace: 4, tier: 2, goal: 3, thisWeek: [0, 1, 2] },
   'p-selin': { pace: 2, tier: 2, goal: 1, thisWeek: [2], off: [3, 8] },
+  'p-ece': { pace: 3, tier: 1, goal: 3, thisWeek: [0, 1] },
 };
 
 function withProgress(person: Person): Person {

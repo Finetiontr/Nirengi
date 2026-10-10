@@ -13,7 +13,7 @@ web
 
 - **Hackathon jürisi (Zemin360, 9–11 Ekim 2026):** GİRVAK, İSTKA, İstanbul Bilgi Üniversitesi temsilcileri. Birkaç dakikada ürünün altı problemi gerçekten çözdüğünü, çalıştığını ve açık kaynak web hizmeti olduğunu görmek ister.
 - **Kurum (işletme, kamu birimi, STK):** Muğlak bir şikâyeti çözülebilir bir ihtiyaca çevirmek, kanıtı doğrulanmış genç yetenek bulmak, pilotu şeffaf takip etmek ister.
-- **Genç yetenek / girişim:** CV yazmadan, ürettiği doğrulanabilir işle görünür olmak; eşleşmediğinde eksiğini bilmek ister.
+- **Genç yetenek / girişim:** CV yazmadan, ürettiği doğrulanabilir işle görünür olmak; eşleşmediğinde eksiğini bilmek ister. Yalnız yazılımcı değil: tasarımcı, animasyoncu, çevirmen, içerik üreticisi de işini LinkedIn, Behance, ArtStation, YouTube bağlantılarıyla gösterir (kullanıcı talimatı, 10 Ekim 2026: genel kitle olabildiğince açık tutulur).
 
 ## Product Purpose
 
@@ -26,7 +26,7 @@ Beyan değil, kanıt. Kariyer/CV platformlarının tersine özgeçmiş, güven p
 ## Operating Context
 
 - Sahne demosu: projektör, iki tarayıcı penceresi (Kurum / Yetenek rolü), sekmeler arası canlı senkron; internet kesilse de arayüz çalışmalı (fontlar gömülü).
-- Gerçek S2 doğrulaması: GitHub (bio/gist kodu), DNS TXT (DoH).
+- Gerçek S2 doğrulaması: GitHub (uygulama kurulumu, bio/gist kodu), DNS TXT (DoH). LinkedIn, Behance, ArtStation gibi sitelerde sahiplik dışarıdan kontrol edilemez: bu bağlantılar Beyan kalır, kurum onayıyla S3 olur.
 - Ritim: çeyreklik ihtiyaç turları.
 
 ## Capabilities and Constraints

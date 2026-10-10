@@ -36,6 +36,18 @@ let counter = 0;
 export const uid = (prefix: string) =>
   `${prefix}-${Date.now().toString(36)}${(counter++).toString(36)}${Math.random().toString(36).slice(2, 6)}`;
 
+const ASCII: Record<string, string> = { ç: 'c', ğ: 'g', ı: 'i', ö: 'o', ş: 's', ü: 'u', â: 'a', î: 'i', û: 'u' };
+
+/** A name as a profile address: "Ece Yıldız" → "ece-yildiz". */
+export const slugify = (name: string) =>
+  name
+    .toLocaleLowerCase('tr-TR')
+    .replace(/[çğıöşüâîû]/g, (c) => ASCII[c]!)
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 30)
+    .replace(/-+$/, '');
+
 export const initials = (name: string) =>
   name
     .split(/\s+/)

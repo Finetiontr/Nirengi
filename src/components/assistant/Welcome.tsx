@@ -7,7 +7,6 @@ import { motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import Niri, { type Dir, type Mood } from '../ui/Niri';
 import NiriSays from '../ui/NiriSays';
-import { GitHub } from '../ui/icons';
 import { ArtGain, ArtGencHos, ArtGencIs, ArtMatch, ArtNeed, ArtPilot, Pip } from './art';
 import { useTrap, type Face, type WelcomeChoice } from './util';
 
@@ -17,7 +16,7 @@ interface Card {
   mood: Mood;
   point?: Dir;
   Art: () => React.JSX.Element;
-  /** The card ends at GitHub instead of only talking. */
+  /** The card ends at setting up the profile instead of only talking. */
   ask?: boolean;
 }
 
@@ -49,7 +48,7 @@ const KURUM_CARDS: Card[] = [
   },
 ];
 
-// Two cards on the genç side: who Niri is, then GitHub. The rest is
+// Two cards on the genç side: who Niri is, then the profile. The rest is
 // taught where it happens (the Bugün tour), not up front.
 const GENC_CARDS: Card[] = [
   {
@@ -60,7 +59,7 @@ const GENC_CARDS: Card[] = [
   },
   {
     title: 'Önce seni tanıyayım',
-    text: 'Nirengi’yi GitHub’a bağla; kurumlara hangi depolarını göstereceğini orada sen seç. Yalnız okur, istediğin an kaldırırsın.',
+    text: 'İşini nerede gösteriyorsan oradan başlayalım: GitHub, LinkedIn, Behance, ArtStation ya da kendi siten. Neyi göstereceğini sen seçersin.',
     mood: 'talk',
     Art: ArtGencIs,
     ask: true,
@@ -70,13 +69,13 @@ const GENC_CARDS: Card[] = [
 interface Props {
   face: Face;
   onClose: (choice: WelcomeChoice) => void;
-  /** The ask card's key: the caller takes the visitor to Kanit bağla to grant access (null). */
-  onGithub: (login: string | null) => void;
-  /** GitHub login already connected: the ask card says so instead of asking again. */
+  /** The ask card's key: the caller takes the visitor to Kanıt bağla. */
+  onStart: () => void;
+  /** Who is already set up (@login or name): the ask card says so instead of asking again. */
   connected?: string;
 }
 
-export default function Welcome({ face, onClose, onGithub, connected }: Props) {
+export default function Welcome({ face, onClose, onStart, connected }: Props) {
   const CARDS = face === 'genc' ? GENC_CARDS : KURUM_CARDS;
   const [i, setI] = useState(0);
   const [dir, setDir] = useState(1);
@@ -86,7 +85,6 @@ export default function Welcome({ face, onClose, onGithub, connected }: Props) {
   const card = CARDS[i];
   const Art = card.Art;
   const asking = !!card.ask && !connected;
-  const submit = () => onGithub(null);
 
   const go = (to: number) => {
     const t = Math.max(0, Math.min(CARDS.length - 1, to));
@@ -168,7 +166,7 @@ export default function Welcome({ face, onClose, onGithub, connected }: Props) {
                 <div className={`mt-2 flex items-end [@media(max-height:700px)]:min-h-0 ${card.ask ? 'min-h-[96px]' : 'min-h-[150px]'}`}>
                   <NiriSays mood={card.mood} point={card.point} size={84} typing className="w-full">
                     <p className="text-[15.5px] font-semibold leading-relaxed text-ink-2">
-                      {card.ask && connected ? `GitHub hesabın bağlı (@${connected}). İstersen sayfayı birlikte gezelim.` : card.text}
+                      {card.ask && connected ? `Profilin hazır (${connected}). İstersen sayfayı birlikte gezelim.` : card.text}
                     </p>
                   </NiriSays>
                 </div>
@@ -193,10 +191,9 @@ export default function Welcome({ face, onClose, onGithub, connected }: Props) {
             ref={main}
             type="button"
             className="btn-primary btn-lg btn-block"
-            onClick={() => (asking ? submit() : last ? onClose('tour') : go(i + 1))}
+            onClick={() => (asking ? onStart() : last ? onClose('tour') : go(i + 1))}
           >
-            {asking && <GitHub size={22} />}
-            {asking ? 'GitHub’a bağlan' : last ? 'Turu başlat' : 'İleri'}
+            {asking ? 'Profilimi kur' : last ? 'Turu başlat' : 'İleri'}
           </button>
           <div className="mt-2 flex items-center justify-between gap-2">
             <button
@@ -210,7 +207,7 @@ export default function Welcome({ face, onClose, onGithub, connected }: Props) {
             </button>
             {asking ? (
               <button type="button" className="btn-quiet btn-sm !min-h-11" onClick={() => onClose('tour')}>
-                GitHub’ım yok, örnek profille gez
+                Örnek profille gez
               </button>
             ) : (
               <button type="button" className="btn-quiet btn-sm !min-h-11" onClick={() => onClose('self')}>

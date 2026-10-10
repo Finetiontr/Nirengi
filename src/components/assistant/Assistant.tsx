@@ -8,7 +8,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useAppState, useView } from '../../lib/store.ts';
-import { appReady, installUrl } from '../../lib/auth.ts';
 import { feedback } from '../ui/kit';
 import Coach from './Coach';
 import Help from './Help';
@@ -38,7 +37,8 @@ export default function Assistant() {
   const face: Face = useView().persona === 'org' ? 'kurum' : 'genc';
   const route = useMemo(() => routeKey(location.pathname), []);
   const steps = toursFor(face)[route];
-  const github = useAppState().people.find((p) => p.isDemoUser)?.links.github;
+  const me = useAppState().people.find((p) => p.isDemoUser);
+  const connected = me && !me.example ? (me.links.github ? `@${me.links.github}` : me.name) : undefined;
   const [welcome, setWelcome] = useState(false);
   const [tour, setTour] = useState<CoachStep[] | null>(null);
   const [help, setHelp] = useState(false);
@@ -96,12 +96,11 @@ export default function Assistant() {
     }, 260);
   };
 
-  // The genç welcome ends at GitHub: straight to the app's install page (null), which
-  // returns to Kanıt bağla, or Kanıt bağla reads a typed handle. Either way the Bugün tour follows.
-  const connectGithub = (login: string | null) => {
+  // The genç welcome ends at Kanıt bağla, which asks where the work lives: GitHub or anywhere
+  // else. The Bugün tour follows once the profile is set up.
+  const startProfile = () => {
     write(welcomeKey(face), 'tour');
-    if (login === null) location.assign(appReady() ? installUrl() : '/kanit-bagla');
-    else location.assign(`/kanit-bagla?gh=${encodeURIComponent(login)}`);
+    location.assign('/kanit-bagla');
   };
 
   const closeTour = (finished: boolean) => {
@@ -111,7 +110,7 @@ export default function Assistant() {
 
   return (
     <>
-      <AnimatePresence>{welcome && <Welcome key={`welcome-${face}`} face={face} onClose={closeWelcome} onGithub={connectGithub} connected={github} />}</AnimatePresence>
+      <AnimatePresence>{welcome && <Welcome key={`welcome-${face}`} face={face} onClose={closeWelcome} onStart={startProfile} connected={connected} />}</AnimatePresence>
       {tour && <Coach steps={tour} onClose={closeTour} />}
       {!welcome && !tour && (
         <Help

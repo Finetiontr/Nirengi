@@ -93,11 +93,12 @@ export const NOTES: Record<string, Note> = {
     ],
   },
   bitti: {
-    sec: 24,
+    sec: 26,
     say: [
       'Altı problemin altısına çalışan bir ekranımız var. GitHub ve DNS doğrulaması, yapay zekâ taslağı canlıda; eşleşme ve kayıt defteri testli.',
-      'Bilerek bıraktıklarımız: kalıcı veritabanı, gerçek kullanıcı ve pilot. Demo kişileri kurgusal, ekranda da öyle yazıyor.',
-      'Finalden sonraki dört ay: kalıcılık, ilk ihtiyaç turu, kod dışı kanıt ve pilot raporu.',
+      'Yalnız yazılımcılar için değil: tasarımcı da çevirmen de LinkedIn, Behance, ArtStation bağlantılarıyla profilini kuruyor.',
+      'Bilerek bıraktıklarımız: kalıcı veritabanı, gerçek kullanıcı ve pilot. Kod dışı bağlantıları makineyle doğrulamıyoruz, Beyan diyoruz. Demo kişileri kurgusal, ekranda da öyle yazıyor.',
+      'Finalden sonraki dört ay: kalıcılık, ilk ihtiyaç turu, kod dışı doğrulama ve pilot raporu.',
     ],
   },
   kapanis: {
@@ -165,6 +166,13 @@ export const QA: Answer[] = [
     say: [
       'Model metinde olmayan her alan için kurumun derdine özel bir öneri getirir; kutuda “Niri’nin önerisi” olarak soluk durur.',
       'Öneride sayı uydurmaz, yerine “…” koyar; rakamı kurum yazar. Kurum kullanmadan hiçbir öneri kanvasa girmez.',
+    ],
+  },
+  {
+    q: 'Yalnız yazılımcılar için mi?',
+    say: [
+      'Hayır. Kanıt bağla önce işin nerede durduğunu sorar: kodu GitHub’da olan depolarını bağlar; tasarımcı, animasyoncu, çevirmen LinkedIn, Behance, ArtStation, YouTube profillerini ve eserlerini ekler.',
+      'Bu sitelerde hesabın kime ait olduğunu dışarıdan kontrol edemiyoruz; o yüzden Beyan diyoruz, uydurma bir doğrulama göstermiyoruz. Her alanda en güçlü kanıt aynı: kurumun onayladığı deneme projesi.',
     ],
   },
   {

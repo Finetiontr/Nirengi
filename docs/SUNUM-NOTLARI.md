@@ -1,6 +1,6 @@
 # Sunum notları
 
-*Zemin360 finali · 12 slayt · planlanan süre 4:16 (film 0:48, konuşma 3:28)*
+*Zemin360 finali · 12 slayt · planlanan süre 4:18 (film 0:48, konuşma 3:30)*
 
 Bu dosya `src/components/sunum/notes.ts` dosyasından üretildi; notları orada düzeltin. Sunum sırasında aynı notlar konuşmacı penceresinde görünür: sunumda **N** tuşu ya da `/sunum?notlar` adresi. Pencere sunumu izler, ok tuşlarıyla sunumu yönetir, **R** süreyi sıfırlar.
 
@@ -90,15 +90,16 @@ Slaytlardaki her sayı `docs/PAZAR-ANALIZI.md` içindeki kaynağıyla birlikte s
 
 ## 11. Bitti ve bırakılan
 
-*3:40 – 4:04 · Niri: “Prototipim çalışıyor. Gerisini pilotta kanıtlayacağım.”*
+*3:40 – 4:06 · Niri: “Prototipim çalışıyor. Gerisini pilotta kanıtlayacağım.”*
 
 - Altı problemin altısına çalışan bir ekranımız var. GitHub ve DNS doğrulaması, yapay zekâ taslağı canlıda; eşleşme ve kayıt defteri testli.
-- Bilerek bıraktıklarımız: kalıcı veritabanı, gerçek kullanıcı ve pilot. Demo kişileri kurgusal, ekranda da öyle yazıyor.
-- Finalden sonraki dört ay: kalıcılık, ilk ihtiyaç turu, kod dışı kanıt ve pilot raporu.
+- Yalnız yazılımcılar için değil: tasarımcı da çevirmen de LinkedIn, Behance, ArtStation bağlantılarıyla profilini kuruyor.
+- Bilerek bıraktıklarımız: kalıcı veritabanı, gerçek kullanıcı ve pilot. Kod dışı bağlantıları makineyle doğrulamıyoruz, Beyan diyoruz. Demo kişileri kurgusal, ekranda da öyle yazıyor.
+- Finalden sonraki dört ay: kalıcılık, ilk ihtiyaç turu, kod dışı doğrulama ve pilot raporu.
 
 ## 12. Teşekkürler
 
-*4:04 – 4:16 · Niri: “Zirvedeyim! Teşekkürler, haritada görüşmek üzere.”*
+*4:06 – 4:18 · Niri: “Zirvedeyim! Teşekkürler, haritada görüşmek üzere.”*
 
 - Tek bir isteğimiz var: bu salondan bir kurumun gerçek bir ihtiyacı. İlk kanvası birlikte yazalım.
 - Beyan değil, kanıt. Teşekkürler.
@@ -141,6 +142,11 @@ Slaytlardaki her sayı `docs/PAZAR-ANALIZI.md` içindeki kaynağıyla birlikte s
 
 - Model metinde olmayan her alan için kurumun derdine özel bir öneri getirir; kutuda “Niri’nin önerisi” olarak soluk durur.
 - Öneride sayı uydurmaz, yerine “…” koyar; rakamı kurum yazar. Kurum kullanmadan hiçbir öneri kanvasa girmez.
+
+### Yalnız yazılımcılar için mi?
+
+- Hayır. Kanıt bağla önce işin nerede durduğunu sorar: kodu GitHub’da olan depolarını bağlar; tasarımcı, animasyoncu, çevirmen LinkedIn, Behance, ArtStation, YouTube profillerini ve eserlerini ekler.
+- Bu sitelerde hesabın kime ait olduğunu dışarıdan kontrol edemiyoruz; o yüzden Beyan diyoruz, uydurma bir doğrulama göstermiyoruz. Her alanda en güçlü kanıt aynı: kurumun onayladığı deneme projesi.
 
 ### İlk pazarınız kim?
 

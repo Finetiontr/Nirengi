@@ -1,6 +1,8 @@
 // Core domain model: three objects — Evidence (Kanıt), Need (İhtiyaç), Pilot.
 // Everything else (matches, scores, network health) is derived from these.
 
+import type { PlatformId, ProfileLink } from './platforms.ts';
+
 export type Level = 'S1' | 'S2' | 'S3';
 export type Scale = 'girisim' | 'kobi' | 'kurumsal' | 'kamu';
 export type Sector =
@@ -19,8 +21,7 @@ export type EvidenceSource =
   | 'npm'
   | 'store'
   | 'doi'
-  | 'behance'
-  | 'figma'
+  | 'link'
   | 'pilot'
   | 'endorsement'
   | 'claim';
@@ -38,6 +39,8 @@ export interface Evidence {
   level: Level;
   skills: string[]; // canonical skill keys, see skills.ts
   url?: string;
+  /** Where a `link` work lives (Behance, YouTube, a web site…). */
+  platform?: PlatformId;
   metrics?: Metric[];
   producedAt: string; // when the work happened (drives momentum)
   verifiedAt?: string;
@@ -62,10 +65,14 @@ export interface Person {
   weeklyHours: number;
   joinedAt: string;
   evidence: Evidence[];
-  links: { github?: string; domain?: string; web?: string };
+  links: { github?: string; domain?: string };
+  /** Accounts elsewhere (LinkedIn, Behance, ArtStation…), shown on the profile as the person's word. */
+  profiles?: ProfileLink[];
   /** Profile photo URL, taken from GitHub when the account is connected. */
   avatar?: string;
   isDemoUser?: boolean;
+  /** The fictional profile behind “Örnek profille gez”: nothing in it is the visitor's own. */
+  example?: boolean;
   /** Local days (YYYY-MM-DD) with public output read from GitHub events. */
   activity?: string[];
   weeklyGoal?: WeeklyGoal;

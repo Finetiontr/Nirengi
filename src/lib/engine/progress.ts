@@ -367,7 +367,7 @@ export function journey(state: State, person: Person): Unit[] {
       sub: 'Ne yaptığını göster, sistem doğrulasın.',
       tone: 'indigo',
       steps: [
-        step('bagla', 'Hesabını bağla', 'GitHub hesabın ya da alan adın senin olduğunu kanıtladığında işlerin profiline akar.', Boolean(person.links.github || person.links.domain), '/kanit-bagla', 'Bağla'),
+        step('bagla', 'Profilini kur', 'GitHub’ını, LinkedIn’ini ya da işini gösterdiğin her yeri bağla; kurumlar seni oradan da tanır.', Boolean(person.links.github || person.links.domain || person.profiles?.length), '/kanit-bagla', 'Kur'),
         step('dogrula', 'İlk doğrulanmış iş', 'Doğrulanmış iş, eşleşmede beyanın neredeyse üç katı ağırlık taşır.', s2 >= 1, '/kanit-bagla', 'İş ekle'),
         step('seri', 'Haftalık hedefini tuttur', 'Düzenli üretim yükselen sinyale girer; kurumlar ivmeyi görür.', p.streak >= 1, '/gorevler', 'Görevlere bak'),
       ],

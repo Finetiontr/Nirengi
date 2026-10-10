@@ -20,7 +20,7 @@ Kurumlar ihtiyacını net tanımlayamıyor, gençler ise ürettiklerini kanıtla
 | # | Problem | Mekanizma | Ekran |
 |---|---------|-----------|-------|
 | 01 | Genç yeteneklerin keşfi | Kör keşif (isim/yaş/okul gizli), problemle arama, takipçiden bağımsız yükselen sinyal | `/kesfet` |
-| 02 | Profil & portfolyo doğruluğu | S1/S2/S3 Doğrulama Merdiveni, **GitHub uygulamasıyla** seçilen depoların (özel depolar dahil) doğrulanması, DNS TXT doğrulaması, kopya eser tespiti, şeffaf itiraz | `/kanit-bagla`, `/profil/:kullanici` |
+| 02 | Profil & portfolyo doğruluğu | S1/S2/S3 Doğrulama Merdiveni; **her alandan iş**: GitHub uygulamasıyla seçilen depolar (özel depolar dahil) doğrulanır, LinkedIn, Behance, ArtStation, YouTube gibi profiller ve eser bağlantıları Beyan olarak eklenir; DNS TXT doğrulaması, kopya eser tespiti, şeffaf itiraz | `/kanit-bagla`, `/profil/:kullanici` |
 | 03 | Kurum–kişi eşleşmesi | Dört bileşenli açıklanabilir skor, gerekçe kartı, eksik kanıt geri bildirimi, takım kompozisyonu | `/ihtiyaclar/:id#adaylar` |
 | 04 | Yaşayan bir ağ | Olay akışı, bağlantı sağlığı ve somut sebepli yeniden temas, mikro-etkileşimler, çeyreklik ihtiyaç turu | `/nabiz` |
 | 05 | İhtiyaçların net tanımı | Yedi alanlı İhtiyaç Kanvası, kurumun kendi sözlerinden **yapay zekâ taslağı** (her alan metindeki cümlesine dayanır), önerilen başarı kriterleri, çözülebilirlik skoru, yayın eşiği, ekosistem hafızası | `/ihtiyaclar/yeni` |
@@ -31,6 +31,7 @@ Döngü: pilotta çift onaylanan her kilometre taşı kişinin profiline **S3 ka
 ## Özellikler
 
 **Genç**
+- Her alandan başlangıç: Kanıt bağla önce işin nerede durduğunu sorar. Kodu GitHub’da olan depolarını bağlar; tasarımcı, animasyoncu, çevirmen ya da içerik üreticisi LinkedIn, Behance, ArtStation, Dribbble, Instagram, YouTube profillerini ve eserlerinin bağlantısını ekler. Beceriler yazılımdan tasarıma, medyaya ve iş alanlarına uzanan tek bir sözlükten seçilir; kurumun ihtiyacı da aynı sözlükle yazıldığı için eşleşme her alanda aynı kurallarla çalışır.
 - GitHub’a bağlan: Nirengi uygulamasını kurarken kurumlara göstereceğin depoları GitHub’da sen seçersin; seçilenler Doğrulandı düzeyinde gelir. Kod ya da anahtar kopyalanmaz.
 - Bugün: haftalık hedef, hafta serisi, Şimdi şeridinde günün kurum ihtiyaçları.
 - Görevler, lig, topluluk ve Saha defteri; XP yalnız doğrulanmış olaylardan gelir.
@@ -70,6 +71,7 @@ flowchart LR
 | Bileşen | Durum |
 |---------|-------|
 | GitHub uygulaması (seçili depolar), bio/gist kodu, DNS TXT | Gerçek servislere gider |
+| LinkedIn, Behance, ArtStation… profilleri ve eser bağlantıları | Beyan: adres denetlenir, sahiplik doğrulanmaz (bu sitelerde hesabın sahibini dışarıdan kontrol etmenin açık bir yolu yok); kurum onayıyla Kurum onaylı olur |
 | Eşleşme, kanvas skoru, takım önerisi, defter bütünlüğü | Gerçek hesaplama |
 | İhtiyaç taslağı | Yapay zekâ: Gemma 4 26B (Workers AI); ağ ya da kota yoksa kural motoru |
 | Niri’nin analizleri ve haftalık özetleri | Kural tabanlı, çevrim dışı |
@@ -145,6 +147,8 @@ src/
   lib/
     engine/            saf hesaplama: match, canvas, ground (model denetimi), ledger, progress, insight
     ai.ts              Niri'nin modeli: taslak isteği, önbellek, kural motoruna dönüş
+    platforms.ts       profil ve eser bağlantıları: LinkedIn, Behance, ArtStation… adres denetimi
+    skills.ts          her alandan beceri sözlüğü (yazılım, veri, tasarım, medya, iş)
     sample-reading.ts  modelin örnek metne verdiği kayıtlı cevap (sunum, testler, ağ yedeği)
     auth.ts            GitHub uygulamasıyla bağlanma ve çıkış
     verify.ts          GitHub ve DNS TXT doğrulaması

@@ -1,10 +1,11 @@
 // Kanıt bağla: onboarding as a short walk. One thing per screen, survey markers
-// on top that fill in as you go, and the key right under the step. Every check still goes to the real
-// services (GitHub API, DNS over HTTPS); whatever cannot be proven stays Beyan.
+// on top that fill in as you go, and the key right under the step. Two routes: code on GitHub, or
+// work anywhere else (LinkedIn, Behance, ArtStation, a site of one's own). Every check still goes to
+// the real services (GitHub API, DNS over HTTPS); whatever cannot be proven stays Beyan.
 
 import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { Check, ChevronLeft, ChevronRight, Copy, ExternalLink, Loader2, LogOut } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight, Copy, ExternalLink, Link2, Loader2, LogOut, Plus, X } from 'lucide-react';
 import type { Evidence, Level, Person, State, WeeklyGoal } from '../../lib/types.ts';
 import { actions, getState, useAppState } from '../../lib/store.ts';
 import { progress, totalXp, XP } from '../../lib/engine/progress.ts';
@@ -33,17 +34,23 @@ import {
 } from '../../lib/verify.ts';
 import { appReady, completeReturn, forgetToken, getToken, installUrl, manageUrl, signInUrl, signOut, type ReturnResult } from '../../lib/auth.ts';
 import { LEVELS } from '../../lib/labels.ts';
-import { daysAgo, relTime, uid } from '../../lib/format.ts';
-import { skillLabel } from '../../lib/skills.ts';
+import { daysAgo, relTime, slugify, uid } from '../../lib/format.ts';
+import { skillLabel, skillsInText } from '../../lib/skills.ts';
+import { isProfile, normalizeUrl, platformOf, PLATFORMS, shortUrl, SUGGESTED, withProfile } from '../../lib/platforms.ts';
 import { type Mood } from '../ui/Niri';
 import NiriSays from '../ui/NiriSays';
 import { celebrate, CountUp, feedback, Head, WeekDots, Why } from '../ui/kit';
 import { CheckCircle, Flame, GitHub, Star } from '../ui/icons';
 import { Avatar, LevelBadge } from '../ui/primitives';
 import { TriMark } from '../ui/TriMark';
+import SkillPicker, { SkillChip } from '../ui/SkillPicker';
 
-type StepId = 'home' | 'add' | 'user' | 'found' | 'goal' | 'prove' | 'domain' | 'done';
-const FLOW: StepId[] = ['user', 'found', 'goal', 'prove', 'domain'];
+type StepId = 'start' | 'home' | 'user' | 'found' | 'goal' | 'prove' | 'profiles' | 'domain' | 'me' | 'work' | 'done';
+type Route = 'github' | 'open';
+const FLOWS: Record<Route, StepId[]> = {
+  github: ['user', 'found', 'goal', 'prove', 'profiles', 'domain'],
+  open: ['me', 'profiles', 'work', 'goal'],
+};
 
 interface Scan {
   user: GhUser;
@@ -111,6 +118,7 @@ const RETRY_KEY = 'nirengi:gh-retry';
 const demoUser = () => getState().people.find((p) => p.isDemoUser);
 const isGhVerified = (p?: Person) => !!p?.evidence.some((e) => e.source === 'github' && e.level === 'S2');
 const hasGhBeyan = (p?: Person) => !!p?.links.github && !!p.evidence.some((e) => e.source === 'github' && e.level === 'S1');
+const isExample = (p?: Person) => !!p?.example;
 const countBy = (p: Person, l: Level) => p.evidence.filter((e) => e.level === l).length;
 
 /** The demo user after this scan: GitHub evidence follows the scan, everything else is kept. */
@@ -148,13 +156,14 @@ function buildPerson(s: State, cur: Person | undefined, sc: Scan, picked: GhRepo
   };
   return {
     ...base,
-    // An example profile is replaced by the real account's details; a connected one keeps its own.
-    ...(cur && !cur.links.github ? profile : {}),
+    // An example profile is replaced by the real account's details; a person's own stay.
+    ...(cur && isExample(cur) ? profile : {}),
     handle: same ? base.handle : taken ? `${login}-gh` : login,
     evidence,
     links: { ...base.links, github: sc.offline ? undefined : sc.user.login },
     avatar: sc.offline ? undefined : sc.user.avatar_url || undefined,
     isDemoUser: true,
+    example: sc.offline || undefined,
   };
 }
 
@@ -169,7 +178,10 @@ export default function ConnectPage() {
   const me = s.people.find((p) => p.isDemoUser);
   const reduce = !!useReducedMotion();
 
-  const [step, setStep] = useState<StepId>(me ? 'home' : 'user');
+  const [step, setStep] = useState<StepId>(me ? 'home' : 'start');
+  /** Which walk the markers follow: code on GitHub, or work kept anywhere else. */
+  const [route, setRoute] = useState<Route>(me && !me.links.github && !isExample(me) ? 'open' : 'github');
+  const [pick, setPick] = useState<Route | null>(null);
   /** The handle field (Beyan only) instead of connecting the GitHub App. */
   const [manual, setManual] = useState(!appReady());
   const [dir, setDir] = useState(1);
@@ -185,7 +197,16 @@ export default function ConnectPage() {
   const [code] = useState(sessionChallenge);
   const [tab, setTab] = useState<'bio' | 'gist'>('bio');
   const [domain, setDomain] = useState('');
-  const [claim, setClaim] = useState('');
+  const own = me && !isExample(me) ? me : undefined;
+  const [name, setName] = useState(own?.name ?? '');
+  const [headline, setHeadline] = useState(own?.headline ?? '');
+  const [city, setCity] = useState(own && own.city !== '—' ? own.city : '');
+  const [meTouched, setMeTouched] = useState(false);
+  const [link, setLink] = useState('');
+  const [linkTouched, setLinkTouched] = useState(false);
+  const [work, setWork] = useState({ title: '', url: '' });
+  /** Skills ticked by hand; until then they follow the link's platform and the title. */
+  const [workSkills, setWorkSkills] = useState<string[] | null>(null);
   const [busy, setBusy] = useState<'verify' | 'dns' | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
   const run = useRef(0);
@@ -208,6 +229,13 @@ export default function ConnectPage() {
   const domainDone = !!me?.links.domain;
   const afterFlow = (next: StepId) => (from === 'home' ? 'home' : next);
   const skipProve = !!scan?.offline || !!scan?.granted || (!scan && !manual);
+  const meOk = name.trim().length >= 2 && headline.trim().length >= 2;
+  const linkUrl = normalizeUrl(link);
+  const workUrl = work.url.trim() ? normalizeUrl(work.url) : null;
+  const workBad = !!work.url.trim() && !workUrl;
+  // What the title names is more precise than what the platform usually holds.
+  const titleSkills = skillsInText(work.title);
+  const shownSkills = workSkills ?? (titleSkills.length || !workUrl ? titleSkills : PLATFORMS[platformOf(workUrl)].skills);
 
   // ------------------------------------------------------------ actions
 
@@ -270,8 +298,9 @@ export default function ConnectPage() {
       } catch {
         /* private mode */
       }
-      const back = me?.links.github ? 'home' : 'user';
+      const back = me && !isExample(me) ? 'home' : 'user';
       setFrom(back === 'home' ? 'home' : 'flow');
+      setRoute('github');
       void scanFor(null, back);
       return;
     }
@@ -307,6 +336,7 @@ export default function ConnectPage() {
     setLoginErr(null);
     setIncluded(new Set(OFFLINE.repos.map((r) => r.name)));
     setScan(OFFLINE);
+    setRoute('github');
     feedback({ tone: 'info', title: 'Örnek profille devam', text: 'Bu veri kurgusal: gerçek hesabına bağlanmaz, her şey Beyan düzeyinde kalır.' });
     go('found');
   };
@@ -331,7 +361,7 @@ export default function ConnectPage() {
     if (!cur) return;
     actions.setWeeklyGoal(cur.id, goal);
     feedback({ tone: 'good', title: 'Hedefin kaydedildi', text: `Haftada ${goal} gün üretim. İstediğin zaman değiştirebilirsin.` });
-    go(skipProve ? 'domain' : 'prove');
+    go(route === 'open' ? 'done' : skipProve ? 'profiles' : 'prove');
   };
 
   const copy = async (text: string, key: string, note: string) => {
@@ -367,7 +397,7 @@ export default function ConnectPage() {
       const before = totalXp(getState(), cur);
       actions.upsertDemoUser({ ...cur, evidence: cur.evidence.map((e) => (e.source === 'github' && e.level === 'S1' ? verifyGitHubEvidence(e, via) : e)) });
       celebrate({ title: 'Doğrulandın!', sub: `${n} işin artık Doğrulandı düzeyinde. Eşleşmede beyandan daha ağır sayılır.`, xp: totalXp(getState(), demoUser()!) - before });
-      go(afterFlow('domain'));
+      go(afterFlow('profiles'));
     } catch (e) {
       feedback({ tone: 'bad', title: 'Kontrol edemedik', text: e instanceof VerifyError ? e.message : 'Beklenmeyen bir hata oldu.' });
     } finally {
@@ -376,19 +406,24 @@ export default function ConnectPage() {
   };
 
   const leave = () => {
+    const text = me?.links.github ? 'GitHub bağlantın kaldırıldı; örnek profille geziyorsun.' : 'Profilin bu tarayıcıdan silindi; örnek profille geziyorsun.';
     signOut();
     run.current++;
     setScan(null);
     setHandle('');
     setFrom('flow');
     setManual(!appReady());
-    feedback({ tone: 'info', title: 'Çıkış yaptın', text: 'GitHub bağlantın kaldırıldı; örnek profille geziyorsun.' });
-    go('user', -1);
+    setPick(null);
+    setName('');
+    setHeadline('');
+    setCity('');
+    feedback({ tone: 'info', title: 'Çıkış yaptın', text });
+    go('start', -1);
   };
 
   const skipProveStep = () => {
     feedback({ tone: 'info', title: 'Şimdilik Beyan olarak kalıyor', text: 'Doğrulanmayan işler profilinde görünür ama eşleşmede düşük ağırlık taşır. Sonra tekrar deneyebilirsin.' });
-    go(afterFlow('domain'));
+    go(afterFlow('profiles'));
   };
 
   const verifyDomain = async () => {
@@ -418,25 +453,112 @@ export default function ConnectPage() {
   };
 
   const skipDomain = () => {
-    feedback({ tone: 'info', title: 'Alan adı atlandı', text: 'İstediğin zaman “Yeni kanıt ekle” ile ekleyebilirsin.' });
+    feedback({ tone: 'info', title: 'Alan adı atlandı', text: 'İstediğin zaman bu sayfadan ekleyebilirsin.' });
     go(afterFlow('done'));
   };
 
-  const addClaim = () => {
-    const cur = demoUser();
-    const t = claim.trim();
-    if (!cur || !t) return;
-    const ev: Evidence = { id: uid('e-claim'), title: t, summary: 'Kişisel beyan.', source: 'claim', level: 'S1', skills: [], producedAt: new Date().toISOString() };
-    actions.addEvidence(cur.id, ev);
-    setClaim('');
-    feedback({ tone: 'good', title: 'Beyan eklendi', text: 'Profilinde görünür; doğrulanana kadar eşleşmede düşük ağırlık taşır.' });
+  const choose = () => {
+    if (!pick) return;
+    setRoute(pick);
+    setFrom('flow');
+    if (pick === 'open') return go('me');
+    setManual(!appReady());
+    go('user');
   };
+
+  /** The open route starts with who the person is, in their own words. */
+  const saveMe = () => {
+    const cur = demoUser();
+    const patch = { name: name.trim(), headline: headline.trim(), city: city.trim() || '—' };
+    if (cur && !isExample(cur)) actions.updatePerson(cur.id, patch);
+    else {
+      const taken = (h: string) => getState().people.some((p) => !p.isDemoUser && p.handle === h);
+      const base = slugify(patch.name) || 'genc';
+      let handle = base;
+      for (let n = 2; taken(handle); n++) handle = `${base}-${n}`;
+      // The example's repositories were never this person's: a real profile starts empty.
+      actions.upsertDemoUser({
+        ...patch,
+        id: uid('p'),
+        handle,
+        age: 0,
+        school: '—',
+        bio: 'Kanıtlarını NİRENGİ’ye bağladı.',
+        availability: 'open',
+        weeklyHours: 15,
+        joinedAt: new Date().toISOString(),
+        evidence: [],
+        links: {},
+        isDemoUser: true,
+      });
+    }
+    go(afterFlow('profiles'));
+  };
+
+  const addProfile = () => {
+    const cur = demoUser();
+    if (!cur || !linkUrl || !isProfile(linkUrl)) {
+      setLinkTouched(true);
+      return false;
+    }
+    actions.updatePerson(cur.id, { profiles: withProfile(cur.profiles, linkUrl) });
+    setLink('');
+    setLinkTouched(false);
+    return true;
+  };
+
+  const removeProfile = (url: string) => {
+    const cur = demoUser();
+    if (cur) actions.updatePerson(cur.id, { profiles: cur.profiles?.filter((p) => p.url !== url) });
+  };
+
+  const saveProfiles = () => {
+    // A pasted address the person did not add yet is added on the way, never dropped.
+    if (link.trim() && !addProfile()) return;
+    go(afterFlow(route === 'open' ? 'work' : 'domain'));
+  };
+
+  const addWork = () => {
+    const cur = demoUser();
+    const title = work.title.trim();
+    if (!cur || !title || workBad) return;
+    const ev: Evidence = {
+      id: uid('e-work'),
+      title,
+      summary: workUrl ? `Bağlantı: ${shortUrl(workUrl, 60)}` : 'Bağlantısı yok; kendi sözüyle eklendi.',
+      source: workUrl ? 'link' : 'claim',
+      ...(workUrl ? { url: workUrl, platform: platformOf(workUrl) } : {}),
+      level: 'S1',
+      skills: shownSkills,
+      producedAt: new Date().toISOString(),
+    };
+    actions.addEvidence(cur.id, ev);
+    setWork({ title: '', url: '' });
+    setWorkSkills(null);
+    feedback({ tone: 'good', title: 'Eser eklendi', text: 'Profilinde Beyan olarak görünür. Bir kurumla deneme projesinde onaylanan iş Kurum onaylı olur.' });
+    go(afterFlow('goal'));
+  };
+
+  const toggleWorkSkill = (k: string) => setWorkSkills(shownSkills.includes(k) ? shownSkills.filter((x) => x !== k) : [...shownSkills, k]);
 
   // ------------------------------------------------------------ chrome
 
   const loading = step === 'found' && !scan;
   const foot: Foot = (() => {
     switch (step) {
+      case 'start':
+        return { label: 'Devam', disabled: !pick, onClick: choose };
+      case 'me':
+        return { label: 'Devam', disabled: !meOk, blocked: () => setMeTouched(true), onClick: saveMe };
+      case 'profiles':
+        return { label: from === 'home' ? 'Bitti' : 'Devam', onClick: saveProfiles };
+      case 'work':
+        return {
+          label: 'Ekle',
+          disabled: !work.title.trim() || workBad,
+          onClick: addWork,
+          side: from === 'home' ? undefined : { label: 'Şimdilik atla', onClick: () => go('goal') },
+        };
       case 'user':
         return manual
           ? { label: 'Devam', disabled: !valid, onClick: startScan, blocked: () => setTouched(true), side: appReady() ? { label: 'GitHub’a bağlan', onClick: () => setManual(false) } : undefined }
@@ -447,7 +569,7 @@ export default function ConnectPage() {
         return { label: 'Devam', onClick: saveGoal };
       case 'prove':
         return proven
-          ? { label: 'Devam', onClick: () => go(afterFlow('domain')) }
+          ? { label: 'Devam', onClick: () => go(afterFlow('profiles')) }
           : { label: 'Kontrol et', busy: busy === 'verify', onClick: verifyOwnership, side: { label: 'Şimdilik atla', onClick: skipProveStep } };
       case 'domain':
         return domainDone
@@ -455,27 +577,20 @@ export default function ConnectPage() {
           : { label: 'Kontrol et', busy: busy === 'dns', disabled: !cleanDomain(domain).includes('.'), onClick: verifyDomain, side: { label: 'Atla', onClick: skipDomain } };
       case 'done':
         return { label: 'Bugün’e git', href: '/bugun', side: me ? { label: 'Profilim', href: `/profil/${me.handle}` } : undefined };
-      case 'add':
-        return { label: 'Bitti', onClick: () => go('home', -1) };
       default:
         return { label: 'Bugün’e git', href: '/bugun' };
     }
   })();
 
-  const back: StepId | null =
-    from === 'home' && step !== 'home'
-      ? 'home'
-      : step === 'found'
-        ? 'user'
-        : step === 'goal'
-          ? 'found'
-          : step === 'prove'
-            ? 'goal'
-            : step === 'domain'
-              ? skipProve
-                ? 'goal'
-                : 'prove'
-              : null;
+  // After a one-click login (or with the example profile) there is nothing to prove.
+  const flow = route === 'open' ? FLOWS.open : skipProve ? FLOWS.github.filter((x) => x !== 'prove') : FLOWS.github;
+  const back: StepId | null = (() => {
+    if (step === 'start') return me ? 'home' : null;
+    if (step === 'home' || step === 'done') return null;
+    if (from === 'home') return 'home';
+    const i = flow.indexOf(step);
+    return i > 0 ? flow[i - 1] : i === 0 ? 'start' : null;
+  })();
   const goBack = () => {
     run.current++;
     go(back!, -1);
@@ -486,26 +601,15 @@ export default function ConnectPage() {
     if (!/[?&](code|setup_action|error)=/.test(location.search)) return;
     setStage('GitHub’dan dönüyorum…');
     setScan(null);
+    setRoute('github');
     go('found');
     void completeReturn().then(onReturn);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Niri's welcome can hand over a handle as ?gh=… (the Beyan route).
-  useEffect(() => {
-    const q = new URLSearchParams(location.search).get('gh');
-    if (q === null) return;
-    history.replaceState(null, '', location.pathname + location.hash);
-    const l = cleanHandle(q);
-    if (!isGitHubLogin(l)) return;
-    setHandle(l);
-    void scanFor(l, 'user');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   // Signed out from the menu while this page is open: there is no account to show any more.
   useEffect(() => {
-    if (!me && step === 'home') go('user', -1);
+    if (!me && step === 'home') go('start', -1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [me, step]);
 
@@ -514,8 +618,6 @@ export default function ConnectPage() {
     window.scrollTo(0, 0);
   }, [step]);
 
-  // After a one-click login (or with the example profile) there is nothing to prove.
-  const flow = skipProve ? FLOW.filter((x) => x !== 'prove') : FLOW;
   const idx = flow.indexOf(step);
   const reached = step === 'done' ? flow.length : idx >= 0 ? idx : null;
 
@@ -541,6 +643,47 @@ export default function ConnectPage() {
 
   const body = (() => {
     switch (step) {
+      case 'start':
+        return <StartBody pick={pick} onPick={setPick} canExample={!me} onExample={continueWithExample} />;
+      case 'me':
+        return (
+          <MeBody
+            name={name}
+            headline={headline}
+            city={city}
+            onName={setName}
+            onHeadline={setHeadline}
+            onCity={setCity}
+            touched={meTouched}
+            onBlur={() => setMeTouched(true)}
+          />
+        );
+      case 'profiles':
+        return (
+          <ProfilesBody
+            me={me}
+            link={link}
+            onLink={(v) => {
+              setLink(v);
+              setLinkTouched(false);
+            }}
+            touched={linkTouched}
+            onAdd={addProfile}
+            onRemove={removeProfile}
+          />
+        );
+      case 'work':
+        return (
+          <WorkBody
+            first={from !== 'home'}
+            title={work.title}
+            url={work.url}
+            onTitle={(title) => setWork((w) => ({ ...w, title }))}
+            onUrl={(url) => setWork((w) => ({ ...w, url }))}
+            skills={shownSkills}
+            onSkill={toggleWorkSkill}
+          />
+        );
       case 'user':
         if (!manual)
           return (
@@ -596,19 +739,6 @@ export default function ConnectPage() {
             onCopy={(text, key) => copy(text, key, 'DNS panelindeki ilgili alana yapıştır.')}
           />
         );
-      case 'add':
-        return (
-          <AddBody
-            me={me}
-            claim={claim}
-            onClaim={setClaim}
-            onAdd={addClaim}
-            onDomain={() => {
-              setFrom('home');
-              go('domain');
-            }}
-          />
-        );
       case 'done':
         return <DoneBody s={s} me={me} />;
       default:
@@ -624,12 +754,18 @@ export default function ConnectPage() {
               // Connected through the app, the private repositories picked on GitHub come along too.
               void scanFor(getToken() ? null : gh, 'home');
             }}
-            onAdd={() => {
+            onOpen={(to) => {
               setFrom('home');
-              go('add');
+              go(to);
+            }}
+            onStart={() => {
+              setFrom('flow');
+              setPick(null);
+              go('start');
             }}
             onConnect={() => {
-              setFrom('flow');
+              setFrom(me && !isExample(me) ? 'home' : 'flow');
+              setRoute('github');
               setManual(!appReady());
               go('user');
             }}
@@ -793,7 +929,7 @@ const weight = (l: Level) => LEVELS[l].weight.toLocaleString('tr-TR');
 const LEVEL_WHY = (
   <div className="space-y-3 text-[16px] font-bold text-ink-2">
     <p>
-      <b>Beyan:</b> kendi sözün. Profilinde görünür ama eşleşmede en düşük ağırlığı taşır ({weight("S1")}).
+      <b>Beyan:</b> kendi sözün ve paylaştığın bağlantılar. Profilinde görünür ama eşleşmede en düşük ağırlığı taşır ({weight("S1")}).
     </p>
     <p>
       <b>Doğrulandı:</b> GitHub hesabının ya da alan adının senin olduğunu makine kontrol etti. Ağırlığı {weight("S2")}.
@@ -803,6 +939,117 @@ const LEVEL_WHY = (
     </p>
   </div>
 );
+
+// ---------------------------------------------------------------- 0 · start, me
+
+const ROUTES: { id: Route; title: string; text: string }[] = [
+  { id: 'github', title: 'Kodum GitHub’da', text: 'Depolarını sen seçersin; seçtiklerin Doğrulandı olarak gelir.' },
+  { id: 'open', title: 'İşim başka yerlerde', text: 'LinkedIn, Behance, ArtStation, YouTube ya da kendi siten. Bağlantısı olmayan işi kendi sözünle eklersin.' },
+];
+
+function StartBody({ pick, onPick, canExample, onExample }: { pick: Route | null; onPick: (r: Route) => void; canExample: boolean; onExample: () => void }) {
+  return (
+    <>
+      <Guide mood="wave">Yazılım, tasarım, video ya da çeviri: işin neyse onunla görün.</Guide>
+      <h1 className="h-page mt-6">İşin nerede duruyor?</h1>
+      <div className="mt-5 space-y-3" role="radiogroup" aria-label="İşin nerede duruyor?">
+        {ROUTES.map((o) => {
+          const on = o.id === pick;
+          return (
+            <button
+              key={o.id}
+              type="button"
+              role="radio"
+              aria-checked={on}
+              onClick={() => onPick(o.id)}
+              className={`card-press flex w-full items-center gap-4 p-4 text-left ${on ? '!border-indigo !bg-indigo-tint' : ''}`}
+              style={on ? { boxShadow: '0 4px 0 rgb(var(--indigo) / 0.5)' } : undefined}
+            >
+              <span className={`grid h-14 w-14 shrink-0 place-items-center rounded-[16px] ${on ? 'bg-indigo text-white' : 'bg-bg-3 text-ink-2'}`} aria-hidden="true">
+                {o.id === 'github' ? <GitHub size={28} /> : <Link2 className="h-7 w-7" strokeWidth={2.75} />}
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className={`block text-[18px] font-black ${on ? 'text-indigo' : 'text-ink'}`}>{o.title}</span>
+                <span className="block text-[14px] font-bold text-ink-3">{o.text}</span>
+              </span>
+            </button>
+          );
+        })}
+      </div>
+      <p className="hint">
+        Diğerini sonra da ekleyebilirsin.{' '}
+        {canExample && (
+          <button type="button" onClick={onExample} className="font-extrabold text-indigo underline-offset-2 hover:underline">
+            Örnek profille gez
+          </button>
+        )}
+      </p>
+    </>
+  );
+}
+
+function MeBody({
+  name,
+  headline,
+  city,
+  onName,
+  onHeadline,
+  onCity,
+  touched,
+  onBlur,
+}: {
+  name: string;
+  headline: string;
+  city: string;
+  onName: (v: string) => void;
+  onHeadline: (v: string) => void;
+  onCity: (v: string) => void;
+  touched: boolean;
+  onBlur: () => void;
+}) {
+  const err = 'mt-2 text-[14px] font-bold text-red-lip';
+  const noName = touched && name.trim().length < 2;
+  const noHeadline = touched && headline.trim().length < 2;
+  return (
+    <>
+      <Guide mood="talk">Kurumlar seni önce bu iki satırla tanır; kısa ve kendi sözünle yaz.</Guide>
+      <h1 className="h-page mt-6">Seni tanıyalım</h1>
+      <div className="mt-5 space-y-4">
+        <div>
+          <label htmlFor="ad" className="label">
+            Adın
+          </label>
+          <input id="ad" className="field" value={name} onChange={(e) => onName(e.target.value)} onBlur={onBlur} autoFocus autoComplete="name" maxLength={60} enterKeyHint="next" aria-invalid={noName} />
+          {noName && <p className={err}>Adını yaz.</p>}
+        </div>
+        <div>
+          <label htmlFor="ne" className="label">
+            Ne üretiyorsun?
+          </label>
+          <input
+            id="ne"
+            className="field"
+            value={headline}
+            onChange={(e) => onHeadline(e.target.value)}
+            onBlur={onBlur}
+            placeholder="ör. İllüstratör, video kurgucu, çevirmen"
+            maxLength={70}
+            enterKeyHint="next"
+            aria-invalid={noHeadline}
+          />
+          {noHeadline && <p className={err}>Ne ürettiğini birkaç kelimeyle yaz.</p>}
+        </div>
+        <div>
+          <label htmlFor="sehir" className="label">
+            Şehrin <span className="font-semibold text-ink-3">(isteğe bağlı)</span>
+          </label>
+          <input id="sehir" className="field" value={city} onChange={(e) => onCity(e.target.value)} autoComplete="address-level2" maxLength={40} enterKeyHint="go" />
+        </div>
+      </div>
+      <p className="hint">Kurum, ilk teması kurana kadar adını görmez; işlerine ve neden uyduğuna bakar.</p>
+    </>
+  );
+}
 
 // ---------------------------------------------------------------- 1 · user
 
@@ -1352,6 +1599,209 @@ function DomainBody({ me, domain, onDomain, code, copied, onCopy }: { me?: Perso
   );
 }
 
+// ---------------------------------------------------------------- profiles, work
+
+const NO_PROOF = (
+  <div className="space-y-3 text-[16px] font-bold text-ink-2">
+    <p>LinkedIn, Behance ya da ArtStation’daki bir hesabın senin olduğunu buradan kontrol etmenin açık bir yolu yok. Bu yüzden bağlantıların ve onlarla eklediğin işler Beyan düzeyinde görünür.</p>
+    <p>Kendi siten varsa alan adını DNS kaydıyla kanıtlayabilirsin; o Doğrulandı olur.</p>
+    <p>En güçlü kanıt her alanda aynıdır: bir kurumla yaptığın deneme projesinde onaylanan her aşama profiline Kurum onaylı olarak eklenir.</p>
+  </div>
+);
+
+function ProfilesBody({
+  me,
+  link,
+  onLink,
+  touched,
+  onAdd,
+  onRemove,
+}: {
+  me?: Person;
+  link: string;
+  onLink: (v: string) => void;
+  touched: boolean;
+  onAdd: () => boolean;
+  onRemove: (url: string) => void;
+}) {
+  const field = useRef<HTMLInputElement>(null);
+  const url = normalizeUrl(link);
+  const id = url ? platformOf(url) : null;
+  const ok = !!url && isProfile(url);
+  const bad = touched && !!link.trim() && !ok;
+  const list = me?.profiles ?? [];
+  const open = SUGGESTED.filter((p) => !list.some((x) => x.platform === p));
+  const start = id ? PLATFORMS[id].start : undefined;
+  const begin = (prefix: string) => {
+    onLink(prefix);
+    window.requestAnimationFrame(() => {
+      field.current?.focus();
+      field.current?.setSelectionRange(prefix.length, prefix.length);
+    });
+  };
+  return (
+    <>
+      <Guide mood="talk">LinkedIn’ini ve işlerini koyduğun yerleri ekle; kurumlar seni oradan da tanır.</Guide>
+      <h1 className="h-page mt-6">Profillerin</h1>
+      <label htmlFor="profil" className="sr-only">
+        Profil bağlantısı
+      </label>
+      <div className="mt-5 flex gap-2">
+        <input
+          ref={field}
+          id="profil"
+          className={`field min-w-0 flex-1 ${bad ? '!border-red !bg-red-tint' : ''}`}
+          value={link}
+          onChange={(e) => onLink(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key !== 'Enter' || !link.trim()) return;
+            e.preventDefault();
+            onAdd();
+          }}
+          placeholder="linkedin.com/in/adin"
+          inputMode="url"
+          autoCapitalize="none"
+          autoCorrect="off"
+          spellCheck={false}
+          enterKeyHint="done"
+          aria-invalid={bad}
+          aria-describedby="profil-note"
+        />
+        <button type="button" className="btn-line shrink-0" disabled={!link.trim()} onClick={onAdd}>
+          Ekle
+        </button>
+      </div>
+      <p id="profil-note" aria-live="polite" className={bad ? 'mt-2 text-[14px] font-bold text-red-lip' : 'hint'}>
+        {bad
+          ? url
+            ? `Profil sayfanın tam adresini yaz${start ? `: ${start}adin gibi` : ''}.`
+            : 'Bu bir bağlantıya benzemiyor. Profil sayfanın adresini yapıştır.'
+          : ok
+            ? id === 'web'
+              ? 'Web siten olarak eklenir.'
+              : `${PLATFORMS[id!].label} profilin olarak eklenir.`
+            : 'Adresi yapıştır ya da aşağıdan bir yer seç.'}
+      </p>
+      {open.length > 0 && (
+        <div className="mt-4 flex flex-wrap gap-2">
+          {open.map((p) => (
+            <button key={p} type="button" onClick={() => begin(PLATFORMS[p].start!)} className="chip !py-1.5 transition-colors hover:border-line-2 hover:bg-bg-2">
+              <Plus className="h-4 w-4" strokeWidth={3} aria-hidden="true" />
+              {PLATFORMS[p].label}
+            </button>
+          ))}
+        </div>
+      )}
+      {list.length > 0 && (
+        <ul className="mt-5 space-y-2" aria-label="Eklenen profiller">
+          {list.map((p) => (
+            <li key={p.url} className="flex items-center gap-3 rounded-[14px] bg-bg-2 py-2 pl-4 pr-2">
+              <span className="min-w-0 flex-1">
+                <span className="block text-[15px] font-black text-ink">{PLATFORMS[p.platform].label}</span>
+                <a href={p.url} target="_blank" rel="noreferrer" className="block truncate text-[13px] font-bold text-ink-3 hover:underline">
+                  {shortUrl(p.url)}
+                </a>
+              </span>
+              <button type="button" onClick={() => onRemove(p.url)} aria-label={`${PLATFORMS[p.platform].label} bağlantısını kaldır`} className="btn-quiet btn-sm shrink-0 !min-h-10 !px-2.5">
+                <X className="h-5 w-5" strokeWidth={3} aria-hidden="true" />
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+      <p className="hint">
+        Profillerin Beyan olarak görünür; kurum, ilk temasa kadar onları da görmez.{' '}
+        <Why title="Neden Doğrulandı değil?">{NO_PROOF}</Why>
+      </p>
+    </>
+  );
+}
+
+function WorkBody({
+  first,
+  title,
+  url,
+  onTitle,
+  onUrl,
+  skills,
+  onSkill,
+}: {
+  first: boolean;
+  title: string;
+  url: string;
+  onTitle: (v: string) => void;
+  onUrl: (v: string) => void;
+  skills: string[];
+  onSkill: (k: string) => void;
+}) {
+  const [more, setMore] = useState(false);
+  const clean = url.trim() ? normalizeUrl(url) : null;
+  const bad = !!url.trim() && !clean;
+  const id = clean ? platformOf(clean) : null;
+  return (
+    <>
+      <Guide mood="talk">Bir iş yeter: bir çizim, bir video, bir çeviri ya da bir proje.</Guide>
+      <h1 className="h-page mt-6">{first ? 'İlk eserin' : 'Eser ekle'}</h1>
+      <div className="mt-5 space-y-4">
+        <div>
+          <label htmlFor="eser" className="label">
+            Ne yaptın?
+          </label>
+          <input id="eser" className="field" value={title} onChange={(e) => onTitle(e.target.value)} autoFocus placeholder="ör. Bir kafenin menüsü ve logosu" maxLength={90} enterKeyHint="next" />
+        </div>
+        <div>
+          <label htmlFor="eser-link" className="label">
+            Bağlantısı <span className="font-semibold text-ink-3">(isteğe bağlı)</span>
+          </label>
+          <input
+            id="eser-link"
+            className={`field ${bad ? '!border-red !bg-red-tint' : ''}`}
+            value={url}
+            onChange={(e) => onUrl(e.target.value)}
+            placeholder="behance.net/gallery/…"
+            inputMode="url"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
+            enterKeyHint="done"
+            aria-invalid={bad}
+            aria-describedby="eser-link-note"
+          />
+          <p id="eser-link-note" aria-live="polite" className={bad ? 'mt-2 text-[14px] font-bold text-red-lip' : 'hint'}>
+            {bad ? 'Bu bir bağlantıya benzemiyor; işin açıldığı sayfanın adresini yapıştır.' : id ? `${PLATFORMS[id].label} bağlantısıyla eklenir.` : 'Bağlantı yoksa kendi sözünle eklenir.'}
+          </p>
+        </div>
+        <div role="group" aria-labelledby="eser-beceri">
+          <p id="eser-beceri" className="label">
+            Hangi becerileri gösteriyor?
+          </p>
+          {skills.length > 0 ? (
+            <div className="flex flex-wrap gap-2">
+              {skills.map((k) => (
+                <SkillChip key={k} k={k} on onToggle={onSkill} />
+              ))}
+            </div>
+          ) : (
+            <p className="hint !mt-0">Yazdıkça öneririm; listeden de seçebilirsin.</p>
+          )}
+          <button type="button" aria-expanded={more} onClick={() => setMore(!more)} className="btn-quiet btn-sm mt-2 !px-2">
+            {more ? 'Listeyi kapat' : 'Listeden seç'}
+          </button>
+          {more && (
+            <div className="mt-2">
+              <SkillPicker value={skills} onToggle={onSkill} />
+            </div>
+          )}
+        </div>
+      </div>
+      <p className="hint">
+        Beyan olarak eklenir.{' '}
+        <Why title="Bu iş nasıl güçlenir?">{NO_PROOF}</Why>
+      </p>
+    </>
+  );
+}
+
 // ---------------------------------------------------------------- 6 · done
 
 function DoneBody({ s, me }: { s: State; me?: Person }) {
@@ -1366,7 +1816,12 @@ function DoneBody({ s, me }: { s: State; me?: Person }) {
         <div className="mt-3">
           <LevelCounts me={me} />
         </div>
-        {!me.links.github && <p className="hint">Örnek profil: gerçek bir GitHub hesabına bağlı değil, her şey Beyan düzeyinde. Gerçek hesabını istediğin zaman bağlayabilirsin.</p>}
+        {isExample(me) ? (
+          <p className="hint">Örnek profil: kimsenin gerçek hesabı değil, her şey Beyan düzeyinde. Kendi profilini istediğin zaman kurabilirsin.</p>
+        ) : (
+          !countBy(me, 'S2') &&
+          !countBy(me, 'S3') && <p className="hint">İşlerin şimdilik Beyan. Bir kurumla yaptığın deneme projesinde onaylanan her aşama profiline Kurum onaylı olarak eklenir.</p>
+        )}
       </section>
       <section className="card mt-6 p-5" aria-labelledby="hafta">
         <h2 id="hafta" className="h-sec">
@@ -1376,14 +1831,14 @@ function DoneBody({ s, me }: { s: State; me?: Person }) {
           <WeekDots days={p.days} />
         </div>
         <p className="mt-4 text-[15px] font-bold text-ink-3">
-          {p.met ? `Haftanın hedefi tamam: ${p.active}/${p.goal} gün.` : `Hedefin haftada ${p.goal} gün; şu ana kadar ${p.active} gün üretim var.`} Commit sayısı değil, üretim yaptığın gün sayılır.
+          {p.met ? `Haftanın hedefi tamam: ${p.active}/${p.goal} gün.` : `Hedefin haftada ${p.goal} gün; şu ana kadar ${p.active} gün üretim var.`} Kaç kez değil, üretim yaptığın gün sayılır.
         </p>
       </section>
     </>
   );
 }
 
-// ---------------------------------------------------------------- home · add
+// ---------------------------------------------------------------- home
 
 function Row({ title, sub, onClick, accent }: { title: string; sub: string; onClick: () => void; accent?: boolean }) {
   return (
@@ -1399,20 +1854,41 @@ function Row({ title, sub, onClick, accent }: { title: string; sub: string; onCl
   );
 }
 
-function HomeBody({ s, me, onRescan, onAdd, onConnect, onSignIn, onSignOut }: { s: State; me?: Person; onRescan: () => void; onAdd: () => void; onConnect: () => void; onSignIn: () => void; onSignOut: () => void }) {
+function HomeBody({
+  s,
+  me,
+  onRescan,
+  onOpen,
+  onStart,
+  onConnect,
+  onSignIn,
+  onSignOut,
+}: {
+  s: State;
+  me?: Person;
+  onRescan: () => void;
+  onOpen: (step: 'work' | 'profiles' | 'domain') => void;
+  onStart: () => void;
+  onConnect: () => void;
+  onSignIn: () => void;
+  onSignOut: () => void;
+}) {
   if (!me) return null;
   const p = progress(s, me);
   const granted = !!getToken();
+  const example = isExample(me);
+  const gh = me.links.github;
+  const profiles = me.profiles ?? [];
   return (
     <>
-      <Guide mood="idle">Hesabın bağlı. İstersen yeniden tarayabilir ya da yeni kanıt ekleyebilirsin.</Guide>
-      <h1 className="h-page mt-6">Bağlı hesap</h1>
+      <Guide mood="idle">{example ? 'Örnek profille geziyorsun. Kendi işlerinle başlamak bir dakika sürer.' : 'Profilin burada. Yeni bir eser, profil ya da alan adı ekleyebilirsin.'}</Guide>
+      <h1 className="h-page mt-6">Hesabın</h1>
       <section className="card mt-5 flex items-center gap-4 p-4">
         <Avatar person={me} size={52} />
         <div className="min-w-0 flex-1">
           <p className="truncate text-[18px] font-black text-ink">{me.name}</p>
           <p className="truncate text-[14px] font-bold text-ink-3">
-            {me.links.github ? `@${me.links.github}` : 'Örnek profil'}
+            {gh ? `@${gh}` : example ? 'Örnek profil' : me.headline}
             {me.links.domain ? ` · ${me.links.domain}` : ''}
           </p>
         </div>
@@ -1424,67 +1900,33 @@ function HomeBody({ s, me, onRescan, onAdd, onConnect, onSignIn, onSignOut }: { 
       <div className="mt-4">
         <LevelCounts me={me} />
       </div>
-      {!me.links.github && <p className="hint">Örnek profil: gerçek bir GitHub hesabına bağlı değil, her şey Beyan düzeyinde.</p>}
+      {example && <p className="hint">Örnek profil: kimsenin gerçek hesabı değil, her şey Beyan düzeyinde.</p>}
       <ul className="mt-6 space-y-3">
+        {example && <Row accent title="Kendi profilini kur" sub="Kodun GitHub’da ya da işin LinkedIn, Behance, ArtStation’da: oradan başla." onClick={onStart} />}
         {hasGhBeyan(me) && appReady() && <Row accent title="GitHub’a bağlan" sub="İşlerin Beyan düzeyinde; Nirengi’yi GitHub’a bağlayınca seçtiğin depolar Doğrulandı olur." onClick={onConnect} />}
         {!granted && isGhVerified(me) && appReady() && <Row accent title="GitHub ile yeniden gir" sub="Giriş süren doldu; özel depolarını yeniden okumak için tek dokunuş." onClick={onSignIn} />}
+        <Row title="Eser ekle" sub="Bir çizim, video, çeviri ya da proje; bağlantısıyla ya da kendi sözünle." onClick={() => onOpen('work')} />
+        <Row
+          title="Profillerin"
+          sub={profiles.length ? profiles.map((x) => PLATFORMS[x.platform].label).join(', ') : 'LinkedIn, Behance, ArtStation ya da işini gösterdiğin her yer.'}
+          onClick={() => onOpen('profiles')}
+        />
+        {gh && <Row title="Depolarını güncelle" sub={granted ? 'Yeni depoları ve son 90 günün etkinliğini oku.' : 'Herkese açık depoları yeniden oku.'} onClick={onRescan} />}
         {granted && <Row title="Depo seçimini değiştir" sub="GitHub’da depo ekle ya da çıkar, sonra “Depolarını güncelle”." onClick={() => window.open(manageUrl(), '_blank', 'noreferrer')} />}
-        {me.links.github ? <Row title="Depolarını güncelle" sub={granted ? 'Yeni depoları ve son 90 günün etkinliğini oku.' : 'Herkese açık depoları yeniden oku.'} onClick={onRescan} /> : <Row accent title="Gerçek hesabını bağla" sub="Örnek yerine kendi GitHub hesabını kullan." onClick={onConnect} />}
-        <Row title="Yeni kanıt ekle" sub="Alan adı ya da kendi sözünle bir iş." onClick={onAdd} />
+        <Row title="Alan adı" sub={me.links.domain ? `${me.links.domain} doğrulandı. Değiştirmek için dokun.` : 'Kendi siten varsa DNS kaydıyla kanıtla; Doğrulandı düzeyinde eklenir.'} onClick={() => onOpen('domain')} />
+        {!gh && !example && <Row title="GitHub’ı bağla" sub="Kod da yazıyorsan seçtiğin depolar Doğrulandı düzeyinde eklenir." onClick={onConnect} />}
       </ul>
       <button type="button" onClick={onSignOut} className="btn-quiet mt-6 !text-red-lip">
         <LogOut className="h-5 w-5" strokeWidth={3} aria-hidden="true" />
         Çıkış yap
       </button>
-      <p className="hint !mt-1">{me.links.github ? `@${me.links.github} bağlantısı ve bu tarayıcıdaki ilerlemen silinir; örnek profile dönersin.` : 'Örnek profil ve bu tarayıcıdaki ilerlemen silinir.'}</p>
-    </>
-  );
-}
-
-function AddBody({ me, claim, onClaim, onAdd, onDomain }: { me?: Person; claim: string; onClaim: (v: string) => void; onAdd: () => void; onDomain: () => void }) {
-  const claims = me?.evidence.filter((e) => e.source === 'claim') ?? [];
-  return (
-    <>
-      <Guide mood="idle">Alan adını kanıtlayabilir ya da henüz kanıtlayamadığın bir işi kendi sözünle ekleyebilirsin.</Guide>
-      <h1 className="h-page mt-6">Yeni kanıt ekle</h1>
-      <ul className="mt-5">
-        <Row title="Alan adı" sub={me?.links.domain ? `${me.links.domain} doğrulandı. Değiştirmek için dokun.` : 'DNS kaydıyla sahipliğini kanıtla. Doğrulandı düzeyinde eklenir.'} onClick={onDomain} />
-      </ul>
-      <section className="mt-8">
-        <h2 className="h-sec">Kendi sözünle</h2>
-        <p className="hint !mt-1">Doğrulanamayan bir işini yaz. Beyan olarak görünür; eşleşmede düşük ağırlık taşır.</p>
-        <div className="mt-3 flex gap-2">
-          <label htmlFor="claim" className="sr-only">
-            Yaptığın iş
-          </label>
-          <input
-            id="claim"
-            className="field min-w-0 flex-1"
-            value={claim}
-            onChange={(e) => onClaim(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key !== 'Enter') return;
-              e.preventDefault();
-              onAdd();
-            }}
-            placeholder="ör. Kulübün web sitesini yaptım"
-            enterKeyHint="done"
-          />
-          <button type="button" className="btn-line shrink-0" disabled={!claim.trim()} onClick={onAdd}>
-            Ekle
-          </button>
-        </div>
-        {claims.length > 0 && (
-          <ul className="mt-4 space-y-2">
-            {claims.map((c) => (
-              <li key={c.id} className="flex items-center gap-3 rounded-[14px] bg-bg-2 px-3 py-2.5">
-                <LevelBadge level="S1" />
-                <span className="min-w-0 flex-1 truncate text-[15px] font-bold text-ink">{c.title}</span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+      <p className="hint !mt-1">
+        {gh
+          ? `@${gh} bağlantısı ve bu tarayıcıdaki ilerlemen silinir; örnek profile dönersin.`
+          : example
+            ? 'Örnek profil ve bu tarayıcıdaki ilerlemen silinir.'
+            : 'Profilin ve bu tarayıcıdaki ilerlemen silinir; örnek profile dönersin.'}
+      </p>
     </>
   );
 }

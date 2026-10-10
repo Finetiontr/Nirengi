@@ -353,6 +353,13 @@ export const actions = {
     });
   },
 
+  /** The person's own details: nothing is proven by them, so no event is written. */
+  updatePerson(personId: string, patch: Partial<Pick<Person, 'name' | 'headline' | 'city' | 'profiles'>>) {
+    commit((s) => {
+      Object.assign(s.people.find((p) => p.id === personId)!, patch);
+    });
+  },
+
   /** Announce (or cancel) a rest week: the streak pauses instead of breaking. */
   toggleRestWeek(personId: string, week: string) {
     commit((s) => {

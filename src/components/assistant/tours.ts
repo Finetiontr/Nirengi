@@ -461,7 +461,7 @@ export const TOURS_GENC: Partial<Record<RouteKey, CoachStep[]>> = {
       target: c('g-profil-bagla'),
       mood: 'point',
       title: 'Kanıt bağla',
-      text: 'GitHub hesabını ya da alan adını bağla; ilk işin doğrulanınca profilinde görünür.',
+      text: 'GitHub’ını, LinkedIn’ini ya da işini gösterdiğin yeri bağla; eklediğin her iş profilinde görünür.',
       placement: 'bottom',
     },
   ],
@@ -497,12 +497,12 @@ export const HELP_GENC: Record<GencRoute | 'ihtiyac-detay' | 'pilot-detay' | 'di
   ],
   profil: [
     'Kurumların seni gördüğü sayfa burası: serin, XP’in, rozetlerin ve doğrulanmış işlerin.',
-    '“Kanıt bağla” ile GitHub hesabını ya da alan adını bağlarsın; iş doğrulanınca profilinde görünür.',
+    '“Kanıt bağla” ile GitHub’ını, LinkedIn, Behance ya da ArtStation profilini ve eserlerini eklersin; hepsi profilinde görünür.',
     'Her iş kendi doğrulama düzeyiyle durur: Beyan, Doğrulandı, Kurum onaylı.',
   ],
   'kanit-bagla': [
-    'Burada işini bağlayıp doğrulatırsın: GitHub hesabını ya da alan adını.',
-    'Doğrulanan iş profiline eklenir; “Doğrulandı” düzeyi beyandan güçlüdür.',
+    'Burada işini profiline bağlarsın: kodun GitHub’daysa depolarını, değilse LinkedIn, Behance, ArtStation profillerini ve eserlerini.',
+    'GitHub hesabı ve alan adı makineyle doğrulanır; öbür bağlantılar Beyan kalır. Her alanda en güçlü kanıt, kurumun onayladığı deneme projesidir.',
   ],
   'ihtiyac-detay': [
     'Bir kurumun yazdığı ihtiyaç burada. Uyum puanın, doğrulanmış işlerinin bu ihtiyaca ne kadar uyduğunu gösterir.',
