@@ -12,7 +12,7 @@ Slaytlardaki her sayı `docs/PAZAR-ANALIZI.md` içindeki kaynağıyla birlikte s
 
 *0:00 – 0:10 · Niri: “Merhaba, ben Niri! Bugün size haritamı göstereceğim.”*
 
-- Merhaba, biz Nirengi: Sezer Uzun ve Emirhan Açık.
+- Merhaba, biz Nirengi: Sezer Uzun ve Emirhan Açık. Niri’nin ilk sözü bizim de sözümüz: her çaban değerli.
 - Nirengi açık kaynak bir web sitesi; telefonda da uygulama olarak çalışıyor. Size videomuzu bu kez adım adım anlatacağız.
 
 ## 2. Problem
@@ -133,7 +133,7 @@ Slaytlardaki her sayı `docs/PAZAR-ANALIZI.md` içindeki kaynağıyla birlikte s
 *3:57 – 4:05 · Niri: “Zirvedeyim! İlk noktayı birlikte koyalım.”*
 
 - Tek isteğimiz: bu salondan bir startupın ya da kurumun gerçek bir ihtiyacı. İlk kanvası birlikte yazalım.
-- Beyan değil, kanıt. Teşekkürler.
+- Niri’nin dediği gibi: her çaban haritada bir nokta. Teşekkürler.
 
 ## Ek sayfalar (konuşmanın dışında)
 

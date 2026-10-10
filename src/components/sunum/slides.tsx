@@ -140,8 +140,10 @@ function Title() {
         <div className="s-in">
           <Wordmark size={156} />
         </div>
-        <p className="s-in mt-[44px] text-[84px] font-extrabold leading-none tracking-[-0.04em] text-ink" style={d(140)}>
-          Beyan değil, kanıt.
+        <p className="s-in mt-[44px] text-[80px] font-extrabold leading-[1.02] tracking-[-0.04em] text-ink" style={d(140)}>
+          Her çaban
+          <br />
+          <span className="text-indigo">benim için değerli.</span>
         </p>
         <p className="s-in mt-[30px] max-w-[760px] text-[30px] font-medium leading-[1.35] text-ink-3" style={d(260)}>
           Gençlerin doğrulanmış işini girişimlerin ve kurumların ihtiyaçlarıyla buluşturan açık kaynak bir web sitesi. Telefonda da uygulama olarak çalışır.
@@ -1005,12 +1007,14 @@ function Close() {
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <Contours seed={7} x={0.86} y={0.78} rings={14} step={34} opacity={0.55} />
       </div>
-      <p className="s-in absolute left-[112px] top-[104px] w-[900px] text-[120px] font-extrabold leading-[0.98] tracking-[-0.045em] text-ink">
-        Beyan değil,
+      <p className="s-in absolute left-[112px] top-[96px] w-[780px] text-[104px] font-extrabold leading-[0.98] tracking-[-0.045em] text-ink">
+        Her çaban
         <br />
-        <span className="text-indigo">kanıt.</span>
+        haritada
+        <br />
+        <span className="text-indigo">bir nokta.</span>
       </p>
-      <p className="s-in absolute left-[112px] top-[392px] w-[640px] text-[32px] font-bold leading-[1.25] tracking-[-0.015em] text-ink-2" style={d(200)}>
+      <p className="s-in absolute left-[112px] top-[436px] w-[640px] text-[32px] font-bold leading-[1.25] tracking-[-0.015em] text-ink-2" style={d(200)}>
         Tek isteğimiz: bu salondan bir girişimin ya da kurumun gerçek bir ihtiyacı. <span className="text-indigo">İlk kanvası birlikte yazalım.</span>
       </p>
       <div className="s-in absolute left-[112px] top-[612px] w-[420px]" style={d(360)}>

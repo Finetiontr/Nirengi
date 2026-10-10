@@ -15,7 +15,7 @@ export const NOTES: Record<string, Note> = {
   baslik: {
     sec: 10,
     say: [
-      'Merhaba, biz Nirengi: Sezer Uzun ve Emirhan Açık.',
+      'Merhaba, biz Nirengi: Sezer Uzun ve Emirhan Açık. Niri’nin ilk sözü bizim de sözümüz: her çaban değerli.',
       'Nirengi açık kaynak bir web sitesi; telefonda da uygulama olarak çalışıyor. Size videomuzu bu kez adım adım anlatacağız.',
     ],
   },
@@ -136,7 +136,7 @@ export const NOTES: Record<string, Note> = {
     sec: 8,
     say: [
       'Tek isteğimiz: bu salondan bir startupın ya da kurumun gerçek bir ihtiyacı. İlk kanvası birlikte yazalım.',
-      'Beyan değil, kanıt. Teşekkürler.',
+      'Niri’nin dediği gibi: her çaban haritada bir nokta. Teşekkürler.',
     ],
   },
   'ek-film': {
