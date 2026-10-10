@@ -9,11 +9,15 @@ yapılamayan iki işi worker yapar:
   `draft.ts` içinde sabittir; tarayıcı yalnız metni gönderir. Cevabı site `src/lib/engine/ground.ts` ile
   metne karşı denetler.
 
-Durum tutmaz, veritabanı kullanmaz, kod içinde hesap kimliği yoktur.
+Tek durumu **gerçek kullanım sayacıdır** (`stats.ts`, bir Durable Object): GitHub ile gerçekten bağlanan farklı
+kişilerin ve modelin okuduğu kurum metinlerinin sayısı. Kişi yalnız GitHub kimliğinin, client secret ile anahtarlanmış
+geri çevrilemez özeti olarak tutulur; böylece aynı kişi bir kez sayılır ve kim olduğu okunamaz. Sitenin örnek metni
+okunur ama sayılmaz. Kod içinde hesap kimliği yoktur.
 
 | Uç | Ne yapar |
 |---|---|
-| `GET /` | `{ ok, github, ai }`: GitHub ve Workers AI ayarlı mı |
+| `GET /` | `{ ok, github, ai, stats }`: GitHub, Workers AI ve sayaç ayarlı mı |
+| `GET /stats` | `{ people, drafts, since }`: gerçek kullanım sayıları ve sayımın başladığı an |
 | `POST /github/token` `{ code }` | `{ token, expiresAt }`. Token yalnız seçilen depoları okur ve birkaç saat geçerlidir. |
 | `POST /github/revoke` `{ token }` | Çıkışta token'ı GitHub'da iptal eder. |
 | `POST /ai/draft` `{ text }` | `{ draft, model, label }`. Metin 30–2.000 karakter. Kota dolduysa `{ error: 'quota' }`, ziyaretçi sınırı aşıldıysa `429`. |
@@ -48,6 +52,7 @@ GitHub uygulamasının izni yalnız **Metadata: read**'dir. Kodu okuyamaz, hiçb
 | `GITHUB_CLIENT_SECRET` | `wrangler secret put` | Depoya girmez. |
 | `ALLOWED_ORIGINS` | `wrangler.toml` `[vars]` | Virgülle ayrılmış site kökenleri. |
 | `AI` | `wrangler.toml` `[ai]` | Workers AI bağlantısı; anahtar gerekmez. |
+| `STATS` | `wrangler.toml` `[[durable_objects.bindings]]` | Sayaç; sınıf adıyla bağlanır, hesap ya da kaynak kimliği gerekmez. İlk `deploy` `migrations` ile oluşturur. |
 | `DRAFT_LIMIT` | `wrangler.toml` `[[ratelimits]]` | Ziyaretçi başına sınır. `namespace_id` hesap içi bir etikettir, hesap kimliği değildir. |
 | `PUBLIC_API_URL` | GitHub depo değişkeni (Settings → Variables) | Sitenin worker adresi; `pages.yml` derlemeye geçirir. |
 

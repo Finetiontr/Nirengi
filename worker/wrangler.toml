@@ -20,3 +20,13 @@ binding = "AI"
 name = "DRAFT_LIMIT"
 namespace_id = "1001"
 simple = { limit = 20, period = 60 }
+
+# The real-use counter (stats.ts): one SQLite-backed Durable Object, addressed by class name, so
+# no account or resource id lives here. It holds only counts and keyed hashes of GitHub ids.
+[[durable_objects.bindings]]
+name = "STATS"
+class_name = "Stats"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Stats"]

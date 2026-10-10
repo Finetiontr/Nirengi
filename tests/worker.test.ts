@@ -1,7 +1,7 @@
 // worker/index.ts offline: fetch is stubbed (GitHub is never called) and so is the Workers AI binding.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import worker, { type Env } from '../worker/index.ts';
+import worker, { Stats, type Env } from '../worker/index.ts';
 
 const API = 'https://nirengi-api.example.workers.dev';
 const SITE = 'https://finetiontr.github.io';
@@ -21,8 +21,8 @@ const post = (path: string, body: unknown, origin = SITE, e = env) =>
   worker.fetch(new Request(API + path, { method: 'POST', headers: { Origin: origin, 'Content-Type': 'application/json' }, body: JSON.stringify(body) }), e);
 
 test('worker: health says what is configured', async () => {
-  assert.deepEqual(await (await worker.fetch(new Request(`${API}/`), env)).json(), { ok: true, github: true, ai: false });
-  assert.deepEqual(await (await worker.fetch(new Request(`${API}/`), {})).json(), { ok: true, github: false, ai: false });
+  assert.deepEqual(await (await worker.fetch(new Request(`${API}/`), env)).json(), { ok: true, github: true, ai: false, stats: false });
+  assert.deepEqual(await (await worker.fetch(new Request(`${API}/`), {})).json(), { ok: true, github: false, ai: false, stats: false });
 });
 
 test('worker: only listed origins get an answer', async () => {
@@ -122,4 +122,52 @@ test('worker: a spent daily allocation is reported as quota, not as a crash', as
   const res = await post('/ai/draft', { text: TEXT }, SITE, e);
   assert.equal(res.status, 503);
   assert.deepEqual(await res.json(), { error: 'quota' });
+});
+
+// ---------------------------------------------------------------- /stats
+
+/** One in-memory Stats object behind the binding, as Cloudflare would give it. */
+function stubStats() {
+  const store = new Map<string, unknown>();
+  const obj = new Stats({ storage: { get: async (k) => store.get(k) as never, put: async (k, v) => void store.set(k, v) } });
+  const STATS = { idFromName: (n: string) => n, get: () => ({ fetch: (url: string, init?: RequestInit) => obj.fetch(new Request(url, init)) }) };
+  return { store, STATS };
+}
+
+const read = async (e: Env) => (await worker.fetch(new Request(`${API}/stats`, { headers: { Origin: SITE } }), e)).json() as Promise<{ people: number; drafts: number; since: string }>;
+
+test('worker: a person counts once however often they sign in, and only as a hash', async () => {
+  const { store, STATS } = stubStats();
+  const e = { ...env, STATS };
+  stubGitHub((url) => new Response(JSON.stringify(url.endsWith('/user') ? { id: 4242, login: 'jury-member' } : { access_token: 'ghu_TEST', expires_in: 28800 })));
+  const waits: Promise<unknown>[] = [];
+  const ctx = { waitUntil: (p: Promise<unknown>) => void waits.push(p) };
+  for (let i = 0; i < 2; i++) {
+    const res = await worker.fetch(new Request(`${API}/github/token`, { method: 'POST', headers: { Origin: SITE }, body: JSON.stringify({ code: 'abc' }) }), e, ctx);
+    assert.equal(res.status, 200);
+  }
+  await Promise.all(waits);
+  const c = await read(e);
+  assert.equal(c.people, 1);
+  assert.ok(Date.parse(c.since) <= Date.now());
+  const kept = JSON.stringify([...store.entries()]);
+  assert.ok(!kept.includes('4242') && !kept.includes('jury-member') && !kept.includes('ghu_'), 'no id, login or token is kept');
+});
+
+test('worker: every reading the model really made is counted', async () => {
+  const { STATS } = stubStats();
+  const { env: e } = stubAI(() => ({ response: { title: 'Kargo paneli kurmak' } }));
+  await post('/ai/draft', { text: TEXT }, SITE, { ...e, STATS });
+  const { env: broken } = stubAI(() => ({ response: 'cevap yok' }));
+  await post('/ai/draft', { text: TEXT }, SITE, { ...broken, STATS });
+  const { SAMPLE_COMPLAINT } = await import('../src/lib/engine/canvas.ts');
+  await post('/ai/draft', { text: SAMPLE_COMPLAINT }, SITE, { ...e, STATS });
+  assert.equal((await read({ ...env, STATS })).drafts, 1, 'a failed reading and the sample text are not counted');
+});
+
+test('worker: the counts are read only from the site, and say when nothing is set up', async () => {
+  const { STATS } = stubStats();
+  assert.equal((await worker.fetch(new Request(`${API}/stats`, { headers: { Origin: 'https://evil.example' } }), { ...env, STATS })).status, 403);
+  assert.equal((await worker.fetch(new Request(`${API}/stats`, { headers: { Origin: SITE } }), env)).status, 503);
+  assert.equal((await post('/stats', {}, SITE, { ...env, STATS })).status, 405);
 });

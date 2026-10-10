@@ -23,7 +23,7 @@ Kurumlar ihtiyacını net tanımlayamıyor, gençler ise ürettiklerini kanıtla
 | 01 | Genç yeteneklerin keşfi | Kör keşif (isim/yaş/okul gizli), problemle arama, takipçiden bağımsız yükselen sinyal | `/kesfet` |
 | 02 | Profil & portfolyo doğruluğu | S1/S2/S3 Doğrulama Merdiveni; **her alandan iş**: GitHub uygulamasıyla seçilen depolar (özel depolar dahil) doğrulanır, LinkedIn, Behance, ArtStation, YouTube gibi profiller ve eser bağlantıları Beyan olarak eklenir; DNS TXT doğrulaması, kopya eser tespiti, şeffaf itiraz | `/kanit-bagla`, `/profil/:kullanici` |
 | 03 | Kurum–kişi eşleşmesi | Dört bileşenli açıklanabilir skor, gerekçe kartı, eksik kanıt geri bildirimi, takım kompozisyonu | `/ihtiyaclar/:id#adaylar` |
-| 04 | Yaşayan bir ağ | Olay akışı, bağlantı sağlığı ve somut sebepli yeniden temas, mikro-etkileşimler, çeyreklik ihtiyaç turu; **telefona yüklenen uygulama**: ana ekrandan açılır, internetsiz çalışır, Android’de paylaş menüsünden eser ekler | `/nabiz`, `/uygulama` |
+| 04 | Yaşayan bir ağ | Olay akışı, bağlantı sağlığı ve somut sebepli yeniden temas, mikro-etkileşimler, çeyreklik ihtiyaç turu; **telefona yüklenen uygulama**: ana ekrandan açılır, internetsiz çalışır, Android’de paylaş menüsünden eser ekler; **gerçek kullanım sayacı**: GitHub ile gerçekten bağlanan kişileri ve modelin okuduğu kurum metinlerini kişisel veri tutmadan sayar | `/nabiz`, `/uygulama`, `/yontem#veri` |
 | 05 | İhtiyaçların net tanımı | Yedi alanlı İhtiyaç Kanvası, kurumun kendi sözlerinden **yapay zekâ taslağı** (her alan metindeki cümlesine dayanır), önerilen başarı kriterleri, çözülebilirlik skoru, yayın eşiği, ekosistem hafızası | `/ihtiyaclar/yeni` |
 | 06 | Şeffaf iş birliği takibi | Kriterden doğan kilometre taşları, çift onay, SHA-256 zincirli defter, sessizlik göstergesi, adil kapanış, kamuya açık özet kartı | `/pilotlar/:id`, `/kart/:id` |
 
@@ -63,13 +63,14 @@ flowchart LR
   W -- client secret ile token --> GHO[github.com OAuth]
   UI -- kurumun metni --> W
   W -- sabit istem + JSON şeması --> AI[Workers AI\nGemma 4 26B]
+  W -- yalnız sayılar --> ST[(Stats\nDurable Object)]
   W -. ham taslak .-> Engine
   Pages[GitHub Pages\nstatik derleme] -. sunar .-> UI
   Pages -. ilk açılışta .-> SW[sw.js\nçevrimdışı kopya]
   SW -. sayfalar ve dosyalar .-> UI
 ```
 
-- **Statik site + tek sunucu parçası.** Site GitHub Pages’te statik çalışır (`npm run build:pages`). Tarayıcıda yapılamayan iki iş `worker/` içindedir: GitHub uygulamasının tek kullanımlık kodunu gizli anahtarla token’a çevirmek ve ihtiyaç taslağını Workers AI’daki modele okutmak. Worker durum tutmaz, hesap kimliği içermez, herhangi bir Cloudflare hesabına taşınabilir ([`worker/README.md`](worker/README.md)).
+- **Statik site + tek sunucu parçası.** Site GitHub Pages’te statik çalışır (`npm run build:pages`). Tarayıcıda yapılamayan iki iş `worker/` içindedir: GitHub uygulamasının tek kullanımlık kodunu gizli anahtarla token’a çevirmek ve ihtiyaç taslağını Workers AI’daki modele okutmak. Worker’ın tek durumu gerçek kullanım sayacıdır (yalnız sayılar ve GitHub kimliğinin geri çevrilemez özeti); hesap kimliği içermez, herhangi bir Cloudflare hesabına taşınabilir ([`worker/README.md`](worker/README.md)).
 - **Astro 7 + React 19 + Tailwind 4 + framer-motion.** Sayfalar Astro’da önceden derlenir; etkileşimli ekranlar React adalarıdır. Hareketler framer-motion ile yapılır, hareket azaltma tercihine uyulur.
 - **Uygulama: PWA, mağaza değil.** Aynı kod tarayıcıda ve telefonun ana ekranında çalışır (`public/manifest.webmanifest`). Yerel bir mağaza uygulaması yerine bunu seçtik: iki günlük finalde, sıfır maliyetle, mağaza incelemesi beklemeden hem gence hem kuruma ulaşıyor; güncelleme kendiliğinden geliyor. `src/sw.js` her sürümün sayfalarını ve dosyalarını telefonda tutar: sayfalar önce ağdan gelir (yeni sürüm hemen görünür), ağ yavaşsa ya da yoksa telefondaki kopya açılır. Bildirim göndermez.
 - **Saf motor.** `src/lib/engine/` arayüzden bağımsız, test edilen fonksiyonlardır. Bütün skorlar her görüntülemede yeniden hesaplanır; formüller `/yontem` sayfasında.
@@ -87,6 +88,7 @@ flowchart LR
 | Niri’nin analizleri ve haftalık özetleri | Kural tabanlı, çevrim dışı |
 | CEDRA Interactive ve idle RPG ihtiyacı | Gerçek kurum: ekibimizle bağlantılı oyun stüdyosu, ihtiyacı örnek olarak kendisi yazdı |
 | Diğer kurumlar, kişiler, S3 tasdikleri | Kurgusal demo verisi |
+| GitHub bağlantı ve model okuma sayıları | Gerçek: worker sayar; aynı kişi bir kez sayılır, örnek profil ve örnek metin sayılmaz, kim olduğu tutulmaz |
 | Telefona yükleme, internetsiz çalışma | Gerçek: manifest ve service worker (canlı sitede ve `build:pages` derlemesinde) |
 | Kalıcılık | Tarayıcı (`localStorage`) |
 
@@ -163,6 +165,7 @@ src/
     platforms.ts       profil ve eser bağlantıları: LinkedIn, Behance, ArtStation… adres denetimi, paylaşılan bağlantı
     skills.ts          her alandan beceri sözlüğü (yazılım, veri, tasarım, medya, iş)
     sample-reading.ts  modelin örnek metne verdiği kayıtlı cevap (sunum, testler, ağ yedeği)
+    stats.ts           gerçek kullanım sayıları: worker'dan GitHub bağlantısı ve model okuması sayısı
     auth.ts            GitHub uygulamasıyla bağlanma ve çıkış
     verify.ts          GitHub ve DNS TXT doğrulaması
     store.ts           tarayıcıda durum ve sekmeler arası senkron
@@ -170,7 +173,7 @@ src/
   styles/global.css    renk ve tipografi tokenları
   sw.js                service worker: sayfaları ve dosyaları telefonda tutar (Pages derlemesi)
 public/                favicon, manifest.webmanifest; pwa/ altında uygulama ikonları ve QR kodu; sunum/ altında tanıtım filmi ve posteri, uzun anlatım videosu, sunum sayfalarının telefon ve masaüstü ekranları ile öne çıkarılan kesitleri
-worker/                tek sunucu parçası (Cloudflare Worker): GitHub token değişimi, yapay zekâ taslağı
+worker/                tek sunucu parçası (Cloudflare Worker): GitHub token değişimi, yapay zekâ taslağı, gerçek kullanım sayacı
 scripts/               GitHub Pages derlemesi, service worker'ın dosya listesi, sunum dışa aktarımı
 tests/                 node:test testleri
 docs/                  başvuru, demo akışı ve GIF'i, pazar analizi, sunum notları
