@@ -8,10 +8,10 @@
 
 ![Niri kurumun metnini açık bir modelle okur; her alan metindeki bir cümleye dayanır](docs/nirengi-demo.gif)
 
-- **Tanıtım filmi:** [48 saniye, müzikli](https://finetiontr.github.io/Nirengi/sunum/nirengi-film.mp4); her özelliği ürünün gerçek ekranlarıyla gösterir, sunumun 6. slaytında oynar; sunumun ek sayfaları her sahnesini ayrı açar. Müziği kodla bestelendi, lisansı bize ait. Uzun anlatım: [79 saniye, sessiz](https://finetiontr.github.io/Nirengi/sunum/nirengi-tanitim-web.mp4), Niri ekranları telefonda gezdirir.
+- **Tanıtım filmi:** [48 saniye, müzikli](https://finetiontr.github.io/Nirengi/sunum/nirengi-film.mp4); her özelliği ürünün gerçek ekranlarıyla gösterir; sunum bu filmin sahnelerini tek tek slayt olarak anlatır, film de sunumun ekinde durur. Müziği kodla bestelendi, lisansı bize ait. Uzun anlatım: [79 saniye, sessiz](https://finetiontr.github.io/Nirengi/sunum/nirengi-tanitim-web.mp4), Niri ekranları telefonda gezdirir.
 - **Canlı:** https://finetiontr.github.io/Nirengi/ (kurulum gerekmez; veri tarayıcıda tutulur)
 - **Telefona yükle:** [`/uygulama`](https://finetiontr.github.io/Nirengi/uygulama) ya da ana sayfanın sonundaki QR kodu. Mağaza gerekmez: Android’de tek dokunuşla, iPhone’da Paylaş → Ana Ekrana Ekle ile yüklenir; ana ekrandan tam ekran açılır, internetsiz de çalışır.
-- **Sunum:** [`/sunum`](https://finetiontr.github.io/Nirengi/sunum), uygulamanın içinde Niri’nin anlattığı 12 slaytlık deste (eşleşme kendi slaytında) ve kapanıştan sonra filmin öbür sahnelerini gerçek ekranıyla açan yedi ek sayfa; yapay zekâ slaytları ürünün kendi denetimini gerçek bir model cevabı üzerinde çalıştırır
+- **Sunum:** [`/sunum`](https://finetiontr.github.io/Nirengi/sunum), uygulamanın içinde Niri’nin anlattığı 18 slaytlık deste: filmin her sahnesi gerçek ekranıyla bir slayt, sonunda Niri’nin gençlere ve kurumlara söyledikleri; yapay zekâ slaytları ürünün kendi denetimini gerçek bir model cevabı üzerinde çalıştırır
 - **Sahne akışı:** [`docs/DEMO.md`](docs/DEMO.md), 5 dakikalık demo ve yedek senaryo
 
 ## Çözdüğü problem

@@ -4,20 +4,24 @@
 // one of two marks (see Deck): 'hero' on the right for the opening and the close,
 // 'dock' bottom-left elsewhere, so every slide keeps that corner (x < 760, y > 700) free.
 //
-// The twelve slides follow the flow the organisers recommended and fit the five-minute
-// talk: team, problem, for whom (the focus: young people and the startups that want to work
-// with them), evidence, what we solve (one sentence, the route of five stops that answers
-// the six problems, and the same product in a browser and on a phone), demo (the film), the
-// match (the part the jury liked most, on its real screens), what the AI does (with the open
-// model it runs on and its before and after), the guard against wrong output, design
-// decisions (a game for the genç, a measure for the kurum), done (the website's real pages,
-// one per problem, and the same app on a phone) and left, close (the ask beside the website). After the close an appendix holds the film's other shots
-// one page each, for questions and for the shared PDF; it is not part of the talk. Numbers come from
-// docs/PAZAR-ANALIZI.md with their sources on the slide; product numbers from the engine,
-// and the AI slides run a real model answer through the product's own guard. Nothing here
-// is invented: plans are labelled as plans, and people and institutions in the demo are
-// fictional and the deck says so. Other products are named only where nirengi connects to
-// them (GitHub, the profile sites), never compared.
+// The talk follows the flow the organisers recommended and tells the promo film as slides,
+// because the film is what the jury liked: team, problem, for whom (young people and the
+// startups and other small organisations that want to work with them), evidence, what we
+// solve (the route of five stops over the six problems, and the same product in a browser
+// and on a phone), then the film's shots one slide each, in its order, with the community
+// beside them: work verified at its source, XP only from real work (GitHub days become the
+// streak, the league to climb), the weekly analysis, young people helping each other, the
+// kurum writing its need, Niri reading it with an open model (what the AI does, the model
+// and its before and after), the guard against wrong output, the blind match, two
+// signatures on a chained ledger, the approval coming back as evidence. Then Niri says what
+// nirengi gives each side, done and left, close. Each film slide puts the film's headline
+// and three working mechanisms beside the real screen with the element ringed and lifted
+// out. The film itself and the design decisions wait in an appendix after the close.
+// Numbers come from docs/PAZAR-ANALIZI.md with their sources on the slide; product numbers
+// from the engine, and the AI slides run a real model answer through the product's own
+// guard. Nothing here is invented: plans are labelled as plans, and people and institutions
+// in the demo are fictional and the deck says so. Other products are named only where
+// nirengi connects to them (GitHub, the profile sites, the model), never compared.
 
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { Check, X } from 'lucide-react';
@@ -185,15 +189,15 @@ function ForWhom() {
     { who: 'genc' as const, tag: 'Genç', title: 'Üreten ama kanıtı olmayan genç', fact: <>Tek bir seçici programa <Fig>~1 milyon</Fig> başvuru. Kapıda kalan görünmüyor.</>, src: 'GİRVAK Fellow, 10. yıl açıklaması' },
     {
       who: 'kurum' as const,
-      tag: 'Girişim',
-      title: 'Ekip kuran erken aşama girişim',
+      tag: 'Startup',
+      title: 'Ekip kuran startup',
       fact: <>İK’sı yok, yanlış işe alımı kaldıramaz. 10–49 çalışanlı girişimlerin yalnız <Fig>%10,8</Fig>’inde BİT uzmanı var.</>,
       src: 'TÜİK, BİT bülteni 2026',
     },
   ];
   return (
     <>
-      <Heading width={1376}>Kimin için: gençler ve onlarla çalışmak isteyen girişimler.</Heading>
+      <Heading width={1376}>Kimin için: gençler ve onlarla çalışmak isteyen startuplar.</Heading>
       {cols.map((c, n) => (
         <div key={c.tag} className="s-in absolute top-[300px] w-[620px]" style={{ left: n ? 848 : 112, ...d(160 + n * 200) }}>
           <Tag who={c.who}>{c.tag}</Tag>
@@ -204,7 +208,7 @@ function ForWhom() {
       ))}
       <Seam top={300} height={300} />
       <p className="s-in absolute left-[112px] top-[624px] w-[1376px] border-t-2 border-line pt-[18px] text-[24px] font-semibold leading-[1.35] text-ink-2" style={d(560)}>
-        <b className="font-extrabold text-ink">Odak: girişim ekosistemi.</b> İlk tur Zemin360 ve GİRVAK ağı; sonra KOBİ’ler, kamu ve STK’lar.
+        <b className="font-extrabold text-ink">Odak: startuplar ve küçük ölçekli kurumlar.</b> İlk tur Zemin360 ve GİRVAK ağı; sonra KOBİ’ler, kamu ve STK’lar.
       </p>
     </>
   );
@@ -314,7 +318,7 @@ function Solution() {
   );
 }
 
-// ---------------------------------------------------------------- appendix: the film's shots, slowed down and explained
+// ---------------------------------------------------------------- 6–15. the film's shots, slowed down and explained
 
 /** Where the real screens stand on every page: a phone on the right, or a browser window filling the right half. */
 const PHONE_AT = { left: 1188, top: 84, width: 300 };
@@ -488,9 +492,9 @@ function PageXp() {
       head={['XP yalnız', 'gerçek işten gelir.']}
       problems={['04']}
       points={[
-        ['Haftalık ritim', 'Hedef üretim günüdür, commit sayısı değil. Hafta serisi, lig ve görevler genci her hafta geri getirir.'],
-        ['XP bir iş makbuzu', <>Üretim günü {XP.activeDay}, doğrulanmış iş {XP.evidence}, kurum onaylı aşama {XP.milestone} XP; günde en çok {XP.dailyCap}. Her satırın arkasında bir olay var.</>],
-        ['Oyun yalnız gençte', 'Lig, Saha defteri ve Niri’nin kostümleri genç tarafında. Kurum ekranında puan ya da seri yok.'],
+        ['GitHub’dan seri', 'GitHub’a push, PR ya da sürüm attığın günler kendiliğinden hedefe ve seriye yazılır. Sayılan commit değil, üretim günü.'],
+        ['Sıralamada yüksel, görün', 'Haftalık ligde ilk beşe giren üst lige çıkar. Kurumun keşif listesi düzenliliğe göre sıralanır; ivmen “Yükselen sinyal” olur.'],
+        ['XP bir iş makbuzu', <>Üretim günü {XP.activeDay}, doğrulanmış iş {XP.evidence}, kurum onaylı aşama {XP.milestone} XP; günde en çok {XP.dailyCap}. Kurum tarafında oyun yok.</>],
       ]}
       web={{ src: '/sunum/dk-bugun.webp', alt: 'Gencin Bugün ekranı masaüstünde: bu hafta, lig, haftanın rotası ve Saha defteri', who: 'genc', route: 'bugun', mark: { x: 226, y: 220, w: 600, h: 291 } }}
       lift={{ src: '/sunum/lift-hafta.webp', alt: 'Bu hafta: haftada 3 gün hedefi tamam, 13 haftalık seri, bu hafta 46 XP', x: 968, y: 520, w: 520, css: [600, 291] }}
@@ -520,9 +524,9 @@ function PageCommunity() {
       head={['Gençler birbirine', 'de yardım eder.']}
       problems={['04']}
       points={[
-        ['Soru, cevap, teşekkür', 'Genç takıldığı yeri sorar, üzerinde çalıştığını paylaşır. Kurumdan önce akran: ağın içinde mentorluk.'],
+        ['Deneyimli, yeni başlayana', 'Takılan genç sorar, o işi yapmış biri cevaplar. Kurumdan önce akran: ağın içinde mentorluk.'],
         ['İşe yarayan cevap', <>Soran “İşe yaradı” derse yanıtlayan +{XP.helpful} XP kazanır; o gün üretim günü sayılır.</>],
-        ['Bu haftanın yardımcıları', 'Sıra beğeniyle değil, işe yarayan cevap sayısıyla belirlenir. Takipçi sayılmaz.'],
+        ['Bu haftanın yardımcıları', 'Sıra beğeniyle değil, işe yarayan cevap sayısıyla belirlenir. Yardım eden de görünür olur.'],
       ]}
       web={{ src: '/sunum/dk-topluluk.webp', alt: 'Topluluk masaüstünde: bir gencin sorusu ve işe yarayan cevap', who: 'genc', route: 'topluluk', mark: { x: 226, y: 132, w: 600, h: 498 } }}
       lift={{ src: '/sunum/lift-topluluk.webp', alt: 'Baran’ın LoRa sorusu ve Emirhan’ın işe yarayan cevabı: +15 XP yanıtlayana', x: 1018, y: 500, w: 470, css: [600, 390] }}
@@ -538,7 +542,7 @@ function PageNeed() {
       points={[
         ['İlan değil, ihtiyaç', 'Kurum iş ilanı yazmaz, derdini anlatır. Niri metni yedi alanlı İhtiyaç Kanvası’na çevirir.'],
         ['Netlik puanı', <>Durum, sorun, ölçüsü, beklenen sonuç, kısıtlar, karar verici, kapsam. Puan {PUBLISH_THRESHOLD}’in altındaysa yayımlanmaz.</>],
-        ['Ekosistem hafızası', 'Benzer ihtiyaçların nasıl sonuçlandığı aynı ekranda. Niri’nin metni nasıl okuduğu yapay zekâ bölümünde.'],
+        ['Ekosistem hafızası', 'Benzer ihtiyaçların nasıl sonuçlandığı aynı ekranda; kurum başkasının deneyiminden başlar.'],
       ]}
       web={{ src: '/sunum/dk-yaz.webp', alt: 'Kurum masaüstünde ihtiyaç yazıyor: derdini kendi sözleriyle anlat', who: 'kurum', route: 'ihtiyaclar/yeni', mark: { x: 404, y: 491, w: 632, h: 168 } }}
       lift={{ src: '/sunum/lift-yaz.webp', alt: 'Kurumun metni: kargom nerede aramaları ayda yaklaşık 6.000', x: 888, y: 610, w: 600, css: [648, 184] }}
@@ -585,8 +589,8 @@ function PageReturn() {
       head={['Onay, gencin', 'kanıtı olur.']}
       problems={['02', '06']}
       points={[
-        ['Döngü kapanır', 'Çift onaylanan aşama gencin profiline Kurum onaylı kanıt olarak geçer: imzalayan kurum ve tarihiyle.'],
-        ['Kanıt gencindir', 'Profil bağlantısı ve kanıt kartı paylaşılır. Kapanan projenin özeti herkese açık bir sayfada kalır.'],
+        ['İşe alım case’i boşa gitmez', 'Şirketin işe almadan önce istediği vaka çalışması burada bir deneme projesi olur; onaylanan her aşama profile yazılır.'],
+        ['Sözde değil, imzalı deneyim', 'Kurum onaylı kanıt, imzalayan kurum ve tarihiyle durur. İşe girmese bile genç bu deneyimi taşır.'],
         ['Bir sonraki ihtiyaca', <>Kurum onaylı iş eşleşmede tam ağırlıkla ({LV('S3')}) sayılır, Beyan {LV('S1')}’da kalır. Genç bir sonrakine daha yakındır.</>],
       ]}
       phone={{ src: '/sunum/ph-s3.webp', alt: 'Gencin profili: Kurum onaylı kilometre taşı', who: 'genc', route: 'profil/emirhanacik', mark: { x: 16, y: 184, w: 358, h: 310 } }}
@@ -595,7 +599,7 @@ function PageReturn() {
   );
 }
 
-// ---------------------------------------------------------------- 6. the film, with the live demo as its fallback
+// ---------------------------------------------------------------- appendix: the film, with the live demo as its fallback
 
 function LiveDemo() {
   const steps = [
@@ -692,7 +696,7 @@ function Film() {
   );
 }
 
-// ---------------------------------------------------------------- 8–9. the AI, computed from a real model answer
+// ---------------------------------------------------------------- the AI, computed from a real model answer
 
 /** Niri's model on the sample text, through the product's guard; and the rules on the same text. */
 const READ = readModelDraft(SAMPLE_COMPLAINT, SAMPLE_READING)!;
@@ -716,16 +720,15 @@ function AiWhat() {
     { name: 'Kurum önerileri ekleyince', a: assessCanvas(added, READ.skills), tone: 'green' },
   ];
   const card: [string, string][] = [
-    ['Nerede', 'Cloudflare Workers AI, günlük ücretsiz kota'],
-    ['Nasıl', 'Sabit istem, JSON şeması, sıcaklık 0,1'],
+    ['Veri bizde kalabilir', 'Açık model kendi sunucumuzda da çalışır; metin dışarı çıkmaz. Bugün Workers AI’da, metin saklanmaz.'],
     ['Neden bu', 'Denediğimiz dört açık model içinde şemaya uyan, Türkçeyi doğru ayıran en hızlısı'],
     ['Karar', 'Yayın, puan ve sıralama kurallarda; model yalnız okur ve önerir'],
   ];
   return (
     <>
-      <Heading width={1376}>Yapay zekâ ne yapıyor?</Heading>
+      <Heading width={1376}>Niri açık bir modelle okur.</Heading>
       <p className="s-in absolute left-[112px] top-[176px] w-[1376px] text-[25px] font-medium leading-[1.35] text-ink-3" style={d(80)}>
-        Niri kurumun kendi sözlerini açık bir modelle okur ve her alanı bir cümleye dayanan ihtiyaç kanvasına çevirir.
+        Yapay zekâ ne yapıyor? Kurumun kendi sözlerini, her alanı bir cümleye dayanan ihtiyaç kanvasına çevirir.
       </p>
 
       <div className="s-in absolute left-[112px] top-[252px] flex w-[940px] items-center" style={d(160)}>
@@ -795,7 +798,7 @@ function AiGuard() {
   );
   return (
     <>
-      <Heading width={1300}>Model yanılırsa ne olur?</Heading>
+      <Heading width={1376} className="!text-[60px]">Model yanılırsa? Metinde olmayanı almaz.</Heading>
 
       {/* The pipeline: the answer passes four gates before it reaches the canvas. */}
       <div className="s-in absolute left-[112px] top-[206px] flex w-[1376px] items-start" style={d(100)}>
@@ -846,7 +849,7 @@ function AiGuard() {
   );
 }
 
-// ---------------------------------------------------------------- 10. design decisions
+// ---------------------------------------------------------------- appendix: design decisions
 
 function Decisions() {
   const pts = (k: keyof typeof WEIGHTS) => Math.round(WEIGHTS[k] * 100);
@@ -889,6 +892,58 @@ function Decisions() {
         </div>
       ))}
       <Seam top={200} height={460} />
+    </>
+  );
+}
+
+// ---------------------------------------------------------------- Niri's word: what nirengi gives each side
+
+/** Niri speaks for the product at the end: to the genç, and to the kurum, startups first. */
+function NiriSays() {
+  const cols: { who: 'genc' | 'kurum'; tag: string; lines: [string, string][] }[] = [
+    {
+      who: 'genc',
+      tag: 'Gençlere',
+      lines: [
+        ['CV yazma, işini bağla.', 'Kod, tasarım, video: yaptığın iş kendini kanıtlar ve seninle kalır.'],
+        ['Eksiğini söylerim.', 'Eşleşmesen bile hangi işin seni hangi ihtiyaca yaklaştıracağını görürsün.'],
+        ['Oyun gibi, ama gerçek.', 'Her hafta küçük bir hedef; her puanın arkasında gerçek bir iş var.'],
+        ['Case’in boşa gitmez.', 'İşe alım için yaptığın iş, kurum onaylayınca profilinde imzalı deneyim olarak kalır.'],
+      ],
+    },
+    {
+      who: 'kurum',
+      tag: 'Kurumlara, önce startuplara',
+      lines: [
+        ['İK’n yoksa da olur.', 'Derdini kendi sözünle yaz; ihtiyacını ben netleştiririm.'],
+        ['İsim değil, iş.', 'Adayı yaptığı işle görürsün; puanın neden o kadar olduğu yazar.'],
+        ['Kadro riski yok.', 'Önce küçük bir deneme projesi: iki onay, kurcalanamaz kayıt.'],
+        ['Küçük ekipler için.', 'Açık kaynak ve ücretsiz; büyük bir sistem kurmadan başlarsın.'],
+      ],
+    },
+  ];
+  return (
+    <>
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <Contours seed={5} x={0.88} y={0.8} rings={12} step={34} opacity={0.4} />
+      </div>
+      <Heading width={1376}>Niri’nin söyleyecekleri var.</Heading>
+      <p className="s-in absolute left-[112px] top-[178px] text-[24px] font-semibold text-ink-3" style={d(80)}>
+        Tasarım kararımız da bu: gence oyun gibi bir ritim, kuruma sakin bir ölçüm.
+      </p>
+      {cols.map((c, n) => (
+        <div key={c.tag} className="s-in absolute top-[230px] w-[520px]" style={{ left: n ? 700 : 112, ...d(200 + n * 260) }}>
+          <Tag who={c.who}>{c.tag}</Tag>
+          <ul className="mt-[10px]">
+            {c.lines.map(([lead, rest]) => (
+              <li key={lead} className="border-t-2 border-line py-[8px] first:border-t-0">
+                <p className="text-[24px] font-extrabold leading-tight tracking-[-0.02em] text-ink">“{lead}”</p>
+                <p className="mt-[2px] text-[19px] font-semibold leading-[1.35] text-ink-2">{rest}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
     </>
   );
 }
@@ -976,22 +1031,23 @@ export const SLIDES: Slide[] = [
   { id: 'baslik', title: 'Nirengi', mark: 'hero', niri: { mood: 'wave', gear: 0, line: 'Merhaba, ben Niri! Bugün size haritamı göstereceğim.' }, View: Title },
   { id: 'problem', title: 'Problem', mark: 'dock', niri: { mood: 'sad', gear: 0, line: 'Gençler görünmüyor, kurumlar emin olamıyor.' }, View: Problem },
   { id: 'kim-icin', title: 'Kim için', mark: 'dock', niri: { mood: 'think', gear: 0, line: 'Biri kanıt arıyor, öbürü güvenilir bir ekip.' }, View: ForWhom },
-  { id: 'kanit', title: 'Kanıt', mark: 'dock', niri: { mood: 'think', gear: 1, line: 'Rakamları uydurmadım; kaynakları altında.' }, View: Evidence },
+  { id: 'kanit', title: 'Kanıt', mark: 'dock', niri: { mood: 'think', gear: 0, line: 'Rakamları uydurmadım; kaynakları altında.' }, View: Evidence },
   { id: 'cozum', title: 'Ne çözüyoruz', mark: 'dock', niri: { mood: 'cheer', gear: 1, line: 'Beş durak, altı problem. Tarayıcıda da cebinde de.' }, View: Solution },
-  { id: 'demo', title: 'Tanıtım filmi', mark: 'dock', bare: true, niri: { mood: 'cheer', gear: 2, line: 'Sahne benim! Ürünü telefonda göstereyim.' }, View: Film },
-  { id: 'eslesme', title: 'Eşleşme', mark: 'dock', niri: { mood: 'think', gear: 2, line: 'İsmi değil, işi tartarım.' }, View: PageBlind },
-  { id: 'yz-ne', title: 'Yapay zekâ ne yapıyor', mark: 'dock', niri: { mood: 'talk', gear: 2, line: 'Derdini yaz, ben okuyayım. Uydurmam.' }, View: AiWhat },
-  { id: 'yz-onlem', title: 'Hatalı çıktıya karşı', mark: 'dock', niri: { mood: 'think', gear: 3, line: 'Metinde yoksa almam, sorarım.' }, View: AiGuard },
-  { id: 'tasarim', title: 'Tasarım kararları', mark: 'dock', niri: { mood: 'cheer', gear: 3, line: 'Gence oyun, kuruma sakin bir ölçüm.' }, View: Decisions },
+  { id: 'dogrulama', title: 'İşin, kaynağında doğrulanır', mark: 'dock', niri: { mood: 'happy', gear: 1, line: 'İşin nerede duruyorsa oradan doğrularım.' }, View: PageVerified },
+  { id: 'xp', title: 'XP yalnız gerçek işten', mark: 'dock', niri: { mood: 'cheer', gear: 1, line: 'Puan değil makbuz: her XP bir iş.' }, View: PageXp },
+  { id: 'analiz', title: 'Eksiğini gör', mark: 'dock', niri: { mood: 'think', gear: 2, line: 'Her hafta nerede güçlü olduğunu söylerim.' }, View: PageInsight },
+  { id: 'topluluk', title: 'Gençler birbirine yardım eder', mark: 'dock', niri: { mood: 'happy', gear: 2, line: 'Burada yardım eden de kazanır.' }, View: PageCommunity },
+  { id: 'ihtiyac', title: 'Kurum derdini yazar', mark: 'dock', niri: { mood: 'talk', gear: 2, line: 'Derdini anlat, alanları ben doldururum.' }, View: PageNeed },
+  { id: 'yz-ne', title: 'Niri açık bir modelle okur', mark: 'dock', niri: { mood: 'talk', gear: 2, line: 'Metni ben okurum ama uydurmam.' }, View: AiWhat },
+  { id: 'yz-onlem', title: 'Metinde olmayanı almaz', mark: 'dock', niri: { mood: 'think', gear: 3, line: 'Metinde yoksa almam, sorarım.' }, View: AiGuard },
+  { id: 'eslesme', title: 'Adaylar isimsiz', mark: 'dock', niri: { mood: 'think', gear: 3, line: 'İsmi değil, işi tartarım.' }, View: PageBlind },
+  { id: 'defter', title: 'İki onay, zincirli kayıt', mark: 'dock', niri: { mood: 'cheer', gear: 3, line: 'İki imza, bir mühür. Sonradan kimse değiştiremez.' }, View: PageLedger },
+  { id: 'donus', title: 'Onay, gencin kanıtı olur', mark: 'dock', niri: { mood: 'happy', gear: 3, line: 'Onaylanan iş, haritanda yeni bir nokta.' }, View: PageReturn },
+  { id: 'niri', title: 'Niri’nin söyleyecekleri', mark: 'hero', niri: { mood: 'talk', gear: 3, line: 'Haritamda herkese yer var: gence de, küçük bir ekibe de.' }, View: NiriSays },
   { id: 'bitti', title: 'Bitti ve bırakılan', mark: 'dock', niri: { mood: 'happy', gear: 3, line: 'Prototipim çalışıyor. Gerisini pilotta kanıtlayacağım.' }, View: Done },
   { id: 'kapanis', title: 'Teşekkürler', mark: 'hero', niri: { mood: 'wave', gear: 4, turns: 2, line: 'Zirvedeyim! İlk noktayı birlikte koyalım.' }, View: Close },
-  { id: 'ek-dogrulama', title: 'İşin, kaynağında doğrulanır', mark: 'dock', extra: true, niri: { mood: 'happy', gear: 4, line: 'İşin nerede duruyorsa oradan doğrularım.' }, View: PageVerified },
-  { id: 'ek-xp', title: 'XP yalnız gerçek işten', mark: 'dock', extra: true, niri: { mood: 'cheer', gear: 4, line: 'Puan değil makbuz: her XP bir iş.' }, View: PageXp },
-  { id: 'ek-analiz', title: 'Eksiğini gör', mark: 'dock', extra: true, niri: { mood: 'think', gear: 4, line: 'Her hafta nerede güçlü olduğunu söylerim.' }, View: PageInsight },
-  { id: 'ek-topluluk', title: 'Gençler birbirine yardım eder', mark: 'dock', extra: true, niri: { mood: 'happy', gear: 4, line: 'Burada yardım eden de kazanır.' }, View: PageCommunity },
-  { id: 'ek-ihtiyac', title: 'Kurum derdini yazar', mark: 'dock', extra: true, niri: { mood: 'talk', gear: 4, line: 'Derdini anlat, alanları ben doldururum.' }, View: PageNeed },
-  { id: 'ek-defter', title: 'İki onay, zincirli kayıt', mark: 'dock', extra: true, niri: { mood: 'cheer', gear: 4, line: 'İki imza, bir mühür. Sonradan kimse değiştiremez.' }, View: PageLedger },
-  { id: 'ek-donus', title: 'Onay, gencin kanıtı olur', mark: 'dock', extra: true, niri: { mood: 'happy', gear: 4, line: 'Onaylanan iş, haritanda yeni bir nokta.' }, View: PageReturn },
+  { id: 'ek-film', title: 'Tanıtım filmi', mark: 'dock', bare: true, extra: true, niri: { mood: 'cheer', gear: 4, line: 'Sahne benim! Ürünü telefonda göstereyim.' }, View: Film },
+  { id: 'ek-tasarim', title: 'Tasarım kararları', mark: 'dock', extra: true, niri: { mood: 'cheer', gear: 4, line: 'Gence oyun, kuruma sakin bir ölçüm.' }, View: Decisions },
 ];
 
 /** The talk is the slides before the appendix; the close is its last. */
