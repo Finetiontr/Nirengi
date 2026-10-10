@@ -519,8 +519,8 @@ function Decisions() {
 // ---------------------------------------------------------------- 11. what we finished, what we left on purpose
 
 function Done() {
-  const done = ['Altı problemin altısına ekran', 'GitHub ve DNS ile doğrulama', 'Her alandan profil ve eser', 'Açık modelle ihtiyaç taslağı', 'Testli eşleşme, defter, denetim'];
-  const left = ['Kalıcı veritabanı', 'Gerçek kullanıcı ve pilot', 'Kod dışı işte makine doğrulaması'];
+  const done = ['Altı problemin altısına ekran', 'GitHub ve DNS ile doğrulama', 'Her alandan profil ve eser', 'Açık modelle ihtiyaç taslağı', 'Testli eşleşme, defter, denetim', 'Telefona yüklenen, internetsiz uygulama'];
+  const left = ['Kalıcı veritabanı', 'Gerçek kullanıcı ve pilot', 'Kod dışı işte makine doğrulaması', 'Bildirim ve mağaza sürümü'];
   const next = ['Kalıcılık', 'İlk ihtiyaç turu', 'Kod dışı doğrulama', 'Pilot raporu'];
   return (
     <>
@@ -592,6 +592,14 @@ function Close() {
         <p className="mt-[8px] text-[21px] font-semibold text-ink-2">{TEAM.join(' · ')}</p>
         <p className="mt-[2px] text-[19px] font-semibold text-ink-3">Açık kaynak, MIT lisanslı</p>
       </div>
+      {/* The QR opens /uygulama: the jury can put the app on their phones before the questions. */}
+      <figure className="s-in absolute left-[1156px] top-[150px] flex w-[360px] flex-col items-center" style={d(480)}>
+        <img src="/pwa/qr.svg" width={248} height={248} alt="nirengi uygulamasını açan QR kodu" className="rounded-[20px] border-2 border-line bg-white p-[10px]" draggable={false} />
+        <figcaption className="mt-[14px] text-center">
+          <span className="block text-[26px] font-extrabold leading-tight text-ink">Telefonunuza yükleyin</span>
+          <span className="mt-[4px] block text-[19px] font-semibold text-ink-3">Kameranızla okutun; mağaza gerekmez.</span>
+        </figcaption>
+      </figure>
       <SurveyFlag size={96} delay={0.6} className="absolute left-[1478px] top-[694px]" />
     </>
   );
@@ -609,7 +617,7 @@ export const SLIDES: Slide[] = [
   { id: 'yz-onlem', title: 'Hatalı çıktıya karşı', mark: 'dock', niri: { mood: 'think', gear: 3, line: 'Metinde yoksa almam, sorarım.' }, View: AiGuard },
   { id: 'tasarim', title: 'Tasarım kararları', mark: 'dock', niri: { mood: 'cheer', gear: 3, line: 'Gence oyun, kuruma sakin bir ölçüm.' }, View: Decisions },
   { id: 'bitti', title: 'Bitti ve bırakılan', mark: 'dock', niri: { mood: 'happy', gear: 3, line: 'Prototipim çalışıyor. Gerisini pilotta kanıtlayacağım.' }, View: Done },
-  { id: 'kapanis', title: 'Teşekkürler', mark: 'hero', niri: { mood: 'wave', gear: 4, turns: 2, line: 'Zirvedeyim! Teşekkürler, haritada görüşmek üzere.' }, View: Close },
+  { id: 'kapanis', title: 'Teşekkürler', mark: 'hero', niri: { mood: 'wave', gear: 4, turns: 2, line: 'Zirvedeyim! Beni telefonunuza alın, haritada görüşmek üzere.' }, View: Close },
 ];
 
 /** "3 / 12" on the counter and in the presenter window. */

@@ -122,3 +122,18 @@ export function withProfile(list: ProfileLink[] | undefined, url: string): Profi
   const rank = (p: ProfileLink) => (SUGGESTED.includes(p.platform) ? SUGGESTED.indexOf(p.platform) : SUGGESTED.length);
   return next.sort((a, b) => rank(a) - rank(b));
 }
+
+/**
+ * A work shared from another app (the installed app's share target): the link, from `baglanti`
+ * or the first address inside `metin` (many apps put it there), and a title from `baslik` or
+ * what is left of the text. Null when nothing shared is a usable link.
+ */
+export function sharedWork(q: URLSearchParams): { title: string; url: string } | null {
+  const text = q.get('metin') ?? '';
+  const found = text.match(/https?:\/\/\S+/)?.[0];
+  const url = normalizeUrl(q.get('baglanti') ?? '') ?? (found ? normalizeUrl(found.replace(/[).,;!?»”"']+$/, '')) : null);
+  if (!url) return null;
+  const rest = (found ? text.replace(found, '') : text).replace(/\s+/g, ' ').trim();
+  const title = (q.get('baslik')?.trim() || rest).replace(/[\s:|–-]+$/, '').slice(0, 90).trim();
+  return { title, url };
+}

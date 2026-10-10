@@ -16,6 +16,8 @@ import DemoTour from '../components/app/DemoTour';
 import Assistant from '../components/assistant/Assistant';
 import SahaDefteri from '../components/genc/SahaDefteri';
 import NowBar from '../components/genc/NowBar';
+import Pwa from '../components/shell/Pwa.astro';
+import InstallKey from '../components/shell/Install';
 
 interface Props {
   title: string;
@@ -54,6 +56,7 @@ const flow = /\/(kanit-bagla|ihtiyaclar\/yeni)\/?$/.test(path);
     <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#161521" media="(prefers-color-scheme: dark)" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <Pwa />
     <script is:inline define:vars={{ pinned: mode }}>
       (() => {
         const d = document.documentElement;
@@ -105,6 +108,7 @@ const flow = /\/(kanit-bagla|ihtiyaclar\/yeni)\/?$/.test(path);
             <div class="menu-pop card absolute right-0 top-14 z-50 w-72 space-y-3 p-4 shadow-[0_12px_32px_-12px_rgb(0_0_0/0.25)]">
               <div class="lg:hidden"><ModeSwitch client:only="react" /></div>
               <Account client:only="react" />
+              <div class="only-browser"><InstallKey client:only="react" variant="menu" /></div>
               <a href="/yontem" class="block rounded-[12px] px-3 py-2 text-[15px] font-extrabold text-ink-2 hover:bg-bg-2">Skorlar nasıl hesaplanıyor?</a>
               <button type="button" data-theme-toggle class="block w-full rounded-[12px] px-3 py-2 text-left text-[15px] font-extrabold text-ink-2 hover:bg-bg-2">Tema değiştir</button>
               <button type="button" data-tour-open class="block w-full rounded-[12px] px-3 py-2 text-left text-[15px] font-extrabold text-ink-2 hover:bg-bg-2">Demo turu</button>

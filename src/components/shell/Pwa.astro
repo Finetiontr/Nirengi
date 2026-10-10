@@ -1,0 +1,60 @@
+---
+// What makes nirengi an app on a phone, in every page head: the manifest, the home-screen icons
+// and the iOS tags. The browser's own install offer is held here, before any island mounts, so
+// the "Uygulamayı yükle" keys can raise it later (lib/install.ts). The GitHub Pages build also
+// registers the service worker that keeps the app working offline (src/sw.js, scripts/pwa.mjs).
+const sw = process.env.PAGES === '1';
+---
+
+<link rel="manifest" href="/manifest.webmanifest" />
+<link rel="apple-touch-icon" href="/pwa/ikon-apple.png" />
+<meta name="apple-mobile-web-app-title" content="nirengi" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<script is:inline>
+  addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    window.__bip = e;
+    dispatchEvent(new Event('nirengi:install'));
+  });
+  // iOS before display-mode support: mark the page so CSS can tell the app from the browser.
+  if (navigator.standalone) document.documentElement.classList.add('standalone');
+  addEventListener('appinstalled', () => {
+    window.__bip = null;
+    window.__installed = true;
+    dispatchEvent(new Event('nirengi:install'));
+  });
+</script>
+<style is:global>
+  /* Install keys and QR codes belong to the browser; the app opened from the home screen hides them. */
+  .only-app {
+    display: none;
+  }
+  @media (display-mode: standalone) {
+    .only-browser {
+      display: none !important;
+    }
+    .only-app {
+      display: block;
+    }
+  }
+  html.standalone .only-browser {
+    display: none !important;
+  }
+  html.standalone .only-app {
+    display: block;
+  }
+</style>
+{
+  sw && (
+    <script is:inline>
+      if ('serviceWorker' in navigator)
+        addEventListener('load', () => {
+          // sw.js sits next to the manifest at the site's root, whatever path the site is served under.
+          const m = document.querySelector('link[rel="manifest"]');
+          if (m) navigator.serviceWorker.register(new URL('sw.js', m.href)).catch(() => undefined);
+        });
+    </script>
+  )
+}

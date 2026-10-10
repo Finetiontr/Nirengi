@@ -1,6 +1,6 @@
 # Sunum notları
 
-*Zemin360 finali · 12 slayt · planlanan süre 4:18 (film 0:48, konuşma 3:30)*
+*Zemin360 finali · 12 slayt · planlanan süre 4:26 (film 0:48, konuşma 3:38)*
 
 Bu dosya `src/components/sunum/notes.ts` dosyasından üretildi; notları orada düzeltin. Sunum sırasında aynı notlar konuşmacı penceresinde görünür: sunumda **N** tuşu ya da `/sunum?notlar` adresi. Pencere sunumu izler, ok tuşlarıyla sunumu yönetir, **R** süreyi sıfırlar.
 
@@ -90,18 +90,20 @@ Slaytlardaki her sayı `docs/PAZAR-ANALIZI.md` içindeki kaynağıyla birlikte s
 
 ## 11. Bitti ve bırakılan
 
-*3:40 – 4:06 · Niri: “Prototipim çalışıyor. Gerisini pilotta kanıtlayacağım.”*
+*3:40 – 4:10 · Niri: “Prototipim çalışıyor. Gerisini pilotta kanıtlayacağım.”*
 
 - Altı problemin altısına çalışan bir ekranımız var. GitHub ve DNS doğrulaması, yapay zekâ taslağı canlıda; eşleşme ve kayıt defteri testli.
 - Yalnız yazılımcılar için değil: tasarımcı da çevirmen de LinkedIn, Behance, ArtStation bağlantılarıyla profilini kuruyor.
-- Bilerek bıraktıklarımız: kalıcı veritabanı, gerçek kullanıcı ve pilot. Kod dışı bağlantıları makineyle doğrulamıyoruz, Beyan diyoruz. Demo kişileri kurgusal, ekranda da öyle yazıyor.
+- Nirengi telefona yüklenen bir uygulama: ana ekrandan açılır, internet olmadan da çalışır.
+- Bilerek bıraktıklarımız: kalıcı veritabanı, gerçek kullanıcı ve pilot. Kod dışı bağlantıları makineyle doğrulamıyoruz, Beyan diyoruz. Bildirim ve mağaza sürümü yok. Demo kişileri kurgusal, ekranda da öyle yazıyor.
 - Finalden sonraki dört ay: kalıcılık, ilk ihtiyaç turu, kod dışı doğrulama ve pilot raporu.
 
 ## 12. Teşekkürler
 
-*4:06 – 4:18 · Niri: “Zirvedeyim! Teşekkürler, haritada görüşmek üzere.”*
+*4:10 – 4:26 · Niri: “Zirvedeyim! Beni telefonunuza alın, haritada görüşmek üzere.”*
 
 - Tek bir isteğimiz var: bu salondan bir kurumun gerçek bir ihtiyacı. İlk kanvası birlikte yazalım.
+- Ekrandaki kodu okutursanız Nirengi şimdi telefonunuza gelir.
 - Beyan değil, kanıt. Teşekkürler.
 
 ## Soru gelirse
@@ -142,6 +144,12 @@ Slaytlardaki her sayı `docs/PAZAR-ANALIZI.md` içindeki kaynağıyla birlikte s
 
 - Model metinde olmayan her alan için kurumun derdine özel bir öneri getirir; kutuda “Niri’nin önerisi” olarak soluk durur.
 - Öneride sayı uydurmaz, yerine “…” koyar; rakamı kurum yazar. Kurum kullanmadan hiçbir öneri kanvasa girmez.
+
+### Mobil uygulama var mı?
+
+- Var. Nirengi bir web uygulaması (PWA): QR’ı okutup Uygulamayı yükle’ye dokununca ana ekrana gelir, tam ekran açılır ve sayfaları telefonda tuttuğu için internetsiz de çalışır.
+- Android’de paylaş menüsünden Behance ya da YouTube bağlantısı doğrudan eser olarak gelir; simgeye basılı tutunca Bugün, Eser ekle, İhtiyaç yaz kısayolları çıkar.
+- Mağaza yerine bunu seçtik: iki gün içinde, sıfır maliyetle, tek kodla hem gence hem kuruma. Bildirim göndermiyoruz; kalıcı sunucu gelince sıradaki iş o.
 
 ### Yalnız yazılımcılar için mi?
 

@@ -6,6 +6,7 @@ import '@fontsource-variable/bricolage-grotesque/opsz.css';
 import '@fontsource-variable/jetbrains-mono';
 import '../styles/global.css';
 import Deck from '../components/sunum/Deck';
+import Pwa from '../components/shell/Pwa.astro';
 
 export const prerender = true;
 
@@ -22,6 +23,7 @@ const description = 'NİRENGİ sahne sunumu: beyan değil, kanıt.';
     <meta name="description" content={description} />
     <meta name="robots" content="noindex" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <Pwa />
     <script is:inline>
       (() => {
         // A projector reads best on light: only an explicit choice switches to dark.

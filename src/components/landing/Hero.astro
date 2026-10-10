@@ -3,6 +3,7 @@
 // four triangle markers (the league elevations); Niri hops it marker by marker, landing
 // on each marker's tip, reaches the summit and waves (HeroNiri), then the flag drops in.
 import { Contours, Tri } from '../ui/pafta';
+import InstallKey, { QrInstall } from '../shell/Install';
 import HeroNiri from './HeroNiri';
 
 type Pt = [number, number];
@@ -63,11 +64,26 @@ const rings = [
       <p class="lead rise mx-auto mt-4 max-w-[38ch] lg:mx-0" style="animation-delay:80ms">
         Gençlerin yaptığı doğrulanmış işi, kurumların yazdığı ihtiyaçlarla buluşturuyoruz. Özgeçmiş yok, iş var.
       </p>
-      <div class="rise mx-auto mt-7 flex max-w-[380px] flex-col gap-3 sm:max-w-none sm:flex-row sm:flex-wrap sm:justify-center lg:mx-0 lg:justify-start" style="animation-delay:160ms">
-        <a href="/bugun" data-door="genc" class="btn-primary btn-lg">Genç olarak başla</a>
-        <a href="/kurum" data-door="kurum" class="btn-line btn-lg">Kurum olarak ihtiyaç yaz</a>
+      <!-- Phones and tablets: install first, the two doors beside each other below it. -->
+      <div class="rise mx-auto mt-7 max-w-[400px] lg:hidden" style="animation-delay:160ms">
+        <div class="only-browser"><InstallKey client:load /></div>
+        <div class="mt-3 grid grid-cols-2 gap-3">
+          <a href="/bugun" data-door="genc" class="btn-line">Genç olarak dene</a>
+          <a href="/kurum" data-door="kurum" class="btn-line">Kurum olarak dene</a>
+        </div>
+        <p class="mt-4 text-balance text-[14px] font-semibold text-ink-3">Kayıt ve mağaza gerekmez; internetsiz de açılır.</p>
       </div>
-      <p class="rise mt-4 text-[14px] font-semibold text-ink-3" style="animation-delay:220ms">Kayıt gerekmez. Demo verisi bu tarayıcıda kalır.</p>
+      <!-- Computers: the doors, then the QR code that puts the app on the phone. -->
+      <div class="rise hidden lg:block" style="animation-delay:160ms">
+        <div class="mt-7 flex flex-wrap gap-3">
+          <a href="/bugun" data-door="genc" class="btn-primary btn-lg">Genç olarak başla</a>
+          <a href="/kurum" data-door="kurum" class="btn-line btn-lg">Kurum olarak ihtiyaç yaz</a>
+        </div>
+        <p class="mt-4 text-[14px] font-semibold text-ink-3">Kayıt gerekmez. Demo verisi bu tarayıcıda kalır.</p>
+        <div class="only-browser mt-8 border-t-2 border-line pt-6">
+          <QrInstall client:load />
+        </div>
+      </div>
     </div>
 
     <!-- The sheet is drawn at 500x420 and scaled down as one piece on small screens. -->

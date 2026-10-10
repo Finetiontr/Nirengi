@@ -93,18 +93,20 @@ export const NOTES: Record<string, Note> = {
     ],
   },
   bitti: {
-    sec: 26,
+    sec: 30,
     say: [
       'Altı problemin altısına çalışan bir ekranımız var. GitHub ve DNS doğrulaması, yapay zekâ taslağı canlıda; eşleşme ve kayıt defteri testli.',
       'Yalnız yazılımcılar için değil: tasarımcı da çevirmen de LinkedIn, Behance, ArtStation bağlantılarıyla profilini kuruyor.',
-      'Bilerek bıraktıklarımız: kalıcı veritabanı, gerçek kullanıcı ve pilot. Kod dışı bağlantıları makineyle doğrulamıyoruz, Beyan diyoruz. Demo kişileri kurgusal, ekranda da öyle yazıyor.',
+      'Nirengi telefona yüklenen bir uygulama: ana ekrandan açılır, internet olmadan da çalışır.',
+      'Bilerek bıraktıklarımız: kalıcı veritabanı, gerçek kullanıcı ve pilot. Kod dışı bağlantıları makineyle doğrulamıyoruz, Beyan diyoruz. Bildirim ve mağaza sürümü yok. Demo kişileri kurgusal, ekranda da öyle yazıyor.',
       'Finalden sonraki dört ay: kalıcılık, ilk ihtiyaç turu, kod dışı doğrulama ve pilot raporu.',
     ],
   },
   kapanis: {
-    sec: 12,
+    sec: 16,
     say: [
       'Tek bir isteğimiz var: bu salondan bir kurumun gerçek bir ihtiyacı. İlk kanvası birlikte yazalım.',
+      'Ekrandaki kodu okutursanız Nirengi şimdi telefonunuza gelir.',
       'Beyan değil, kanıt. Teşekkürler.',
     ],
   },
@@ -166,6 +168,14 @@ export const QA: Answer[] = [
     say: [
       'Model metinde olmayan her alan için kurumun derdine özel bir öneri getirir; kutuda “Niri’nin önerisi” olarak soluk durur.',
       'Öneride sayı uydurmaz, yerine “…” koyar; rakamı kurum yazar. Kurum kullanmadan hiçbir öneri kanvasa girmez.',
+    ],
+  },
+  {
+    q: 'Mobil uygulama var mı?',
+    say: [
+      'Var. Nirengi bir web uygulaması (PWA): QR’ı okutup Uygulamayı yükle’ye dokununca ana ekrana gelir, tam ekran açılır ve sayfaları telefonda tuttuğu için internetsiz de çalışır.',
+      'Android’de paylaş menüsünden Behance ya da YouTube bağlantısı doğrudan eser olarak gelir; simgeye basılı tutunca Bugün, Eser ekle, İhtiyaç yaz kısayolları çıkar.',
+      'Mağaza yerine bunu seçtik: iki gün içinde, sıfır maliyetle, tek kodla hem gence hem kuruma. Bildirim göndermiyoruz; kalıcı sunucu gelince sıradaki iş o.',
     ],
   },
   {

@@ -1,36 +1,40 @@
 ---
-// Closing band: solid indigo with faint contours, Niri saying goodbye on a sheet laid
-// over it (Niri's indigo would vanish on the band), and the same two doors again.
-// Niri has reached the summit here (the Zirve costume) and points at the doors.
+// Closing band: the app on a phone rising out of the band's foot, Niri at the summit (the Zirve
+// costume, on a light sheet since its indigo would vanish on the band) asking to come along, and
+// the way to get it: the install key on phones, the QR code on a computer, the doors for the
+// browser. The phone shows the real Bugün screen.
 import { Contours } from '../ui/pafta';
+import InstallKey, { QrInstall } from '../shell/Install';
 import Say from './Say';
 ---
 
 <section class="relative overflow-hidden border-t-2 border-line bg-indigo" aria-labelledby="cta-title">
-  <Contours color="white" opacity={0.16} x={0.22} y={0.5} seed={5} rings={11} step={32} />
+  <Contours color="white" opacity={0.16} x={0.78} y={0.62} seed={5} rings={11} step={32} />
 
-  <div class="relative mx-auto flex max-w-[var(--frame,1120px)] flex-col items-center gap-6 px-4 py-14 text-center sm:px-6 lg:flex-row lg:gap-16 lg:py-16 lg:text-left">
-    <div class="w-full max-w-[420px] shrink-0 rounded-[20px] border-2 border-line bg-bg-2 px-4 pb-1 pt-7 text-left lg:w-[400px]" style="box-shadow:0 5px 0 rgb(255 255 255 / 0.4)">
-      <Say client:idle size={104} gear={4} point="down" wide={{ at: 1024, size: 112, point: 'right', side: 'left' }} text="Dinlediğin için teşekkürler! *İlk noktayı birlikte koyalım mı?*" />
+  <div class="relative mx-auto grid max-w-[var(--frame,1120px)] gap-10 px-4 pt-14 sm:px-6 lg:grid-cols-[minmax(0,640px)_minmax(0,1fr)] lg:gap-16 lg:pt-16">
+    <div class="pb-2 lg:pb-16">
+      <div class="w-full max-w-[440px] rounded-[20px] border-2 border-line bg-bg-2 px-4 pb-1 pt-7 text-left" style="box-shadow:0 5px 0 rgb(255 255 255 / 0.4)">
+        <Say client:idle size={96} gear={4} point="down" wide={{ at: 1024, size: 104, point: 'right', side: 'left' }} text="Beni cebine al! *Ana ekranında beklerim;* internet olmasa da açılırım." />
+      </div>
+      <h2 id="cta-title" class="mt-8 text-[clamp(28px,3.6vw,40px)] font-black leading-[1.12] tracking-[-0.02em] !text-white">Haritan bir noktayla başlar.</h2>
+      <p class="mt-3 max-w-[46ch] text-[18px] font-bold leading-snug text-white">Nirengi’yi telefonuna yükle. Genç işini cebinden ekler, kurum aşamayı cebinden onaylar.</p>
+      <p class="mt-2 max-w-[46ch] text-[17px] font-semibold text-white/85">Kayıt ve mağaza yok. Kurgusal kurumlar ve kişilerle bütün döngüyü bir oturumda dene; Niri her adımda yanında.</p>
+
+      <div class="only-browser mt-7 max-w-[400px] lg:hidden"><InstallKey client:load variant="band" /></div>
+      <div class="only-browser mt-8 hidden lg:block"><QrInstall client:load onBand /></div>
+
+      <p class="mt-6 text-[15px] font-bold text-white/85">
+        Yüklemeden dene:
+        <a href="/bugun" class="ml-1 font-extrabold text-white underline decoration-white/50 underline-offset-4 hover:decoration-white">Genç olarak</a>
+        <span aria-hidden="true" class="mx-1">·</span>
+        <a href="/kurum" class="font-extrabold text-white underline decoration-white/50 underline-offset-4 hover:decoration-white">Kurum olarak</a>
+      </p>
     </div>
-    <div class="w-full">
-      <h2 id="cta-title" class="text-[clamp(28px,3.6vw,40px)] font-black leading-[1.12] tracking-[-0.02em] !text-white">Haritan bir noktayla başlar.</h2>
-      <p class="mx-auto mt-3 max-w-[42ch] text-[18px] font-bold leading-snug text-white lg:mx-0">Öğrenme uygulamalarının alışkanlık mekaniği, işe alımın ciddiyetiyle.</p>
-      <p class="mx-auto mt-2 max-w-[42ch] text-[17px] font-semibold text-white/85 lg:mx-0">Kayıt yok. Kurgusal kurumlar ve kişilerle bütün döngüyü bir oturumda dene; Niri her adımda yanında.</p>
-      <div class="mx-auto mt-7 flex max-w-[380px] flex-col gap-3 sm:max-w-none sm:flex-row sm:justify-center lg:mx-0 lg:justify-start">
-        <a
-          href="/bugun"
-          class="btn-lg inline-flex min-h-[54px] items-center justify-center rounded-[12px] bg-white px-7 text-[17px] font-bold text-indigo transition-transform duration-100 active:translate-y-[3px]"
-          style="box-shadow:0 3px 0 rgb(255 255 255 / 0.45)"
-        >
-          Genç olarak başla
-        </a>
-        <a
-          href="/kurum"
-          class="inline-flex min-h-[54px] items-center justify-center rounded-[12px] border-2 border-white/60 px-7 text-[17px] font-bold text-white transition-colors hover:bg-white/10"
-        >
-          Kurum olarak ihtiyaç yaz
-        </a>
+
+    <!-- The phone stands on the band's foot and is cut by it, as if it were rising out of the page. -->
+    <div class="relative mx-auto h-[300px] w-[248px] self-end sm:h-[340px] lg:h-[470px] lg:w-[300px]" aria-hidden="true">
+      <div class="absolute inset-x-0 top-0 rounded-[38px] bg-[#16142a] p-[8px] ring-2 ring-white/25">
+        <img src="/sunum/genc-bugun.webp" alt="" width="780" height="1688" decoding="async" class="block h-auto w-full rounded-[31px]" />
       </div>
     </div>
   </div>

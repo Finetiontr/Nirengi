@@ -2,7 +2,7 @@
 // network it belongs to, and what is refused before it can reach a profile page.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { isProfile, normalizeUrl, platformOf, shortUrl, withProfile } from '../src/lib/platforms.ts';
+import { isProfile, normalizeUrl, platformOf, sharedWork, shortUrl, withProfile } from '../src/lib/platforms.ts';
 import { slugify } from '../src/lib/format.ts';
 import { skillsInText } from '../src/lib/skills.ts';
 
@@ -63,4 +63,16 @@ test('skills: work outside software is read from the text too', () => {
   assert.deepEqual(skillsInText('Çocuk kitabı için karakter tasarımı ve animasyon'), ['illustration', 'animation']);
   assert.deepEqual(skillsInText('Belgeselin altyazı çevirisi'), ['translation']);
   assert.ok(!skillsInText('Okul kurgusu üzerine bir deneme').includes('video'), 'a loose word is not a skill');
+});
+
+test('platforms: a work shared from another app keeps its link and a title', () => {
+  const q = (o: Record<string, string>) => new URLSearchParams(o);
+  assert.deepEqual(sharedWork(q({ baslik: 'Kafe menüsü', baglanti: 'https://www.behance.net/gallery/123/kafe' })), {
+    title: 'Kafe menüsü',
+    url: 'https://www.behance.net/gallery/123/kafe',
+  });
+  // Many apps put the address inside the text; a closing bracket or dot is not part of it.
+  assert.deepEqual(sharedWork(q({ metin: 'Yeni animasyonum: https://youtu.be/abc123).' })), { title: 'Yeni animasyonum', url: 'https://youtu.be/abc123' });
+  assert.equal(sharedWork(q({ metin: 'bağlantısız bir not' })), null);
+  assert.equal(sharedWork(q({ baglanti: 'javascript:alert(1)' })), null);
 });

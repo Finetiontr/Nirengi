@@ -1,0 +1,120 @@
+---
+// /uygulama: nirengi on a phone. In the browser it is the page the QR code opens: the install
+// for this device (one key, or the steps the browser needs), what the app does on a phone, and
+// the way into the browser version. Opened from the home screen (the manifest's start_url) it
+// sends the person straight to their side, or asks once whether they come as genç or kurum.
+import Layout from '../layouts/Layout.astro';
+import { InstallPanel } from '../components/shell/Install';
+import NavIcon from '../components/shell/NavIcon';
+import NiriSays from '../components/ui/NiriSays';
+import { Contours } from '../components/ui/pafta';
+import { Building2, LayoutGrid, Share2, Smartphone, WifiOff } from 'lucide-react';
+
+export const prerender = true;
+
+const perks = [
+  { Icon: Smartphone, title: 'Ana ekrandan açılır', text: 'Simgesine dokun; tarayıcı çubuğu olmadan, tam ekran açılsın.' },
+  { Icon: WifiOff, title: 'İnternetsiz de çalışır', text: 'Sayfalar ve verin telefonunda durur; sinyal gidince de açılır.' },
+  { Icon: Share2, title: 'Paylaş’tan eser ekle', text: 'Behance’te, YouTube’da, ArtStation’da Paylaş → nirengi: bağlantı eserin olarak gelir. Android’de.' },
+  { Icon: LayoutGrid, title: 'Kısayollar', text: 'Simgeye basılı tut: Bugün, Eser ekle, İhtiyaç yaz, Projeler. Android’de.' },
+  { Icon: Building2, title: 'Kurum da cebinden', text: 'İhtiyacını yolda kendi sözlerinle yaz, Niri taslağa çevirsin; aşamaları telefondan onayla.' },
+];
+
+const sides = [
+  { href: '/bugun', icon: 'home', title: 'Gencim', text: 'İşimi göstermek, kurumlarla deneme projesi yapmak istiyorum.' },
+  { href: '/kurum', icon: 'building', title: 'Kurumum', text: 'Bir ihtiyacım var; işi kanıtlanmış gençler arıyorum.' },
+] as const;
+---
+
+<Layout title="Uygulama" description="nirengi’yi telefonuna yükle: ana ekrandan açılır, internetsiz de çalışır. Mağaza gerekmez.">
+  <script is:inline slot="head">
+    // From the home screen: straight to the side this person last used.
+    (() => {
+      if (!(matchMedia('(display-mode: standalone)').matches || navigator.standalone)) return;
+      let v = {};
+      try {
+        v = JSON.parse(sessionStorage.getItem('nirengi:view') || localStorage.getItem('nirengi:view') || '{}');
+      } catch {}
+      if (v.persona === 'org') location.replace('/kurum');
+      else if (v.persona === 'person') location.replace('/bugun');
+    })();
+  </script>
+
+  <!-- the app's first launch: one question, then the person's side -->
+  <div class="only-app">
+    <section class="mx-auto max-w-[560px] px-4 pb-16 pt-8 sm:px-6">
+      <NiriSays client:load mood="wave" typing>Hoş geldin! Nirengi’yi nasıl kullanacağını seç, seni oraya götüreyim.</NiriSays>
+      <h1 class="h-page mt-6">Kim olarak giriyorsun?</h1>
+      <ul class="mt-5 space-y-3">
+        {
+          sides.map((s) => (
+            <li>
+              <a href={s.href} class="card-press flex w-full items-center gap-4 p-4 text-left">
+                <span class="grid h-14 w-14 shrink-0 place-items-center rounded-[16px] bg-bg-2" aria-hidden="true">
+                  <NavIcon icon={s.icon} size={34} />
+                </span>
+                <span class="min-w-0 flex-1">
+                  <span class="block text-[18px] font-black text-ink">{s.title}</span>
+                  <span class="block text-[14px] font-bold text-ink-3">{s.text}</span>
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="hint">Sonra menüden istediğin an değiştirebilirsin.</p>
+    </section>
+  </div>
+
+  <div class="only-browser">
+    <section class="relative overflow-hidden border-b-2 border-line" aria-labelledby="uygulama-title">
+      <Contours seed={7} x={0.78} y={0.6} rings={12} step={34} opacity={0.5} className="[mask-image:linear-gradient(to_right,transparent_10%,black_60%)]" />
+      <div class="relative mx-auto grid max-w-[var(--frame,1120px)] items-center gap-10 px-4 pb-14 pt-8 sm:px-6 lg:grid-cols-[1fr_auto] lg:pb-16 lg:pt-14">
+        <div class="max-w-[560px]">
+          <h1 id="uygulama-title" class="h-hero !text-[clamp(34px,5vw,56px)]">Nirengi’yi <span class="text-indigo">telefonuna</span> yükle.</h1>
+          <p class="lead mt-4 max-w-[44ch]">Mağaza yok, hesap yok. Tarayıcıdan yüklenir, ana ekranından tam ekran açılır ve internet olmadan da çalışır.</p>
+          <div class="mt-7 min-h-[54px]">
+            <InstallPanel client:only="react" />
+          </div>
+          <p class="mt-8 text-[15px] font-bold text-ink-3">
+            Yüklemeden dene:
+            <a href="/bugun" class="ml-1 font-extrabold text-indigo underline-offset-2 hover:underline">Genç olarak</a>
+            <span aria-hidden="true" class="mx-1">·</span>
+            <a href="/kurum" class="font-extrabold text-indigo underline-offset-2 hover:underline">Kurum olarak</a>
+          </p>
+        </div>
+
+        <!-- the two faces as they open on a phone; the genç screen in front -->
+        <div class="relative mx-auto hidden h-[520px] w-[400px] md:block" aria-hidden="true">
+          <div class="absolute right-0 top-10 w-[220px] rounded-[34px] bg-[#16142a] p-[8px] ring-2 ring-line">
+            <img src="/sunum/kurum-okuma.webp" alt="" width="780" height="1688" class="block h-auto w-full rounded-[27px]" loading="lazy" />
+          </div>
+          <div class="absolute left-0 top-0 w-[236px] rounded-[36px] bg-[#16142a] p-[8px] ring-2 ring-line">
+            <img src="/sunum/genc-bugun.webp" alt="" width="780" height="1688" class="block h-auto w-full rounded-[29px]" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mx-auto max-w-[var(--frame,1120px)] px-4 py-14 sm:px-6 lg:py-16" aria-labelledby="telefonda">
+      <h2 id="telefonda" class="text-[clamp(26px,3.2vw,34px)] font-black leading-[1.1] tracking-[-0.02em] text-ink">Telefonda neler var</h2>
+      <p class="lead mt-3 max-w-[56ch]">Aynı nirengi, cebine göre: genç işini her an ekler, kurum aşamayı beklemeden onaylar.</p>
+      <ul class="mt-8 grid gap-x-12 md:grid-cols-2">
+        {
+          perks.map(({ Icon, title, text }) => (
+            <li class="flex items-start gap-4 border-t-2 border-line py-5">
+              <span class="grid h-11 w-11 shrink-0 place-items-center rounded-[14px] bg-indigo-tint text-indigo" aria-hidden="true">
+                <Icon className="h-6 w-6" strokeWidth={2.5} />
+              </span>
+              <span class="min-w-0">
+                <span class="block text-[18px] font-black text-ink">{title}</span>
+                <span class="mt-1 block text-[15px] font-bold text-ink-3">{text}</span>
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="mt-6 text-[14px] font-semibold text-ink-3">nirengi bir web uygulaması (PWA): aynı kod tarayıcıda ve ana ekranda çalışır, güncellemeler kendiliğinden gelir. Bildirim göndermez.</p>
+    </section>
+  </div>
+</Layout>

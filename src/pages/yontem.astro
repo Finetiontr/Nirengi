@@ -78,6 +78,7 @@ const truth = [
   ['İhtiyaç taslağı', 'Yapay zekâ', 'Gemma 4 26B, açık ağırlıklı bir model (Cloudflare Workers AI). Ağ ya da kota yoksa aynı işi kural motoru yapar.'],
   ['Niri’nin analizleri ve haftalık özetleri', 'Kural tabanlı', 'Bu sayfadaki sayılardan kurallarla yazılır; model kullanılmaz.'],
   ['Kurumlar, kişiler, lig arkadaşları, S3 tasdikleri', 'Kurgusal', 'Demo ekosistemi; gerçek kurum hesaplarıyla değişecek.'],
+  ['Telefona yükleme, internetsiz çalışma', 'Gerçek', 'Manifest ve service worker: ana ekrandan açılır, sayfalar telefonda tutulur. Bildirim yok.'],
   ['Kalıcılık', 'Tarayıcı', 'Demo verisi localStorage’da tutulur; üretimde Cloudflare D1 planlı.'],
 ] as const;
 const truthTone: Record<string, string> = { Gerçek: 'bg-green-tint text-green-lip', Beyan: 'bg-bg-3 text-ink-2', 'Yapay zekâ': 'bg-indigo-tint text-indigo', 'Kural tabanlı': 'bg-cyan-tint text-cyan-lip', Kurgusal: 'bg-bg-3 text-ink-2', Tarayıcı: 'bg-bg-3 text-ink-2' };

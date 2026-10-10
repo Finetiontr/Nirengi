@@ -1,6 +1,6 @@
 # NİRENGİ
 
-**Beyan değil, kanıt.** Gençlerin ürettiği doğrulanabilir işi kurumların yapılandırılmış ihtiyaçlarıyla buluşturan ve iş birliğini iki tarafın onayıyla kayda geçiren açık kaynak web hizmeti. Zemin360 Hackathon (9–11 Ekim 2026) için geliştirildi.
+**Beyan değil, kanıt.** Gençlerin ürettiği doğrulanabilir işi kurumların yapılandırılmış ihtiyaçlarıyla buluşturan ve iş birliğini iki tarafın onayıyla kayda geçiren açık kaynak uygulama. Tarayıcıda çalışır, telefona yüklenir. Zemin360 Hackathon (9–11 Ekim 2026) için geliştirildi.
 
 > Nirengi noktası: haritacılıkta üzerine güvenle ölçüm yapılan sabit referans.
 
@@ -10,6 +10,7 @@
 
 - **Tanıtım filmi:** [48 saniye, müzikli](https://finetiontr.github.io/Nirengi/sunum/nirengi-film.mp4); her özelliği ürünün gerçek ekranlarıyla gösterir, sunumun 6. slaytında oynar. Müziği kodla bestelendi, lisansı bize ait. Uzun anlatım: [79 saniye, sessiz](https://finetiontr.github.io/Nirengi/sunum/nirengi-tanitim-web.mp4), Niri ekranları telefonda gezdirir.
 - **Canlı:** https://finetiontr.github.io/Nirengi/ (kurulum gerekmez; veri tarayıcıda tutulur)
+- **Telefona yükle:** [`/uygulama`](https://finetiontr.github.io/Nirengi/uygulama) ya da sunumun son slaytındaki QR kodu. Mağaza gerekmez: Android’de tek dokunuşla, iPhone’da Paylaş → Ana Ekrana Ekle ile yüklenir; ana ekrandan tam ekran açılır, internetsiz de çalışır.
 - **Sunum:** [`/sunum`](https://finetiontr.github.io/Nirengi/sunum), uygulamanın içinde Niri’nin anlattığı 12 slaytlık deste; yapay zekâ slaytları ürünün kendi denetimini gerçek bir model cevabı üzerinde çalıştırır
 - **Sahne akışı:** [`docs/DEMO.md`](docs/DEMO.md), 5 dakikalık demo ve yedek senaryo
 
@@ -22,7 +23,7 @@ Kurumlar ihtiyacını net tanımlayamıyor, gençler ise ürettiklerini kanıtla
 | 01 | Genç yeteneklerin keşfi | Kör keşif (isim/yaş/okul gizli), problemle arama, takipçiden bağımsız yükselen sinyal | `/kesfet` |
 | 02 | Profil & portfolyo doğruluğu | S1/S2/S3 Doğrulama Merdiveni; **her alandan iş**: GitHub uygulamasıyla seçilen depolar (özel depolar dahil) doğrulanır, LinkedIn, Behance, ArtStation, YouTube gibi profiller ve eser bağlantıları Beyan olarak eklenir; DNS TXT doğrulaması, kopya eser tespiti, şeffaf itiraz | `/kanit-bagla`, `/profil/:kullanici` |
 | 03 | Kurum–kişi eşleşmesi | Dört bileşenli açıklanabilir skor, gerekçe kartı, eksik kanıt geri bildirimi, takım kompozisyonu | `/ihtiyaclar/:id#adaylar` |
-| 04 | Yaşayan bir ağ | Olay akışı, bağlantı sağlığı ve somut sebepli yeniden temas, mikro-etkileşimler, çeyreklik ihtiyaç turu | `/nabiz` |
+| 04 | Yaşayan bir ağ | Olay akışı, bağlantı sağlığı ve somut sebepli yeniden temas, mikro-etkileşimler, çeyreklik ihtiyaç turu; **telefona yüklenen uygulama**: ana ekrandan açılır, internetsiz çalışır, Android’de paylaş menüsünden eser ekler | `/nabiz`, `/uygulama` |
 | 05 | İhtiyaçların net tanımı | Yedi alanlı İhtiyaç Kanvası, kurumun kendi sözlerinden **yapay zekâ taslağı** (her alan metindeki cümlesine dayanır), önerilen başarı kriterleri, çözülebilirlik skoru, yayın eşiği, ekosistem hafızası | `/ihtiyaclar/yeni` |
 | 06 | Şeffaf iş birliği takibi | Kriterden doğan kilometre taşları, çift onay, SHA-256 zincirli defter, sessizlik göstergesi, adil kapanış, kamuya açık özet kartı | `/pilotlar/:id`, `/kart/:id` |
 
@@ -42,6 +43,12 @@ Döngü: pilotta çift onaylanan her kilometre taşı kişinin profiline **S3 ka
 - Kör aday listesi, “Neden bu uyum?” gerekçesi, deneme projesi teklifi.
 - Pilot: kilometre taşları, çift onay, kurcalanamaz defter, kamuya açık özet kartı.
 
+**Telefonda**
+- Uygulamayı yükle: tanıtım sayfası, uygulama menüsü ve `/uygulama` tarayıcının kendi yükleme penceresini açar; açamayan tarayıcıya (iPhone Safari, başka bir uygulamanın içindeki tarayıcı) adım adım nasıl ekleneceğini gösterir. Bilgisayarda QR kodu telefonda `/uygulama`’yı açar.
+- Ana ekrandan ilk açılışta tek soru (genç mi, kurum mu); sonra doğrudan o tarafın ana sayfası.
+- İnternetsiz çalışır: bütün sayfalar ve dosyalar telefonda tutulur, demo verisi zaten tarayıcıda.
+- Android’de paylaş menüsü: Behance’te, YouTube’da, ArtStation’da Paylaş → nirengi, bağlantı “Eser ekle” ekranına dolu gelir. Simgeye basılı tutunca Bugün, Eser ekle, İhtiyaç yaz, Projeler kısayolları çıkar.
+
 ## Mimari
 
 ```mermaid
@@ -58,10 +65,13 @@ flowchart LR
   W -- sabit istem + JSON şeması --> AI[Workers AI\nGemma 4 26B]
   W -. ham taslak .-> Engine
   Pages[GitHub Pages\nstatik derleme] -. sunar .-> UI
+  Pages -. ilk açılışta .-> SW[sw.js\nçevrimdışı kopya]
+  SW -. sayfalar ve dosyalar .-> UI
 ```
 
 - **Statik site + tek sunucu parçası.** Site GitHub Pages’te statik çalışır (`npm run build:pages`). Tarayıcıda yapılamayan iki iş `worker/` içindedir: GitHub uygulamasının tek kullanımlık kodunu gizli anahtarla token’a çevirmek ve ihtiyaç taslağını Workers AI’daki modele okutmak. Worker durum tutmaz, hesap kimliği içermez, herhangi bir Cloudflare hesabına taşınabilir ([`worker/README.md`](worker/README.md)).
 - **Astro 7 + React 19 + Tailwind 4 + framer-motion.** Sayfalar Astro’da önceden derlenir; etkileşimli ekranlar React adalarıdır. Hareketler framer-motion ile yapılır, hareket azaltma tercihine uyulur.
+- **Uygulama: PWA, mağaza değil.** Aynı kod tarayıcıda ve telefonun ana ekranında çalışır (`public/manifest.webmanifest`). Yerel bir mağaza uygulaması yerine bunu seçtik: iki günlük finalde, sıfır maliyetle, mağaza incelemesi beklemeden hem gence hem kuruma ulaşıyor; güncelleme kendiliğinden geliyor. `src/sw.js` her sürümün sayfalarını ve dosyalarını telefonda tutar: sayfalar önce ağdan gelir (yeni sürüm hemen görünür), ağ yavaşsa ya da yoksa telefondaki kopya açılır. Bildirim göndermez.
 - **Saf motor.** `src/lib/engine/` arayüzden bağımsız, test edilen fonksiyonlardır. Bütün skorlar her görüntülemede yeniden hesaplanır; formüller `/yontem` sayfasında.
 - **Görsel dil: Pafta.** Harita paftası, nirengi üçgenleri, kontur çizgileri, Bricolage Grotesque. Kurallar [`DESIGN.md`](DESIGN.md). Fontlar pakete gömülü: sahnede internet kesilse de arayüz çalışır.
 - Demo verisi tarayıcıda tutulur. İki pencerede **Kurum** ve **Genç** rolü açılırsa çift onay canlı gösterilir; durum sekmeler arasında anında senkronlanır.
@@ -76,6 +86,7 @@ flowchart LR
 | İhtiyaç taslağı | Yapay zekâ: Gemma 4 26B (Workers AI); ağ ya da kota yoksa kural motoru |
 | Niri’nin analizleri ve haftalık özetleri | Kural tabanlı, çevrim dışı |
 | Kurumlar, kişiler, S3 tasdikleri | Kurgusal demo verisi |
+| Telefona yükleme, internetsiz çalışma | Gerçek: manifest ve service worker (canlı sitede ve `build:pages` derlemesinde) |
 | Kalıcılık | Tarayıcı (`localStorage`) |
 
 ## Yapay zekâ kullanımı
@@ -123,10 +134,10 @@ npm run dev          # http://localhost:4321
 npm test             # motor ve worker testleri (node:test)
 npm run typecheck
 npm run build        # Node sunucusu için
-npm run build:pages  # GitHub Pages için statik derleme → dist-pages/
+npm run build:pages  # GitHub Pages için statik derleme → dist-pages/ (service worker dahil)
 ```
 
-Node 22+ gerekir (testler TypeScript’i doğrudan çalıştırır). GitHub’a bağlan akışı ve modelle taslak yerelde `worker/` ile denenir: [`worker/README.md`](worker/README.md). Worker yoksa taslağı kural motoru çıkarır, uygulamanın geri kalanı aynen çalışır.
+Node 22+ gerekir (testler TypeScript’i doğrudan çalıştırır). Telefona yükleme ve internetsiz çalışma yalnız `build:pages` derlemesinde açılır; `npm run dev` service worker kaydetmez. GitHub’a bağlan akışı ve modelle taslak yerelde `worker/` ile denenir: [`worker/README.md`](worker/README.md). Worker yoksa taslağı kural motoru çıkarır, uygulamanın geri kalanı aynen çalışır.
 
 ## Dosya yapısı
 
@@ -140,14 +151,15 @@ src/
     kurum/             kurum yüzü: ana sayfa, haftalık özet
     app/               ortak uygulama ekranları (kanıt bağla, ihtiyaç, pilot, profil, keşif)
     assistant/         Niri: karşılama, turlar, yardım
-    shell/             menü, hesap, rol anahtarı
+    shell/             menü, hesap, rol anahtarı, uygulamayı yükle
     sunum/             uygulama içi sunum destesi
     method/            /yontem sayfası parçaları
     ui/                ortak parçalar (Niri, ikonlar, düğmeler)
   lib/
     engine/            saf hesaplama: match, canvas, ground (model denetimi), ledger, progress, insight
     ai.ts              Niri'nin modeli: taslak isteği, önbellek, kural motoruna dönüş
-    platforms.ts       profil ve eser bağlantıları: LinkedIn, Behance, ArtStation… adres denetimi
+    install.ts         uygulamayı yükleme: tarayıcının penceresi ya da o tarayıcıya göre adımlar
+    platforms.ts       profil ve eser bağlantıları: LinkedIn, Behance, ArtStation… adres denetimi, paylaşılan bağlantı
     skills.ts          her alandan beceri sözlüğü (yazılım, veri, tasarım, medya, iş)
     sample-reading.ts  modelin örnek metne verdiği kayıtlı cevap (sunum, testler, ağ yedeği)
     auth.ts            GitHub uygulamasıyla bağlanma ve çıkış
@@ -155,9 +167,10 @@ src/
     store.ts           tarayıcıda durum ve sekmeler arası senkron
     seed.ts            kurgusal demo ekosistemi
   styles/global.css    renk ve tipografi tokenları
-public/                favicon; sunum/ altında tanıtım filmi ve posteri, uzun anlatım videosu, telefon ekranları
+  sw.js                service worker: sayfaları ve dosyaları telefonda tutar (Pages derlemesi)
+public/                favicon, manifest.webmanifest; pwa/ altında uygulama ikonları ve QR kodu; sunum/ altında tanıtım filmi ve posteri, uzun anlatım videosu, telefon ekranları
 worker/                tek sunucu parçası (Cloudflare Worker): GitHub token değişimi, yapay zekâ taslağı
-scripts/               GitHub Pages derlemesi, sunum dışa aktarımı
+scripts/               GitHub Pages derlemesi, service worker'ın dosya listesi, sunum dışa aktarımı
 tests/                 node:test testleri
 docs/                  başvuru, demo akışı ve GIF'i, pazar analizi, sunum notları
 ```

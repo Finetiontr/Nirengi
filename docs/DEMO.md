@@ -10,6 +10,7 @@ Kenardaki **Demo turu** paneli adımları gerçek durum değişikliklerinden iş
 - [ ] İki tarayıcı penceresi: solda **Kurum**, sağda **Genç** (sol menüdeki Genç/Kurum seçimi sekme başınadır, veri anında senkronlanır).
 - [ ] Sahneden önce `/sunum`’u bir kez aç: tanıtım filmi iki saniye sonra arka planda iner, 6. slaytta beklemeden oynar. Film müziklidir: bilgisayarın sesi salona bağlı olsun ve sunum penceresinde başta bir kez **F**’ye bas ya da tıkla (tarayıcı sesi ancak bir dokunuştan sonra açar; yine sessiz başlarsa filme bir kez tıkla). Film açılmazsa o slayt canlı demo paneline döner; mp4’ün yerel bir kopyası da sunum bilgisayarında dursun.
 - [ ] İnternet ya da GitHub sorgu sınırı sorunu olursa: `/kanit-bagla` → **Örnek profille gez** (örnek veri olarak etiketlenir).
+- [ ] Bir telefona nirengi’yi önceden yükle (QR ya da `/uygulama` → **Uygulamayı yükle**; iPhone’da Paylaş → Ana Ekrana Ekle) ve bir kez çevrimiçi aç. Uygulama sayfaları telefonda tutar: salonun ağı giderse demo telefondan, uçak modunda da açılır.
 
 ## Akış
 
@@ -30,6 +31,10 @@ Jüri “metin eksik olursa?” derse sihirbazda kısa ve belirsiz bir metin yaz
 ## Soru gelirse: kod yazmayan genç
 
 Jüri “yalnız yazılımcılar için mi?” derse: `/profil/eceyildiz` (animasyon ve illüstrasyon; LinkedIn, ArtStation, YouTube bağlantıları Beyan, bir sağlık kurumunun onayı Kurum onaylı). Kurum tarafında `/ihtiyaclar/n-asi` (aşı hatırlatması için bir dakikalık animasyon) adaylarında ilk sırada odur. Akışı göstermek için genç penceresinde `/kanit-bagla` → **İşim başka yerlerde** → ad ve “ne üretiyorsun” → **LinkedIn** çipi adresi başlatır → bir ArtStation bağlantısıyla ilk eser; beceriler başlıktan gelir. “Bu sitelerde sahipliği dışarıdan kontrol edemiyoruz; o yüzden Beyan diyoruz. Güçlendiren şey kurum onayı, her alanda aynı.”
+
+## Soru gelirse: mobil uygulama
+
+Jüri “telefonda var mı?” derse: kapanış slaytındaki QR’ı okutsunlar ya da telefonda nirengi simgesini aç. İlk açılış “Kim olarak giriyorsun?” diye sorar; sonra doğrudan o tarafa gider. Uçak modunu açıp bir sayfa daha aç: “Sayfalar ve veri telefonda; internet yokken de çalışır.” Android’de Behance ya da YouTube’da bir işi **Paylaş → nirengi** ile gönder: “Eser ekle” ekranı bağlantı ve başlıkla dolu açılır. “Mağaza yerine PWA seçtik: aynı kod, sıfır maliyet, inceleme beklemeden. Bildirim yok, bilerek.”
 
 ## Yedek senaryo
 

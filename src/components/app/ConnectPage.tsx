@@ -36,7 +36,7 @@ import { appReady, completeReturn, forgetToken, getToken, installUrl, manageUrl,
 import { LEVELS } from '../../lib/labels.ts';
 import { daysAgo, relTime, slugify, uid } from '../../lib/format.ts';
 import { skillLabel, skillsInText } from '../../lib/skills.ts';
-import { isProfile, normalizeUrl, platformOf, PLATFORMS, shortUrl, SUGGESTED, withProfile } from '../../lib/platforms.ts';
+import { isProfile, normalizeUrl, platformOf, PLATFORMS, sharedWork, shortUrl, SUGGESTED, withProfile } from '../../lib/platforms.ts';
 import { type Mood } from '../ui/Niri';
 import NiriSays from '../ui/NiriSays';
 import { celebrate, CountUp, feedback, Head, WeekDots, Why } from '../ui/kit';
@@ -606,6 +606,29 @@ export default function ConnectPage() {
     setRoute('github');
     go('found');
     void completeReturn().then(onReturn);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // The installed app's share sheet (?baglanti, ?metin, ?baslik from Behance, YouTube…) and its
+  // "Eser ekle" shortcut (?adim=eser) land here. With a profile the work screen opens, filled in;
+  // without one the open route is picked and the shared link waits on its work step.
+  useEffect(() => {
+    const q = new URLSearchParams(location.search);
+    const shared = sharedWork(q);
+    if (!shared && q.get('adim') !== 'eser') return;
+    history.replaceState(null, '', location.pathname + location.hash);
+    if (shared) {
+      setWork(shared);
+      setWorkSkills(null);
+    }
+    if (me && !isExample(me)) {
+      setFrom('home');
+      go('work');
+    } else {
+      setPick('open');
+      if (me) go('start');
+      if (shared) feedback({ tone: 'info', title: 'Bağlantın hazır', text: 'Önce profilini kur; paylaştığın iş ilk eserin olarak gelecek.' });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

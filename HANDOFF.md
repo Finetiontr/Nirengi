@@ -16,6 +16,9 @@ Worker → `worker/README.md`.
   depolar ve DNS TXT ile alan adı doğrulanır.
 - **Kurum yüzü:** ihtiyaç sihirbazı (Niri kurumun metnini açık bir modelle okur, `src/lib/engine/ground.ts` metne
   karşı denetler), isimsiz kısa liste, çift onaylı pilot ve SHA-256 zincirli defter, haftalık özet.
+- **Telefonda:** nirengi bir PWA. `/uygulama` (QR’ın açtığı sayfa) ve tanıtım sayfası **Uygulamayı yükle** der; ana ekrandan
+  ilk açılışta genç/kurum sorulur. `src/sw.js` sayfaları telefonda tutar (yalnız `build:pages`), Android’de paylaş menüsü
+  bağlantıyı “Eser ekle”ye getirir. Bildirim ve mağaza sürümü yok.
 - **Sunum:** `/sunum`, organizasyonun 12 adımlık akışı, slayt başına az söz; 6. slaytta müzikli tanıtım filmi. Olası soruların kısa cevapları konuşmacı penceresinde, kapanış slaytında.
 - **Kontrol:** `npm run typecheck`, `npm test`, `npm run build`, `npm run build:pages`; CI aynılarını çalıştırır.
 
@@ -29,6 +32,9 @@ Worker → `worker/README.md`.
 
 - Demo verisi tarayıcıda (`localStorage`); tarayıcı ya da cihaz değişince başlangıç verisi yüklenir. Panelden “Sıfırla”.
 - GitHub’a ulaşılamazsa `/kanit-bagla` → “Örnek profille devam et” (örnek veri olarak etiketlenir).
+- Yüklenen uygulamada yeni sürüm, sayfalar ağdan geldiği için hemen görünür; telefondaki kopya, uygulama tamamen kapanıp
+  açılınca yenilenir. QR kodu canlı adrese (`finetiontr.github.io/Nirengi/uygulama`) sabittir; site taşınırsa
+  `public/pwa/qr.svg` yeniden üretilir.
 - İhtiyaç taslağını açık bir model (Gemma 4, Workers AI) çıkarır. Günlük ücretsiz kota (10.000 nöron, taslak başına
   yaklaşık 28) dolarsa ya da ağ yoksa taslağı kural motoru çıkarır; ücretsiz planda fatura çıkmaz. Ayrıntı: README
   “Yapay zekâ kullanımı”.

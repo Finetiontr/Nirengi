@@ -7,7 +7,7 @@
 
 ## Platform
 
-web
+web; telefona yüklenen uygulama (PWA): ana ekrandan açılır, internetsiz çalışır, Android’de paylaş menüsünden eser alır. Mağaza sürümü ve bildirim yok (kullanıcı talimatı, 10 Ekim 2026: site uygulamayı indirmeye teşvik etmeli; uygulama genç ve kurum için daha erişilebilir olmalı).
 
 ## Users
 

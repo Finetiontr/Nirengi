@@ -44,7 +44,11 @@ const tiers: Line[] = [
 ];
 ---
 
-<Layout title="nirengi · Yaptığın işle fark edil" description="Gençlerin yaptığı doğrulanmış işi, kurumların yazdığı ihtiyaçlarla buluşturan açık kaynak web hizmeti. Özgeçmiş yok, iş var.">
+<Layout title="nirengi · Yaptığın işle fark edil" description="Gençlerin yaptığı doğrulanmış işi, kurumların yazdığı ihtiyaçlarla buluşturan açık kaynak uygulama. Özgeçmiş yok, iş var.">
+  <script is:inline slot="head">
+    // The installed app has no use for its own advert: from the home screen, go to the app's door.
+    if (matchMedia('(display-mode: standalone)').matches || navigator.standalone) location.replace('/uygulama');
+  </script>
   <Hero />
   <Who />
 
