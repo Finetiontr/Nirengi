@@ -190,7 +190,7 @@ export default function QuestsPage() {
 
       {/* Growth */}
       <section data-coach="g-gelisim" className="mt-12" aria-labelledby="gelisim">
-        <Head title={<span id="gelisim">Gelişim görevleri</span>} action={<span className="pill bg-cyan-tint text-cyan-lip">Sana özel</span>} />
+        <Head title={<span id="gelisim">Gelişim görevleri</span>} action={<span className="pill bg-cyan-tint text-cyan-ink">Sana özel</span>} />
         <p className="mt-1 text-[15px] font-bold text-ink-3">
           Profilinle gerçek açık ihtiyaçlar arasındaki boşluklardan üretildi. Başkasında farklı görünür.{' '}
           <Why title="Bu görevler neden bana çıktı?" label="Neden bana?">
@@ -213,7 +213,7 @@ export default function QuestsPage() {
                   <div className="min-w-0 flex-1">
                     <p className="text-[16px] font-extrabold leading-snug text-ink">{q.title}</p>
                     <p className="mt-1 text-[14px] font-bold text-ink-3">{q.why}</p>
-                    <p className="mt-2 text-[13px] font-extrabold text-cyan-lip">Doğrulanan her iş +{XP.evidence} XP</p>
+                    <p className="mt-2 text-[13px] font-extrabold text-cyan-ink">Doğrulanan her iş +{XP.evidence} XP</p>
                   </div>
                   <ChevronRight className="h-6 w-6 shrink-0 text-ink-3" strokeWidth={3} />
                 </a>
@@ -292,7 +292,7 @@ export default function QuestsPage() {
                         <span>{relTime(it.updatedAt)} güncellendi</span>
                       </span>
                       {done ? (
-                        <span className="pill shrink-0 bg-green-tint text-green-lip">
+                        <span className="pill shrink-0 bg-green-tint text-green-ink">
                           <CheckCircle size={18} />
                           Tamamlandı
                         </span>

@@ -205,7 +205,7 @@ function Notebook({ start, onClose }: { start?: { entry?: EntryId }; onClose: ()
       </a>
     ) : page.kind === 'costume' ? (
       wearing ? (
-        <p className="flex min-h-12 items-center justify-center gap-2 rounded-[12px] bg-green-tint px-4 text-[16px] font-extrabold text-green-lip">
+        <p className="flex min-h-12 items-center justify-center gap-2 rounded-[12px] bg-green-tint px-4 text-[16px] font-extrabold text-green-ink">
           <Check className="h-5 w-5" strokeWidth={3.5} />
           Niri bunu giyiyor
         </p>
@@ -316,7 +316,7 @@ function Notebook({ start, onClose }: { start?: { entry?: EntryId }; onClose: ()
                   <dt className="font-bold text-ink-3">Durum</dt>
                   <dd className="font-bold">
                     {page.earned ? (
-                      <span className="text-green-lip">Kazandın{page.at ? ` · ${fmtDate(page.at)}` : ''}</span>
+                      <span className="text-green-ink">Kazandın{page.at ? ` · ${fmtDate(page.at)}` : ''}</span>
                     ) : (
                       <span className="text-ink-3">
                         Henüz açılmadı

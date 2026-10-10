@@ -112,7 +112,7 @@ function XpWhy() {
             <b className="text-ink">Destek almak:</b> her destek yazara <b className="num text-gold-ink">+{XP.support} XP</b>. Bu da ilerleme sayılmaz.
           </li>
           <li className="rounded-[14px] bg-green-tint p-3">
-            <b className="text-green-lip">İşe yarayan cevap:</b> soran “İşe yaradı” derse yanıtlayan <b className="num text-gold-ink">+{XP.helpful} XP</b> kazanır ve o gün üretim günü sayılır. Hedefine ve serine yazılır.
+            <b className="text-green-ink">İşe yarayan cevap:</b> soran “İşe yaradı” derse yanıtlayan <b className="num text-gold-ink">+{XP.helpful} XP</b> kazanır ve o gün üretim günü sayılır. Hedefine ve serine yazılır.
           </li>
         </ul>
         <p className="text-ink-3">Günlük toplam en fazla {XP.dailyCap} XP. XP için paylaşım yapmanın anlamı yok: yalnız gerçekten işe yarayan yardım öne geçer.</p>

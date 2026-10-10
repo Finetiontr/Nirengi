@@ -23,7 +23,7 @@ const TABS: { key: Tab; label: string }[] = [
 /** Kept for the need detail screen, which still tints its status pill with it. */
 export const statusTone = (st: NeedStatus) =>
   ({
-    published: 'border-green/40 text-green-lip bg-green-tint',
+    published: 'border-green/40 text-green-ink bg-green-tint',
     piloting: 'border-indigo/40 text-indigo bg-indigo-tint',
     closed: 'border-line-2 text-ink-3',
     draft: 'border-dashed border-line-2 text-ink-3',
@@ -47,7 +47,7 @@ export default function NeedsPage() {
   const count = (k: Tab) => (k === 'all' ? rows.length : rows.filter((r) => r.n.status === k).length);
 
   return (
-    <div className="mx-auto max-w-[760px]">
+    <div className="max-lg:mx-auto max-w-[760px]">
       <PageHead title="İhtiyaçlar" lead={`${org.name} için çözmek istediğin problemleri burada yazar, yayımlar ve uyan gençleri görürsün.`}>
         <a href="/ihtiyaclar/yeni" data-coach="ihtiyac-yeni" className="btn-primary">
           Yeni ihtiyaç
@@ -58,7 +58,7 @@ export default function NeedsPage() {
         <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
           <div data-coach="ihtiyac-filtre" className="seg w-full sm:w-auto" role="group" aria-label="Duruma göre süz">
             {TABS.map((t) => (
-              <button key={t.key} type="button" aria-pressed={tab === t.key} onClick={() => setTab(t.key)} className="flex-1 !px-2.5 sm:flex-none sm:!px-3.5">
+              <button key={t.key} type="button" aria-pressed={tab === t.key} onClick={() => setTab(t.key)} className="flex-1 whitespace-nowrap !px-1 text-[13px] sm:flex-none sm:!px-3.5 sm:text-[14px]">
                 {t.label} <span className="num font-black opacity-70">{count(t.key)}</span>
               </button>
             ))}
@@ -119,7 +119,7 @@ export default function NeedsPage() {
                       {r.n.status === 'published' &&
                         (r.fits ? (
                           <>
-                            <b className="num text-green-lip">{r.fits}</b> uygun aday · en iyi uyum %{r.best}
+                            <b className="num text-green-ink">{r.fits}</b> uygun aday · en iyi uyum %{r.best}
                           </>
                         ) : (
                           'Henüz uygun aday yok'

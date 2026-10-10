@@ -60,7 +60,7 @@ export default function ClosestDoor({ s, closest, more = false }: { s: State; cl
           <p className="text-[13px] font-bold text-ink-3">{org?.name} · kurgusal demo kurumu</p>
           <p className="mt-2 text-[15px] font-bold leading-snug text-ink-2">
             <b className="text-ink">{skillLabel(skill)}</b> alanında bir doğrulanmış iş eklersen uyumun{' '}
-            <b className="num text-ink">{m.score}</b> → <b className="num text-green-lip">{to}</b> olur.
+            <b className="num text-ink">{m.score}</b> → <b className="num text-green-ink">{to}</b> olur.
           </p>
         </div>
       </div>

@@ -23,7 +23,8 @@ export default function GencRail({ omit }: { omit?: 'week' | 'route' }) {
   const l = league(s, me);
   const mine = l.rows.find((r) => r.personId === me.id);
   const weekly = questsFor(s, me).filter((q) => q.kind === 'haftalik');
-  const left = Math.max(0, Math.ceil((l.endsAt - Date.now()) / 86_400_000));
+  // Whole days, as the league card's "1 gün 5 saat" reads them.
+  const left = Math.max(0, Math.floor((l.endsAt - Date.now()) / 86_400_000));
   useDefterStore();
   const book = pages(s, me);
   const fresh = unread(book).length;
@@ -38,9 +39,9 @@ export default function GencRail({ omit }: { omit?: 'week' | 'route' }) {
             <p className="text-[15px] font-bold text-ink-3">
               {mine ? (
                 <>
-                  <span className={mine.zone === 'up' ? 'text-green-lip' : mine.zone === 'down' ? 'text-red-lip' : 'text-ink-2'}>{mine.rank}. sıradasın</span>
+                  <span className={mine.zone === 'up' ? 'text-green-ink' : mine.zone === 'down' ? 'text-red-lip' : 'text-ink-2'}>{mine.rank}. sıradasın</span>
                   {' · '}
-                  {left} gün kaldı
+                  {left ? `${left} gün kaldı` : 'bugün bitiyor'}
                 </>
               ) : (
                 'Bu hafta yarışa katıl'

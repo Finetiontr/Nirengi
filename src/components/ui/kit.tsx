@@ -199,7 +199,7 @@ export function Why({ title, children, label = 'Neden?' }: { title: string; chil
           e.stopPropagation();
           setOpen(true);
         }}
-        className="rounded-full px-2 py-0.5 text-[13px] font-extrabold text-indigo transition-colors hover:bg-indigo-tint"
+        className="relative rounded-full px-2 py-0.5 text-[13px] font-extrabold text-indigo transition-colors after:absolute after:-inset-y-2 after:inset-x-0 after:content-[''] hover:bg-indigo-tint"
       >
         {label}
       </button>
@@ -242,6 +242,9 @@ export const celebrate = (c: Celebration) => window.dispatchEvent(new CustomEven
 export const feedback = (f: FeedbackMsg) => window.dispatchEvent(new CustomEvent('nirengi:feedback', { detail: f }));
 
 const BURST = ['orange', 'cyan', 'purple', 'gold', 'green', 'indigo'];
+/** The kurum face never shows orange, not even in confetti. */
+const onKurum = () => typeof document !== 'undefined' && document.documentElement.dataset.mode === 'kurum';
+const tonesFor = (tones: string[]) => (onKurum() ? tones.filter((t) => t !== 'orange') : tones);
 
 // Niri's own triangle with rounded corners, so the rings echo the survey marker.
 const RING = (() => {
@@ -272,7 +275,7 @@ const RING_TONES = ['indigo', 'cyan', 'purple', 'orange'];
 function Rings() {
   return (
     <svg viewBox="0 0 120 120" className="pointer-events-none absolute inset-0 h-full w-full overflow-visible" aria-hidden="true">
-      {RING_TONES.map((t, i) => (
+      {tonesFor(RING_TONES).map((t, i) => (
         <path key={t} className="c-ring" d={RING} fill="none" stroke={`rgb(var(--${t}) / 0.75)`} strokeWidth="2" strokeLinejoin="round" style={{ '--i': i } as CSSProperties} />
       ))}
     </svg>
@@ -281,10 +284,11 @@ function Rings() {
 
 /** Small rounded triangles in palette tokens, thrown out from Niri. */
 function Confetti() {
+  const burst = tonesFor(BURST);
   const bits = Array.from({ length: 32 }, (_, i) => {
     const a = (i / 32) * Math.PI * 2 + (i % 3) * 0.2;
     const d = 130 + (i % 5) * 36;
-    return { i, x: Math.cos(a) * d, y: Math.sin(a) * d - 70, r: (i * 53) % 360, tone: BURST[i % BURST.length], w: 9 + (i % 3) * 4 };
+    return { i, x: Math.cos(a) * d, y: Math.sin(a) * d - 70, r: (i * 53) % 360, tone: burst[i % burst.length], w: 9 + (i % 3) * 4 };
   });
   return (
     <div className="pointer-events-none absolute left-1/2 top-1/2" aria-hidden="true">
@@ -306,8 +310,9 @@ function Confetti() {
   );
 }
 
-/** A survey flag: drops in, bounces once and settles; the cloth keeps rippling. Static when motion is reduced. */
+/** A survey flag: drops in, bounces once and settles; the cloth keeps rippling. Static when motion is reduced. Kurum plants a green one. */
 export function SurveyFlag({ size = 76, delay = 0, className = '' }: { size?: number; delay?: number; className?: string }) {
+  const cloth = onKurum() ? 'green' : 'orange';
   return (
     <svg viewBox="0 0 60 80" width={(size * 60) / 80} height={size} className={`c-flag overflow-visible ${className}`} style={{ '--d': `${delay}s` } as CSSProperties} aria-hidden="true">
       <path d="M6 77q16-15 32 0Z" fill="rgb(var(--line-2))" />
@@ -315,7 +320,7 @@ export function SurveyFlag({ size = 76, delay = 0, className = '' }: { size?: nu
       <rect x="20" y="9" width="4" height="66" rx="2" fill="rgb(var(--indigo-lip))" />
       <circle cx="22" cy="8" r="3.4" fill="rgb(var(--indigo))" />
       <g className="c-cloth" style={{ '--d': `${delay}s` } as CSSProperties}>
-        <path d="M25 13 53 23 25 35Z" fill="rgb(var(--orange))" stroke="rgb(var(--orange))" strokeWidth="4" strokeLinejoin="round" />
+        <path d="M25 13 53 23 25 35Z" fill={`rgb(var(--${cloth}))`} stroke={`rgb(var(--${cloth}))`} strokeWidth="4" strokeLinejoin="round" />
         <path d="M28 19 38 23 28 28Z" fill="rgb(var(--indigo))" stroke="rgb(var(--indigo))" strokeWidth="2" strokeLinejoin="round" />
       </g>
     </svg>

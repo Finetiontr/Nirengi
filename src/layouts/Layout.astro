@@ -84,7 +84,7 @@ const fullTitle = title.startsWith('nirengi') ? title : `${title} · nirengi`;
           <button type="button" data-theme-toggle class="btn-quiet btn-sm !px-2.5 !text-ink-3" aria-label="Aydınlık / karanlık tema">
             <svg viewBox="0 0 20 20" class="h-5 w-5" aria-hidden="true"><circle cx="10" cy="10" r="7" fill="none" stroke="currentColor" stroke-width="2"></circle><path d="M10 3a7 7 0 0 1 0 14Z" fill="currentColor"></path></svg>
           </button>
-          <a href="/bugun" class="only-browser btn-primary btn-sm ml-1">Uygulamaya gir</a>
+          <a href="/bugun" data-app-door class="only-browser btn-primary btn-sm ml-1">Uygulamaya gir</a>
         </nav>
       </div>
     </header>
@@ -111,6 +111,12 @@ const fullTitle = title.startsWith('nirengi') ? title : `${title} · nirengi`;
         });
       for (const b of document.querySelectorAll('[data-tour-open]'))
         b.addEventListener('click', () => window.dispatchEvent(new Event('nirengi:tour')));
+      // A kurum visitor goes back to the kurum side, not to the genç Bugün.
+      try {
+        const v = JSON.parse(sessionStorage.getItem('nirengi:view') || localStorage.getItem('nirengi:view') || '{}');
+        const door = document.querySelector<HTMLAnchorElement>('[data-app-door]');
+        if (door && v.persona === 'org') door.href = door.href.replace(/bugun$/, 'kurum');
+      } catch {}
     </script>
   </body>
 </html>

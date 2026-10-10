@@ -22,7 +22,7 @@ import { NEED_LABEL } from '../kurum/NeedBits';
 import { calmTone, Consistency, EvidenceChips, IdName, PartBars, Who, WeekStrip } from './matchbits.tsx';
 
 const STATUS_PILL: Record<NeedStatus, string> = {
-  published: 'bg-green-tint text-green-lip',
+  published: 'bg-green-tint text-green-ink',
   piloting: 'bg-indigo-tint text-indigo',
   closed: 'bg-bg-3 text-ink-3',
   draft: 'border-2 border-dashed border-line-2 bg-bg text-ink-2',
@@ -33,7 +33,7 @@ export default function NeedDetail({ id }: { id: string }) {
   const need = byId.need(s, routeId(id));
   if (!need)
     return (
-      <div className="mx-auto max-w-[720px]">
+      <div className="max-lg:mx-auto max-w-[720px]">
         <EmptyState title="Bu ihtiyaç bulunamadı" action={<a className="btn-line" href="/ihtiyaclar">İhtiyaçlara dön</a>}>
           Bağlantı eski olabilir ya da demo verisi sıfırlanmış olabilir.
         </EmptyState>
@@ -78,6 +78,16 @@ function Detail({ need }: { need: Need }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [need.id, live]);
 
+  // A link ending in #adaylar (after publishing, from the tour) lands on the list once it is drawn.
+  useEffect(() => {
+    if (location.hash !== '#adaylar') return;
+    const t = window.setTimeout(() => {
+      const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      document.getElementById('adaylar')?.scrollIntoView({ block: 'start', behavior: still ? 'auto' : 'smooth' });
+    }, 150);
+    return () => window.clearTimeout(t);
+  }, []);
+
   // Keep the last match around so the sheet can finish its exit animation.
   const current = ranked.find((m) => m.person.id === openId);
   const last = useRef<Match | undefined>(undefined);
@@ -118,7 +128,7 @@ function Detail({ need }: { need: Need }) {
   const myPilot = pilot && pilot.personId === me.id;
 
   return (
-    <div className="mx-auto max-w-[720px]">
+    <div className="max-lg:mx-auto max-w-[720px]">
       <a href={isOrg ? '/ihtiyaclar' : '/bugun#ihtiyaclar'} className="inline-flex items-center gap-1 text-[14px] font-extrabold text-ink-3 transition-colors hover:text-indigo">
         <ChevronLeft className="h-4 w-4" strokeWidth={3} />
         {isOrg ? 'İhtiyaçlar' : 'Sana uyan ihtiyaçlar'}
@@ -175,7 +185,7 @@ function Detail({ need }: { need: Need }) {
 
       {/* Kurum: ranked candidates */}
       {isOrg && live && (
-        <section id="adaylar" className="mt-10 scroll-mt-6" aria-labelledby="adaylar-b">
+        <section id="adaylar" className="mt-10 scroll-mt-24" aria-labelledby="adaylar-b">
           <h2 id="adaylar-b" className="sr-only">
             Uyan adaylar
           </h2>
@@ -282,7 +292,7 @@ function Detail({ need }: { need: Need }) {
                   </b>
                 </span>
               ))}{' '}
-              birlikte aranan yetkinliklerin <b className="num text-green-lip">%{Math.round(team.total * 100)}</b> kadarını kapatıyor.
+              birlikte aranan yetkinliklerin <b className="num text-green-ink">%{Math.round(team.total * 100)}</b> kadarını kapatıyor.
             </p>
           </div>
         </section>
@@ -434,7 +444,7 @@ function NeedCard({ open, onClose, need }: { open: boolean; onClose: () => void;
                 <span className="num pt-px text-[13px] font-black text-ink-3">K{i + 1}</span>
                 <span className="min-w-0 flex-1">
                   {k.text}
-                  <span className={`ml-2 text-[13px] font-extrabold ${isCheckable(k.text) ? 'text-green-lip' : 'text-red-lip'}`}>{isCheckable(k.text) ? 'ölçülebilir' : 'ölçülemez'}</span>
+                  <span className={`ml-2 text-[13px] font-extrabold ${isCheckable(k.text) ? 'text-green-ink' : 'text-red-lip'}`}>{isCheckable(k.text) ? 'ölçülebilir' : 'ölçülemez'}</span>
                 </span>
               </li>
             ))}
@@ -476,7 +486,7 @@ function CandidateCard({ m, rank, hist, inPilot, onOpen }: { m: Match; rank: num
           <span className="block truncate text-[17px] font-black text-ink">{id.name}</span>
           <span className="block truncate text-[14px] font-bold text-ink-3">{m.person.headline}</span>
           {(rank === 1 || inPilot) && (
-            <span className={`pill mt-1.5 !py-0.5 ${inPilot ? 'bg-indigo-tint text-indigo' : 'bg-green-tint text-green-lip'}`}>{inPilot ? 'Denemede' : 'En uyumlu'}</span>
+            <span className={`pill mt-1.5 !py-0.5 ${inPilot ? 'bg-indigo-tint text-indigo' : 'bg-green-tint text-green-ink'}`}>{inPilot ? 'Denemede' : 'En uyumlu'}</span>
           )}
         </span>
         <Ring value={m.score} size={60} tone={calmTone(m.score)} />
@@ -609,7 +619,7 @@ function CandidateSheet({
                 <span className="min-w-0 flex-1 text-[15px] font-bold text-ink-2">
                   <b>Eksik: {skillLabel(g.skill)}</b> · {g.kind === 'claim' ? 'yalnız beyan var' : 'kanıt yok'}
                 </span>
-                {g.gain > 0 && <span className="num shrink-0 text-[14px] font-black text-green-lip">+{g.gain}</span>}
+                {g.gain > 0 && <span className="num shrink-0 text-[14px] font-black text-green-ink">+{g.gain}</span>}
               </li>
             ))}
           </ul>
@@ -687,7 +697,7 @@ function MyFit({ m, org }: { m: Match; org: Org }) {
             {gaps.map((g) => (
               <li key={g.skill}>
                 <a href="/kanit-bagla" className="card-press flex items-center gap-4 p-4">
-                  <span className="num grid h-12 w-12 shrink-0 place-items-center rounded-full bg-green-tint text-[16px] font-black text-green-lip">+{g.gain}</span>
+                  <span className="num grid h-12 w-12 shrink-0 place-items-center rounded-full bg-green-tint text-[16px] font-black text-green-ink">+{g.gain}</span>
                   <span className="min-w-0 flex-1">
                     <span className="block text-[16px] font-black text-ink">{skillLabel(g.skill)} alanında doğrulanmış bir iş ekle</span>
                     <span className="block text-[14px] font-bold text-ink-3">{g.kind === 'claim' ? 'Şu an yalnız beyanın var' : 'Henüz kanıtın yok'}</span>

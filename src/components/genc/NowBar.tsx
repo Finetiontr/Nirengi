@@ -517,7 +517,7 @@ function DoorRow({ d }: { d: Door }) {
           <span className="mt-0.5 line-clamp-2 block text-[15.5px] font-extrabold leading-snug text-ink">{d.m.need.title}</span>
           {gap && gap.gain > 0 && (
             <span className="mt-1 block text-[13px] font-bold text-ink-3">
-              {skillLabel(gap.skill)} alanında bir işle <b className="whitespace-nowrap text-green-lip">+{gap.gain} uyum</b>
+              {skillLabel(gap.skill)} alanında bir işle <b className="whitespace-nowrap text-green-ink">+{gap.gain} uyum</b>
             </span>
           )}
         </span>

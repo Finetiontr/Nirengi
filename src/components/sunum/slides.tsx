@@ -69,7 +69,7 @@ function Wordmark({ size }: { size: number }) {
 }
 
 function Tag({ who, children }: { who: 'genc' | 'kurum'; children: ReactNode }) {
-  const tone = who === 'genc' ? 'bg-cyan-tint text-cyan-lip' : 'bg-indigo-tint text-indigo';
+  const tone = who === 'genc' ? 'bg-cyan-tint text-cyan-ink' : 'bg-indigo-tint text-indigo';
   return <span className={`pill !px-[12px] !text-[17px] ${tone}`}>{children}</span>;
 }
 
@@ -259,7 +259,7 @@ function LiveDemo() {
     { who: 'İkisi', text: 'Genç teslim eder, kurum onaylar: aşama deftere mühürlenir.' },
     { who: 'Genç', text: 'Onaylanan aşama profilde Kurum onaylı kanıt olarak görünür.' },
   ];
-  const tag = (who: string) => (who === 'Kurum' ? 'bg-indigo-tint text-indigo' : who === 'Genç' ? 'bg-cyan-tint text-cyan-lip' : 'bg-bg-3 text-ink-2');
+  const tag = (who: string) => (who === 'Kurum' ? 'bg-indigo-tint text-indigo' : who === 'Genç' ? 'bg-cyan-tint text-cyan-ink' : 'bg-bg-3 text-ink-2');
   const windows = [
     { name: 'Kurum penceresi', path: '/kurum', note: 'Solda: ihtiyaç, adaylar, onay' },
     { name: 'Genç penceresi', path: '/bugun', note: 'Sağda: kanıt, teslim, profil' },
@@ -421,7 +421,7 @@ function AiDiff() {
             <div className="h-full rounded-full" style={{ width: `${b.a.score}%`, background: `rgb(var(--${b.tone}))` }} />
             <span className="absolute top-[-9px] h-[40px] w-[4px] -translate-x-1/2 rounded-full bg-ink" style={{ left: `${PUBLISH_THRESHOLD}%` }} />
           </div>
-          <p className={`mt-[10px] text-[20px] font-bold ${b.a.canPublish ? 'text-green-lip' : 'text-ink-3'}`}>{b.a.canPublish ? 'Yayımlanabilir' : 'Yayımlanamaz'}</p>
+          <p className={`mt-[10px] text-[20px] font-bold ${b.a.canPublish ? 'text-green-ink' : 'text-ink-3'}`}>{b.a.canPublish ? 'Yayımlanabilir' : 'Yayımlanamaz'}</p>
         </div>
       ))}
       <p className="s-in absolute left-[852px] top-[714px] text-[20px] font-semibold text-ink-3" style={d(900)}>
@@ -488,7 +488,7 @@ function AiGuard() {
       </div>
 
       <p className="s-in absolute left-[112px] top-[630px] flex items-center gap-[12px] text-[23px] font-bold text-ink-2" style={d(1040)}>
-        <Check size={26} strokeWidth={3.4} className="shrink-0 text-green-lip" />
+        <Check size={26} strokeWidth={3.4} className="shrink-0 text-green-ink" />
         Model susarsa aynı ekranı kural motoru doldurur.
       </p>
     </>
@@ -526,11 +526,11 @@ function Done() {
     <>
       <Heading width={1376}>Neyi bitirdik, neyi bilerek bıraktık?</Heading>
       <div className="s-in absolute left-[112px] top-[214px] w-[640px]" style={d(120)}>
-        <p className="text-[20px] font-bold text-green-lip">Bitti, canlıda çalışıyor</p>
+        <p className="text-[20px] font-bold text-green-ink">Bitti, canlıda çalışıyor</p>
         <ul className="mt-[16px] flex flex-col gap-[18px]">
           {done.map((t) => (
             <li key={t} className="flex items-center gap-[14px] text-[30px] font-bold leading-tight text-ink">
-              <Check size={30} strokeWidth={3.4} className="shrink-0 text-green-lip" />
+              <Check size={30} strokeWidth={3.4} className="shrink-0 text-green-ink" />
               {t}
             </li>
           ))}

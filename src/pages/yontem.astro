@@ -81,7 +81,7 @@ const truth = [
   ['Telefona yükleme, internetsiz çalışma', 'Gerçek', 'Manifest ve service worker: ana ekrandan açılır, sayfalar telefonda tutulur. Bildirim yok.'],
   ['Kalıcılık', 'Tarayıcı', 'Demo verisi localStorage’da tutulur; üretimde Cloudflare D1 planlı.'],
 ] as const;
-const truthTone: Record<string, string> = { Gerçek: 'bg-green-tint text-green-lip', Beyan: 'bg-bg-3 text-ink-2', 'Yapay zekâ': 'bg-indigo-tint text-indigo', 'Kural tabanlı': 'bg-cyan-tint text-cyan-lip', Kurgusal: 'bg-bg-3 text-ink-2', Tarayıcı: 'bg-bg-3 text-ink-2' };
+const truthTone: Record<string, string> = { Gerçek: 'bg-green-tint text-green-ink', Beyan: 'bg-bg-3 text-ink-2', 'Yapay zekâ': 'bg-indigo-tint text-indigo', 'Kural tabanlı': 'bg-cyan-tint text-cyan-ink', Kurgusal: 'bg-bg-3 text-ink-2', Tarayıcı: 'bg-bg-3 text-ink-2' };
 ---
 
 <App
@@ -89,7 +89,7 @@ const truthTone: Record<string, string> = { Gerçek: 'bg-green-tint text-green-l
   mode="auto"
   description="nirengi sayıları nasıl hesaplar ve yapay zekâyı nerede kullanır: doğrulama basamakları, eşleşme formülü, yayın eşiği, yapay zekâ taslağı ve denetimi, kayıt defteri, haftalık ilerleme, XP ve ligler."
 >
-  <div class="mx-auto max-w-[680px]">
+  <div class="max-lg:mx-auto max-w-[680px]">
     <div class="relative overflow-hidden rounded-[20px] border-2 border-line px-4 pb-1 pt-5">
       <Contours seed={6} x={0.86} y={0.4} rings={8} step={30} opacity={0.5} />
       <div class="relative flex items-end gap-3">
@@ -183,7 +183,7 @@ const truthTone: Record<string, string> = { Gerçek: 'bg-green-tint text-green-l
       <div class="card p-4">
         <div class="flex items-center justify-between gap-3">
           <p class="text-[16px] font-black text-ink">Yayın eşiği</p>
-          <span class="num text-[18px] font-black text-green-lip">{PUBLISH_THRESHOLD}/100</span>
+          <span class="num text-[18px] font-black text-green-ink">{PUBLISH_THRESHOLD}/100</span>
         </div>
         <div class="relative mt-3">
           <Bar value={PUBLISH_THRESHOLD / 100} tone="green" h={16} />

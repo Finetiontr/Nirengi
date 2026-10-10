@@ -57,7 +57,7 @@ export default function AnalysisPage() {
             </h1>
             <button type="button" onClick={() => setMail(true)} className="chip transition-colors hover:border-indigo/40 hover:text-indigo">
               <Mail className="h-4 w-4" strokeWidth={2.6} aria-hidden="true" />
-              E-postada nasıl görünür?
+              E-postada gör
             </button>
           </div>
           <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -153,7 +153,7 @@ export default function AnalysisPage() {
                   </p>
                 </div>
                 {lever && lever.gain > 0 && (
-                  <span className="num shrink-0 rounded-full bg-green-tint px-2.5 py-1 text-[13px] font-black text-green-lip" title="Bu alanda bir doğrulanmış iş eklersen ihtiyaçlardaki toplam uyum artışı">
+                  <span className="num shrink-0 rounded-full bg-green-tint px-2.5 py-1 text-[13px] font-black text-green-ink" title="Bu alanda bir doğrulanmış iş eklersen ihtiyaçlardaki toplam uyum artışı">
                     +{lever.gain}
                   </span>
                 )}
@@ -196,8 +196,8 @@ function Fact({ i, icon, value, label }: { i: number; icon: ReactNode; value: Re
 const TONE_TEXT: Record<Advice['tone'], string> = {
   indigo: 'text-indigo',
   orange: 'text-orange-ink',
-  cyan: 'text-cyan-lip',
-  green: 'text-green-lip',
+  cyan: 'text-cyan-ink',
+  green: 'text-green-ink',
   purple: 'text-purple',
 };
 

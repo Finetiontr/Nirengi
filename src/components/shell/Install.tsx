@@ -196,7 +196,7 @@ export function InstallPanel() {
   if (way === 'app') return null;
   if (way === 'done')
     return (
-      <p className="flex items-start gap-3 rounded-[16px] bg-green-tint p-4 text-[16px] font-bold text-green-lip">
+      <p className="flex items-start gap-3 rounded-[16px] bg-green-tint p-4 text-[16px] font-bold text-green-ink">
         <Check className="mt-0.5 h-5 w-5 shrink-0" strokeWidth={3} aria-hidden="true" />
         Yüklendi. Ana ekranındaki ya da uygulamalarındaki nirengi simgesinden aç.
       </p>

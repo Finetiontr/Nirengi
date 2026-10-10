@@ -75,6 +75,8 @@ interface Foot {
   /** `href` opens in a new tab, and `onClick` still runs. */
   external?: boolean;
   side?: { label: string; onClick?: () => void; href?: string };
+  /** Quieter ways out under the key, so the key itself stays on the first screen. */
+  below?: ReactNode;
 }
 
 const OFFLINE: Scan = {
@@ -487,7 +489,7 @@ export default function ConnectPage() {
         school: '—',
         bio: 'Kanıtlarını NİRENGİ’ye bağladı.',
         availability: 'open',
-        weeklyHours: 15,
+        weeklyHours: 0,
         joinedAt: new Date().toISOString(),
         evidence: [],
         links: {},
@@ -551,7 +553,7 @@ export default function ConnectPage() {
       case 'start':
         return { label: 'Devam', disabled: !pick, onClick: choose };
       case 'me':
-        return { label: 'Devam', disabled: !meOk, blocked: () => setMeTouched(true), onClick: saveMe };
+        return { label: 'Devam', onClick: () => (meOk ? saveMe() : setMeTouched(true)) };
       case 'profiles':
         return { label: from === 'home' ? 'Bitti' : 'Devam', onClick: saveProfiles };
       case 'work':
@@ -564,7 +566,12 @@ export default function ConnectPage() {
       case 'user':
         return manual
           ? { label: 'Devam', disabled: !valid, onClick: startScan, blocked: () => setTouched(true), side: appReady() ? { label: 'GitHub’a bağlan', onClick: () => setManual(false) } : undefined }
-          : { label: 'GitHub’a bağlan', icon: <GitHub size={22} />, onClick: () => location.assign(installUrl()) };
+          : {
+              label: 'GitHub’a bağlan',
+              icon: <GitHub size={22} />,
+              onClick: () => location.assign(installUrl()),
+              below: <ConnectOther onSignIn={() => location.assign(signInUrl())} onManual={() => setManual(true)} canExample={!me} onExample={continueWithExample} />,
+            };
       case 'found':
         return { label: 'Devam', disabled: loading || included.size === 0, onClick: saveScan };
       case 'goal':
@@ -712,7 +719,7 @@ export default function ConnectPage() {
       case 'user':
         if (!manual)
           return (
-            <ConnectBody onSignIn={() => location.assign(signInUrl())} onManual={() => setManual(true)} canExample={!me} onExample={continueWithExample} reduce={reduce} />
+            <ConnectBody reduce={reduce} />
           );
         return (
           <UserBody
@@ -836,10 +843,11 @@ export default function ConnectPage() {
         </AnimatePresence>
       </div>
 
-      <div className="mt-8 flex flex-col-reverse items-start gap-3 pb-6 sm:flex-row sm:items-center">
+      <div className={`mt-6 flex flex-col-reverse items-start gap-3 sm:mt-8 sm:flex-row sm:items-center ${foot.below ? 'pb-3' : 'pb-6'}`}>
         {foot.side && <Key {...foot.side} className="btn-quiet" />}
         <Key {...foot} className="btn-primary btn-lg sm:min-w-[200px]" />
       </div>
+      {foot.below && <div className="pb-6">{foot.below}</div>}
     </div>
   );
 }
@@ -1004,7 +1012,7 @@ function StartBody({ pick, onPick, canExample, onExample }: { pick: Route | null
       <p className="hint">
         Diğerini sonra da ekleyebilirsin.{' '}
         {canExample && (
-          <button type="button" onClick={onExample} className="font-extrabold text-indigo underline-offset-2 hover:underline">
+          <button type="button" onClick={onExample} className="inline-flex min-h-10 items-center font-extrabold text-indigo underline-offset-2 hover:underline">
             Örnek profille gez
           </button>
         )}
@@ -1130,20 +1138,7 @@ function AccessSketch({ live }: { live: boolean }) {
   );
 }
 
-function ConnectBody({
-  onSignIn,
-  onManual,
-  canExample,
-  onExample,
-  reduce,
-}: {
-  onSignIn: () => void;
-  onManual: () => void;
-  canExample: boolean;
-  onExample: () => void;
-  reduce: boolean;
-}) {
-  const link = 'font-extrabold text-indigo underline-offset-2 hover:underline';
+function ConnectBody({ reduce }: { reduce: boolean }) {
   return (
     <>
       <Guide mood="wave">Nirengi’yi GitHub’a bağla; kurumlara hangi depolarını göstereceğini orada sen seç.</Guide>
@@ -1162,13 +1157,24 @@ function ConnectBody({
           <p className="mt-0.5 text-[14px] font-bold text-ink-3">
             <b className="text-ink-2">Only select repositories</b>’i seçip kurumlara göstermek istediğin depoları işaretle. Özel depoların da olur.
           </p>
-          <AccessSketch live={!reduce} />
+          <div className="hidden sm:block">
+            <AccessSketch live={!reduce} />
+          </div>
         </Stop>
         <Stop n={3} state="next" title="“Install”a bas, buraya dönersin">
           <p className="mt-0.5 text-[14px] font-bold text-ink-3">Depoların kendiliğinden gelir. Kopyalanacak kod ya da anahtar yok.</p>
         </Stop>
       </ol>
 
+    </>
+  );
+}
+
+/** Under the GitHub key: what Nirengi can see, and the other ways in (signed in before, a handle as Beyan, the example). */
+function ConnectOther({ onSignIn, onManual, canExample, onExample }: { onSignIn: () => void; onManual: () => void; canExample: boolean; onExample: () => void }) {
+  const link = 'inline-flex min-h-10 items-center font-extrabold text-indigo underline-offset-2 hover:underline';
+  return (
+    <>
       <p className="hint !mt-0">
         Kodunu okumayız, hiçbir şeye yazamayız.{' '}
         <Why title="Nirengi neyi görür?">
@@ -1179,7 +1185,7 @@ function ConnectBody({
           </div>
         </Why>
       </p>
-      <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[14px] font-bold text-ink-3">
+      <p className="mt-1 flex flex-wrap gap-x-5 text-[14px] font-bold text-ink-3">
         <button type="button" onClick={onSignIn} className={link}>
           Daha önce bağladım
         </button>

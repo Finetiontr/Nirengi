@@ -10,7 +10,7 @@ export const FIT_MIN = 60;
 
 const PILL: Record<NeedStatus, string> = {
   draft: 'bg-bg-3 text-ink-3',
-  published: 'bg-green-tint text-green-lip',
+  published: 'bg-green-tint text-green-ink',
   piloting: 'bg-indigo-tint text-indigo',
   closed: 'bg-bg-3 text-ink-3',
 };

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import type { Level, Person } from '../../lib/types.ts';
 import { LEVELS } from '../../lib/labels.ts';
 import { blindCode, initials } from '../../lib/format.ts';
-import { useView } from '../../lib/store.ts';
+import { useAppState, useView } from '../../lib/store.ts';
 import { AlertTriangle, Check, Circle, X } from 'lucide-react';
 import { Bar, EmptyState, Ring } from './kit';
 import { Mark as BrandMark } from './icons';
@@ -10,7 +10,7 @@ import { Mark as BrandMark } from './icons';
 // ---------------------------------------------------------------- glyphs
 
 const STATUS = { ok: Check, fail: X, warn: AlertTriangle, pending: Circle } as const;
-const STATUS_TONE = { ok: 'text-green-lip', fail: 'text-red-lip', warn: 'text-orange-ink', pending: 'text-ink-3' } as const;
+const STATUS_TONE = { ok: 'text-green-ink', fail: 'text-red-lip', warn: 'text-orange-ink', pending: 'text-ink-3' } as const;
 
 /** Drawn status mark (never a Unicode glyph): passed, blocking, warning, pending. */
 export function StatusIcon({ kind, className = '' }: { kind: keyof typeof STATUS; className?: string }) {
@@ -41,7 +41,7 @@ export function LevelGlyph({ level, size = 16 }: { level: Level; size?: number }
 }
 
 export function LevelBadge({ level, long = false }: { level: Level; long?: boolean }) {
-  const tone = level === 'S1' ? 'bg-bg-3 text-ink-3' : level === 'S2' ? 'bg-cyan-tint text-cyan-lip' : 'bg-indigo-tint text-indigo';
+  const tone = level === 'S1' ? 'bg-bg-3 text-ink-3' : level === 'S2' ? 'bg-cyan-tint text-cyan-ink' : 'bg-indigo-tint text-indigo';
   return (
     <span className={`pill ${tone}`} title={`${LEVEL_NAME[level]} — ${LEVELS[level].short}`}>
       <LevelGlyph level={level} size={14} />
@@ -65,10 +65,13 @@ const TONES = ['indigo', 'orange', 'cyan', 'purple', 'green', 'red', 'gold-lip',
 const tone = (id: string) => TONES[[...id].reduce((a, c) => a + c.charCodeAt(0), 0) % TONES.length];
 
 /** What the viewer is allowed to see. Blind mode hides identity for the kurum side. */
-export function useIdentity(person: Person) {
-  const { persona, blind, revealed } = useView();
+/** `partner`: a deneme projesi with this kurum counts as first contact (the profile page; candidate lists stay blind). */
+export function useIdentity(person: Person, { partner: byPilot = false }: { partner?: boolean } = {}) {
+  const { persona, blind, revealed, orgId } = useView();
+  const pilots = useAppState().pilots;
+  const partner = byPilot && pilots.some((p) => p.orgId === orgId && p.personId === person.id);
   // The connected GitHub user is blind too: kurum sees the work first, the name and photo after first contact.
-  const hidden = blind && persona === 'org' && !revealed.includes(person.id);
+  const hidden = blind && persona === 'org' && !revealed.includes(person.id) && !partner;
   const code = blindCode(person.id);
   return {
     hidden,

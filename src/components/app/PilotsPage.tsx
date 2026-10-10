@@ -71,7 +71,7 @@ export function Face({ look, size, n }: { look: Look; size: number; n?: number }
 
 // ---------------------------------------------------------------- page
 
-const TONE_TEXT: Record<Tone, string> = { indigo: 'text-indigo', green: 'text-green-lip', ink: 'text-ink-2' };
+const TONE_TEXT: Record<Tone, string> = { indigo: 'text-indigo', green: 'text-green-ink', ink: 'text-ink-2' };
 
 function PilotCard({ pilot, persona, i }: { pilot: Pilot; persona: Persona; i: number }) {
   const s = useAppState();
@@ -133,7 +133,7 @@ export default function PilotsPage() {
   const closed = mine.filter((p) => p.status !== 'active');
 
   return (
-    <div className="mx-auto max-w-[640px]">
+    <div className="max-lg:mx-auto max-w-[640px]">
       <header>
         <div className="flex items-start justify-between gap-3">
           <h1 className="h-page">{persona === 'org' ? 'Projeler' : 'Projelerim'}</h1>

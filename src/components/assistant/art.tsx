@@ -167,9 +167,9 @@ export function ArtMatch() {
             </span>
             <span className="block whitespace-nowrap text-[11.5px] font-bold leading-tight text-ink-3">isim gizli</span>
           </span>
-          <span className="num rounded-full bg-green-tint px-2 py-0.5 text-[13px] font-black text-green-lip">%86</span>
+          <span className="num rounded-full bg-green-tint px-2 py-0.5 text-[13px] font-black text-green-ink">%86</span>
         </div>
-        <div className="mt-2 flex items-center gap-1.5 whitespace-nowrap rounded-[10px] bg-cyan-tint px-2 py-1.5 text-[11.5px] font-extrabold text-cyan-lip">
+        <div className="mt-2 flex items-center gap-1.5 whitespace-nowrap rounded-[10px] bg-cyan-tint px-2 py-1.5 text-[11.5px] font-extrabold text-cyan-ink">
           <svg viewBox="0 0 16 16" width="13" height="13" className="shrink-0">
             <path d="M8 2.2 14.2 13.3H1.8Z" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
             <circle cx="8" cy="9.6" r="1.6" fill="currentColor" />

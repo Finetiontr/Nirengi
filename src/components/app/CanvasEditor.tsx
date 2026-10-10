@@ -140,7 +140,16 @@ const SLIDE: Variants = {
   exit: (d: number) => ({ x: d * -56, opacity: 0, transition: { duration: 0.12 } }),
 };
 
-type Done = { kind: 'draft' | 'published' | 'saved'; id: string; fits: number };
+/** fits: candidates at or above FIT_MIN; listed and top: what the need page will show under Adaylar. */
+type Done = { kind: 'draft' | 'published' | 'saved'; id: string; fits: number; listed?: number; top?: number };
+
+/** What publishing says about candidates, in the same terms as the list it links to. */
+const candidateLine = (d: Done) =>
+  d.fits
+    ? `${d.fits} aday ihtiyacına uyuyor.`
+    : d.listed
+      ? `${d.listed} aday listede; en uyumlusu ${d.top} puanda. Kanıtları arttıkça uyum yükselir.`
+      : 'Henüz uyan aday yok; yeni kanıtlar geldikçe burada görünür.';
 
 export default function CanvasEditor() {
   const s = useAppState();
@@ -185,9 +194,9 @@ export default function CanvasEditor() {
   // The moment the gate opens deserves a nod, but only when it actually flips.
   const gate = useRef(a.canPublish);
   useEffect(() => {
-    if (a.canPublish && !gate.current) feedback({ tone: 'good', title: 'Artık yayımlayabilirsin', text: `Netlik puanın ${a.score}. Hazırsan yayımla ya da biraz daha netleştir.` });
+    if (a.canPublish && !gate.current) feedback({ tone: 'good', title: 'Artık yayımlayabilirsin', text: 'Netlik puanın yayın eşiğini geçti. Hazırsan yayımla ya da biraz daha netleştir.' });
     gate.current = a.canPublish;
-  }, [a.canPublish, a.score]);
+  }, [a.canPublish]);
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [i]);
@@ -255,11 +264,13 @@ export default function CanvasEditor() {
     actions.publishNeed(nid);
     setSavedId(nid);
     const st = getState();
-    const fits = rankCandidates(st, st.needs.find((n) => n.id === nid)!).filter((m) => m.score >= FIT_MIN).length;
-    setDone({ kind: 'published', id: nid, fits });
+    // The same list the need page shows: anyone with work in at least one asked skill, best first.
+    const ranked = rankCandidates(st, st.needs.find((n) => n.id === nid)!).filter((m) => m.coverage.some((c) => c.score > 0));
+    const result: Done = { kind: 'published', id: nid, fits: ranked.filter((m) => m.score >= FIT_MIN).length, listed: Math.min(ranked.length, 6), top: ranked[0]?.score };
+    setDone(result);
     celebrate({
       title: 'İhtiyacın yayında!',
-      sub: fits ? `${fits} aday uyuyor` : 'Henüz uyan aday yok; yeni kanıtlar geldikçe burada görünür.',
+      sub: candidateLine(result),
       cta: 'Adayları gör',
       href: `/ihtiyaclar/${nid}#adaylar`,
     });
@@ -312,7 +323,7 @@ export default function CanvasEditor() {
               </ul>
             </Why>
           </span>
-          <span className={`text-[17px] font-black ${a.canPublish ? 'text-green-lip' : 'text-ink'}`}>
+          <span className={`text-[17px] font-black ${a.canPublish ? 'text-green-ink' : 'text-ink'}`}>
             <CountUp value={a.score} />
             <span className="text-ink-3">/100</span>
           </span>
@@ -322,7 +333,7 @@ export default function CanvasEditor() {
           <span className="absolute -top-1 h-[22px] w-[3px] -translate-x-1/2 rounded-full bg-ink" style={{ left: `${PUBLISH_THRESHOLD}%` }} aria-hidden="true" />
         </div>
         <div className="relative mt-2 h-5 text-[13px] font-extrabold">
-          <span className={a.canPublish ? 'text-green-lip' : 'text-ink-2'}>{a.canPublish ? 'Yayımlamaya hazır' : gateNote(a)}</span>
+          <span className={a.canPublish ? 'text-green-ink' : 'text-ink-2'}>{a.canPublish ? 'Yayımlamaya hazır' : gateNote(a)}</span>
           <span className="absolute top-0 -translate-x-1/2 whitespace-nowrap text-ink-3" style={{ left: `${PUBLISH_THRESHOLD}%` }}>
             {PUBLISH_THRESHOLD}
           </span>
@@ -486,13 +497,13 @@ function CheckRow({ ok, label, fix, points, must }: { ok: boolean; label: string
         {ok && <StatusIcon kind="ok" className="!align-baseline" />}
       </span>
       <span className="min-w-0 flex-1">
-        <span className={`block text-[15px] font-extrabold ${ok ? 'text-green-lip' : 'text-ink'}`}>
+        <span className={`block text-[15px] font-extrabold ${ok ? 'text-green-ink' : 'text-ink'}`}>
           {label}
           {must && !ok && <span className="ml-2 text-[13px] font-extrabold text-indigo">zorunlu</span>}
         </span>
         {!ok && <span className="block text-[14px] font-semibold leading-snug text-ink-3">{fix}</span>}
       </span>
-      {points > 0 && <span className={`num text-[14px] font-black ${ok ? 'text-green-lip' : 'text-ink-3'}`}>+{points}</span>}
+      {points > 0 && <span className={`num text-[14px] font-black ${ok ? 'text-green-ink' : 'text-ink-3'}`}>+{points}</span>}
     </li>
   );
 }
@@ -547,7 +558,7 @@ function StepView({ id, ok, checks, c, setC, title, setTitle, skills, toggleSkil
       <div className="mt-2">
         {quotes && (val || id === 'constraints') && (
           <div className="mb-3">
-            <span className="pill !py-0.5 bg-cyan-tint text-cyan-lip">Metninden doldurdum, bir kontrol et</span>
+            <span className="pill !py-0.5 bg-cyan-tint text-cyan-ink">Metninden doldurdum, bir kontrol et</span>
             {cited.map((q) => (
               <p key={q} className="mt-1.5 text-[14px] font-semibold leading-snug text-ink-3">
                 <span className="font-extrabold">Metninde:</span> “{q}”
@@ -776,7 +787,7 @@ function DertStep({ raw, setRaw, busy }: { raw: string; setRaw: (v: string) => v
         autoFocus
       />
       <div className="mt-2 flex items-center justify-between gap-3">
-        <span className={`num text-[13px] font-bold ${n >= 30 ? 'text-green-lip' : 'text-ink-3'}`}>{n >= 30 ? 'Yeterli' : `En az 30 karakter · ${n}`}</span>
+        <span className={`num text-[13px] font-bold ${n >= 30 ? 'text-green-ink' : 'text-ink-3'}`}>{n >= 30 ? 'Yeterli' : `En az 30 karakter · ${n}`}</span>
         <button type="button" className="btn-quiet btn-sm" disabled={busy} onClick={() => setRaw(SAMPLE_COMPLAINT)}>
           Örnekle doldur
         </button>
@@ -1057,7 +1068,7 @@ function Review({ org, c, title, skills, a, titleOk, ready, draftLeft, canMem, o
 
 function Finished({ done, onResume }: { done: Done; onResume: () => void }) {
   const copy = {
-    published: { h: 'İhtiyacın yayında', p: done.fits ? `${done.fits} aday ihtiyacına uyuyor. Adayların isimleri ilk temasa kadar gizli kalır.` : 'Henüz uyan aday yok; yeni kanıtlar geldikçe burada görünür.' },
+    published: { h: 'İhtiyacın yayında', p: `${candidateLine(done)}${done.listed ? ' Adayların isimleri ilk temasa kadar gizli kalır.' : ''}` },
     draft: { h: 'Taslak kaydedildi', p: 'Kaldığın yerden istediğin zaman devam edebilirsin.' },
     saved: { h: 'Değişiklikler kaydedildi', p: 'İhtiyacın güncel hâli adaylara yansıdı.' },
   }[done.kind];

@@ -21,6 +21,13 @@ function pageKey(url) {
   return u.origin + p;
 }
 
+/** A detail page made at runtime (/pilotlar/<id>…) is the kept `_` page; it reads the id from the address. */
+const DETAIL = /\/(ihtiyaclar|kart|pilotlar|profil)\/([^/]+)\/?$/;
+function detailKey(url) {
+  const m = new URL(url).pathname.match(DETAIL);
+  return m && m[2] !== '_' ? at(`${m[1]}/_`) : null;
+}
+
 /** A response that came through a redirect cannot answer a navigation; keep a plain copy. */
 async function plain(res) {
   if (!res.redirected) return res;
@@ -65,15 +72,17 @@ async function page(request) {
   });
   net.catch(() => undefined);
   const slow = new Promise((_, fail) => setTimeout(() => fail(new Error('slow')), WAIT_MS));
+  const detail = detailKey(request.url);
+  const asDetail = async (res) => (res.status === 404 && detail ? ((await cache.match(detail)) ?? res) : res);
   try {
-    return await Promise.race([net, slow]);
+    return await asDetail(await Promise.race([net, slow]));
   } catch {
-    const kept = await cache.match(key, { ignoreSearch: true });
+    const kept = (await cache.match(key, { ignoreSearch: true })) ?? (detail ? await cache.match(detail) : undefined);
     if (kept) return kept;
     try {
-      return await net;
+      return await asDetail(await net);
     } catch {
-      // A detail page made at runtime has no copy of its own; the kept 404 page forwards it to its `_` page.
+      // Nothing kept for this address: the kept 404 page says so (and forwards runtime ids).
       return (await cache.match(at('404.html'))) ?? Response.error();
     }
   }

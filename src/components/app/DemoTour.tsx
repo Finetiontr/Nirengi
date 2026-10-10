@@ -5,6 +5,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Check, X } from 'lucide-react';
 import { actions, useAppState, useView } from '../../lib/store.ts';
+import { SAMPLE_CARD } from '../../lib/seed.ts';
 import Niri from '../ui/Niri';
 import { Bar } from '../ui/kit';
 
@@ -102,7 +103,8 @@ export default function DemoTour() {
           href: targetPerson ? `/profil/${targetPerson.handle}` : '/kesfet',
           done: Boolean(approvedAfter && s.demo.viewedProfileAfterApproval),
         },
-        { title: 'Herkese açık kartı gör', hint: 'Projenin özeti, tek bir bağlantıyla paylaşılır.', href: target ? `/kart/${target.id}` : '/pilotlar', done: visited('/kart') },
+        // Only a closed project with both sides' consent has a card; the seeded one stands in until then.
+        { title: 'Herkese açık kartı gör', hint: 'Kapanan projenin özeti, tek bir bağlantıyla paylaşılır.', href: `/kart/${target?.closure?.publicConsent.person && target.closure.publicConsent.org ? target.id : SAMPLE_CARD}`, done: visited('/kart') },
       ],
     };
   }, [s, seen]);

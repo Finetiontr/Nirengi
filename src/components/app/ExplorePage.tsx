@@ -116,7 +116,7 @@ export default function ExplorePage() {
   );
 
   return (
-    <div className="mx-auto max-w-[1000px]">
+    <div className="max-lg:mx-auto max-w-[1000px]">
       <section className="relative overflow-hidden rounded-[20px] bg-indigo-tint p-5 sm:p-7">
         <Contours color="indigo" opacity={0.13} x={0.92} y={0.1} seed={7} />
         <div className="relative">
@@ -133,7 +133,7 @@ export default function ExplorePage() {
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Problemi yaz: ör. dosya dağıtımını üretimde çözmüş biri"
+          placeholder="Bir problem yaz: ör. dosya dağıtımı"
           aria-label="Problemle ara"
           className="min-w-0 flex-1 bg-transparent py-3.5 text-[16px] font-bold text-ink outline-none placeholder:text-ink-4"
         />

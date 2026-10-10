@@ -28,7 +28,7 @@ export default function ProfilePage({ handle }: { handle?: string }) {
   const person = handle ? byId.handle(s, routeId(handle)) : currentMe(s);
   if (!person)
     return (
-      <div className="mx-auto max-w-[680px] py-6">
+      <div className="max-lg:mx-auto max-w-[680px] py-6">
         <EmptyState
           title="Bu profil bulunamadı"
           action={
@@ -48,10 +48,12 @@ function Profile({ personId }: { personId: string }) {
   const s = useAppState();
   const view = useView();
   const person = byId.person(s, personId)!;
-  const id = useIdentity(person);
+  const id = useIdentity(person, { partner: true });
   const conflicts = useMemo(() => findConflicts(s.people), [s.people]);
 
   const kurum = view.persona === 'org';
+  // The week strip is the genç's seri (orange); the kurum reads the same weeks in indigo.
+  const week = kurum ? 'indigo' : 'orange';
   const isSelf = !kurum && person.id === currentMe(s).id;
 
   const seeded = Date.parse(s.seededAt);
@@ -88,11 +90,11 @@ function Profile({ personId }: { personId: string }) {
   };
 
   return (
-    <div className="mx-auto max-w-[680px]">
+    <div className="max-lg:mx-auto max-w-[680px]">
       {/* Header */}
       <section className="card p-5 sm:p-6" aria-label="Profil">
         <div className="flex items-start gap-4 sm:gap-5">
-          <Avatar person={person} size={88} />
+          <Avatar person={person} size={88} reveal={!id.hidden} />
           <div className="min-w-0 flex-1">
             <h1 className="text-[26px] font-black leading-tight text-ink sm:text-[30px]">{id.name}</h1>
             {id.hidden ? (
@@ -116,7 +118,7 @@ function Profile({ personId }: { personId: string }) {
         <p className="mt-4 text-[16px] font-semibold leading-relaxed text-ink-2">{person.bio}</p>
 
         <div className="mt-4 flex flex-wrap items-center gap-2">
-          <span className={`chip ${person.availability === 'open' ? '!border-green !text-green-lip' : ''}`}>
+          <span className={`chip ${person.availability === 'open' ? '!border-green !text-green-ink' : ''}`}>
             {AVAILABILITY[person.availability]}
             {person.weeklyHours > 0 && ` · haftada ${person.weeklyHours} saat`}
           </span>
@@ -141,7 +143,7 @@ function Profile({ personId }: { personId: string }) {
               ))}
           {m.rising && (
             <span className="inline-flex items-center">
-              <span className="chip !border-green !bg-green-tint !text-green-lip">
+              <span className="chip !border-green !bg-green-tint !text-green-ink">
                 <TrendingUp className="h-4 w-4" strokeWidth={3} />
                 Yükselen sinyal
               </span>
@@ -221,11 +223,11 @@ function Profile({ personId }: { personId: string }) {
             return (
               <li key={w.week} title={`${fmtDate(w.week)} haftası: ${w.active}/${w.goal} gün`} aria-label={`${fmtDate(w.week)} haftası: ${w.active}/${w.goal} gün, ${state}`}>
                 {w.met ? (
-                  <TriMark color="orange" />
+                  <TriMark color={week} />
                 ) : w.rest ? (
                   <TriMark color="ink-4" variant="dashed" />
                 ) : (
-                  <TriMark color={current ? 'orange' : 'line-2'} variant="outline" />
+                  <TriMark color={current ? week : 'line-2'} variant="outline" />
                 )}
               </li>
             );
@@ -364,7 +366,7 @@ function Stats({ kurum, person, streak, xp, verified, s3, pilots }: { kurum: boo
     ? [
         { key: 'dogrulanmis', icon: <CheckCircle size={34} />, value: <CountUp value={verified} />, label: 'doğrulanmış kanıt', color: 'rgb(var(--green-lip))' },
         { key: 'onayli', icon: <Building size={34} />, value: <CountUp value={s3} />, label: 'kurum onaylı kanıt', color: 'rgb(var(--indigo))' },
-        { key: 'duzenli', icon: <Flame size={34} className={streak ? 'flame-live' : ''} dim={!streak} />, value: <CountUp value={streak} />, label: 'hafta üst üste düzenli', color: 'rgb(var(--orange-ink))' },
+        { key: 'duzenli', icon: <CalendarCheck className="h-[34px] w-[34px] text-indigo" strokeWidth={2.5} aria-hidden="true" />, value: <CountUp value={streak} />, label: 'hafta üst üste düzenli', color: 'rgb(var(--indigo))' },
         { key: 'proje', icon: <Flag size={34} />, value: <CountUp value={pilots} />, label: 'proje', color: 'rgb(var(--green-lip))' },
       ]
     : [

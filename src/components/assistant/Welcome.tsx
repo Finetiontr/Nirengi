@@ -215,7 +215,9 @@ export default function Welcome({ face, onClose, onStart, connected }: Props) {
               </button>
             )}
           </div>
-          <p className="mt-1 text-center text-[13px] font-bold text-ink-3 [@media(max-height:700px)]:hidden">Sonradan sağ alttaki “Niri’ye sor” düğmesiyle beni çağırabilirsin.</p>
+          <p className="mt-1 text-center text-[13px] font-bold text-ink-3 [@media(max-height:700px)]:hidden">
+            {face === 'kurum' ? 'Sonradan üst bardaki “Niri’ye sor” düğmesiyle beni çağırabilirsin.' : 'Sonradan alttaki Şimdi şeridine dokunup “Niri’ye sor” ile beni çağırabilirsin.'}
+          </p>
         </div>
       </motion.div>
     </motion.div>

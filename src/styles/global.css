@@ -33,6 +33,8 @@
   --cyan: 0 180 216;
   --cyan-lip: 0 140 172;
   --cyan-tint: 222 246 251;
+  --cyan-ink: 0 112 140; /* cyan as text on light grounds and its tint */
+  --cyan-deep: 0 104 130; /* the lip under a cyan key, whose face is cyan-lip */
   --purple: 155 4 218;
   --purple-lip: 118 0 168;
   --purple-tint: 246 230 253;
@@ -43,6 +45,8 @@
   --green: 52 194 107;
   --green-lip: 36 156 82;
   --green-tint: 225 248 234;
+  --green-ink: 24 120 62; /* green as text on light grounds and its tint */
+  --green-deep: 22 112 58; /* the lip under a green key, whose face is green-lip */
   --red: 255 75 75;
   --red-lip: 214 52 52;
   --red-tint: 255 231 231;
@@ -59,6 +63,8 @@
 [data-theme="dark"] {
   --orange-ink: var(--orange);
   --gold-ink: var(--gold);
+  --green-ink: var(--green);
+  --cyan-ink: var(--cyan);
   --bg: 22 21 33;
   --bg-2: 29 28 43;
   --bg-3: 38 37 55;
@@ -122,6 +128,7 @@
   --color-cyan: rgb(var(--cyan));
   --color-cyan-lip: rgb(var(--cyan-lip));
   --color-cyan-tint: rgb(var(--cyan-tint));
+  --color-cyan-ink: rgb(var(--cyan-ink));
   --color-purple: rgb(var(--purple));
   --color-purple-lip: rgb(var(--purple-lip));
   --color-purple-tint: rgb(var(--purple-tint));
@@ -132,6 +139,7 @@
   --color-green: rgb(var(--green));
   --color-green-lip: rgb(var(--green-lip));
   --color-green-tint: rgb(var(--green-tint));
+  --color-green-ink: rgb(var(--green-ink));
   --color-red: rgb(var(--red));
   --color-red-lip: rgb(var(--red-lip));
   --color-red-tint: rgb(var(--red-tint));
@@ -285,8 +293,9 @@
 @layer components {
   .btn-primary { @apply btn; }
   .btn-orange { @apply btn; --key: var(--orange); --key-lip: var(--orange-lip); }
-  .btn-cyan { @apply btn; --key: var(--cyan); --key-lip: var(--cyan-lip); }
-  .btn-green { @apply btn; --key: var(--green); --key-lip: var(--green-lip); }
+  /* Green and cyan faces sit one shade down so white text stays readable on them. */
+  .btn-cyan { @apply btn; --key: var(--cyan-lip); --key-lip: var(--cyan-deep); }
+  .btn-green { @apply btn; --key: var(--green-lip); --key-lip: var(--green-deep); }
   .btn-red { @apply btn; --key: var(--red); --key-lip: var(--red-lip); }
   .btn-purple { @apply btn; --key: var(--purple); --key-lip: var(--purple-lip); }
   /* White key with a seam: the secondary action. */

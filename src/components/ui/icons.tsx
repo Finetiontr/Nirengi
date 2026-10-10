@@ -152,9 +152,9 @@ export const Clipboard = ({ size = 28, className = '' }: P) =>
     size,
     className,
     <>
-      <rect x="5.5" y="5" width="21" height="24.5" rx="3" fill={c('orange')} />
+      <rect x="5.5" y="5" width="21" height="24.5" rx="3" fill={c('indigo')} />
       <rect x="8.5" y="8.5" width="15" height="18" rx="1.5" fill="#fff" />
-      <rect x="11" y="2.5" width="10" height="5.5" rx="2" fill={c('orange-lip')} />
+      <rect x="11" y="2.5" width="10" height="5.5" rx="2" fill={c('indigo-lip')} />
       <path d="m11 15 2 2 4-4" fill="none" stroke={c('green')} strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
       <path d="M11 21.5h10" stroke={c('line-2')} strokeWidth="2.4" strokeLinecap="round" />
     </>,

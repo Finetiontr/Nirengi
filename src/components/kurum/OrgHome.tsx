@@ -174,7 +174,7 @@ export default function OrgHome() {
   const shown = all ? queue : queue.slice(0, 4);
 
   return (
-    <div className="mx-auto max-w-[1040px]">
+    <div className="max-lg:mx-auto max-w-[1040px]">
       <header className="relative flex flex-wrap items-center gap-x-4 gap-y-3 overflow-hidden rounded-[20px] bg-indigo-tint p-5 sm:p-6">
         <Contours color="indigo" opacity={0.13} x={0.9} y={0.15} seed={5} />
         <div className="relative flex min-w-0 flex-[1_1_260px] items-center gap-4">
@@ -394,13 +394,13 @@ export default function OrgHome() {
             ) : (
               <>
                 <p className="mt-2 text-[15px] font-bold text-ink-2">
-                  Son 7 günde ihtiyaçlarının alanında <b className="num text-green-lip">{week.total}</b> yeni doğrulanmış iş geldi.
+                  Son 7 günde ihtiyaçlarının alanında <b className="num text-green-ink">{week.total}</b> yeni doğrulanmış iş geldi.
                 </p>
                 <ul className="mt-3 flex flex-wrap gap-2">
                   {week.bySkill.slice(0, 5).map((x) => (
                     <li key={x.k} className="chip">
                       {skillLabel(x.k)}
-                      <span className="num font-black text-green-lip">{x.n}</span>
+                      <span className="num font-black text-green-ink">{x.n}</span>
                     </li>
                   ))}
                 </ul>

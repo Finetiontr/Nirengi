@@ -8,21 +8,34 @@ import { PILOT_STATUS, SCALE, SECTOR } from '../../lib/labels.ts';
 import { fmtDate } from '../../lib/format.ts';
 import type { Pilot } from '../../lib/types.ts';
 import { routeId } from '../../lib/route.ts';
+import { SAMPLE_CARD } from '../../lib/seed.ts';
 import { EmptyState, feedback, Why } from '../ui/kit';
 import { CheckCircle } from '../ui/icons';
 import { Avatar, LevelBadge, Mark, OrgMark } from '../ui/primitives';
 
 const DAY = 86_400_000;
 
-function Gate({ title, children }: { title: string; children: string }) {
+/** A card that cannot be shown yet; an open project points back to itself and to a finished example. */
+function Gate({ title, children, pilotId }: { title: string; children: string; pilotId?: string }) {
   return (
     <div className="mx-auto w-full max-w-[560px] px-4 py-16">
       <EmptyState
         title={title}
         action={
-          <a href="/" className="btn-primary">
-            Ana sayfaya dön
-          </a>
+          pilotId ? (
+            <div className="flex flex-wrap justify-center gap-3">
+              <a href={`/pilotlar/${pilotId}`} className="btn-primary">
+                Projeye dön
+              </a>
+              <a href={`/kart/${SAMPLE_CARD}`} className="btn-line">
+                Kapanmış bir projenin kartı
+              </a>
+            </div>
+          ) : (
+            <a href="/" className="btn-primary">
+              Ana sayfaya dön
+            </a>
+          )
         }
       >
         {children}
@@ -35,7 +48,12 @@ export default function PublicCard({ id }: { id: string }) {
   const s = useAppState();
   const p = byId.pilot(s, routeId(id));
   if (!p) return <Gate title="Bu kart bulunamadı">Bağlantı eski olabilir ya da kart bu cihazda yok.</Gate>;
-  if (p.status === 'active') return <Gate title="Bu proje henüz kapanmadı">Kart yalnız kapanmış projeler için hazırlanır.</Gate>;
+  if (p.status === 'active')
+    return (
+      <Gate title="Bu proje henüz kapanmadı" pilotId={p.id}>
+        Kart, proje kapanınca iki tarafın onayıyla yayımlanır. Nasıl göründüğüne kapanmış bir projede bakabilirsin.
+      </Gate>
+    );
   if (!p.closure?.publicConsent.person || !p.closure.publicConsent.org) return <Gate title="Taraflar yayın onayı vermedi">Kart, iki taraf da onay verirse yayımlanır.</Gate>;
   return <Card pilot={p} />;
 }
@@ -73,7 +91,7 @@ function Card({ pilot: p }: { pilot: Pilot }) {
             <Mark className="h-8 w-8" />
             <span className="text-[22px] font-black tracking-[-0.03em] text-indigo">nirengi</span>
           </span>
-          <span className={`pill ${ok ? 'bg-green-tint text-green-lip' : 'bg-bg-3 text-ink-2'}`}>{PILOT_STATUS[p.status]}</span>
+          <span className={`pill ${ok ? 'bg-green-tint text-green-ink' : 'bg-bg-3 text-ink-2'}`}>{PILOT_STATUS[p.status]}</span>
         </header>
 
         <div className="px-6 pb-6 pt-6">
@@ -91,7 +109,7 @@ function Card({ pilot: p }: { pilot: Pilot }) {
             <div className="flex min-w-0 flex-1 items-center gap-3">
               <OrgMark name={org.name} size={48} />
               <div className="min-w-0">
-                <p className="truncate text-[16px] font-black text-ink">{org.name}</p>
+                <p className="line-clamp-2 text-[16px] font-black leading-tight text-ink">{org.name}</p>
                 <p className="truncate text-[13px] font-bold text-ink-3">
                   {SECTOR[org.sector]} · {SCALE[org.scale]}
                 </p>
@@ -101,8 +119,8 @@ function Card({ pilot: p }: { pilot: Pilot }) {
             <div className="flex min-w-0 flex-1 items-center gap-3 sm:flex-row-reverse sm:text-right">
               <Avatar person={person} size={48} reveal />
               <div className="min-w-0">
-                <p className="truncate text-[16px] font-black text-ink">{person.name}</p>
-                <p className="truncate text-[13px] font-bold text-ink-3">{person.headline}</p>
+                <p className="line-clamp-2 text-[16px] font-black leading-tight text-ink">{person.name}</p>
+                <p className="line-clamp-2 text-[13px] font-bold text-ink-3">{person.headline}</p>
               </div>
             </div>
           </div>
@@ -160,7 +178,7 @@ function Card({ pilot: p }: { pilot: Pilot }) {
             </p>
           </div>
           <div className="flex items-center gap-1">
-            <span className={`pill pop ${intact ? 'bg-green-tint text-green-lip' : 'bg-red-tint text-red-lip'}`}>
+            <span className={`pill pop ${intact ? 'bg-green-tint text-green-ink' : 'bg-red-tint text-red-lip'}`}>
               {intact && <CheckCircle size={18} />}
               {intact ? 'Zincir doğrulandı' : 'Zincir kırık'}
             </span>

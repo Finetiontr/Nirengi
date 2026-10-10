@@ -29,8 +29,8 @@ const KIND: Record<LogEntry['kind'], string> = {
   nudge: 'hatırlatma',
 };
 const ACTOR = { person: 'Genç', org: 'Kurum', system: 'Sistem' } as const;
-const ACTOR_TONE = { person: 'bg-cyan-tint text-cyan-lip', org: 'bg-indigo-tint text-indigo', system: 'bg-bg-3 text-ink-3' } as const;
-const STATUS_TONE = { active: 'bg-indigo-tint text-indigo', succeeded: 'bg-green-tint text-green-lip', failed: 'bg-bg-3 text-ink-2' } as const;
+const ACTOR_TONE = { person: 'bg-cyan-tint text-cyan-ink', org: 'bg-indigo-tint text-indigo', system: 'bg-bg-3 text-ink-3' } as const;
+const STATUS_TONE = { active: 'bg-indigo-tint text-indigo', succeeded: 'bg-green-tint text-green-ink', failed: 'bg-bg-3 text-ink-2' } as const;
 
 export default function PilotDetail({ id }: { id: string }) {
   const s = useAppState();
@@ -252,7 +252,7 @@ function Detail({ pilot }: { pilot: Pilot }) {
           <button
             type="button"
             onClick={() => setClosing(true)}
-            className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-[14px] bg-white px-5 text-[15px] font-black text-green-lip"
+            className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-[14px] bg-white px-5 text-[15px] font-black text-green-ink"
             style={{ boxShadow: '0 4px 0 rgb(255 255 255 / 0.45)' }}
           >
             Kapat ve kartı yayımla
@@ -349,7 +349,7 @@ function roadNode(m: Milestone, i: number, kind: NodeKind, persona: Persona, pil
   const overdue = kind !== 'done' && pilot.status === 'active' && Date.parse(m.due) < Date.now();
   const caption: { text: string; cls: string } | null =
     kind === 'done'
-      ? { text: 'Onaylandı', cls: 'text-green-lip' }
+      ? { text: 'Onaylandı', cls: 'text-green-ink' }
       : kind === 'waiting'
         ? persona === 'org'
           ? { text: 'Onayın bekleniyor', cls: 'text-indigo' }
@@ -416,7 +416,7 @@ function MilestoneBody({
   const revision = revisionOf(pilot, m);
   const status =
     kind === 'done'
-      ? { text: 'Onaylandı', cls: 'bg-green-tint text-green-lip' }
+      ? { text: 'Onaylandı', cls: 'bg-green-tint text-green-ink' }
       : kind === 'waiting'
         ? persona === 'org'
           ? { text: 'Senin onayını bekliyor', cls: 'bg-indigo-tint text-indigo' }
@@ -584,7 +584,7 @@ function Actions({
       );
     }
     if (kind === 'waiting')
-      return wrap(<p className="text-[14px] font-bold text-ink-3">Teslimin kuruma gitti. Demoda sol menüden Kurum yüzüne geçip bu aşamayı onaylayabilirsin.</p>);
+      return wrap(<p className="text-[14px] font-bold text-ink-3">Teslimin kuruma gitti. Demoda Genç/Kurum seçiminden (üst bar ya da menü) Kurum’a geçip bu aşamayı onaylayabilirsin.</p>);
     return wrap(<p className="text-[14px] font-bold text-ink-3">Aşamalar sırayla teslim edilir. Önce sıradaki aşamayı teslim et, bu aşama ondan sonra açılır.</p>);
   }
 
@@ -739,7 +739,7 @@ function CloseBody({ pilot, onDone }: { pilot: Pilot; onDone: () => void }) {
             </li>
           ))}
         </ul>
-        <p className={`mt-3 text-[13px] font-extrabold ${both ? 'text-green-lip' : 'text-ink-3'}`}>{both ? 'İki taraf da onayladı: kart yayımlanacak.' : 'Kart yayımlanmayacak.'}</p>
+        <p className={`mt-3 text-[13px] font-extrabold ${both ? 'text-green-ink' : 'text-ink-3'}`}>{both ? 'İki taraf da onayladı: kart yayımlanacak.' : 'Kart yayımlanmayacak.'}</p>
       </div>
 
       <div className="mt-6 flex gap-3">
@@ -791,8 +791,9 @@ function LedgerBody({ pilot, persona }: { pilot: Pilot; persona: Persona }) {
   const broken = useMemo(() => verifyChain(entries), [entries]);
   const end = broken === -1 ? entries.length : broken + 1;
 
+  // Doğrula checks the chain as it stands, tampered copy included; only "Geri al" undoes the tamper.
   const run = (withTamper: boolean) => {
-    setTamper(withTamper);
+    if (withTamper) setTamper(true);
     setChecked(0);
     setPhase('running');
   };

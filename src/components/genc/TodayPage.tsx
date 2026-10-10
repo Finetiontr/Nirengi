@@ -93,7 +93,7 @@ export default function TodayPage() {
         )}
       >
         <p className="text-[17px] font-extrabold text-ink">
-          {greeting()}, {firstName(me)}!
+          {me.example ? `${greeting()}!` : `${greeting()}, ${firstName(me)}!`}
         </p>
         <p className="text-[15px] font-bold text-ink-3">{say}</p>
       </NiriSays>
@@ -178,7 +178,7 @@ export default function TodayPage() {
                     <p className="text-[13px] font-bold text-ink-3">{org.name}</p>
                     {gap && gap.gain > 0 && (
                       <p className="mt-1 text-[14px] font-bold text-ink-3">
-                        {skillLabel(gap.skill)} alanında bir iş eklersen <b className="text-green-lip">+{gap.gain}</b>
+                        {skillLabel(gap.skill)} alanında bir iş eklersen <b className="text-green-ink">+{gap.gain}</b>
                       </p>
                     )}
                   </div>

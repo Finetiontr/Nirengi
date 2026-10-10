@@ -43,7 +43,7 @@ function Rank({ row }: { row: LeagueRow }) {
       </span>
     );
   return (
-    <span className={`num w-9 shrink-0 text-center text-[16px] font-black ${row.zone === 'up' ? 'text-green-lip' : row.zone === 'down' ? 'text-red-lip' : 'text-ink-3'}`}>
+    <span className={`num w-9 shrink-0 text-center text-[16px] font-black ${row.zone === 'up' ? 'text-green-ink' : row.zone === 'down' ? 'text-red-lip' : 'text-ink-3'}`}>
       {row.rank}
     </span>
   );
@@ -53,7 +53,7 @@ function Zone({ kind, tier }: { kind: 'up' | 'down'; tier: number }) {
   const up = kind === 'up';
   const Arrow = up ? ChevronUp : ChevronDown;
   return (
-    <li role="separator" data-coach="g-lig-bolge" aria-label={up ? 'Yükselme bölgesi' : 'Düşme bölgesi'} className={`flex items-center gap-3 px-2 py-2.5 ${up ? 'text-green-lip' : 'text-red-lip'}`}>
+    <li role="separator" data-coach="g-lig-bolge" aria-label={up ? 'Yükselme bölgesi' : 'Düşme bölgesi'} className={`flex items-center gap-3 px-2 py-2.5 ${up ? 'text-green-ink' : 'text-red-lip'}`}>
       <span className={`h-[2px] flex-1 rounded-full ${up ? 'bg-green/40' : 'bg-red/40'}`} />
       <span className="inline-flex items-center gap-1 text-[13px] font-bold">
         <Arrow className="h-4 w-4" strokeWidth={3.5} />
@@ -166,7 +166,7 @@ function status(rows: LeagueRow[], mine: LeagueRow | undefined, tier: number) {
 }
 
 const TONE = {
-  green: 'bg-green-tint text-green-lip',
+  green: 'bg-green-tint text-green-ink',
   red: 'bg-red-tint text-red-lip',
   ink: 'bg-bg-2 text-ink-2',
 } as const;

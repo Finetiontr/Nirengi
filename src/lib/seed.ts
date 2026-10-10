@@ -8,6 +8,8 @@ import { dayKey, weekKey } from './engine/progress.ts';
 
 export const STATE_VERSION = 7;
 export const ROUND = '2026·Ç4';
+/** A closed pilot both sides agreed to publish: the public card the demo shows before its own project closes. */
+export const SAMPLE_CARD = 'pl-shader';
 
 type EvInput = Omit<Evidence, 'producedAt' | 'verifiedAt'> & { ago: number; verifiedAgo?: number };
 

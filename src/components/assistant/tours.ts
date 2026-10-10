@@ -284,7 +284,7 @@ export const HELP: Record<KurumRoute | 'diger', string[]> = {
     'Her hareket değiştirilemeyen kayıt defterine yazılır.',
   ],
   diger: [
-    'Üst menüden ihtiyaçlarına, gençleri keşfetmeye ve deneme projelerine geçebilirsin.',
+    'Alttaki gezinme çubuğundan ihtiyaçlarına, gençleri keşfetmeye ve deneme projelerine geçebilirsin.',
     'Takıldığında buradan beni çağırabilir, turu yeniden başlatabilirsin.',
   ],
 };
