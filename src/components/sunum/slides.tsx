@@ -634,7 +634,7 @@ function LiveDemo() {
           </div>
         ))}
         <p className="s-cap s-in mt-[4px]" style={d(320)}>
-          Demodaki kişiler ve kurumlar kurgusal; GitHub, DNS doğrulaması ve yapay zekâ taslağı gerçek.
+          CEDRA Interactive dışındaki kurumlar ve kişiler kurgusal; GitHub, DNS doğrulaması ve yapay zekâ taslağı gerçek.
         </p>
       </div>
       <ol className="absolute left-[760px] top-[120px] flex w-[728px] flex-col gap-[14px]">
