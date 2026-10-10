@@ -1,7 +1,7 @@
 // The stage deck: one idea per slide, Niri on stage with one short line each.
 // The organisers' twelve steps, then an appendix of detail pages after the close for questions.
 // Keys: →, Space, PageDown next; ←, PageUp back; Home/End (the close; → goes on into the appendix); 1–9 and 0 jump;
-// F fullscreen; B blanks the screen; T flips the theme for this visit; N opens the
+// F fullscreen; B blanks the screen; N opens the
 // presenter window (/sunum?notlar) with the speaker notes, which follows the deck
 // and can drive it. A click anywhere but a link or key advances. The slide number
 // lives in the hash, so a reload or a shared link lands on the same slide.
@@ -120,10 +120,7 @@ function Stage() {
       else if (k === 'f' || k === 'F') fullscreen();
       else if (k === 'n' || k === 'N') notes();
       else if (k === 'b' || k === 'B' || k === '.') setBlank((b) => !b);
-      else if (k === 't' || k === 'T') {
-        const d = document.documentElement;
-        d.dataset.theme = d.dataset.theme === 'dark' ? 'light' : 'dark';
-      } else hit = false;
+      else hit = false;
       if (hit) e.preventDefault();
     };
     window.addEventListener('keydown', onKey);

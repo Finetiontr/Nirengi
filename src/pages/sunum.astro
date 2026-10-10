@@ -26,11 +26,9 @@ const description = 'NİRENGİ sahne sunumu: beyan değil, kanıt.';
     <Pwa />
     <script is:inline>
       (() => {
-        // A projector reads best on light: only an explicit choice switches to dark.
+        // A projector reads best on light: the deck is always light, whatever the site's theme.
         const d = document.documentElement;
-        let t;
-        try { t = localStorage.getItem('nirengi:theme'); } catch {}
-        d.dataset.theme = t === 'dark' ? 'dark' : 'light';
+        d.dataset.theme = 'light';
         // The stage is drawn at 1600×900 and scaled to fit, so nothing reflows on the projector.
         const fit = () => d.style.setProperty('--s', String(Math.min(innerWidth / 1600, innerHeight / 900)));
         fit();
