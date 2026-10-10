@@ -36,13 +36,17 @@ export interface ReadDraft extends Draft {
 const flat = (s: string) =>
   s
     .toLocaleLowerCase('tr-TR')
+    // The model often drops the circumflex when it copies a sentence ("şikâyet" → "şikayet").
+    .replace(/â/g, 'a')
+    .replace(/î/g, 'i')
+    .replace(/û/g, 'u')
     .replace(/[’‘`´]/g, "'")
     .replace(/[“”«»]/g, '"')
     .replace(/\s+/g, ' ')
     .trim();
 const trimEnds = (s: string) => s.replace(/^[\s"'.,;:!?…-]+|[\s"'.,;:!?…-]+$/g, '');
 
-/** The quote is a verbatim piece of the text (case, quote marks and spacing aside). */
+/** The quote is a verbatim piece of the text (case, circumflex, quote marks and spacing aside). */
 export function cites(text: string, quote: string) {
   const q = trimEnds(flat(quote));
   return q.length >= 3 && flat(text).includes(q);

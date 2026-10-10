@@ -12,6 +12,7 @@ const bend = (patch: Record<string, unknown>) => ({ ...structuredClone(MODEL), .
 test('ground: quotes must be verbatim pieces of the text', () => {
   assert.ok(cites(SAMPLE_COMPLAINT, 'Bütçemiz 40.000 TL'));
   assert.ok(cites(SAMPLE_COMPLAINT, '  araçlarımızda GPS cihazı var.'), 'case, spacing and end marks aside');
+  assert.ok(cites('Haftada 900 şikâyet geliyor.', 'haftada 900 şikayet geliyor'), 'the circumflex aside');
   assert.ok(!cites(SAMPLE_COMPLAINT, 'Bütçemiz 80.000 TL'));
   assert.ok(!cites(SAMPLE_COMPLAINT, ''));
 });
