@@ -4,6 +4,7 @@
 // docs/SUNUM-NOTLARI.md. Plain data so a script can read it without React.
 // Every number here is on the slide, in docs/PAZAR-ANALIZI.md with its source, or
 // computed by the engine (the AI slides and the answers on XP and the fit score).
+// The film's lines carry the second of the shot they belong to (Video/src/film/cues.json).
 
 export interface Note {
   /** Suggested speaking time in seconds; 0 for appendix pages, which sit outside the talk. */
@@ -15,141 +16,160 @@ export const NOTES: Record<string, Note> = {
   baslik: {
     sec: 10,
     say: [
-      'Merhaba, biz Nirengi: Sezer Uzun ve Emirhan Açık. Niri’nin ilk sözü bizim de sözümüz: her çaban değerli.',
-      'Nirengi açık kaynak bir web sitesi; telefonda da uygulama olarak çalışıyor. Size videomuzu bu kez adım adım anlatacağız.',
+      'Merhaba, biz Nirengi: Sezer Uzun ve Emirhan Açık.',
+      'Nirengi, gencin gerçek işini kanıta çeviren ve onu girişimlerin gerçek case’leriyle buluşturan açık kaynak bir web sitesi; telefonda da uygulama olarak çalışıyor.',
     ],
   },
   problem: {
-    sec: 14,
+    sec: 15,
     say: [
-      'Deneyim yoksa iş yok, iş yoksa deneyim yok. Her 100 gençten 23’ü ne okulda ne işte.',
-      'BİT uzmanı almakta zorlanan her 100 girişimden 71’i aynı şeyi söylüyor: ilgili iş deneyimi yok.',
+      'Deneyim yoksa iş yok, iş yoksa deneyim yok. Türkiye’de her 100 gençten 23’ü ne okulda ne işte.',
+      'Öbür tarafta BİT uzmanı almakta zorlanan her 100 girişimden 71’i aynı gerekçeyi söylüyor: ilgili iş deneyimi yok. İki taraf birbirini arıyor ama bulamıyor.',
     ],
   },
   'kim-icin': {
     sec: 15,
     say: [
-      'Odağımız startuplar ve küçük ölçekli kurumlar: İK’sı yok, yanlış işe alımı kaldıramıyor.',
-      'Öbür yanda üreten ama kanıtı olmayan genç: tek bir seçici programa bir milyon başvuru geliyor.',
+      'Odağımız startuplar ve küçük ekipler: İK’sı yok, yanlış bir işe alımı kaldıramıyor.',
+      'Öbür yanda üreten ama bunu kanıtlayamayan genç: tek bir seçici programa bir milyon başvuru geliyor, kapıda kalan görünmüyor.',
     ],
   },
   kanit: {
-    sec: 10,
+    sec: 12,
     say: [
-      'Diploma şartını kaldıran şirketlerde bile işe alım 700’de 1’den az değişti: ölçme aracı yok.',
-      '37 platformu inceledik; doğrulanmış işi ve kurum imzasını birlikte sunanı bulamadık.',
+      'Diploma şartını kaldıran şirketlerde bile işe alım 700’de 1’den az değişti; çünkü yerine koyacak bir ölçme aracı yok.',
+      '37 platform ve programı inceledik; doğrulanmış işi ve kurum imzasını bir arada sunanı Türkiye’de bulamadık.',
     ],
   },
   cozum: {
-    sec: 16,
+    sec: 26,
     say: [
-      'Ne çözüyoruz? Gencin yaptığı işi ve kurumun ihtiyacını beyandan kanıta çeviriyoruz; ikisi küçük bir pilotta buluşuyor.',
-      'Altı problem bu beş durakta. Ve bu bir web sitesi: adresi açan kullanıyor; telefonda da yükleniyor.',
+      'Çözümümüz tek cümle: kurum gerçek bir case verir, genç onu gerçekten çözer.',
+      'Genç işini bağlar; GitHub’daki iş kaynağında doğrulanır. Kurum case’ini kendi sözleriyle yazar; Niri onu açık bir modelle ölçülebilir hale getirir. Gençler bu case’e göre isimsiz ölçülür.',
+      'En uyumlu genç case’i küçük bir deneme projesinde gerçekten çözer: genç teslim eder, kurum onaylar. Onaylanan iş gencin profiline imzalı deneyim olarak döner.',
+      'Ve bu bir web sitesi: adresi açan hemen kullanır; telefonda da ana ekrana yüklenir.',
+    ],
+  },
+  demo: {
+    sec: 58,
+    say: [
+      '(Film oynarken üstüne konuş; ekrandaki yazıyı okuma, onu tamamla. Müzik kısık çalar. P durdurur ve devam ettirir; film bitince →.)',
+      '0:00 Şimdi bir case’in baştan sona yolculuğunu izleyeceksiniz; gördüğünüz her ekran ürünün gerçek ekranı.',
+      '0:08 Emirhan GitHub’ını bağlıyor; depoları kaynağında doğrulanıyor, doğrulayanı ve tarihi yazıyor.',
+      '0:14 Puanı yalnız gerçek işten geliyor: üretim yaptığı günler seri oluyor, haftalık ligde yükseliyor.',
+      '0:18 Niri ona eksiğini söylüyor: hangi iş onu hangi kurum ihtiyacına yaklaştırır.',
+      '0:22 Şimdi kurum tarafı: Kuzey Lojistik ilan yazmıyor, derdini anlatıyor.',
+      '0:26 Niri metni açık model Gemma 4 ile okuyor; her alan kurumun bir cümlesine dayanıyor. Metinde olmayan bir satır uydurulursa denetimde siliniyor.',
+      '0:34 Gençler bu case’e göre isimsiz ölçülüyor; puanın her parçasının gerekçesi yazıyor.',
+      '0:40 En uyumlu genç case’i deneme projesinde çözüyor: genç teslim ediyor, kurum onaylıyor, kayıt zincirleniyor.',
+      '0:46 Onaylanan iş gencin profilinde imzalayanıyla duruyor; bir sonraki kurum bunu görüyor.',
+    ],
+  },
+  'yz-ne': {
+    sec: 22,
+    say: [
+      'Yapay zekâ ne yapıyor? Kurumun kendi sözlerini okuyup yedi alanlı ihtiyaç kanvasına çeviriyor; her alanı metindeki bir cümleye bağlıyor.',
+      'Model açık kaynak: Google’ın Gemma 4’ü, ağırlıkları açık. Kapalı bir yapay zekâ şirketine veri göndermiyoruz. Model açık olduğu için bizim ya da kurumun kendi sunucusunda çalışabilir; o zaman veri hiç dışarı çıkmaz. Bugünkü demo ücretsiz Workers AI’da çalışıyor ve metni saklamıyoruz.',
+      'Karar modelde değil: yayın, puan ve sıralama açık kurallarda.',
+    ],
+  },
+  'yz-fark': {
+    sec: 22,
+    say: [
+      'Farkı ne? Aynı metin: kural motoru 60 puan çıkarıyor, eşiğin altında, yayımlanamıyor. Niri okuyunca 75, yayına hazır; kurum Niri’nin önerilerini ekleyince 100.',
+      'Case ölçülebilir olunca genç de ölçülebiliyor: case’in becerileri cetvel oluyor, gençlerin doğrulanmış işi bu cetvelle ölçülüyor. Liste isimsiz; puan yapay zekâ değil, açık bir formül.',
+    ],
+  },
+  'yz-onlem': {
+    sec: 18,
+    say: [
+      'Model yanılırsa? Cevap dört kapıdan geçiyor: şemaya uyuyor mu, alıntı metinde mi, sayı metinde mi, kriter ölçülebilir mi.',
+      'Metinde olmayan bir karar verici uydurursa o alan alınmıyor, Niri kuruma soruyor. Model hiç cevap vermezse aynı ekranı kural motoru dolduruyor; akış kesilmiyor.',
+    ],
+  },
+  tasarim: {
+    sec: 18,
+    say: [
+      'Tasarım kararımız: gence oyun gibi bir ritim, kuruma sakin bir ölçüm.',
+      'Genç tarafında her XP bir iş makbuzu; seri, lig, topluluk ve haftalık analiz var. Kurum tarafında oyun yok: isimsiz liste, açık puan, iki onay, kurcalanamaz kayıt. Her ekranda tek iş; Niri yol gösteriyor.',
+    ],
+  },
+  bitti: {
+    sec: 14,
+    say: [
+      'Bunların hepsi web sitemizde canlı; altı problemin altısı çalışıyor, motor ve sunucu 59 otomatik testle sınanıyor.',
+      'Bilerek bıraktıklarımız: kalıcı veritabanı, gerçek pilot, kod dışı işlerde makine doğrulaması. Sıradaki iş ilk gerçek ihtiyaç turu.',
+    ],
+  },
+  kapanis: {
+    sec: 10,
+    say: [
+      'Tek isteğimiz: bu salondan bir girişimin gerçek bir case’i. İlk kanvası birlikte yazalım.',
+      'Niri’nin dediği gibi: her çaban haritada bir nokta. Teşekkürler.',
     ],
   },
   dogrulama: {
-    sec: 14,
+    sec: 0,
     say: [
-      'Önce kanıt. Emirhan GitHub’da hangi depoları göstereceğini kendisi seçiyor; hepsi Doğrulandı geliyor, doğrulayanı yazıyor.',
+      '(Ek: “Kanıtı nasıl doğruluyorsunuz?” gelirse.) Emirhan GitHub’da hangi depoları göstereceğini kendisi seçiyor; hepsi Doğrulandı geliyor, doğrulayanı yazıyor.',
       'Behance ya da ArtStation’daki iş dürüstçe Beyan yazıyor ve eşleşmede daha az sayılıyor.',
     ],
   },
   xp: {
-    sec: 15,
+    sec: 0,
     say: [
-      'Oyunlaştırma: GitHub’a push attığın günler kendiliğinden seriye yazılıyor; commit sayısı değil, üretim günü.',
+      '(Ek: oyunlaştırma sorulursa.) GitHub’a push attığın günler kendiliğinden seriye yazılıyor; commit sayısı değil, üretim günü.',
       'Haftalık ligde yükselen üst lige çıkıyor; düzenli üretim kurumun listesinde öne çıkıyor. Her XP bir iş makbuzu.',
     ],
   },
   analiz: {
-    sec: 13,
+    sec: 0,
     say: [
-      'Niri her hafta gencin haftasını okuyor ve en yakın kapıyı gösteriyor: Flutter’da bir iş eklersen uyumun 63’ten 72’ye çıkar.',
-      'Eşleşmeyen genç neyin eksik olduğunu biliyor.',
+      '(Ek: analiz sorulursa.) Niri her hafta gencin haftasını okuyor ve en yakın kapıyı gösteriyor: Flutter’da bir iş eklersen uyumun 63’ten 72’ye çıkar.',
+      'Eşleşmeyen genç neyin eksik olduğunu biliyor. Analiz kural tabanlı, formülü açık.',
     ],
   },
   topluluk: {
-    sec: 13,
+    sec: 0,
     say: [
-      'Gençler birbirine de yardım ediyor: takılan soruyor, o işi yapmış biri cevaplıyor.',
+      '(Ek: topluluk sorulursa.) Gençler birbirine de yardım ediyor: takılan soruyor, o işi yapmış biri cevaplıyor.',
       'Soran “İşe yaradı” deyince yanıtlayan 15 XP kazanıyor; yardım eden de görünür oluyor.',
     ],
   },
   ihtiyac: {
-    sec: 13,
+    sec: 0,
     say: [
-      'Şimdi kurum tarafı. Kuzey Lojistik ilan yazmıyor, derdini anlatıyor: “kargom nerede” aramaları ayda 6.000.',
-      'Niri bunu yedi alanlı kanvasa çeviriyor; netlik 70’i geçmeden yayın yok.',
-    ],
-  },
-  'yz-ne': {
-    sec: 17,
-    say: [
-      'Metni açık ağırlıklı bir model okuyor: Gemma 4. Her alan metindeki bir cümleye dayanıyor.',
-      'Model açık olduğu için veri bizde kalabilir: aynı model kendi sunucumuzda çalışır. Kural motoru aynı metne 60 veriyor, model 75; öneriler eklenince 100.',
-    ],
-  },
-  'yz-onlem': {
-    sec: 13,
-    say: [
-      'Model yanılırsa? Cevap dört kapıdan geçiyor: şema, alıntı, sayı, ölçülebilirlik.',
-      'Metinde olmayan bir karar verici uydurursa alan boş kalıyor, Niri kuruma soruyor.',
+      '(Ek: “Kurum ihtiyacı nasıl yazıyor?” gelirse.) Kuzey Lojistik ilan yazmıyor, derdini anlatıyor: “kargom nerede” aramaları ayda 6.000.',
+      'Niri bunu yedi alanlı kanvasa çeviriyor; netlik 70’i geçmeden yayın yok. Benzer ihtiyaçların nasıl sonuçlandığı aynı ekranda.',
     ],
   },
   eslesme: {
-    sec: 15,
+    sec: 0,
     say: [
-      'Kurum adayları isimsiz görüyor: Aday 9C03, 86 puan. Önce iş, sonra isim.',
+      '(Ek: eşleşme sorulursa.) Kurum adayları isimsiz görüyor: Aday 9C03, 86 puan. Önce iş, sonra isim.',
       'Puanın dört parçası açık, her birinin gerekçesi yazıyor; kimlik deneme projesi teklif edilince açılıyor.',
     ],
   },
   defter: {
-    sec: 13,
+    sec: 0,
     say: [
-      'Deneme projesinde kriterler aşamaya dönüşüyor: Emirhan teslim ediyor, Kuzey Lojistik onaylıyor.',
+      '(Ek: deneme projesi sorulursa.) Case’in başarı kriterleri aşamaya dönüşüyor: Emirhan teslim ediyor, Kuzey Lojistik onaylıyor.',
       'Her kayıt öncekine zincirli; biri sonradan tek harf değiştirse zincir orada kırılıyor.',
     ],
   },
   donus: {
-    sec: 14,
+    sec: 0,
     say: [
-      'Şirketler işe almadan önce bir case ister; bu iş genelde sözde bir deneyim olarak kalır. Nirengi’de case bir deneme projesi: onaylanan aşama Emirhan’ın profiline Kurum onaylı deneyim olarak, imzalayanıyla yazılıyor.',
+      '(Ek: “Genç bundan ne kazanıyor?” gelirse.) Şirketler işe almadan önce bir case ister; bu iş genelde sözde bir deneyim olarak kalır. Nirengi’de case bir deneme projesi: onaylanan aşama Emirhan’ın profiline Kurum onaylı deneyim olarak, imzalayanıyla yazılıyor.',
       'İşe girmese bile bu deneyimi taşıyor; döngü kapanıyor.',
     ],
   },
   niri: {
-    sec: 20,
+    sec: 0,
     say: [
-      'Ve Niri’nin size söyleyecekleri var.',
+      '(Ek: vakit kalırsa ya da “kullanıcıya ne vaat ediyorsunuz?” gelirse.)',
       'Gençlere: CV yazma, işini bağla; eksiğini söylerim; işe alım için yaptığın case de boşa gitmez, imzalı deneyim olur.',
       'Kurumlara, önce startuplara: İK’n yoksa da olur; adayı yaptığı işle gör; kadro riski yerine küçük bir deneme projesiyle başla.',
-    ],
-  },
-  bitti: {
-    sec: 12,
-    say: [
-      'Bunların hepsi web sitemizde canlı; motor 55 testle sınanıyor.',
-      'Bilerek bıraktıklarımız: kalıcı veritabanı, gerçek kullanıcı ve pilot, kod dışı işte makine doğrulaması.',
-    ],
-  },
-  kapanis: {
-    sec: 8,
-    say: [
-      'Tek isteğimiz: bu salondan bir startupın ya da kurumun gerçek bir ihtiyacı. İlk kanvası birlikte yazalım.',
-      'Niri’nin dediği gibi: her çaban haritada bir nokta. Teşekkürler.',
-    ],
-  },
-  'ek-film': {
-    sec: 0,
-    say: [
-      '(Ek: soru gelirse ya da vakit kalırsa 48 saniyelik film. Müzikle oynar; bitince → ile devam.)',
-      'Ses gelmezse filme bir kez tıkla. Film açılmazsa slayt canlı demo paneline döner.',
-    ],
-  },
-  'ek-tasarim': {
-    sec: 0,
-    say: [
-      '(Ek: “Tasarım kararlarınız neler?” gelirse.) Gence oyun, kuruma ölçüm: XP makbuzu, seri ve lig, topluluk, haftalık analiz; kurumda isimsiz liste, açık puan, iki onay, oyun yok.',
     ],
   },
 };
@@ -161,6 +181,20 @@ export interface Answer {
 
 /** Likely questions after the close, answered aloud; the presenter window shows them on the last slide. */
 export const QA: Answer[] = [
+  {
+    q: 'Veri nereye gidiyor, model sizin sunucunuzda mı?',
+    say: [
+      'Bugünkü demo ücretsiz Cloudflare Workers AI üzerinde çalışıyor. Metni kaydetmiyoruz. Kapalı bir yapay zekâ şirketinin servisine hiçbir metin gitmiyor.',
+      'Model açık ağırlıklı olduğu için aynı modeli kendi sunucumuzda ya da kurumun sunucusunda çalıştırabiliriz; o zaman metin kurumdan hiç çıkmaz. Bunu henüz kurmadık; ilk pilotta kurumla birlikte kuracağız.',
+    ],
+  },
+  {
+    q: 'Genç bir şirketin problemini gerçekten çözebilir mi?',
+    say: [
+      'Bu yüzden önce küçük bir deneme projesi var, kadro değil. Case’in başarı kriterleri aşamalara bölünüyor; her aşamayı genç teslim ediyor, kurum onaylıyor. Kurum onaylamadan aşama kapanmıyor.',
+      'Örnekte Kuzey Lojistik’in rota case’i: 3.000 noktalık rotanın 5 dakikanın altında hesaplanması. Onaylanan aşama gencin profiline imzalı deneyim olarak yazılıyor; işe girmese bile bu deneyimi taşıyor.',
+    ],
+  },
   {
     q: 'XP neyle kazanılıyor?',
     say: [
