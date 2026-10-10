@@ -1,6 +1,6 @@
 # Sunum notları
 
-*Zemin360 finali · 12 slayt · planlanan süre 5:08 (film 0:48, konuşma 4:20)*
+*Zemin360 finali · 12 slayt · planlanan süre 4:16 (film 0:48, konuşma 3:28)*
 
 Bu dosya `src/components/sunum/notes.ts` dosyasından üretildi; notları orada düzeltin. Sunum sırasında aynı notlar konuşmacı penceresinde görünür: sunumda **N** tuşu ya da `/sunum?notlar` adresi. Pencere sunumu izler, ok tuşlarıyla sunumu yönetir, **R** süreyi sıfırlar.
 
@@ -10,47 +10,46 @@ Slaytlardaki her sayı `docs/PAZAR-ANALIZI.md` içindeki kaynağıyla birlikte s
 
 ## 1. Nirengi
 
-*0:00 – 0:15 · Niri: “Merhaba, ben Niri! Bugün size haritamı göstereceğim.”*
+*0:00 – 0:12 · Niri: “Merhaba, ben Niri! Bugün size haritamı göstereceğim.”*
 
 - Merhaba, biz Nirengi: Sezer Uzun ve Emirhan Açık.
-- Nirengi noktası, haritacının üzerine güvenle ölçüm yaptığı sabit noktadır. Biz gençlerin işi için o noktayı kuruyoruz.
+- Nirengi noktası, haritacının güvenle ölçtüğü sabit noktadır. Biz gençlerin işi için o noktayı kuruyoruz.
 
 ## 2. Problem
 
-*0:15 – 0:40 · Niri: “Gençler görünmüyor, kurumlar emin olamıyor.”*
+*0:12 – 0:32 · Niri: “Gençler görünmüyor, kurumlar emin olamıyor.”*
 
-- Döngüyü hepimiz biliyoruz: deneyim yoksa iş yok, iş yoksa deneyim yok.
-- Her 100 gençten 23’ü ne okulda ne işte; Avrupa’yla kıyaslandığında en yüksek oran bizde.
+- Deneyim yoksa iş yok, iş yoksa deneyim yok.
+- Her 100 gençten 23’ü ne okulda ne işte.
 - Öbür tarafta, BİT uzmanı almakta zorlanan her 100 şirketten 71’i aynı şeyi söylüyor: ilgili iş deneyimi yok.
 
 ## 3. Kim için
 
-*0:40 – 1:05 · Niri: “Biri kanıt arıyor, öbürü güven.”*
+*0:32 – 0:52 · Niri: “Biri kanıt arıyor, öbürü güven.”*
 
 - İki kullanıcımız var.
-- Birincisi üreten ama kanıtı olmayan genç. Tek bir seçici programa bir milyon başvuru geliyor; kapıda kalanın da gösterecek bir işi olmalı.
-- İkincisi BİT uzmanı olmayan küçük kurum: 10–49 çalışanlı girişimlerin yalnız %10,8’inde BİT uzmanı var. İhtiyacı var ama tarif edemiyor, kadro riskini alamıyor.
+- Birincisi, üreten ama kanıtı olmayan genç: tek bir seçici programa bir milyon başvuru geliyor, kapıda kalan görünmüyor.
+- İkincisi, BİT uzmanı olmayan küçük kurum: ihtiyacı var ama tarif edemiyor, kadro riskini alamıyor.
 
 ## 4. Kanıt
 
-*1:05 – 1:30 · Niri: “Rakamları uydurmadım; kaynakları altında.”*
+*0:52 – 1:12 · Niri: “Rakamları uydurmadım; kaynakları altında.”*
 
 - Bunu nereden biliyoruz?
 - Diploma şartını kaldıran şirketlerde bile işe alım 700’de 1’den az değişti: niyet var, ölçme aracı yok.
-- İşverenlerin %63’ü beceri açığını bir numaralı engel görüyor.
-- Biz de 37 platform ve programı tek tek inceledik. Oyun ritmini, doğrulanmış işi ve kurum imzasını bir arada sunan birini Türkiye’de bulamadık.
+- 37 platform ve programı inceledik; doğrulanmış işi ve kurum imzasını bir arada sunanı Türkiye’de bulamadık.
 
 ## 5. Çözüm
 
-*1:30 – 1:55 · Niri: “Kanıt, ihtiyaç, pilot: tek döngü.”*
+*1:12 – 1:32 · Niri: “Kanıt, ihtiyaç, pilot: tek döngü.”*
 
 - Çözümümüz tek cümle: genç gerçek işiyle görünür, kurum ihtiyacını ölçülebilir yazar, ikisi küçük bir pilotta buluşur.
-- Pilotta onaylanan her aşama, gencin profiline kurum onaylı kanıt olarak döner.
-- Ekranlar gerçek. Ama onları biz değil, maskotumuz anlatsın: sözü Niri’ye bırakıyorum.
+- Onaylanan her aşama, gencin profiline kurum onaylı kanıt olarak döner.
+- Ürünü 48 saniyelik filmle gösterelim.
 
 ## 6. Tanıtım filmi
 
-*1:55 – 2:43 · Niri: “Sahne benim! Ürünü telefonda göstereyim.”*
+*1:32 – 2:20 · Niri: “Sahne benim! Ürünü telefonda göstereyim.”*
 
 - (Film müzikle oynar; konuşma yok. Bitince → ile devam.)
 - Ses gelmezse filme bir kez tıkla.
@@ -58,52 +57,51 @@ Slaytlardaki her sayı `docs/PAZAR-ANALIZI.md` içindeki kaynağıyla birlikte s
 
 ## 7. Yapay zekâ ne yapıyor
 
-*2:43 – 3:08 · Niri: “Derdini yaz, ben okuyayım. Uydurmam.”*
+*2:20 – 2:40 · Niri: “Derdini yaz, ben okuyayım. Uydurmam.”*
 
-- Filmde gördüğünüz yapay zekâ adımı şu: kurum derdini kendi sözleriyle yazıyor.
+- Filmdeki yapay zekâ adımı şu: kurum derdini kendi sözleriyle yazıyor.
 - Açık ağırlıklı bir model, Gemma 4, bu metni yedi alanlı ihtiyaç kanvasına çeviriyor.
-- Her alan metindeki bir cümleye dayanıyor: “ayda 6.000 arama” sorunun ölçüsü, operasyon direktörü karar verici oluyor.
+- Her alan metindeki bir cümleye dayanıyor: “ayda 6.000 arama” sorunun ölçüsü oluyor.
 
 ## 8. Önce ve sonra
 
-*3:08 – 3:33 · Niri: “Aynı metinden daha dolu bir taslak.”*
+*2:40 – 2:58 · Niri: “Aynı metinden daha dolu bir taslak.”*
 
-- Aynı metni önceki kural motorumuz da okuyordu: beş alan, netlik 60, yayımlanamaz.
-- Model yedi alanı doldurdu ve iki ölçülebilir başarı kriteri önerdi: 75. Kurum önerileri ekleyince 100, yayımlanabilir.
-- Bu sayıları ürünün kendi kuralları hesaplıyor; testlerimizde sabit.
+- Aynı metni kural motorumuz da okuyor: beş alan, netlik 60, yayımlanamaz.
+- Model yedi alanı dolduruyor ve iki ölçülebilir kriter öneriyor: 75. Kurum önerileri ekleyince 100.
+- Bu sayıları ürünün kendi kuralları hesaplıyor.
 
 ## 9. Hatalı çıktıya karşı
 
-*3:33 – 4:03 · Niri: “Metinde yoksa almam, sorarım.”*
+*2:58 – 3:22 · Niri: “Metinde yoksa almam, sorarım.”*
 
-- Model yanılırsa? Cevabını doğrudan kullanmıyoruz; dört kapıdan geçiyor: şema, alıntı, sayı ve ölçülebilirlik.
-- Testten bir örnek: model “Genel Müdür onaylar” diye uydurursa bu cümle metinde olmadığı için alan boş kalır, Niri kuruma kimin onaylayacağını sorar.
-- Öneriler kurum “Ekle” demeden kanvasa girmez; reddedilen her şey kuruma gösterilir. Model hiç cevap vermezse aynı ekranı kural motoru doldurur.
+- Model yanılırsa? Cevabı dört kapıdan geçiyor: şema, alıntı, sayı, ölçülebilirlik.
+- Model “Genel Müdür onaylar” diye uydurursa, bu cümle metinde olmadığı için alan boş kalır; Niri kuruma sorar.
+- Yayın kararını model değil, kurallar veriyor. Model hiç cevap vermezse kural motoru devralır.
 
 ## 10. Tasarım kararları
 
-*4:03 – 4:28 · Niri: “Gence oyun, kuruma sakin bir ölçüm.”*
+*3:22 – 3:40 · Niri: “Gence oyun, kuruma sakin bir ölçüm.”*
 
 - Tasarımda beş karar verdik.
-- Her ekranda tek iş, ve önce telefon: her ekran önce 390 pikselde tasarlandı.
-- Oyun yalnız genç tarafında; kurum ekranı sakin, XP yok.
-- Kurum adayı temasa kadar isimsiz görür.
-- Niri yol gösterir ama kimseyi bekletmez.
+- Her ekranda tek iş, ve önce telefon.
+- Oyun yalnız genç tarafında; kurum ekranı sakin.
+- Kurum adayı temasa kadar isimsiz görür. Niri yol gösterir ama kimseyi bekletmez.
 
 ## 11. Bitti ve bırakılan
 
-*4:28 – 4:53 · Niri: “Prototipim çalışıyor. Gerisini pilotta kanıtlayacağım.”*
+*3:40 – 4:04 · Niri: “Prototipim çalışıyor. Gerisini pilotta kanıtlayacağım.”*
 
-- Altı problemin altısına çalışan bir ekranımız var. GitHub ve DNS doğrulaması, yapay zekâ taslağı ve denetimi canlıda; eşleşme, defter ve denetim testli.
-- Bilerek bıraktıklarımız: kalıcı veritabanı yok, veri tarayıcıda. Demo kişileri kurgusal ve ekranda öyle yazıyor. Kod dışı kanıt sırada.
-- Finalden sonraki dört ay: kalıcılık, ilk ihtiyaç turu, kod dışı kanıt ve fon verene pilot raporu.
+- Altı problemin altısına çalışan bir ekranımız var. GitHub ve DNS doğrulaması, yapay zekâ taslağı canlıda; eşleşme ve kayıt defteri testli.
+- Bilerek bıraktıklarımız: kalıcı veritabanı, gerçek kullanıcı ve pilot. Demo kişileri kurgusal, ekranda da öyle yazıyor.
+- Finalden sonraki dört ay: kalıcılık, ilk ihtiyaç turu, kod dışı kanıt ve pilot raporu.
 
 ## 12. Teşekkürler
 
-*4:53 – 5:08 · Niri: “Zirvedeyim! Teşekkürler, haritada görüşmek üzere.”*
+*4:04 – 4:16 · Niri: “Zirvedeyim! Teşekkürler, haritada görüşmek üzere.”*
 
 - Tek bir isteğimiz var: bu salondan bir kurumun gerçek bir ihtiyacı. İlk kanvası birlikte yazalım.
-- Beyan değil, kanıt. Teşekkürler; sorularınızı bekliyoruz.
+- Beyan değil, kanıt. Teşekkürler.
 
 ## Soru gelirse
 
@@ -128,6 +126,16 @@ Slaytlardaki her sayı `docs/PAZAR-ANALIZI.md` içindeki kaynağıyla birlikte s
 - Puan dört parçadan oluşur ve ağırlıkları açıktır: kanıt 45, bağlam 20, kapasite 15, iş birliği geçmişi 20 puan.
 - İlk temasta isim, okul, şehir görünmez; kimlik pilot teklifiyle açılır.
 - Her aşama iki tarafın onayıyla deftere yazılır; kayıtlar SHA-256 ile zincirlenir. Kod açık: her formülü herkes okuyabilir.
+
+### Neden bu model?
+
+- Gemma 4 açık ağırlıklı ve Apache 2.0 lisanslı: açık kaynak bir hizmetin modeli de açık, istenirse kendi sunucumuzda çalışır.
+- Örnek metinde dört açık model denedik; JSON şemasına uyan, Türkçe metni doğru alanlara ayıran en hızlı model buydu.
+
+### İnternet ya da model giderse ne olur?
+
+- Taslağı kural motoru çıkarır ve ekran bunu açıkça söyler; akış kesilmez.
+- Örnek metin için modelin gerçek, kayıtlı bir cevabı var: model ulaşılamazsa o gösterilir ve ekranda “kayıttan” yazar.
 
 ### İlk pazarınız kim?
 
