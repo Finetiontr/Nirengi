@@ -1,167 +1,148 @@
 # Sunum notları
 
-*Zemin360 finali · 22 slayt · planlanan süre 4:53 (film 0:48, konuşma 4:05)*
+*Zemin360 finali · 12 slayt · planlanan süre 4:12 (film 0:48, konuşma 3:24)*
 
 Bu dosya `src/components/sunum/notes.ts` dosyasından üretildi; notları orada düzeltin. Sunum sırasında aynı notlar konuşmacı penceresinde görünür: sunumda **N** tuşu ya da `/sunum?notlar` adresi. Pencere sunumu izler, ok tuşlarıyla sunumu yönetir, **R** süreyi sıfırlar.
 
-Akış, organizasyonun önerdiği 12 adımı izler; demo sayfalara bölünmüştür. Önce ne çözdüğümüz (beş durak, altı problem) ve ürünün web’de ve telefonda aynı olduğu, sonra tanıtım filminin her sahnesi kendi sayfasında: filmin başlığı, ne anlama geldiği, ürünün gerçek ekranı (genç tarafı telefonda, kurum tarafı masaüstünde) ve o ekrandan öne çıkarılan öğe. Hikâye tek bir genç (Emirhan, adı takımdan, profil kurgusal) ve tek bir kurumla (Kuzey Lojistik) ilerler. Filmin kendisi kapanıştan önce oynar; süre darsa → ile geçilir. Sorular için ayrı slayt yok: kısa cevaplar aşağıda ve kapanışta konuşmacı penceresinde.
+Konuşma, organizasyonun önerdiği 12 adımı izler ve beş dakikaya sığar. 5. slayt ne çözdüğümüzü (beş durak, altı problem) ve ürünün bir web sitesi olduğunu (tarayıcıda ve telefona yüklü) gösterir; 6. slaytta tanıtım filmi müziğiyle oynar, Niri ve sayaç o sırada çekilir. Kapanıştan sonra konuşmanın dışında sekiz ek sayfa var: filmin her sahnesi gerçek ekranı ve üç mekanizmasıyla; soru gelince açılır, paylaşılan PDF’te de durur. Kısa cevaplar aşağıda ve kapanıştan itibaren konuşmacı penceresinde.
 
 Slaytlardaki her sayı `docs/PAZAR-ANALIZI.md` içindeki kaynağıyla birlikte slaytın üzerinde yazar ya da ürünün kendi kodundan gelir (XP tablosu, uyum ağırlıkları, kanıt düzeylerinin ağırlığı, yayın eşiği); yapay zekâ slaytlarındaki sonuçları ürünün kendi kodu, gerçek bir model cevabıyla hesaplar. Planlar plan olarak etiketli; kullanıcı, pilot ya da gelir rakamı yok.
 
 ## 1. Nirengi
 
-*0:00 – 0:08 · Niri: “Merhaba, ben Niri! Bugün size haritamı göstereceğim.”*
+*0:00 – 0:12 · Niri: “Merhaba, ben Niri! Bugün size haritamı göstereceğim.”*
 
 - Merhaba, biz Nirengi: Sezer Uzun ve Emirhan Açık.
-- Nirengi noktası, haritacının güvenle ölçtüğü sabit noktadır; biz gençlerin işi için o noktayı kuruyoruz.
+- Nirengi noktası, haritacının güvenle ölçtüğü sabit noktadır. Biz gençlerin işi için o noktayı kuruyoruz: web’de ve telefonda çalışan açık kaynak bir uygulama.
 
 ## 2. Problem
 
-*0:08 – 0:20 · Niri: “Gençler görünmüyor, kurumlar emin olamıyor.”*
+*0:12 – 0:30 · Niri: “Gençler görünmüyor, kurumlar emin olamıyor.”*
 
-- Deneyim yoksa iş yok, iş yoksa deneyim yok. Her 100 gençten 23’ü ne okulda ne işte.
-- BİT uzmanı almakta zorlanan her 100 girişimden 71’i aynı şeyi söylüyor: ilgili iş deneyimi yok.
+- Deneyim yoksa iş yok, iş yoksa deneyim yok.
+- Her 100 gençten 23’ü ne okulda ne işte.
+- Öbür tarafta, BİT uzmanı almakta zorlanan her 100 girişimden 71’i aynı şeyi söylüyor: ilgili iş deneyimi yok.
 
 ## 3. Kim için
 
-*0:20 – 0:33 · Niri: “Biri kanıt arıyor, öbürü güvenilir bir ekip.”*
+*0:30 – 0:50 · Niri: “Biri kanıt arıyor, öbürü güvenilir bir ekip.”*
 
-- Odağımız girişim ekosistemi. Bir yanda üreten ama kanıtı olmayan genç: tek bir seçici programa bir milyon başvuru geliyor.
+- Odağımız girişim ekosistemi.
+- Bir yanda üreten ama kanıtı olmayan genç: tek bir seçici programa bir milyon başvuru geliyor, kapıda kalan görünmüyor.
 - Öbür yanda ekip kuran erken aşama girişim: İK’sı yok, yanlış işe alımı kaldıramaz. İlk tur Zemin360 ve GİRVAK ağı.
 
 ## 4. Kanıt
 
-*0:33 – 0:43 · Niri: “Rakamları uydurmadım; kaynakları altında.”*
+*0:50 – 1:06 · Niri: “Rakamları uydurmadım; kaynakları altında.”*
 
+- Bunu nereden biliyoruz?
 - Diploma şartını kaldıran şirketlerde bile işe alım 700’de 1’den az değişti: niyet var, ölçme aracı yok.
-- 37 platformu inceledik; doğrulanmış işi ve kurum imzasını birlikte sunanı bulamadık.
+- 37 platform ve programı inceledik; doğrulanmış işi ve kurum imzasını bir arada sunanı Türkiye’de bulamadık.
 
 ## 5. Ne çözüyoruz
 
-*0:43 – 0:55 · Niri: “Beş durak, altı problem. Haritada gezelim!”*
+*1:06 – 1:28 · Niri: “Beş durak, altı problem. Tarayıcıda da cebinde de.”*
 
 - Ne çözüyoruz? Gencin yaptığı işi ve kurumun ihtiyacını beyandan kanıta çeviriyoruz; ikisi küçük bir pilotta buluşuyor.
-- Yarışmanın altı problemi bu beş durakta, her biri çalışan bir ekranla.
+- Beş durak var ve yarışmanın altı problemi bu duraklarda, her biri çalışan bir ekranla.
+- Ve bu bir web sitesi: tarayıcıda açılıyor, telefona uygulama olarak yükleniyor, internetsiz de çalışıyor. Şimdi 48 saniyelik filmle gezelim.
 
-## 6. Web’de ve telefonda
+## 6. Tanıtım filmi
 
-*0:55 – 1:07 · Niri: “Tarayıcıda da cebinde de aynı haritayım.”*
+*1:28 – 2:16 · Niri: “Sahne benim! Ürünü telefonda göstereyim.”*
 
-- Nirengi bir web sitesi: tarayıcıda açılıyor, kurulum yok. Aynı adres telefona uygulama olarak yükleniyor ve internetsiz çalışıyor.
-- Şimdi videomuzdaki her sahneyi yavaşça açalım. Hikâyenin genci Emirhan: adı bizden, profil kurgusal.
-
-## 7. İşin, kaynağında doğrulanır
-
-*1:07 – 1:20 · Niri: “İşin nerede duruyorsa oradan doğrularım.”*
-
-- Önce kanıt. Emirhan GitHub’da hangi depoları göstereceğini kendisi seçiyor; hepsi Doğrulandı geliyor, yanında doğrulayanı yazıyor.
-- Behance ya da ArtStation’daki iş dürüstçe Beyan yazıyor; eşleşmede de daha az sayılıyor.
-
-## 8. XP yalnız gerçek işten
-
-*1:20 – 1:33 · Niri: “Puan değil makbuz: her XP bir iş.”*
-
-- Oyunlaştırma burada: haftalık hedef, seri, lig, görevler ve Niri’nin kostümleri.
-- Ama XP yalnız gerçek işten geliyor; her XP bir iş makbuzu. Kurum tarafında oyun yok.
-
-## 9. Eksiğini gör
-
-*1:33 – 1:45 · Niri: “Her hafta nerede güçlü olduğunu söylerim.”*
-
-- Niri her hafta gencin haftasını okuyor ve en yakın kapıyı gösteriyor: Flutter’da bir doğrulanmış iş eklersen uyumun 63’ten 72’ye çıkar.
-- Eşleşmeyen genç neyin eksik olduğunu biliyor.
-
-## 10. Gençler birbirine yardım eder
-
-*1:45 – 1:57 · Niri: “Burada yardım eden de kazanır.”*
-
-- Gençler yalnız kurumlarla değil, birbirleriyle de çalışıyor: Baran soruyor, Emirhan cevaplıyor.
-- Baran “İşe yaradı” deyince Emirhan 15 XP kazanıyor; yardım da üretim sayılıyor.
-
-## 11. Kurum derdini yazar
-
-*1:57 – 2:09 · Niri: “Derdini anlat, alanları ben doldururum.”*
-
-- Şimdi kurum tarafı. Kuzey Lojistik ilan yazmıyor, derdini anlatıyor: “kargom nerede” aramaları ayda 6.000.
-- Niri bunu yedi alanlı kanvasa çeviriyor; netlik 70’i geçmeden ihtiyaç yayına çıkmıyor.
-
-## 12. Adaylar isimsiz
-
-*2:09 – 2:22 · Niri: “İsmi değil, işi tartarım.”*
-
-- Kurum adayları isimsiz görüyor: Aday 9C03, iki Kurum onaylı iş, 86 puan.
-- Puanın dört parçası açık, her birinin gerekçesi yazıyor. Kimlik ancak deneme projesi teklif edilince açılıyor.
-
-## 13. İki onay, zincirli kayıt
-
-*2:22 – 2:35 · Niri: “İki imza, bir mühür. Sonradan kimse değiştiremez.”*
-
-- Deneme projesinde kriterler aşamaya dönüşüyor: Emirhan teslim ediyor, Kuzey Lojistik onaylıyor.
-- Her kaydın özeti bir sonrakine yazılıyor; biri sonradan tek harf değiştirse zincir tam orada kırılıyor.
-
-## 14. Onay, gencin kanıtı olur
-
-*2:35 – 2:46 · Niri: “Onaylanan iş, haritanda yeni bir nokta.”*
-
-- Onaylanan aşama Emirhan’ın profiline Kurum onaylı kanıt olarak dönüyor, imzalayanıyla.
-- Döngü kapanıyor; Emirhan bir sonraki ihtiyaca daha yakın.
-
-## 15. Yapay zekâ ne yapıyor
-
-*2:46 – 2:59 · Niri: “Metni ben okurum ama uydurmam.”*
-
-- Kurumun metnini kim okuyor? Açık ağırlıklı bir model, Gemma 4.
-- Metni yedi alana ayırıyor ve her alanı metindeki bir cümleye bağlıyor: “ayda 6.000 arama” sorunun ölçüsü oluyor.
-
-## 16. Neden Gemma 4
-
-*2:59 – 3:12 · Niri: “Ben okurum; kararı kurallar verir.”*
-
-- Neden Gemma? Açık ağırlıklı ve Apache lisanslı; denediğimiz dört açık model içinde Türkçeyi doğru ayıran en hızlısı oydu.
-- Ücretsiz kotada çalışıyor. Model okuyor ve öneriyor; yayın kararı, puan ve sıralama kurallarda.
-
-## 17. Önce ve sonra
-
-*3:12 – 3:22 · Niri: “Aynı metinden daha dolu bir taslak.”*
-
-- Aynı metni kural motoru okuyunca netlik 60, yayımlanamıyor. Modelle 75; kurum önerileri ekleyince 100.
-- Bu sayıları ürünün kendi kuralları hesaplıyor.
-
-## 18. Hatalı çıktıya karşı
-
-*3:22 – 3:34 · Niri: “Metinde yoksa almam, sorarım.”*
-
-- Model yanılırsa? Cevap dört kapıdan geçiyor: şema, alıntı, sayı, ölçülebilirlik.
-- Metinde olmayan bir karar verici uydurursa alan boş kalıyor, Niri kuruma soruyor. Model susarsa kural motoru devralıyor.
-
-## 19. Tasarım kararları
-
-*3:34 – 3:42 · Niri: “Gence oyun, kuruma sakin bir ölçüm.”*
-
-- Tasarımda kararımız net: her ekranda tek iş, önce telefon; oyun yalnız gençte, kurum ekranı sakin; aday temasa kadar isimsiz.
-
-## 20. Bitti ve bırakılan
-
-*3:42 – 3:55 · Niri: “Prototipim çalışıyor. Gerisini pilotta kanıtlayacağım.”*
-
-- Gördüğünüz her şey canlıda çalışıyor; motor 55 testle sınanıyor.
-- Bilerek bıraktıklarımız: kalıcı veritabanı, gerçek kullanıcı ve pilot, kod dışı işte makine doğrulaması. Sonraki dört ay bunlar.
-
-## 21. Tanıtım filmi
-
-*3:55 – 4:43 · Niri: “Sahne benim! Ürünü telefonda göstereyim.”*
-
-- (Süre darsa bu slaytı → ile geç: sayfalar filmin sahneleri. Oynarsa müzikle oynar, konuşma yok; bitince → ile devam.)
+- (Film müzikle oynar; konuşma yok. Bitince → ile devam.)
 - Ses gelmezse filme bir kez tıkla.
 - Film açılmazsa slayt kendiliğinden canlı demo paneline döner; Sunum klasöründeki mp4 de yedekte.
 
-## 22. Teşekkürler
+## 7. Yapay zekâ ne yapıyor
 
-*4:43 – 4:53 · Niri: “Zirvedeyim! Beni telefonunuza alın, haritada görüşmek üzere.”*
+*2:16 – 2:38 · Niri: “Derdini yaz, ben okuyayım. Uydurmam.”*
+
+- Filmdeki yapay zekâ adımı şu: kurum derdini kendi sözleriyle yazıyor.
+- Açık ağırlıklı bir model, Gemma 4, metni yedi alanlı kanvasa çeviriyor; her alan metindeki bir cümleye dayanıyor: “ayda 6.000 arama” sorunun ölçüsü oluyor.
+- Modeli açık olduğu, ücretsiz kotada çalıştığı ve denediğimiz dört model içinde Türkçeyi en iyi ayırdığı için seçtik. Yayın kararı ve puanlar kurallarda.
+
+## 8. Önce ve sonra
+
+*2:38 – 2:54 · Niri: “Aynı metinden daha dolu bir taslak.”*
+
+- Aynı metni kural motorumuz da okuyor: beş alan, netlik 60, yayımlanamaz.
+- Model yedi alanı dolduruyor ve iki ölçülebilir kriter öneriyor: 75. Kurum önerileri ekleyince 100. Bu sayıları ürünün kendi kuralları hesaplıyor.
+
+## 9. Hatalı çıktıya karşı
+
+*2:54 – 3:14 · Niri: “Metinde yoksa almam, sorarım.”*
+
+- Model yanılırsa? Cevabı dört kapıdan geçiyor: şema, alıntı, sayı, ölçülebilirlik.
+- Model “Genel Müdür onaylar” diye uydurursa, bu cümle metinde olmadığı için alan boş kalır; Niri kuruma sorar.
+- Model hiç cevap vermezse kural motoru devralır.
+
+## 10. Tasarım kararları
+
+*3:14 – 3:36 · Niri: “Gence oyun, kuruma sakin bir ölçüm.”*
+
+- Tasarımın tek fikri: gence oyun, kuruma ölçüm.
+- Genç her hafta hedef, seri ve ligle geri geliyor; ama her XP bir iş makbuzu. Gençler birbirine de yardım ediyor, yardım eden XP kazanıyor. Niri her hafta en yakın kapıyı gösteriyor.
+- Kurum adayı isimsiz görüyor, puanın dört parçası açık, her aşama iki onayla zincirli deftere yazılıyor. Kurum ekranında oyun yok.
+
+## 11. Bitti ve bırakılan
+
+*3:36 – 3:58 · Niri: “Prototipim çalışıyor. Gerisini pilotta kanıtlayacağım.”*
+
+- Gördüğünüz her şey canlıda çalışıyor: altı problemin altısına bir ekran, gerçek GitHub ve DNS doğrulaması, açık modelle taslak; motor 55 testle sınanıyor.
+- Bilerek bıraktıklarımız: kalıcı veritabanı, gerçek kullanıcı ve pilot, kod dışı işte makine doğrulaması, bildirim ve mağaza sürümü.
+- Finalden sonraki dört ay: kalıcılık, ilk ihtiyaç turu, kod dışı doğrulama ve pilot raporu.
+
+## 12. Teşekkürler
+
+*3:58 – 4:12 · Niri: “Zirvedeyim! Beni telefonunuza alın, haritada görüşmek üzere.”*
 
 - Tek bir isteğimiz var: bu salondan bir girişimin ya da kurumun gerçek bir ihtiyacı. İlk kanvası birlikte yazalım.
 - Ekrandaki kodu okutursanız Nirengi şimdi telefonunuza gelir.
 - Beyan değil, kanıt. Teşekkürler.
+
+## Ek sayfalar (konuşmanın dışında)
+
+### Ek 1. İşin, kaynağında doğrulanır
+
+- (Ek sayfa: “Doğrulama nasıl işliyor?” gelirse.) Beyan, Doğrulandı, Kurum onaylı; eşleşmede 0,3, 0,8 ve 1 ağırlıkla sayılır.
+- GitHub depolarını genç kendisi seçer; alan adı DNS kaydıyla doğrulanır. Behance, ArtStation, LinkedIn Beyan olarak gelir.
+
+### Ek 2. XP yalnız gerçek işten
+
+- (Ek sayfa: “Oyunlaştırma ne?” gelirse.) Hedef üretim günüdür, commit değil; seri, lig, görevler ve Niri’nin kostümleri.
+- XP yalnız doğrulanmış işten: 10, 40, 120; günde en çok 200. Kurum tarafında oyun yok.
+
+### Ek 3. Eksiğini gör
+
+- (Ek sayfa: “Analiz ne gösteriyor?” gelirse.) Niri’nin haftalık notu ve en yakın kapı: “Flutter’da bir doğrulanmış iş eklersen uyumun 63 → 72.”
+- Analiz kural tabanlı; formülü /yontem sayfasında.
+
+### Ek 4. Gençler birbirine yardım eder
+
+- (Ek sayfa: “Gençler birbirine nasıl yardım ediyor?” gelirse.) Soru, cevap, teşekkür: soran “İşe yaradı” derse yanıtlayan 15 XP alır.
+- Bu haftanın yardımcıları beğeniyle değil, işe yarayan cevap sayısıyla sıralanır.
+
+### Ek 5. Kurum derdini yazar
+
+- (Ek sayfa: “Kurum ihtiyacı nasıl yazıyor?” gelirse.) Kurum derdini düz metinle anlatır; Niri yedi alanlı kanvasa çevirir.
+- Netlik 70’in altındaysa ihtiyaç yayımlanmaz; benzer ihtiyaçların sonucu aynı ekranda.
+
+### Ek 6. Adaylar isimsiz
+
+- (Ek sayfa: “Eşleşme nasıl?” gelirse.) Aday isimsiz: isim, yaş, okul, şehir ilk temasa kadar gizli.
+- Puan dört parça: yaptığı iş 45, sektör ve ölçek 20, zaman 15, ortak geçmiş 20; her parçanın gerekçesi yazar.
+
+### Ek 7. İki onay, zincirli kayıt
+
+- (Ek sayfa: “Pilot nasıl takip ediliyor?” gelirse.) Kriterler aşamaya dönüşür; genç teslim eder, kurum onaylar.
+- Her kaydın özeti bir sonrakine yazılır; sonradan tek harf değişirse zincir o kayıtta kırılır.
+
+### Ek 8. Onay, gencin kanıtı olur
+
+- (Ek sayfa: “Pilot bitince ne oluyor?” gelirse.) Onaylanan aşama gencin profiline Kurum onaylı kanıt olarak geçer, imzalayanıyla.
+- Kapanan projenin özeti herkese açık bir sayfada kalır; genç bir sonraki ihtiyaca daha yakındır.
 
 ## Soru gelirse
 

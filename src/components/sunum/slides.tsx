@@ -4,13 +4,14 @@
 // one of two marks (see Deck): 'hero' on the right for the opening and the close,
 // 'dock' bottom-left elsewhere, so every slide keeps that corner (x < 760, y > 700) free.
 //
-// The slides follow the flow the organisers recommended, with the demo told in pages: team,
-// problem, for whom (the focus: young people and the startups that want to work with them),
-// evidence, what we solve (one sentence and the route of five stops that answers the six
-// problems), the same product on the web and on the phone, then the promo film's shots one
-// page each (headline, what it means, the real screen with the element ringed and lifted
-// out), what the AI does, why this open model, its before and after, the guard against
-// wrong output, design decisions, done and left, the film itself, close. Numbers come from
+// The twelve slides follow the flow the organisers recommended and fit the five-minute
+// talk: team, problem, for whom (the focus: young people and the startups that want to work
+// with them), evidence, what we solve (one sentence, the route of five stops that answers
+// the six problems, and the same product in a browser and on a phone), demo (the film),
+// what the AI does (with the open model it runs on), its before and after, the guard
+// against wrong output, design decisions (a game for the genç, a measure for the kurum),
+// done and left, close. After the close an appendix holds the film's eight shots one page
+// each, for questions and for the shared PDF; it is not part of the talk. Numbers come from
 // docs/PAZAR-ANALIZI.md with their sources on the slide; product numbers from the engine,
 // and the AI slides run a real model answer through the product's own guard. Nothing here
 // is invented: plans are labelled as plans, and people and institutions in the demo are
@@ -39,6 +40,8 @@ export interface Slide {
   mark: Mark;
   /** The view owns the whole stage (the film): Niri and the counter step aside. */
   bare?: boolean;
+  /** An appendix page after the close: outside the talk and its clock, opened for questions. */
+  extra?: boolean;
   /** Niri's line. `gear` is the league costume (climbing toward Zirve by the close); `turns` the twirl into it. */
   niri: { mood: Mood; line: string; point?: Dir; gear?: number; turns?: 1 | 2 };
   View: () => ReactNode;
@@ -199,8 +202,8 @@ function ForWhom() {
         </div>
       ))}
       <Seam top={300} height={300} />
-      <p className="s-in absolute left-[112px] top-[636px] w-[1376px] border-t-2 border-line pt-[18px] text-[24px] font-semibold leading-[1.35] text-ink-2" style={d(560)}>
-        <b className="font-extrabold text-ink">Odak: girişim ekosistemi.</b> İlk tur Zemin360 ve GİRVAK ağındaki girişimler ve gençler; sonra KOBİ’ler, kamu birimleri ve STK’lar.
+      <p className="s-in absolute left-[112px] top-[624px] w-[1376px] border-t-2 border-line pt-[18px] text-[24px] font-semibold leading-[1.35] text-ink-2" style={d(560)}>
+        <b className="font-extrabold text-ink">Odak: girişim ekosistemi.</b> İlk tur Zemin360 ve GİRVAK ağı; sonra KOBİ’ler, kamu ve STK’lar.
       </p>
     </>
   );
@@ -232,7 +235,7 @@ function Evidence() {
   );
 }
 
-// ---------------------------------------------------------------- 5. the solution: one sentence and its route
+// ---------------------------------------------------------------- 5. the solution: what we solve, the route, where it runs
 
 /**
  * The five stops of the loop, each with the competition problems it answers (README table) and its screen.
@@ -256,48 +259,61 @@ function StopMark({ n, size }: { n: number; size: number }) {
   );
 }
 
-/** The whole route on one line, like a surveyor's traverse: five stops, and the leg that brings the approved work back. */
-function Route() {
-  const col = 275;
-  const left = (n: number) => 112 + n * col;
-  const mid = (n: number) => left(n) + 28;
+/** One sentence, the route down the left like a surveyor's traverse, and the same product in a browser and on a phone. */
+function Solution() {
+  const row = 80;
+  const top = 236;
+  const mid = (n: number) => top + n * row + 22;
   return (
     <>
-      <Heading width={1376} className="!text-[52px]">
+      <Heading width={1376} className="!text-[50px]">
         Gencin yaptığı işi ve kurumun ihtiyacını beyandan kanıta çeviriyoruz; ikisi <span className="text-indigo">küçük bir pilotta</span> buluşur.
       </Heading>
 
+      {/* The legs between stops, and the return leg on the margin: the approved work comes back as evidence. */}
       <svg viewBox="0 0 1600 900" width="1600" height="900" className="pointer-events-none absolute inset-0" aria-hidden="true">
-        <path className="s-in" style={d(300)} d={`M${mid(0) + 40} 417H${mid(4) - 40}`} stroke="rgb(var(--line-2))" strokeWidth="4" strokeDasharray="2 12" strokeLinecap="round" />
+        <path className="s-in" style={d(300)} d={`M134 ${mid(0) + 30}V${mid(4) - 26}`} stroke="rgb(var(--line-2))" strokeWidth="4" strokeDasharray="2 12" strokeLinecap="round" />
         <g className="s-in" style={d(1000)} fill="none" stroke="rgb(var(--indigo))" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
-          <path d={`M${mid(4)} 376V346Q${mid(4)} 326 ${mid(4) - 20} 326H${mid(0) + 20}Q${mid(0)} 326 ${mid(0)} 346V370`} />
-          <path d={`M${mid(0) - 10} 360 ${mid(0)} 372 ${mid(0) + 10} 360`} />
+          <path d={`M104 ${mid(4)}H92Q80 ${mid(4)} 80 ${mid(4) - 12}V${mid(0) + 12}Q80 ${mid(0)} 92 ${mid(0)}H100`} />
+          <path d={`M92 ${mid(0) - 9} 102 ${mid(0)} 92 ${mid(0) + 9}`} />
         </g>
       </svg>
-      <p className="s-in absolute top-[310px] -translate-x-1/2 bg-bg px-[16px] text-[21px] font-bold text-indigo" style={{ left: (mid(0) + mid(4)) / 2, ...d(1000) }}>
-        Onaylanan her aşama gencin profiline kanıt olarak döner
-      </p>
-
       {STOPS.map((s, n) => (
-        <div key={s.name} className="s-in absolute top-[390px] w-[251px]" style={{ left: left(n), ...d(300 + n * 140) }}>
-          <StopMark n={n} size={56} />
-          <p className="mt-[20px] text-[34px] font-extrabold leading-none tracking-[-0.025em] text-ink">{s.name}</p>
-          <ul className="mt-[14px] flex flex-col gap-[6px]">
-            {s.problems.map(([code, name]) => (
-              <li key={code} className="flex items-baseline gap-[8px] text-[20px] font-bold leading-[1.25] text-ink-2">
-                <span className="num shrink-0 text-indigo">{code}</span>
-                {name}
-              </li>
-            ))}
-          </ul>
-          <p className="mono mt-[12px] text-[16px] font-semibold text-ink-3">/{s.route}</p>
+        <div key={s.name} className="s-in absolute left-[112px] flex w-[660px] items-start gap-[18px]" style={{ top: top + n * row, ...d(260 + n * 120) }}>
+          <StopMark n={n} size={44} />
+          <div className="min-w-0">
+            <p className="flex items-baseline gap-[14px]">
+              <span className="text-[28px] font-extrabold leading-none tracking-[-0.02em] text-ink">{s.name}</span>
+              <span className="mono text-[16px] font-semibold text-ink-3">/{s.route}</span>
+            </p>
+            <p className="mt-[6px] flex flex-wrap gap-x-[16px] text-[19px] font-bold leading-[1.25] text-ink-2">
+              {s.problems.map(([code, name]) => (
+                <span key={code}>
+                  <span className="num text-indigo">{code}</span> {name}
+                </span>
+              ))}
+            </p>
+          </div>
         </div>
       ))}
+      <p className="s-in absolute left-[112px] top-[640px] text-[20px] font-bold text-indigo" style={d(1000)}>
+        Onaylanan her aşama gencin profiline kanıt olarak döner.
+      </p>
+
+      <figure className="s-in absolute" style={{ left: 846, top: 232, ...d(200) }}>
+        <Browser src="/sunum/dk-home.webp" alt="Nirengi masaüstü tarayıcıda: Yaptığın işle fark edil" route="" width={620} />
+        <figcaption className="mt-[12px] w-[440px] text-[19px] font-bold leading-[1.3] text-ink-2">
+          Bir web sitesi: tarayıcıda açılır, telefona uygulama olarak yüklenir, internetsiz de çalışır.
+        </figcaption>
+      </figure>
+      <figure className="s-in absolute" style={{ left: 1300, top: 420, ...d(480) }}>
+        <Phone src="/sunum/genc-bugun.webp" alt="Aynı uygulama telefonda: gencin Bugün ekranı" width={188} />
+      </figure>
     </>
   );
 }
 
-// ---------------------------------------------------------------- 6–14. the product in pages: the film's shots, slowed down and explained
+// ---------------------------------------------------------------- appendix: the film's shots, slowed down and explained
 
 /** Where the real screens stand on every page: a phone on the right, or a browser window filling the right half. */
 const PHONE_AT = { left: 1188, top: 84, width: 300 };
@@ -428,35 +444,7 @@ function Page({ head, problems, points, phone, web, lift }: { head: [string, str
   );
 }
 
-// 6. one product on the web and on the phone
-
-function Everywhere() {
-  return (
-    <>
-      <PageText
-        head={['Web’de ve telefonda', 'aynı Nirengi.']}
-        lead={<span className="mono text-indigo">{SITE}</span>}
-        points={[
-          ['Tarayıcıda açılır', 'Kurulum yok, kayıt şartı yok: adresi açan hemen kullanır. Kurum çoğu zaman masaüstünde çalışır.'],
-          ['Telefona yüklenir', 'Mağaza gerekmez: ana ekrana eklenir, tam ekran açılır, internet olmadan da çalışır.'],
-          ['Tek adres, iki yüz', 'Genç ve kurum aynı adresten girer, rolünü seçer; her biri kendi ekranlarını görür.'],
-        ]}
-      />
-      <figure className="s-in absolute" style={{ left: WEB_AT.left, top: WEB_AT.top, ...d(140) }}>
-        <Browser src="/sunum/dk-home.webp" alt="Nirengi’nin tanıtım sayfası masaüstü tarayıcıda: Yaptığın işle fark edil" route="" width={WEB_AT.width} />
-      </figure>
-      <figure className="s-in absolute flex flex-col items-center" style={{ left: 1262, top: 300, ...d(420) }}>
-        <Phone src="/sunum/genc-bugun.webp" alt="Aynı uygulama telefonda: gencin Bugün ekranı" width={226} />
-        <figcaption className="mt-[12px] flex items-center gap-[10px]">
-          <Tag who="genc">Genç</Tag>
-          <span className="s-cap">telefona yüklü</span>
-        </figcaption>
-      </figure>
-    </>
-  );
-}
-
-// 7–14. the film's shots, in its order: the genç's week, then the kurum's need, the match, the pilot and the way back
+// The film's shots in its order: the genç's week, then the kurum's need, the match, the pilot and the way back.
 
 const LV = (code: keyof typeof LEVELS) => String(LEVELS[code].weight).replace('.', ',');
 
@@ -589,7 +577,7 @@ function PageReturn() {
   );
 }
 
-// ---------------------------------------------------------------- 21. the film, with the live demo as its fallback
+// ---------------------------------------------------------------- 6. the film, with the live demo as its fallback
 
 function LiveDemo() {
   const steps = [
@@ -686,7 +674,7 @@ function Film() {
   );
 }
 
-// ---------------------------------------------------------------- 15–18. the AI, computed from a real model answer
+// ---------------------------------------------------------------- 7–9. the AI, computed from a real model answer
 
 /** Niri's model on the sample text, through the product's guard; and the rules on the same text. */
 const READ = readModelDraft(SAMPLE_COMPLAINT, SAMPLE_READING)!;
@@ -703,81 +691,52 @@ const sentenceOf = (key: keyof Canvas) => SENTENCES.find((s) => (READ.quotes[key
 
 function AiWhat() {
   const more = filledFields(READ.canvas).length - SHOWN.length;
+  const card: [string, string][] = [
+    ['Nerede', 'Cloudflare Workers AI, günlük ücretsiz kota'],
+    ['Nasıl', 'Sabit istem, JSON şeması, sıcaklık 0,1'],
+    ['Neden bu', 'Denediğimiz dört açık model içinde Türkçeyi doğru alana ayıran en hızlısı'],
+    ['Karar', 'Yayın, puan ve sıralama kurallarda; model yalnız okur ve önerir'],
+  ];
   return (
     <>
-      <Heading width={1300}>Niri metni açık bir modelle okur.</Heading>
-      <p className="s-in absolute left-[112px] top-[176px] w-[1340px] text-[28px] font-medium leading-[1.35] text-ink-3" style={d(80)}>
-        Yapay zekâ, kurumun kendi sözlerini her alanı bir cümleye dayanan ihtiyaç kanvasına çevirir.
+      <Heading width={1376}>Yapay zekâ ne yapıyor?</Heading>
+      <p className="s-in absolute left-[112px] top-[176px] w-[1376px] text-[25px] font-medium leading-[1.35] text-ink-3" style={d(80)}>
+        Niri kurumun kendi sözlerini açık bir modelle okur ve her alanı bir cümleye dayanan ihtiyaç kanvasına çevirir.
       </p>
 
-      <div className="s-in absolute left-[112px] top-[252px] flex w-[1376px] items-center justify-between" style={d(160)}>
-        <p className="text-[19px] font-bold text-ink-3">Kurumun cümlesi</p>
-        <p className="flex w-[636px] items-center justify-between text-[19px] font-bold text-ink-3">
-          Niri’nin taslağı
-          <span className="pill !text-[17px] bg-indigo-tint text-indigo">Gemma 4 · açık model</span>
-        </p>
+      <div className="s-in absolute left-[112px] top-[252px] flex w-[960px] items-center" style={d(160)}>
+        <p className="w-[510px] text-[18px] font-bold text-ink-3">Kurumun cümlesi</p>
+        <p className="text-[18px] font-bold text-ink-3">Niri’nin taslağı</p>
       </div>
       {SHOWN.map(([k, label], n) => (
-        <div key={k} className="s-in absolute left-[112px] flex w-[1376px] items-center" style={{ top: 300 + n * 128, ...d(260 + n * 180) }}>
-          <p className="w-[620px] rounded-[16px] bg-bg-2 px-[22px] py-[14px] text-[23px] font-semibold leading-[1.35] text-ink-2">“{sentenceOf(k)}”</p>
-          <svg viewBox="0 0 120 24" width="120" height="24" className="shrink-0" aria-hidden="true">
-            <path d="M22 12H96M86 4l10 8-10 8" fill="none" stroke="rgb(var(--indigo))" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+        <div key={k} className="s-in absolute left-[112px] flex w-[960px] items-center" style={{ top: 292 + n * 124, ...d(260 + n * 180) }}>
+          <p className="w-[440px] rounded-[16px] bg-bg-2 px-[20px] py-[12px] text-[20px] font-semibold leading-[1.35] text-ink-2">“{sentenceOf(k)}”</p>
+          <svg viewBox="0 0 70 24" width="70" height="24" className="shrink-0" aria-hidden="true">
+            <path d="M12 12H52M43 4l9 8-9 8" fill="none" stroke="rgb(var(--indigo))" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
           <div className="min-w-0 flex-1">
-            <p className="text-[18px] font-bold text-ink-3">{label}</p>
-            <p className="text-[30px] font-extrabold leading-[1.15] tracking-[-0.015em] text-ink">{READ.canvas[k] as string}</p>
+            <p className="text-[17px] font-bold text-ink-3">{label}</p>
+            <p className="text-[26px] font-extrabold leading-[1.15] tracking-[-0.015em] text-ink">{READ.canvas[k] as string}</p>
           </div>
         </div>
       ))}
-      <p className="s-in absolute left-[852px] top-[694px] text-[21px] font-semibold text-ink-3" style={d(860)}>
+      <p className="s-in absolute left-[622px] top-[664px] text-[19px] font-semibold text-ink-3" style={d(860)}>
         +{more} alan daha, her biri kendi cümlesiyle.
       </p>
-    </>
-  );
-}
 
-/** What the model is, where it runs, how it is asked, and what it is never asked to do (README, worker/draft.ts). */
-function AiModel() {
-  const facts: [string, string][] = [
-    ['Model', 'Gemma 4 26B, Google. Ağırlıkları açık, Apache 2.0 lisanslı.'],
-    ['Nerede', 'Cloudflare Workers AI. İstersek aynı model kendi sunucumuzda çalışır.'],
-    ['Nasıl', 'Sabit istem, JSON şeması, sıcaklık 0,1. Tarayıcıdan yalnız kurumun metni gider.'],
-    ['Neden bu', 'Denediğimiz dört açık model içinde şemaya uyan, Türkçeyi doğru alana ayıran en hızlısı.'],
-    ['Maliyet', 'Günlük ücretsiz kota: taslak başına ~28 nöron, günde ~350 taslak. Fatura çıkmaz.'],
-  ];
-  const does = ['Metni yedi alana ayırır', 'Her alana dayandığı cümleyi koyar', 'Ölçülebilir kriter önerir', 'Eksik alana başlangıç cümlesi önerir'];
-  const never = ['Yayın kararı vermez', 'Uyum puanı hesaplamaz', 'Adayları sıralamaz', 'Gençlerin verisini görmez'];
-  return (
-    <>
-      <Heading width={1376}>Neden Gemma 4, neden açık model?</Heading>
-      <dl className="absolute left-[112px] top-[196px] w-[780px]">
-        {facts.map(([k, v], n) => (
-          <div key={k} className="s-in grid grid-cols-[150px_1fr] items-baseline gap-x-[24px] border-t-2 border-line py-[14px]" style={d(120 + n * 110)}>
-            <dt className="text-[19px] font-bold text-ink-3">{k}</dt>
-            <dd className="text-[24px] font-semibold leading-[1.3] text-ink">{v}</dd>
-          </div>
-        ))}
-      </dl>
-      <div className="s-in absolute left-[968px] top-[208px] w-[520px]" style={d(420)}>
-        <p className="text-[20px] font-bold text-green-ink">Model yapar</p>
-        <ul className="mt-[12px] flex flex-col gap-[12px]">
-          {does.map((t) => (
-            <li key={t} className="flex items-center gap-[12px] text-[25px] font-bold leading-tight text-ink">
-              <Check size={26} strokeWidth={3.4} className="shrink-0 text-green-ink" />
-              {t}
-            </li>
+      {/* The model, plainly: what it is, where it runs, how it is asked, and what it never decides. */}
+      <aside className="s-in absolute left-[1112px] top-[244px] w-[376px] rounded-[22px] bg-indigo-tint px-[26px] py-[22px]" style={d(420)}>
+        <p className="text-[30px] font-extrabold leading-tight tracking-[-0.02em] text-indigo">Gemma 4 26B</p>
+        <p className="mt-[2px] text-[17px] font-bold text-indigo">Google · ağırlıkları açık · Apache 2.0</p>
+        <dl className="mt-[14px] flex flex-col gap-[12px]">
+          {card.map(([k, v]) => (
+            <div key={k}>
+              <dt className="text-[15px] font-bold text-ink-3">{k}</dt>
+              <dd className="text-[19px] font-semibold leading-[1.3] text-ink">{v}</dd>
+            </div>
           ))}
-        </ul>
-        <p className="mt-[34px] text-[20px] font-bold text-ink-3">Model yapmaz: kurallar yapar</p>
-        <ul className="mt-[12px] flex flex-col gap-[12px]">
-          {never.map((t) => (
-            <li key={t} className="flex items-center gap-[12px] text-[25px] font-bold leading-tight text-ink-2">
-              <X size={26} strokeWidth={3.4} className="shrink-0 text-ink-3" />
-              {t}
-            </li>
-          ))}
-        </ul>
-      </div>
+        </dl>
+      </aside>
     </>
   );
 }
@@ -881,37 +840,64 @@ function AiGuard() {
   );
 }
 
-// ---------------------------------------------------------------- 19. design decisions
+// ---------------------------------------------------------------- 10. design decisions
 
 function Decisions() {
-  const items = ['Her ekranda tek iş', 'Önce telefon', 'Oyun yalnız genç tarafında', 'Temasa kadar isimsiz', 'Niri yol gösterir, kimseyi bekletmez'];
+  const pts = (k: keyof typeof WEIGHTS) => Math.round(WEIGHTS[k] * 100);
+  const cols: { who: 'genc' | 'kurum'; tag: string; items: [string, ReactNode][] }[] = [
+    {
+      who: 'genc',
+      tag: 'Genç: oyun gibi',
+      items: [
+        ['Her XP bir iş makbuzu', <>Üretim günü {XP.activeDay}, doğrulanmış iş {XP.evidence}, kurum onaylı aşama {XP.milestone}; günde en çok {XP.dailyCap}.</>],
+        ['Hedef, seri, lig', 'Hedef üretim günüdür, commit değil. Mola haftası seriyi bozmaz; Niri her ligde yeni kostüm giyer.'],
+        ['Topluluk', <>Gençler birbirine yardım eder: soran “İşe yaradı” derse yanıtlayan +{XP.helpful} XP alır.</>],
+        ['Haftalık analiz', 'Niri en yakın kapıyı gösterir: “Flutter’da bir doğrulanmış iş eklersen uyumun 63 → 72.”'],
+      ],
+    },
+    {
+      who: 'kurum',
+      tag: 'Kurum: sakin bir ölçüm',
+      items: [
+        ['İsim değil iş', 'Aday listesi ilk temasa kadar isimsiz; kurum unvanla değil problemle arar.'],
+        ['Açık uyum puanı', <>Yaptığı iş {pts('evidence')}, sektör ve ölçek {pts('context')}, zaman {pts('capacity')}, ortak geçmiş {pts('history')}; her parçanın gerekçesi yazar.</>],
+        ['İki onay, zincirli kayıt', 'Genç teslim eder, kurum onaylar; her kayıt SHA-256 ile öncekine bağlı.'],
+        ['Oyun yok, tek iş', 'Kurum ekranında XP, seri ya da lig yok. Her ekranda tek iş; Niri yol gösterir, kimseyi bekletmez.'],
+      ],
+    },
+  ];
   return (
     <>
-      <Heading width={1300}>Neden böyle tasarladık?</Heading>
-      <ol className="absolute left-[112px] top-[200px] w-[1376px]">
-        {items.map((t, n) => (
-          <li key={t} className="s-in flex items-center gap-x-[28px] border-t-2 border-line py-[16px]" style={d(120 + n * 110)}>
-            <Tri size={44} state="waiting">
-              <span className="text-[17px] font-black leading-none text-ink-3">{n + 1}</span>
-            </Tri>
-            <p className="text-[42px] font-extrabold leading-[1.1] tracking-[-0.025em] text-ink">{t}</p>
-          </li>
-        ))}
-      </ol>
+      <Heading width={1376}>Tasarım: gence oyun, kuruma ölçüm.</Heading>
+      {cols.map((c, n) => (
+        <div key={c.tag} className="s-in absolute top-[196px] w-[640px]" style={{ left: n ? 848 : 112, ...d(140 + n * 200) }}>
+          <Tag who={c.who}>{c.tag}</Tag>
+          <ul className="mt-[10px]">
+            {c.items.map(([term, text]) => (
+              <li key={term} className="border-t-2 border-line py-[11px] first:border-t-0">
+                <p className="text-[25px] font-extrabold leading-tight tracking-[-0.02em] text-ink">{term}</p>
+                <p className="mt-[3px] text-[19px] font-semibold leading-[1.35] text-ink-2">{text}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+      <Seam top={200} height={460} />
     </>
   );
 }
 
-// ---------------------------------------------------------------- 20. what we finished, what we left on purpose
+// ---------------------------------------------------------------- 11. what we finished, what we left on purpose
 
 function Done() {
   const done = [
     'Altı problemin altısına çalışan ekran',
-    'GitHub uygulaması ve DNS ile doğrulama',
+    'GitHub ve DNS ile gerçek doğrulama',
     'Açık modelle taslak, dört kapılı denetim',
-    'Açık uyum puanı, zincirli kayıt defteri',
-    'Her formül açık, motor 55 testle sınanıyor',
-    'Telefona yüklenen, internetsiz uygulama',
+    'Kör keşif, açık puan, zincirli defter',
+    'Oyunlaştırma, topluluk, haftalık analiz',
+    'Web’de ve telefonda, internetsiz',
+    'Motor 55 otomatik testle sınanıyor',
   ];
   const left = ['Kalıcı veritabanı', 'Gerçek kullanıcı ve pilot', 'Kod dışı işte makine doğrulaması', 'Bildirim ve mağaza sürümü'];
   const next = ['Kalıcılık', 'İlk ihtiyaç turu', 'Kod dışı doğrulama', 'Pilot raporu'];
@@ -920,9 +906,9 @@ function Done() {
       <Heading width={1376}>Neyi bitirdik, neyi bilerek bıraktık?</Heading>
       <div className="s-in absolute left-[112px] top-[214px] w-[640px]" style={d(120)}>
         <p className="text-[20px] font-bold text-green-ink">Bitti, canlıda çalışıyor</p>
-        <ul className="mt-[16px] flex flex-col gap-[18px]">
+        <ul className="mt-[16px] flex flex-col gap-[14px]">
           {done.map((t) => (
-            <li key={t} className="flex items-center gap-[14px] text-[30px] font-bold leading-tight text-ink">
+            <li key={t} className="flex items-center gap-[14px] text-[28px] font-bold leading-tight text-ink">
               <Check size={30} strokeWidth={3.4} className="shrink-0 text-green-ink" />
               {t}
             </li>
@@ -963,7 +949,7 @@ function Done() {
   );
 }
 
-// ---------------------------------------------------------------- 22. close: the one ask
+// ---------------------------------------------------------------- 12. close: the one ask
 
 function Close() {
   return (
@@ -1003,25 +989,27 @@ export const SLIDES: Slide[] = [
   { id: 'problem', title: 'Problem', mark: 'dock', niri: { mood: 'sad', gear: 0, line: 'Gençler görünmüyor, kurumlar emin olamıyor.' }, View: Problem },
   { id: 'kim-icin', title: 'Kim için', mark: 'dock', niri: { mood: 'think', gear: 0, line: 'Biri kanıt arıyor, öbürü güvenilir bir ekip.' }, View: ForWhom },
   { id: 'kanit', title: 'Kanıt', mark: 'dock', niri: { mood: 'think', gear: 1, line: 'Rakamları uydurmadım; kaynakları altında.' }, View: Evidence },
-  { id: 'cozum', title: 'Ne çözüyoruz', mark: 'dock', niri: { mood: 'cheer', gear: 1, line: 'Beş durak, altı problem. Haritada gezelim!' }, View: Route },
-  { id: 'web', title: 'Web’de ve telefonda', mark: 'dock', niri: { mood: 'happy', gear: 1, line: 'Tarayıcıda da cebinde de aynı haritayım.' }, View: Everywhere },
-  { id: 'sayfa-dogrulama', title: 'İşin, kaynağında doğrulanır', mark: 'dock', niri: { mood: 'happy', gear: 1, line: 'İşin nerede duruyorsa oradan doğrularım.' }, View: PageVerified },
-  { id: 'sayfa-xp', title: 'XP yalnız gerçek işten', mark: 'dock', niri: { mood: 'cheer', gear: 2, line: 'Puan değil makbuz: her XP bir iş.' }, View: PageXp },
-  { id: 'sayfa-analiz', title: 'Eksiğini gör', mark: 'dock', niri: { mood: 'think', gear: 2, line: 'Her hafta nerede güçlü olduğunu söylerim.' }, View: PageInsight },
-  { id: 'sayfa-topluluk', title: 'Gençler birbirine yardım eder', mark: 'dock', niri: { mood: 'happy', gear: 2, line: 'Burada yardım eden de kazanır.' }, View: PageCommunity },
-  { id: 'sayfa-ihtiyac', title: 'Kurum derdini yazar', mark: 'dock', niri: { mood: 'talk', gear: 2, line: 'Derdini anlat, alanları ben doldururum.' }, View: PageNeed },
-  { id: 'sayfa-aday', title: 'Adaylar isimsiz', mark: 'dock', niri: { mood: 'think', gear: 2, line: 'İsmi değil, işi tartarım.' }, View: PageBlind },
-  { id: 'sayfa-defter', title: 'İki onay, zincirli kayıt', mark: 'dock', niri: { mood: 'cheer', gear: 3, line: 'İki imza, bir mühür. Sonradan kimse değiştiremez.' }, View: PageLedger },
-  { id: 'sayfa-donus', title: 'Onay, gencin kanıtı olur', mark: 'dock', niri: { mood: 'happy', gear: 3, line: 'Onaylanan iş, haritanda yeni bir nokta.' }, View: PageReturn },
-  { id: 'yz-ne', title: 'Yapay zekâ ne yapıyor', mark: 'dock', niri: { mood: 'talk', gear: 3, line: 'Metni ben okurum ama uydurmam.' }, View: AiWhat },
-  { id: 'yz-model', title: 'Neden Gemma 4', mark: 'dock', niri: { mood: 'think', gear: 3, line: 'Ben okurum; kararı kurallar verir.' }, View: AiModel },
+  { id: 'cozum', title: 'Ne çözüyoruz', mark: 'dock', niri: { mood: 'cheer', gear: 1, line: 'Beş durak, altı problem. Tarayıcıda da cebinde de.' }, View: Solution },
+  { id: 'demo', title: 'Tanıtım filmi', mark: 'dock', bare: true, niri: { mood: 'cheer', gear: 2, line: 'Sahne benim! Ürünü telefonda göstereyim.' }, View: Film },
+  { id: 'yz-ne', title: 'Yapay zekâ ne yapıyor', mark: 'dock', niri: { mood: 'talk', gear: 2, line: 'Derdini yaz, ben okuyayım. Uydurmam.' }, View: AiWhat },
   { id: 'yz-fark', title: 'Önce ve sonra', mark: 'dock', niri: { mood: 'happy', gear: 3, line: 'Aynı metinden daha dolu bir taslak.' }, View: AiDiff },
   { id: 'yz-onlem', title: 'Hatalı çıktıya karşı', mark: 'dock', niri: { mood: 'think', gear: 3, line: 'Metinde yoksa almam, sorarım.' }, View: AiGuard },
   { id: 'tasarim', title: 'Tasarım kararları', mark: 'dock', niri: { mood: 'cheer', gear: 3, line: 'Gence oyun, kuruma sakin bir ölçüm.' }, View: Decisions },
   { id: 'bitti', title: 'Bitti ve bırakılan', mark: 'dock', niri: { mood: 'happy', gear: 3, line: 'Prototipim çalışıyor. Gerisini pilotta kanıtlayacağım.' }, View: Done },
-  { id: 'demo', title: 'Tanıtım filmi', mark: 'dock', bare: true, niri: { mood: 'cheer', gear: 4, line: 'Sahne benim! Ürünü telefonda göstereyim.' }, View: Film },
   { id: 'kapanis', title: 'Teşekkürler', mark: 'hero', niri: { mood: 'wave', gear: 4, turns: 2, line: 'Zirvedeyim! Beni telefonunuza alın, haritada görüşmek üzere.' }, View: Close },
+  { id: 'ek-dogrulama', title: 'İşin, kaynağında doğrulanır', mark: 'dock', extra: true, niri: { mood: 'happy', gear: 4, line: 'İşin nerede duruyorsa oradan doğrularım.' }, View: PageVerified },
+  { id: 'ek-xp', title: 'XP yalnız gerçek işten', mark: 'dock', extra: true, niri: { mood: 'cheer', gear: 4, line: 'Puan değil makbuz: her XP bir iş.' }, View: PageXp },
+  { id: 'ek-analiz', title: 'Eksiğini gör', mark: 'dock', extra: true, niri: { mood: 'think', gear: 4, line: 'Her hafta nerede güçlü olduğunu söylerim.' }, View: PageInsight },
+  { id: 'ek-topluluk', title: 'Gençler birbirine yardım eder', mark: 'dock', extra: true, niri: { mood: 'happy', gear: 4, line: 'Burada yardım eden de kazanır.' }, View: PageCommunity },
+  { id: 'ek-ihtiyac', title: 'Kurum derdini yazar', mark: 'dock', extra: true, niri: { mood: 'talk', gear: 4, line: 'Derdini anlat, alanları ben doldururum.' }, View: PageNeed },
+  { id: 'ek-aday', title: 'Adaylar isimsiz', mark: 'dock', extra: true, niri: { mood: 'think', gear: 4, line: 'İsmi değil, işi tartarım.' }, View: PageBlind },
+  { id: 'ek-defter', title: 'İki onay, zincirli kayıt', mark: 'dock', extra: true, niri: { mood: 'cheer', gear: 4, line: 'İki imza, bir mühür. Sonradan kimse değiştiremez.' }, View: PageLedger },
+  { id: 'ek-donus', title: 'Onay, gencin kanıtı olur', mark: 'dock', extra: true, niri: { mood: 'happy', gear: 4, line: 'Onaylanan iş, haritanda yeni bir nokta.' }, View: PageReturn },
 ];
 
-/** "3 / 12" on the counter and in the presenter window. */
-export const place = (i: number) => `${i + 1} / ${SLIDES.length}`;
+/** The talk is the slides before the appendix; the close is its last. */
+export const TALK = SLIDES.filter((s) => !s.extra).length;
+export const CLOSE = TALK - 1;
+
+/** "3 / 12" on the counter and in the presenter window; appendix pages read "Ek 2 / 8". */
+export const place = (i: number) => (i < TALK ? `${i + 1} / ${TALK}` : `Ek ${i - TALK + 1} / ${SLIDES.length - TALK}`);

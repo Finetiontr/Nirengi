@@ -19,7 +19,7 @@ Worker → `worker/README.md`.
 - **Telefonda:** nirengi bir PWA. `/uygulama` (QR’ın açtığı sayfa) ve tanıtım sayfası **Uygulamayı yükle** der; ana ekrandan
   ilk açılışta genç/kurum sorulur. `src/sw.js` sayfaları telefonda tutar (yalnız `build:pages`), Android’de paylaş menüsü
   bağlantıyı “Eser ekle”ye getirir. Bildirim ve mağaza sürümü yok.
-- **Sunum:** `/sunum`, organizasyonun 12 adımlık akışı, 22 slayt: ne çözdüğümüz (beş durak, altı problem), web’de ve telefonda aynı ürün, tanıtım filminin her sahnesi kendi sayfasında (gerçek ekran, öne çıkarılan öğe, üç mekanizma), Gemma 4 dahil dört yapay zekâ slaytı; müzikli film kapanıştan önce, süre darsa geçilir. Olası soruların kısa cevapları konuşmacı penceresinde, kapanış slaytında.
+- **Sunum:** `/sunum`, organizasyonun 12 adımlık akışı, beş dakikalık konuşma (plan 4:12): ne çözdüğümüz (beş durak, altı problem) ve web’de ve telefonda aynı ürün, 6. slaytta müzikli tanıtım filmi, Gemma 4 kartıyla yapay zekâ, gence oyun kuruma ölçüm. Kapanıştan sonra konuşmanın dışında sekiz ek sayfa: filmin her sahnesi gerçek ekranı ve üç mekanizmasıyla, soru gelince açılır. Olası soruların kısa cevapları konuşmacı penceresinde, kapanıştan itibaren.
 - **Kontrol:** `npm run typecheck`, `npm test`, `npm run build`, `npm run build:pages`; CI aynılarını çalıştırır.
 
 ## Sırada (finalden sonra 4 ay)

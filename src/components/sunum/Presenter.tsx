@@ -1,11 +1,11 @@
 // The presenter window (/sunum?notlar, or N on the deck): the speaker notes for the
-// slide on screen, what comes next, and a clock against the planned pace; on the close,
-// short answers for the likely questions. It follows the deck over a BroadcastChannel
+// slide on screen, what comes next, and a clock against the planned pace of the talk; from
+// the close on (and in the appendix after it), short answers for the likely questions. It follows the deck over a BroadcastChannel
 // and drives it with the same keys.
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { NOTES, QA } from './notes';
-import { place, SLIDES } from './slides';
+import { CLOSE, place, SLIDES } from './slides';
 
 export const CHANNEL = 'nirengi:sunum';
 export type Msg = { type: 'at'; i: number } | { type: 'go'; i: number } | { type: 'hello' };
@@ -16,7 +16,8 @@ const mmss = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).
 const secOf = (id: string) => NOTES[id]?.sec ?? 0;
 /** Planned seconds before each slide starts. */
 const START = SLIDES.reduce<number[]>((acc, s, n) => [...acc, n ? acc[n - 1] + secOf(SLIDES[n - 1].id) : 0], []);
-const TOTAL = START[last] + secOf(SLIDES[last].id);
+/** The talk ends with the close; appendix pages have no planned time. */
+const TOTAL = START[CLOSE] + secOf(SLIDES[CLOSE].id);
 
 export default function Presenter() {
   const [i, setI] = useState(() => clamp((Number.parseInt(location.hash.slice(1), 10) || 1) - 1));
@@ -59,7 +60,7 @@ export default function Presenter() {
       if (k === 'ArrowRight' || k === 'ArrowDown' || k === 'PageDown' || k === ' ') go(i + 1);
       else if (k === 'ArrowLeft' || k === 'ArrowUp' || k === 'PageUp') go(i - 1);
       else if (k === 'Home') go(0);
-      else if (k === 'End') go(last);
+      else if (k === 'End') go(CLOSE);
       else if (k === 'r' || k === 'R') setT0(Date.now());
       else hit = false;
       if (hit) e.preventDefault();
@@ -84,12 +85,18 @@ export default function Presenter() {
           </div>
           <div className="text-right">
             <p className="mono text-[40px] font-bold leading-none text-ink">{mmss(elapsed)}</p>
-            <p className="mt-2 text-[16px] font-semibold text-ink-3">
-              Plan: başlangıç {mmss(START[i])} · süre {mmss(note?.sec ?? 0)} · toplam {mmss(TOTAL)}
-            </p>
-            <p className={`text-[16px] font-bold ${drift > 30 ? 'text-red-lip' : 'text-ink-3'}`}>
-              {Math.abs(drift) < 10 ? 'Tam zamanında' : drift > 0 ? `${mmss(drift)} geridesin` : `${mmss(-drift)} öndesin`}
-            </p>
+            {slide.extra ? (
+              <p className="mt-2 text-[16px] font-semibold text-ink-3">Ek sayfa: konuşmanın dışında, soru gelirse açılır · konuşma {mmss(TOTAL)}</p>
+            ) : (
+              <>
+                <p className="mt-2 text-[16px] font-semibold text-ink-3">
+                  Plan: başlangıç {mmss(START[i])} · süre {mmss(note?.sec ?? 0)} · toplam {mmss(TOTAL)}
+                </p>
+                <p className={`text-[16px] font-bold ${drift > 30 ? 'text-red-lip' : 'text-ink-3'}`}>
+                  {Math.abs(drift) < 10 ? 'Tam zamanında' : drift > 0 ? `${mmss(drift)} geridesin` : `${mmss(-drift)} öndesin`}
+                </p>
+              </>
+            )}
           </div>
         </header>
 
@@ -103,7 +110,7 @@ export default function Presenter() {
                 </li>
               ))}
             </ul>
-            {i === last && (
+            {i >= CLOSE && (
               <section className="border-t-2 border-line pt-5">
                 <h2 className="text-[18px] font-bold text-ink-3">Soru gelirse</h2>
                 <dl className="mt-3 flex flex-col gap-4">
