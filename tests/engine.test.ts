@@ -53,6 +53,14 @@ test('copy-portfolio detection flags the weaker claimant', () => {
   assert.equal(c!.ownerId, 'p-defne');
 });
 
+test('the one real kurum carries no made-up history', () => {
+  const s = buildSeed();
+  assert.deepEqual(s.orgs.filter((o) => o.real).map((o) => o.id), ['o-cedra']);
+  assert.equal(s.pilots.filter((p) => p.orgId === 'o-cedra').length, 0);
+  assert.ok(s.people.every((p) => p.evidence.every((e) => !e.verifier?.includes('CEDRA'))));
+  assert.deepEqual(s.needs.filter((n) => n.orgId === 'o-cedra').map((n) => n.status), ['published']);
+});
+
 test('problem search finds work, not titles', () => {
   const hits = searchByProblem(buildSeed(), 'yüksek trafikli dosya dağıtımını üretimde çözmüş biri');
   assert.equal(hits[0].person.id, 'p-emirhan');

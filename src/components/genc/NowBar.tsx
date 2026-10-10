@@ -447,7 +447,7 @@ function Panel({ s, me, doors, bottom, onClose }: { s: State; me: Person; doors:
 
             <div className="mt-5 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5">
               <h3 className="text-[17px] font-black text-ink">Sana uyan ihtiyaçlar</h3>
-              <span className="text-[13px] font-bold text-ink-3">Kurumlar kurgusal demo</span>
+              <span className="whitespace-nowrap text-[13px] font-bold text-ink-3">CEDRA hariç kurgusal</span>
             </div>
             {doors.length ? (
               <Stagger className="mt-3 space-y-2.5">
@@ -511,7 +511,10 @@ function DoorRow({ d }: { d: Door }) {
         <Ring value={d.m.score} size={54} />
         <span className="min-w-0 flex-1">
           <span className="flex min-w-0 items-center gap-1.5">
-            <span className="truncate text-[13px] font-bold text-ink-3">{d.org.name}</span>
+            <span className="truncate text-[13px] font-bold text-ink-3">
+              {d.org.name}
+              {d.org.real && ' · gerçek kurum'}
+            </span>
             {d.fresh && <span className="pill shrink-0 bg-indigo-tint !px-1.5 !py-0 text-[11px] text-indigo">Yeni</span>}
           </span>
           <span className="mt-0.5 line-clamp-2 block text-[15.5px] font-extrabold leading-snug text-ink">{d.m.need.title}</span>

@@ -57,7 +57,7 @@ export default function ClosestDoor({ s, closest, more = false }: { s: State; cl
         <Reach from={m.score} to={to} />
         <div className="min-w-0 flex-1">
           <p className="text-[17px] font-extrabold leading-snug text-ink">{m.need.title}</p>
-          <p className="text-[13px] font-bold text-ink-3">{org?.name} · kurgusal demo kurumu</p>
+          <p className="text-[13px] font-bold text-ink-3">{org?.name} · {org?.real ? 'gerçek kurum, örnek ihtiyaç' : 'kurgusal demo kurumu'}</p>
           <p className="mt-2 text-[15px] font-bold leading-snug text-ink-2">
             <b className="text-ink">{skillLabel(skill)}</b> alanında bir doğrulanmış iş eklersen uyumun{' '}
             <b className="num text-ink">{m.score}</b> → <b className="num text-green-ink">{to}</b> olur.

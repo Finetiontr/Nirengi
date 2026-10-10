@@ -135,6 +135,9 @@ export interface Org {
   scale: Scale;
   city: string;
   about: string;
+  /** A real organisation that wrote its own (example) need; every other kurum is fictional demo data. */
+  real?: boolean;
+  site?: string;
 }
 
 export interface Criterion {

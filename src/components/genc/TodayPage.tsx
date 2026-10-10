@@ -164,7 +164,7 @@ export default function TodayPage() {
 
       {/* Doors */}
       <section id="ihtiyaclar" data-coach="g-ihtiyaclar" className="mt-8 scroll-mt-6">
-        <Head title="Sana uyan ihtiyaçlar" action={<span className="text-[13px] font-bold text-ink-3">Kurumlar kurgusal demo</span>} />
+        <Head title="Sana uyan ihtiyaçlar" action={<span className="whitespace-nowrap text-[13px] font-bold text-ink-3">CEDRA hariç kurgusal</span>} />
         <ul className="mt-4 space-y-3">
           {matches.map((m) => {
             const org = s.orgs.find((o) => o.id === m.need.orgId)!;
@@ -175,7 +175,10 @@ export default function TodayPage() {
                   <Ring value={m.score} size={58} />
                   <div className="min-w-0 flex-1">
                     <p className="text-[16px] font-extrabold leading-snug text-ink">{m.need.title}</p>
-                    <p className="text-[13px] font-bold text-ink-3">{org.name}</p>
+                    <p className="text-[13px] font-bold text-ink-3">
+                      {org.name}
+                      {org.real && ' · gerçek kurum'}
+                    </p>
                     {gap && gap.gain > 0 && (
                       <p className="mt-1 text-[14px] font-bold text-ink-3">
                         {skillLabel(gap.skill)} alanında bir iş eklersen <b className="text-green-ink">+{gap.gain}</b>

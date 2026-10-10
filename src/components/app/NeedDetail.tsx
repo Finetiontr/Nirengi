@@ -308,7 +308,9 @@ function Detail({ need }: { need: Need }) {
         </button>
       )}
 
-      <p className="mt-6 text-[13px] font-bold text-ink-3">Kurumlar ve kişiler kurgusal demo verisidir.</p>
+      <p className="mt-6 text-[13px] font-bold text-ink-3">
+        {org.real ? `${org.name} gerçek bir kurumdur ve bu örnek ihtiyacı kendisi yazdı. Adaylar kurgusal demo kişileridir.` : 'Kurumlar ve kişiler kurgusal demo verisidir.'}
+      </p>
 
       <NeedCard open={cardOpen} onClose={() => setCardOpen(false)} need={need} />
 
@@ -359,7 +361,13 @@ function Header({ need, org, a, calm }: { need: Need; org: Org; a: ReturnType<ty
           <p className="text-[16px] font-extrabold leading-tight text-ink">{org.name}</p>
           <p className="text-[13px] font-bold leading-tight text-ink-3">
             {SECTOR[org.sector]} · {SCALE[org.scale]} · {org.city}
+            {org.real && ' · gerçek kurum'}
           </p>
+          {org.site && (
+            <a href={org.site} target="_blank" rel="noreferrer" className="text-[13px] font-extrabold text-indigo hover:underline">
+              {org.site.replace(/^https?:\/\//, '')}
+            </a>
+          )}
         </div>
         <span className={`pill shrink-0 ${STATUS_PILL[need.status]}`}>{NEED_LABEL[need.status]}</span>
       </div>

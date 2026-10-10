@@ -52,6 +52,7 @@ export const SKILLS: Record<string, SkillDef> = {
   animation: { label: 'Animasyon', area: 'tasarim', aliases: ['animasyon', 'motion graphics', 'hareketli grafik', 'after effects'] },
   industrial: { label: 'Endüstriyel tasarım', area: 'tasarim', aliases: ['endüstriyel tasarım', 'ürün tasarımı', 'solidworks'] },
   architecture: { label: 'Mimari çizim', area: 'tasarim', aliases: ['mimari proje', 'mimarlık', 'iç mimari', 'autocad', 'revit', 'sketchup'] },
+  gamedesign: { label: 'Oyun tasarımı', area: 'tasarim', aliases: ['oyun tasarım', 'game design', 'gdd', 'oyun mekaniği', 'seviye tasarımı', 'level design', 'oyun ekonomisi'] },
   fashion: { label: 'Moda ve tekstil', area: 'tasarim', aliases: ['moda tasarımı', 'tekstil tasarımı', 'desen tasarımı', 'giyim tasarımı'] },
   docs: { label: 'Teknik yazım', area: 'medya', aliases: ['dokümantasyon', 'teknik yazım', 'kılavuz', 'readme'] },
   writing: { label: 'İçerik yazarlığı', area: 'medya', aliases: ['içerik yazarlığı', 'metin yazarlığı', 'copywriting', 'blog', 'senaryo yazımı', 'bülten'] },

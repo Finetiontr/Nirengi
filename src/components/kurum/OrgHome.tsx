@@ -186,6 +186,14 @@ export default function OrgHome() {
             <p className="mt-1 text-[15px] font-bold text-ink-3">
               {queue.length ? `Seni bekleyen ${queue.length} iş var.` : 'Şu an seni bekleyen bir iş yok.'} Bekleyen işler, ihtiyaçlar ve süren projeler burada tek yerde.
             </p>
+            {org.real && org.site && (
+              <p className="mt-1 text-[14px] font-bold text-ink-3">
+                Gerçek kurum ·{' '}
+                <a href={org.site} target="_blank" rel="noreferrer" className="font-extrabold text-indigo hover:underline">
+                  {org.site.replace(/^https?:\/\//, '')}
+                </a>
+              </p>
+            )}
           </div>
         </div>
         <button type="button" onClick={() => setPick(true)} className="chip relative transition-colors hover:border-indigo/40 hover:text-indigo">
@@ -414,9 +422,11 @@ export default function OrgHome() {
       </div>
 
       <Sheet open={pick} onClose={() => setPick(false)} title="Hangi kurum olarak bakıyorsun?">
-        <p className="text-[15px] font-bold text-ink-3">Bunlar kurgusal demo kurumlardır; hangisini seçersen onun ihtiyaçlarını ve projelerini görürsün.</p>
+        <p className="text-[15px] font-bold text-ink-3">
+          CEDRA Interactive gerçek bir oyun stüdyosu; örnek ihtiyacını kendisi yazdı. Diğerleri kurgusal demo kurumlardır. Hangisini seçersen onun ihtiyaçlarını ve projelerini görürsün.
+        </p>
         <div className="mt-5 space-y-3" role="radiogroup" aria-label="Kurum">
-          {s.orgs.map((o) => {
+          {[...s.orgs].sort((a, b) => Number(!!b.real) - Number(!!a.real)).map((o) => {
             const on = o.id === org.id;
             return (
               <button
@@ -428,14 +438,17 @@ export default function OrgHome() {
                   setView({ orgId: o.id });
                   setAll(false);
                   setPick(false);
-                  feedback({ tone: 'info', title: `${o.name} olarak bakıyorsun`, text: 'Bu yalnız demo içindir.' });
+                  feedback({ tone: 'info', title: `${o.name} olarak bakıyorsun`, text: o.real ? 'Gerçek kurum; ihtiyacı örnek olarak yazıldı.' : 'Bu yalnız demo içindir.' });
                 }}
                 className={`card-press flex w-full items-center gap-4 p-3 text-left ${on ? '!border-indigo !bg-indigo-tint' : ''}`}
                 style={on ? { boxShadow: '0 4px 0 rgb(var(--indigo) / 0.5)' } : undefined}
               >
                 <OrgMark name={o.name} size={44} />
                 <span className="min-w-0">
-                  <span className={`block text-[16px] font-black ${on ? 'text-indigo' : 'text-ink'}`}>{o.name}</span>
+                  <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                    <span className={`text-[16px] font-black ${on ? 'text-indigo' : 'text-ink'}`}>{o.name}</span>
+                    {o.real && <span className="pill bg-green-tint !py-0 text-[12px] text-green-ink">Gerçek kurum</span>}
+                  </span>
                   <span className="block truncate text-[14px] font-bold text-ink-3">
                     {SECTOR[o.sector]} · {SCALE[o.scale]} · {o.city}
                   </span>

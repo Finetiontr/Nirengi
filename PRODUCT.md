@@ -45,7 +45,8 @@ Beyan değil, kanıt. Kariyer/CV platformlarının tersine özgeçmiş, güven p
 ## Evidence on Hand
 
 - Çalışan motor ve 12 birim testi (`tests/engine.test.ts`), uçtan uca Playwright akışı.
-- Kurum/kişi verisi **kurgusaldır** ve öyle etiketlenmelidir. Gerçek kullanıcı, müşteri, istatistik, referans yok — uydurulamaz.
+- Tek gerçek kurum CEDRA Interactive: ekiple bağlantılı oyun stüdyosu, örnek ihtiyacını (tek kişilik idle RPG için tasarım dokümanı) kendisi yazdı (kullanıcı talimatı, 10 Ekim 2026) ve “gerçek kurum” etiketiyle görünür. Ona uydurma proje geçmişi ya da onay yazılmaz.
+- Diğer kurum/kişi verisi **kurgusaldır** ve öyle etiketlenmelidir. Gerçek kullanıcı, müşteri, istatistik, referans yok — uydurulamaz.
 
 ## Product Principles
 

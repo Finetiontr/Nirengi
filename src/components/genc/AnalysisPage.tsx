@@ -128,7 +128,7 @@ export default function AnalysisPage() {
       </section>
 
       <section className="mt-10" aria-labelledby="aranan">
-        <Head title={<span id="aranan">Kurumlar ne arıyor, sen neredesin</span>} action={<span className="text-[13px] font-bold text-ink-3">Kurumlar kurgusal demo</span>} />
+        <Head title={<span id="aranan">Kurumlar ne arıyor, sen neredesin</span>} action={<span className="whitespace-nowrap text-[13px] font-bold text-ink-3">CEDRA hariç kurgusal</span>} />
         <ul className="mt-4 space-y-2">
           {ins.wanted.slice(0, 6).map((k) => {
             const lever = ins.levers.find((x) => x.skill === k.skill);

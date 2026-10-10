@@ -32,6 +32,10 @@ Jüri “metin eksik olursa?” derse sihirbazda kısa ve belirsiz bir metin yaz
 
 Jüri “yalnız yazılımcılar için mi?” derse: `/profil/eceyildiz` (animasyon ve illüstrasyon; LinkedIn, ArtStation, YouTube bağlantıları Beyan, bir sağlık kurumunun onayı Kurum onaylı). Kurum tarafında `/ihtiyaclar/n-asi` (aşı hatırlatması için bir dakikalık animasyon) adaylarında ilk sırada odur. Akışı göstermek için genç penceresinde `/kanit-bagla` → **İşim başka yerlerde** → ad ve “ne üretiyorsun” → **LinkedIn** çipi adresi başlatır → bir ArtStation bağlantısıyla ilk eser; beceriler başlıktan gelir. “Bu sitelerde sahipliği dışarıdan kontrol edemiyoruz; o yüzden Beyan diyoruz. Güçlendiren şey kurum onayı, her alanda aynı.”
 
+## Soru gelirse: gerçek bir kurum var mı?
+
+Kurum rolünde `/kurum` → **Kurumu değiştir** → listenin başındaki **CEDRA Interactive** (“Gerçek kurum” etiketli). Ekibimizle bağlantılı gerçek bir oyun stüdyosu; tek kişilik bir idle RPG için oyun tasarım dokümanı ihtiyacını örnek olarak kendisi yazdı (`/ihtiyaclar/n-idle`). Adaylarda ilk sırada oyun tasarımı Kurum onaylı olan aday durur. “Kurum gerçek, ihtiyaç örnek; adaylar demo verisi. Ona uydurma bir proje geçmişi yazmadık.”
+
 ## Soru gelirse: mobil uygulama
 
 Jüri “telefonda var mı?” derse: ana sayfanın sonundaki QR’ı okutsunlar ya da telefonda nirengi simgesini aç. İlk açılış “Kim olarak giriyorsun?” diye sorar; sonra doğrudan o tarafa gider. Uçak modunu açıp bir sayfa daha aç: “Sayfalar ve veri telefonda; internet yokken de çalışır.” Android’de Behance ya da YouTube’da bir işi **Paylaş → nirengi** ile gönder: “Eser ekle” ekranı bağlantı ve başlıkla dolu açılır. “Mağaza yerine PWA seçtik: aynı kod, sıfır maliyet, inceleme beklemeden. Bildirim yok, bilerek.”

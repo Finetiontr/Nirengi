@@ -85,7 +85,8 @@ flowchart LR
 | Eşleşme, kanvas skoru, takım önerisi, defter bütünlüğü | Gerçek hesaplama |
 | İhtiyaç taslağı | Yapay zekâ: Gemma 4 26B (Workers AI); ağ ya da kota yoksa kural motoru |
 | Niri’nin analizleri ve haftalık özetleri | Kural tabanlı, çevrim dışı |
-| Kurumlar, kişiler, S3 tasdikleri | Kurgusal demo verisi |
+| CEDRA Interactive ve idle RPG ihtiyacı | Gerçek kurum: ekibimizle bağlantılı oyun stüdyosu, ihtiyacı örnek olarak kendisi yazdı |
+| Diğer kurumlar, kişiler, S3 tasdikleri | Kurgusal demo verisi |
 | Telefona yükleme, internetsiz çalışma | Gerçek: manifest ve service worker (canlı sitede ve `build:pages` derlemesinde) |
 | Kalıcılık | Tarayıcı (`localStorage`) |
 

@@ -6,7 +6,7 @@ import { appendEntry } from './engine/ledger.ts';
 import { daysAgo, daysFromNow } from './format.ts';
 import { dayKey, weekKey } from './engine/progress.ts';
 
-export const STATE_VERSION = 8;
+export const STATE_VERSION = 9;
 export const ROUND = '2026·Ç4';
 /** A closed pilot both sides agreed to publish: the public card the demo shows before its own project closes. */
 export const SAMPLE_CARD = 'pl-shader';
@@ -70,6 +70,16 @@ const orgs: Org[] = [
     scale: 'kobi',
     city: 'Denizli · Buldan',
     about: '42 üyeli kadın dokuma kooperatifi; el dokuması ürünlerini çevrim içi satmaya hazırlanıyor.',
+  },
+  {
+    id: 'o-cedra',
+    name: 'CEDRA Interactive',
+    sector: 'oyun',
+    scale: 'girisim',
+    city: 'İstanbul',
+    about: 'Türkiye’den bağımsız oyun stüdyosu: oyunlar, etkileşimli deneyimler ve geliştirici araçları yapıyor; Teliqos oyun analitiği de onun.',
+    real: true,
+    site: 'https://cedrainteractive.com',
   },
 ];
 
@@ -430,6 +440,17 @@ function people(): Person[] {
           context: { sector: 'uretim', scale: 'kobi' },
           pilotId: 'pl-kimlik',
           ago: 62,
+        }),
+        ev({
+          id: 'e-def-4',
+          title: 'Bulmaca modunun seviye ve ekonomi tasarımı',
+          summary: 'Anka Oyun’un mobil oyununa eklenen 40 seviyelik modun tasarım dokümanını ve zorluk eğrisini yazdı; rolü ve teslimi kurumca imzalandı.',
+          source: 'endorsement',
+          level: 'S3',
+          skills: ['gamedesign', 'docs'],
+          verifier: 'Anka Oyun Stüdyosu · Oyun Direktörü',
+          context: { sector: 'oyun', scale: 'girisim' },
+          ago: 45,
         }),
       ],
     },
@@ -936,6 +957,34 @@ function needs(): Need[] {
       },
     },
     {
+      // CEDRA Interactive's own example need, written by the studio.
+      id: 'n-idle',
+      orgId: 'o-cedra',
+      title: 'Tek kişilik bir idle RPG için oyun tasarım dokümanı hazırlamak',
+      status: 'published',
+      createdAt: daysAgo(1),
+      publishedAt: daysAgo(0.5),
+      round: ROUND,
+      skills: ['gamedesign', 'docs', 'writing'],
+      canvas: {
+        current: 'Tek kişilik bir idle RPG fikrimiz var; çekirdek döngü, karakter gelişimi ve oyun içi ekonomi şimdilik yalnız toplantı notlarında duruyor.',
+        pain: 'Programcı ve sanatçı neyi üreteceğini konuşmalardan çıkarıyor; aynı karar her hafta yeniden tartışılıyor.',
+        painMetric: 'Yazılı tasarım bugün 0 sayfa; ilk oynanabilir sürümün iş listesi bu yüzden çıkarılamıyor',
+        outcome: 'Ekibin doğrudan üretime geçebileceği, döngüleri, ilerleme eğrilerini ve ekonomiyi anlatan bir oyun tasarım dokümanı.',
+        criteria: [
+          crit('c-idle-1', 'Çekirdek döngü, ilerleme ve ekonomi bölümleriyle en az 20 sayfalık tasarım dokümanı teslim edilir'),
+          crit('c-idle-2', 'Oyunun ilk 30 dakikası kaynak ve seviye eğrileriyle bir tabloda belgelenir'),
+          crit('c-idle-3', 'Dokümandan ilk oynanabilir sürüm için en az 15 maddelik iş listesi çıkarılır'),
+        ],
+        constraints: [
+          { kind: 'teknoloji', text: 'Tek kişilik, çevrim dışı oynanan mobil oyun; sunucu ve çok oyunculu özellik yok' },
+          { kind: 'sure', text: '4 hafta' },
+        ],
+        decisionMaker: 'Kurucu ortak',
+        scope: 'Yalnız tasarım dokümanı; kod, sanat ve ses bu ihtiyacın dışında.',
+      },
+    },
+    {
       id: 'n-asi',
       orgId: 'o-sifa',
       title: 'Aşı hatırlatmalarına gelmeyen aileleri bir dakikalık animasyonla geri kazanmak',
@@ -1117,6 +1166,7 @@ function events(): NetEvent[] {
     ...refs,
   });
   return [
+    e(0.5, 'need_published', 'CEDRA Interactive yeni ihtiyaç yayımladı: “Tek kişilik bir idle RPG için oyun tasarım dokümanı hazırlamak”.', { orgId: 'o-cedra', needId: 'n-idle' }),
     e(1, 'micro', 'Zeynep Yalçın, Pera Finans Lab ekibine 30 dakikalık uzman görüşü verdi.', { personId: 'p-zeynep', orgId: 'o-pera' }),
     e(1, 'evidence_verified', 'İrem Koç’un kanıtı “iremkoc.dev” DNS TXT ile doğrulandı.', { personId: 'p-irem' }),
     e(2, 'micro', 'Defne Arslan, Şifa Dijital Sağlık’ın taslak ihtiyacına erişilebilirlik incelemesi bıraktı.', { personId: 'p-defne', orgId: 'o-sifa' }),
