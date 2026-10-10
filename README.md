@@ -8,7 +8,7 @@
 
 ![Niri kurumun metnini açık bir modelle okur; her alan metindeki bir cümleye dayanır](docs/nirengi-demo.gif)
 
-- **Tanıtım videosu:** [79 saniye, sessiz](https://finetiontr.github.io/Nirengi/sunum/nirengi-tanitim-web.mp4); Niri genç ve kurum ekranlarını telefonda gezdirir. Sunumun 6. slaytında oynar.
+- **Tanıtım filmi:** [48 saniye, müzikli](https://finetiontr.github.io/Nirengi/sunum/nirengi-film.mp4); her özelliği ürünün gerçek ekranlarıyla gösterir, sunumun 6. slaytında oynar. Müziği kodla bestelendi, lisansı bize ait. Uzun anlatım: [79 saniye, sessiz](https://finetiontr.github.io/Nirengi/sunum/nirengi-tanitim-web.mp4), Niri ekranları telefonda gezdirir.
 - **Canlı:** https://finetiontr.github.io/Nirengi/ (kurulum gerekmez; veri tarayıcıda tutulur)
 - **Sunum:** [`/sunum`](https://finetiontr.github.io/Nirengi/sunum), uygulamanın içinde Niri’nin anlattığı 12 slaytlık deste; yapay zekâ slaytları ürünün kendi denetimini gerçek bir model cevabı üzerinde çalıştırır
 - **Sahne akışı:** [`docs/DEMO.md`](docs/DEMO.md), 5 dakikalık demo ve yedek senaryo
@@ -150,7 +150,7 @@ src/
     store.ts           tarayıcıda durum ve sekmeler arası senkron
     seed.ts            kurgusal demo ekosistemi
   styles/global.css    renk ve tipografi tokenları
-public/                favicon; sunum/ altında tanıtım videosu, posteri ve telefon ekranları
+public/                favicon; sunum/ altında tanıtım filmi ve posteri, uzun anlatım videosu, telefon ekranları
 worker/                tek sunucu parçası (Cloudflare Worker): GitHub token değişimi, yapay zekâ taslağı
 scripts/               GitHub Pages derlemesi, sunum dışa aktarımı
 tests/                 node:test testleri

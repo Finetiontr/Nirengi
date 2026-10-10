@@ -16,7 +16,7 @@ Worker → `worker/README.md`.
   depolar ve DNS TXT ile alan adı doğrulanır.
 - **Kurum yüzü:** ihtiyaç sihirbazı (Niri kurumun metnini açık bir modelle okur, `src/lib/engine/ground.ts` metne
   karşı denetler), isimsiz kısa liste, çift onaylı pilot ve SHA-256 zincirli defter, haftalık özet.
-- **Sunum:** `/sunum`, organizasyonun 12 adımlık akışı ve soru-cevap için ek slaytlar; 6. slaytta tanıtım videosu.
+- **Sunum:** `/sunum`, organizasyonun 12 adımlık akışı, slayt başına az söz; 6. slaytta müzikli tanıtım filmi. Olası soruların kısa cevapları konuşmacı penceresinde, kapanış slaytında.
 - **Kontrol:** `npm run typecheck`, `npm test`, `npm run build`, `npm run build:pages`; CI aynılarını çalıştırır.
 
 ## Sırada (finalden sonra 4 ay)

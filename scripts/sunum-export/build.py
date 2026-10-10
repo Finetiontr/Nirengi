@@ -8,7 +8,8 @@ Niri and the bubble keep the names `!!niri` / `!!bubble` on every slide and the
 slides change with Morph (Fade fallback), so Niri glides between marks. The film
 slide carries the promo video (public/sunum), full-frame on its poster, and starts
 it on its own as the slide opens. Speaker notes from notes.ts go into each slide's
-notes pane. Needs python-pptx and Pillow.
+notes pane, and the close also carries the short answers for likely questions.
+Needs python-pptx and Pillow.
 """
 
 import json
@@ -23,7 +24,7 @@ from pptx.util import Emu
 LAYERS = Path(sys.argv[1])
 OUT = Path(sys.argv[2])
 WORK = LAYERS / "_trim"
-FILM = Path(__file__).resolve().parents[2] / "public" / "sunum" / "nirengi-tanitim-web.mp4"
+FILM = Path(__file__).resolve().parents[2] / "public" / "sunum" / "nirengi-film.mp4"
 
 SLIDE_W, SLIDE_H = 12192000, 6858000  # 13.333 x 7.5 in
 RISE = 16 / 900  # the web's translateY(16px) as a fraction of slide height
@@ -189,7 +190,7 @@ def main():
     prs.slide_width, prs.slide_height = Emu(SLIDE_W), Emu(SLIDE_H)
     blank = prs.slide_layouts[6]
     placed = {"slides": []}
-    close = max(x["n"] for x in manifest["slides"] if not x.get("appendix"))
+    close = max(x["n"] for x in manifest["slides"])
 
     for s in manifest["slides"]:
         n, src = s["n"], LAYERS / f"{s['n']:02d}"
@@ -257,6 +258,9 @@ def main():
 
         notes = s.get("notes") or {}
         lines = [f"{n}. {s['title']} (~{notes.get('sec', '?')} sn)", f"Niri: {s['line']}", ""] + list(notes.get("say", []))
+        if n == close:
+            for a in manifest.get("qa", []):
+                lines += ["", f"Soru: {a['q']}"] + list(a["say"])
         slide.notes_slide.notes_text_frame.text = "\n".join(lines)
         placed["slides"].append(rec)
 

@@ -1,8 +1,9 @@
-// Speaker notes, keyed by slide id: what the team says while Niri says one line.
+// Speaker notes, keyed by slide id: what the team says while Niri says one line,
+// and short answers for the questions most likely to come after the close.
 // Shown in the presenter window (N on the deck, or /sunum?notlar) and mirrored in
 // docs/SUNUM-NOTLARI.md. Plain data so a script can read it without React.
 // Every number here is on the slide, in docs/PAZAR-ANALIZI.md with its source, or
-// computed by the engine (the AI slides). Appendix notes are for questions.
+// computed by the engine (the AI slides and the answers on XP and the fit score).
 
 export interface Note {
   /** Suggested speaking time in seconds. */
@@ -19,29 +20,28 @@ export const NOTES: Record<string, Note> = {
     ],
   },
   problem: {
-    sec: 30,
+    sec: 25,
     say: [
       'Döngüyü hepimiz biliyoruz: deneyim yoksa iş yok, iş yoksa deneyim yok.',
-      '15–24 yaşta her 100 gençten 23’ü ne okulda ne işte. Avrupa’yla kıyaslandığında en yüksek oran bizde.',
-      'Öbür tarafta, BİT uzmanı almakta zorlanan şirketlerin %71’i aynı şeyi söylüyor: ilgili deneyim yok.',
-      'Genç görünmüyor, kurum kime güveneceğini bilmiyor.',
+      'Her 100 gençten 23’ü ne okulda ne işte; Avrupa’yla kıyaslandığında en yüksek oran bizde.',
+      'Öbür tarafta, BİT uzmanı almakta zorlanan her 100 şirketten 71’i aynı şeyi söylüyor: ilgili iş deneyimi yok.',
     ],
   },
   'kim-icin': {
     sec: 25,
     say: [
       'İki kullanıcımız var.',
-      'Birincisi üreten ama kanıtı olmayan genç. Tek bir seçici programa bir milyon başvuru geliyor; kapıdan giremeyenlerin de gösterecek bir işi olmalı.',
-      'İkincisi BİT uzmanı olmayan küçük kurum. Türkiye’deki 3,93 milyon girişimin %99,6’sı KOBİ. İhtiyacı var ama tarif edemiyor, kadro riskini alamıyor.',
+      'Birincisi üreten ama kanıtı olmayan genç. Tek bir seçici programa bir milyon başvuru geliyor; kapıda kalanın da gösterecek bir işi olmalı.',
+      'İkincisi BİT uzmanı olmayan küçük kurum: 10–49 çalışanlı girişimlerin yalnız %10,8’inde BİT uzmanı var. İhtiyacı var ama tarif edemiyor, kadro riskini alamıyor.',
     ],
   },
   kanit: {
     sec: 25,
     say: [
       'Bunu nereden biliyoruz?',
-      'Diploma şartını kaldıran şirketlerde bile işe alım 700’de 1’den az değişti. Niyet var, ölçme aracı yok.',
-      'İşverenlerin %63’ü beceri açığını bir numaralı engel görüyor. Yapay zekâya açık mesleklerde ise en çok gençlerin istihdamı düşüyor.',
-      'Bir de 37 platform ve programı tek tek inceledik. Oyun ritmini, dışarıda doğrulanmış işi ve kurum imzasını bir araya getiren bir örnek bulamadık.',
+      'Diploma şartını kaldıran şirketlerde bile işe alım 700’de 1’den az değişti: niyet var, ölçme aracı yok.',
+      'İşverenlerin %63’ü beceri açığını bir numaralı engel görüyor.',
+      'Biz de 37 platform ve programı tek tek inceledik. Oyun ritmini, doğrulanmış işi ve kurum imzasını bir arada sunan birini Türkiye’de bulamadık.',
     ],
   },
   cozum: {
@@ -53,44 +53,42 @@ export const NOTES: Record<string, Note> = {
     ],
   },
   demo: {
-    sec: 79,
+    sec: 48,
     say: [
-      '(Video oynar; konuşma yok. Bitince → ile devam.)',
-      'Süre kalırsa canlı göster: hazır kurum penceresinde Örnekle doldur → Taslağa dönüştür → Metninden çıkardıklarım.',
-      'Video açılmazsa slayt kendiliğinden canlı demo paneline döner; Sunum klasöründeki mp4 de yedekte.',
+      '(Film müzikle oynar; konuşma yok. Bitince → ile devam.)',
+      'Ses gelmezse filme bir kez tıkla.',
+      'Film açılmazsa slayt kendiliğinden canlı demo paneline döner; Sunum klasöründeki mp4 de yedekte.',
     ],
   },
   'yz-ne': {
-    sec: 30,
+    sec: 25,
     say: [
-      'Videoda gördüğünüz yapay zekâ adımı şu: kurum derdini kendi sözleriyle yazıyor.',
-      'Açık ağırlıklı bir model, Gemma 4, bu metni yedi alanlı ihtiyaç kanvasına çeviriyor: mevcut durum, sorun, sorunun ölçüsü, hedef, kısıtlar, karar verici ve kapsam.',
-      'Her alanın yanında metindeki hangi cümleden geldiği yazıyor. Kurum taslağı okurken kaynağını da görüyor.',
+      'Filmde gördüğünüz yapay zekâ adımı şu: kurum derdini kendi sözleriyle yazıyor.',
+      'Açık ağırlıklı bir model, Gemma 4, bu metni yedi alanlı ihtiyaç kanvasına çeviriyor.',
+      'Her alan metindeki bir cümleye dayanıyor: “ayda 6.000 arama” sorunun ölçüsü, operasyon direktörü karar verici oluyor.',
     ],
   },
   'yz-fark': {
     sec: 25,
     say: [
-      'Fark ne? Aynı metni önceki kural motorumuz da okuyordu.',
-      'Kural motoru beş alan buldu: netlik 60, yayımlanamaz.',
-      'Model yedi alanı doldurdu, karar vericiyi ve kapsamı da buldu: 75. Üstüne ölçülebilir iki başarı kriteri önerdi; kurum ikisini ekleyince 100 ve yayımlanabilir.',
-      'Bu sayılar tahmin değil; testlerimizde sabit.',
+      'Aynı metni önceki kural motorumuz da okuyordu: beş alan, netlik 60, yayımlanamaz.',
+      'Model yedi alanı doldurdu ve iki ölçülebilir başarı kriteri önerdi: 75. Kurum önerileri ekleyince 100, yayımlanabilir.',
+      'Bu sayıları ürünün kendi kuralları hesaplıyor; testlerimizde sabit.',
     ],
   },
   'yz-onlem': {
     sec: 30,
     say: [
-      'Model yanılırsa? Cevabını doğrudan kullanmıyoruz; dört kapıdan geçiyor.',
-      'Şemaya uymalı, her alanın alıntısı metinde birebir geçmeli, alandaki her sayı metinde yazmalı, her kriter ölçülebilir olmalı.',
-      'Testten bir örnek: model “Genel Müdür onaylar” diye uydurursa alan boş kalır, Niri kuruma kimin onaylayacağını sorar.',
-      'Reddedilen her şey kuruma gösterilir. Model hiç cevap vermezse aynı ekranı kural motoru doldurur.',
+      'Model yanılırsa? Cevabını doğrudan kullanmıyoruz; dört kapıdan geçiyor: şema, alıntı, sayı ve ölçülebilirlik.',
+      'Testten bir örnek: model “Genel Müdür onaylar” diye uydurursa bu cümle metinde olmadığı için alan boş kalır, Niri kuruma kimin onaylayacağını sorar.',
+      'Öneriler kurum “Ekle” demeden kanvasa girmez; reddedilen her şey kuruma gösterilir. Model hiç cevap vermezse aynı ekranı kural motoru doldurur.',
     ],
   },
   tasarim: {
     sec: 25,
     say: [
       'Tasarımda beş karar verdik.',
-      'Her ekranda tek iş, ve önce telefon.',
+      'Her ekranda tek iş, ve önce telefon: her ekran önce 390 pikselde tasarlandı.',
       'Oyun yalnız genç tarafında; kurum ekranı sakin, XP yok.',
       'Kurum adayı temasa kadar isimsiz görür.',
       'Niri yol gösterir ama kimseyi bekletmez.',
@@ -99,9 +97,9 @@ export const NOTES: Record<string, Note> = {
   bitti: {
     sec: 25,
     say: [
-      'Altı problemin altısına çalışan bir ekranımız var. GitHub ve DNS doğrulaması, yapay zekâ taslağı ve denetimi canlıda.',
-      'Bilerek bıraktıklarımız da belli: kalıcı veritabanı yok, veri tarayıcıda. Demo kişileri kurgusal ve ekranda öyle yazıyor.',
-      'Finalden sonraki dört ayın planı: kalıcılık, ilk ihtiyaç turu, kod dışı kanıt, taşınabilir rozet ve fon verene pilot raporu.',
+      'Altı problemin altısına çalışan bir ekranımız var. GitHub ve DNS doğrulaması, yapay zekâ taslağı ve denetimi canlıda; eşleşme, defter ve denetim testli.',
+      'Bilerek bıraktıklarımız: kalıcı veritabanı yok, veri tarayıcıda. Demo kişileri kurgusal ve ekranda öyle yazıyor. Kod dışı kanıt sırada.',
+      'Finalden sonraki dört ay: kalıcılık, ilk ihtiyaç turu, kod dışı kanıt ve fon verene pilot raporu.',
     ],
   },
   kapanis: {
@@ -111,73 +109,72 @@ export const NOTES: Record<string, Note> = {
       'Beyan değil, kanıt. Teşekkürler; sorularınızı bekliyoruz.',
     ],
   },
+};
 
-  // Appendix: open with the key when a question comes.
-  fark: {
-    sec: 30,
+export interface Answer {
+  q: string;
+  say: string[];
+}
+
+/** Likely questions after the close, answered aloud; the presenter window shows them on the last slide. */
+export const QA: Answer[] = [
+  {
+    q: 'XP neyle kazanılıyor?',
     say: [
-      'Başka yerlerde XP uygulamanın içinde kalır; Nirengi’de her XP bir iş makbuzudur.',
-      'Üretim yaptığın gün 10, doğrulanmış kanıt 40, kurum onaylı aşama 120 XP. Günlük tavan 200. Boş tıklama sıfır.',
+      'Her XP bir iş makbuzu: üretim yaptığın gün 10, doğrulanmış kanıt 40, kurum onaylı aşama 120 XP. Günlük tavan 200.',
       'Her satırın arkasında dışarıda kontrol edilebilen bir olay var: birleşmiş bir PR, doğrulanmış bir alan adı ya da bir kurum imzası.',
     ],
   },
-  dongu: {
-    sec: 30,
+  {
+    q: 'Sistem nasıl işliyor?',
     say: [
-      'Sistem üç nesneden oluşuyor: Kanıt, İhtiyaç, Pilot.',
-      'Kanıtın üç seviyesi var: Beyan, Doğrulandı, Kurum onaylı.',
-      'Kurum ilan yazmaz; yedi alanlı kanvasla ihtiyaç yazar. Çözülebilirlik puanı 70’i geçmeden ihtiyaç yayımlanmaz.',
+      'Üç nesne var: Kanıt, İhtiyaç, Pilot. Kanıtın üç seviyesi var: Beyan, Doğrulandı, Kurum onaylı.',
+      'Kurum ilan yazmaz; yedi alanlı kanvasla ihtiyaç yazar. Netlik puanı 70’i geçmeden ihtiyaç yayımlanmaz.',
       'Pilot aşamalara bölünür: genç teslim eder, kurum onaylar. Onaylanan aşama gencin profiline Kurum onaylı kanıt olarak döner.',
     ],
   },
-  'iki-yuz': {
-    sec: 35,
+  {
+    q: 'Genç ve kurum tarafı neden farklı?',
     say: [
-      'Genç için tanıdık bir oyun ritmi: haftalık hedef, seri, lig ve Niri’nin kostümleri. Ama hepsini yalnızca gerçek iş kazandırır.',
-      'Eşleşmediğinde nedenini görür: hangi kanıt eksik, hangi görev o eksiği kapatır.',
-      'Kurum tarafı sakin: oyun yok, ölçüm var. Şikâyetten ihtiyaca, gerekçeli kısa listeye, küçük bir pilota ve hesap verebilir kayda.',
+      'Genç ritim ister: haftalık hedef, seri, lig ve Niri’nin kostümleri. Ama hepsini yalnızca gerçek iş kazandırır.',
+      'Kurum ölçüm ister, oyun yok: şikâyetten ihtiyaca, gerekçeli kısa listeye, küçük bir pilota ve hesap verebilir kayda.',
     ],
   },
-  guven: {
-    sec: 40,
+  {
+    q: 'Uyum puanına neden güvenelim?',
     say: [
-      'Uyum puanı dört parçadan oluşur ve ağırlıkları açıktır: kanıt 45, bağlam 20, kapasite 15, iş birliği geçmişi 20 puan.',
-      'İlk temasta isim, okul, şehir görünmez. Kurum önce işi görür; kimlik pilot teklifiyle açılır.',
-      'Her aşama iki tarafın onayıyla deftere yazılır; kayıtlar SHA-256 ile zincirlenir. Biri geçmişi kurcalarsa zincir kırılır.',
-      'Kod açık: her formülü herkes okuyabilir.',
+      'Puan dört parçadan oluşur ve ağırlıkları açıktır: kanıt 45, bağlam 20, kapasite 15, iş birliği geçmişi 20 puan.',
+      'İlk temasta isim, okul, şehir görünmez; kimlik pilot teklifiyle açılır.',
+      'Her aşama iki tarafın onayıyla deftere yazılır; kayıtlar SHA-256 ile zincirlenir. Kod açık: her formülü herkes okuyabilir.',
     ],
   },
-  pazar: {
-    sec: 30,
+  {
+    q: 'İlk pazarınız kim?',
     say: [
-      'Bağımsız bir mikro staj pazar büyüklüğü bulamadık; uydurma bir rakam göstermiyoruz. Bunun yerine kimden başlayacağımızı söylüyoruz.',
-      'İlk tur: Zemin360 ve GİRVAK ağındaki kurumlar ve gençler.',
-      'İlk pazar: BİT uzmanı olmayan küçük işletmeler, kamu birimleri, STK’lar. 10–49 çalışanlı girişimlerin yalnızca %10,8’i BİT uzmanı çalıştırıyor.',
+      'Bağımsız bir mikro staj pazar büyüklüğü bulamadık; uydurma bir rakam vermiyoruz.',
+      'İlk tur: Zemin360 ve GİRVAK ağındaki kurumlar ve gençler. Sonra BİT uzmanı olmayan küçük işletmeler, kamu birimleri ve STK’lar.',
     ],
   },
-  rekabet: {
-    sec: 25,
+  {
+    q: 'Rakipleriniz kim?',
     say: [
       'Pazarda iki dünya var. Oyunlaştırılmış öğrenme alışkanlık kurar ama puanı dışarıda geçmez.',
-      'İlan siteleri, testler, bootcamp’ler, mikro staj ve açık inovasyon programları ise tek seferlik bir eşik; kanıt çoğu zaman platformun içinde kalır.',
-      'Sağ üst köşe boş: hem alışkanlık kuran hem dışarıda doğrulanmış işe dayanan. Türkiye’de bu bileşimi sunan bir platform bulamadık.',
+      'İlan siteleri, testler, bootcamp’ler ve mikro staj programları tek seferlik bir eşik; kanıt çoğu zaman platformun içinde kalır. İkisini birleştiren bir platformu Türkiye’de bulamadık.',
     ],
   },
-  model: {
-    sec: 35,
+  {
+    q: 'Nasıl yaşayacak, ücret var mı?',
     say: [
-      'Gence ücret yok. Kod MIT lisanslı ve açık; kanıt gencindir.',
-      'Bugün gelirimiz yok. Pilotta sınayacağımız dört seçenek var; hiçbiri henüz gelir değil.',
-      'Kamu ve vakıf fonları, kalkınma ajansları, üniversite kariyer merkezleri ve kurum tarafında barındırma ile destek.',
+      'Gence ücret yok. Kod MIT lisanslı ve açık; kanıt gencindir. Bugün gelirimiz yok.',
+      'Pilotta dört seçenek sınayacağız: kamu ve vakıf fonları, kalkınma ajansları, üniversite kariyer merkezleri, kurum tarafında barındırma ve destek.',
       'Yapay zekâ da ücretsiz kotayla çalışıyor: Workers AI’ın günlük ücretsiz payı, taslak başına yaklaşık 28 nöron, günde 350 civarı taslak. Kota dolarsa kural motoru devralır; fatura çıkmaz.',
     ],
   },
-  olcum: {
-    sec: 25,
+  {
+    q: 'Başarıyı nasıl ölçeceksiniz?',
     say: [
-      'Pilotta dört şeyi ölçeceğiz; hedef rakam koymuyoruz, önce taban çizgisini ölçeceğiz.',
-      'Kayıttan ilk doğrulanmış işe kaç gün geçiyor; yayımlanan ihtiyaçların kaçı pilota dönüşüyor.',
-      'Pilotlarda çift onaylanan aşamalar ve tamamlanma oranı; eşleşmeyen gençlerin geri bildirimden sonra yeni kanıt ekleme oranı.',
+      'Hedef rakam koymuyoruz, önce taban çizgisini ölçeceğiz.',
+      'Kayıttan ilk doğrulanmış işe kaç gün geçtiği, yayımlanan ihtiyaçların kaçının pilota dönüştüğü, pilotların tamamlanma oranı ve eşleşmeyen gençlerin geri bildirimden sonra yeni kanıt ekleme oranı.',
     ],
   },
-};
+];

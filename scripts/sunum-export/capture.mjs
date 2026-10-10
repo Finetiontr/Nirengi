@@ -1,4 +1,4 @@
-// Renders every slide of /sunum, the appendix included, as layers for the PowerPoint
+// Renders every slide of /sunum as layers for the PowerPoint
 // export (see README.md). Per slide: the full frame (reference), the background (all
 // `s-in` blocks and Niri hidden), every top-level `s-in` block alone on transparency,
 // Niri alone and the bubble alone. The film slide has no Niri: it is shot on the
@@ -34,7 +34,7 @@ function loadPlaywright() {
 }
 const { chromium } = loadPlaywright();
 
-const { NOTES } = await import(pathToFileURL(join(repo, 'src/components/sunum/notes.ts')).href);
+const { NOTES, QA } = await import(pathToFileURL(join(repo, 'src/components/sunum/notes.ts')).href);
 
 mkdirSync(OUT, { recursive: true });
 const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || undefined });
@@ -73,7 +73,7 @@ await page.addStyleTag({
 // notes.ts lists every slide in deck order.
 const slideIds = Object.keys(NOTES);
 const count = slideIds.length;
-const manifest = { width: 3840, height: 2160, stage: { width: 1600, height: 900 }, slides: [] };
+const manifest = { width: 3840, height: 2160, stage: { width: 1600, height: 900 }, qa: QA, slides: [] };
 
 for (let n = 1; n <= count; n++) {
   await page.evaluate((n) => (location.hash = `#${n}`), n);
@@ -96,7 +96,6 @@ for (let n = 1; n <= count; n++) {
   });
   const bare = !!film;
   if (bare) await page.waitForTimeout(600);
-  const appendix = await page.evaluate(() => document.querySelector('[aria-roledescription="slayt"]').getAttribute('aria-label').startsWith('Ek '));
 
   const dir = join(OUT, String(n).padStart(2, '0'));
   mkdirSync(dir, { recursive: true });
@@ -151,7 +150,7 @@ for (let n = 1; n <= count; n++) {
   });
 
   const id = slideIds[n - 1];
-  manifest.slides.push({ n, id, bare, appendix, film_ms: film?.ms || null, title: info.title, line: info.line, notes: NOTES[id] ?? null, layers: info.layers.map((l) => ({ ...l, file: `l${l.k}.png` })) });
+  manifest.slides.push({ n, id, bare, film_ms: film?.ms || null, title: info.title, line: info.line, notes: NOTES[id] ?? null, layers: info.layers.map((l) => ({ ...l, file: `l${l.k}.png` })) });
   console.log(`${n}/${count} ${info.title}: ${info.layers.length} layers`);
 }
 

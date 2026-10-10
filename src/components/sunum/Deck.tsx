@@ -1,5 +1,5 @@
 // The stage deck: one idea per slide, Niri on stage with one short line each.
-// Twelve slides for the talk, then the appendix for questions (→ past the close).
+// Twelve slides in the organisers' order; questions are answered from the notes.
 // Keys: →, Space, PageDown next; ←, PageUp back; Home/End (the close); 1–9 and 0 jump;
 // F fullscreen; B blanks the screen; T flips the theme for this visit; N opens the
 // presenter window (/sunum?notlar) with the speaker notes, which follows the deck
@@ -9,7 +9,7 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type MouseEvent } from 'react';
 import StageNiri from './StageNiri';
 import Presenter, { CHANNEL, type Msg } from './Presenter';
-import { FILM, MAIN, place, SLIDES, type Mark } from './slides';
+import { FILM, place, SLIDES, type Mark } from './slides';
 import './sunum.css';
 
 /** Where Niri stands: the box is anchored by its bottom-left corner on the 1600×900 stage. */
@@ -115,7 +115,7 @@ function Stage() {
         go(i + 1);
       } else if (k === 'ArrowLeft' || k === 'ArrowUp' || k === 'PageUp' || k === 'Backspace') go(i - 1);
       else if (k === 'Home') go(0);
-      else if (k === 'End') go(MAIN - 1);
+      else if (k === 'End') go(last);
       else if (/^[0-9]$/.test(k)) go(k === '0' ? 9 : Number(k) - 1);
       else if (k === 'f' || k === 'F') fullscreen();
       else if (k === 'n' || k === 'N') notes();
@@ -179,10 +179,10 @@ function Stage() {
           <StageNiri line={{ key: slide.id, ...slide.niri, text: slide.niri.line, size: mark.size, side: mark.side }} />
         </div>
 
-        {/* A quiet counter: the talk's route so far as small survey markers; the appendix shows its own count. */}
+        {/* A quiet counter: the talk's route so far as small survey markers. */}
         <div className={`absolute right-[48px] top-[34px] flex items-center gap-3 ${bare ? 'invisible' : ''}`} aria-hidden="true">
           <div className="flex items-end gap-[5px]">
-            {SLIDES.slice(0, MAIN).map((s, n) => (
+            {SLIDES.map((s, n) => (
               <svg key={s.id} viewBox="0 0 12 11" width={n === i ? 16 : 11} height={n === i ? 15 : 10} className="block">
                 <path
                   d="M6 1.2 11 10H1Z"
