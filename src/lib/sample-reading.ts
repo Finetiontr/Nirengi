@@ -1,6 +1,7 @@
 // A real answer from Niri's draft model (Gemma 4 26B on Workers AI) for SAMPLE_COMPLAINT,
 // kept as recorded. The deck runs it through the same guard the product uses
 // (engine/ground.ts), so the AI slides show computed results, not drawn ones;
+// ai.ts shows it for the sample text when the model is out of reach;
 // tests/ground.test.ts bends it the ways a model fails.
 
 export const SAMPLE_READING = {

@@ -5,7 +5,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { assessCanvas, SAMPLE_COMPLAINT } from '../src/lib/engine/canvas.ts';
 import { cites, numbersFrom, readModelDraft, readRulesDraft } from '../src/lib/engine/ground.ts';
-import { INVENTED_DECIDER, SAMPLE_READING as MODEL } from '../src/components/sunum/reading.ts';
+import { INVENTED_DECIDER, SAMPLE_READING as MODEL } from '../src/lib/sample-reading.ts';
 
 const bend = (patch: Record<string, unknown>) => ({ ...structuredClone(MODEL), ...patch });
 

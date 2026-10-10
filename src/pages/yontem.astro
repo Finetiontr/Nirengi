@@ -65,7 +65,7 @@ const aiGuards = [
   ['Metinde olmayan sayı giremez.', 'Alandaki her sayı kurumun metninde geçmeli. Metinde “6.000 arama” yazıyorsa model “8.000” diyemez; derse alan reddedilir.'],
   ['Kriterler öneri olarak kalır.', 'Model başarı kriteri önerir; kurum “Ekle”ye basmadan kanvasa girmez. Eşik ya da somut teslim içermeyen öneri hiç gösterilmez.'],
   ['Reddedilen gizlenmez.', 'Denetimden geçmeyen her şey “Almadıklarım” listesinde nedeniyle görünür.'],
-  ['Yedek yol hep açık.', 'Ağ, kota ya da model sorununda taslağı kural motoru çıkarır ve ekran bunu söyler. Aynı metnin cevabı tarayıcıda saklanır.'],
+  ['Yedek yol hep açık.', 'Ağ, kota ya da model sorununda taslağı kural motoru çıkarır ve ekran bunu söyler. Aynı metnin cevabı tarayıcıda saklanır; örnek metnin, modelden alınmış kayıtlı bir cevabı vardır.'],
 ] as const;
 
 const truth = [

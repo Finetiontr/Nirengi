@@ -5,7 +5,7 @@ Kenardaki **Demo turu** paneli adımları gerçek durum değişikliklerinden iş
 ## Hazırlık (sunumdan önce)
 
 - [ ] Canlı adresi aç: https://finetiontr.github.io/Nirengi/ (worker bağlı). Yerel yedek: `PUBLIC_API_URL=<worker adresi> npm run build && npm run preview`; adres verilmezse taslağı kural motoru çıkarır.
-- [ ] Kurum penceresinde yapay zekâ taslağını bir kez önceden çalıştır (**Örnekle doldur** → **Taslağa dönüştür**), sonra sihirbazdan kaydetmeden çık. Cevap tarayıcıda saklanır; sahnede ağ yavaş olsa da anında gelir ve ekranda “daha önce verdiği cevap” yazar.
+- [ ] Kurum penceresinde yapay zekâ taslağını bir kez önceden çalıştır (**Örnekle doldur** → **Taslağa dönüştür**), sonra sihirbazdan kaydetmeden çık. Cevap tarayıcıda saklanır; sahnede ağ yavaş olsa da anında gelir ve ekranda “daha önce verdiği cevap” yazar. Ağ hiç yoksa örnek metin için modelin kayıtlı cevabı gelir; ekranda “kayıttan” yazar.
 - [ ] Sunumda bağlanacak GitHub hesabında tarayıcıda oturum açık olsun. Nirengi uygulaması o hesaba daha önce kurulduysa GitHub’da **Configure** ile göstereceğin depoları (bir özel depo dahil) hazırla.
 - [ ] İki tarayıcı penceresi: solda **Kurum**, sağda **Genç** (sol menüdeki Genç/Kurum seçimi sekme başınadır, veri anında senkronlanır).
 - [ ] Sahneden önce `/sunum`’u bir kez aç: tanıtım filmi iki saniye sonra arka planda iner, 6. slaytta beklemeden oynar. Film müziklidir: bilgisayarın sesi salona bağlı olsun ve sunum penceresinde başta bir kez **F**’ye bas ya da tıkla (tarayıcı sesi ancak bir dokunuştan sonra açar; yine sessiz başlarsa filme bir kez tıkla). Film açılmazsa o slayt canlı demo paneline döner; mp4’ün yerel bir kopyası da sunum bilgisayarında dursun.

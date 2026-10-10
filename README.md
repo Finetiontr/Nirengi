@@ -102,7 +102,7 @@ flowchart LR
 3. **Kriterler öneridir.** Kurum “Ekle”ye basmadan kanvasa girmez. Eşik ya da somut teslim içermeyen öneri, kanvasın kendi ölçülebilirlik kuralından geçemez ve gösterilmez.
 4. **Yayın kararı modelde değil.** Netlik puanı, 70 eşiği ve üç zorunlu madde kurallarla hesaplanır.
 5. **Reddedilen gizlenmez.** “Almadıklarım” listesinde nedeniyle görünür.
-6. **Yedek yol.** Ağ, kota ya da model sorununda taslağı kural motoru ([`canvas.ts`](src/lib/engine/canvas.ts)) çıkarır ve ekran bunu söyler. Aynı metnin cevabı tarayıcıda saklanır; sahnede ağ kesilse de çalışır.
+6. **Yedek yol.** Ağ, kota ya da model sorununda taslağı kural motoru ([`canvas.ts`](src/lib/engine/canvas.ts)) çıkarır ve ekran bunu söyler. Aynı metnin cevabı tarayıcıda saklanır; sahnede ağ kesilse de çalışır. Örnek metnin ise modelden alınmış gerçek bir cevabı kayıtlı ([`sample-reading.ts`](src/lib/sample-reading.ts)): modele ulaşılamazsa o gösterilir ve ekranda “kayıttan” yazar.
 7. **Kötüye kullanım.** Uç yalnız izinli sitelerden çağrılır; metin 30–2.000 karakter; ziyaretçi başına dakikada 20 istek.
 
 **Sınırlar.**
@@ -145,6 +145,7 @@ src/
   lib/
     engine/            saf hesaplama: match, canvas, ground (model denetimi), ledger, progress, insight
     ai.ts              Niri'nin modeli: taslak isteği, önbellek, kural motoruna dönüş
+    sample-reading.ts  modelin örnek metne verdiği kayıtlı cevap (sunum, testler, ağ yedeği)
     auth.ts            GitHub uygulamasıyla bağlanma ve çıkış
     verify.ts          GitHub ve DNS TXT doğrulaması
     store.ts           tarayıcıda durum ve sekmeler arası senkron

@@ -20,7 +20,7 @@ import { Mark as BrandMark } from '../ui/icons';
 import type { Canvas } from '../../lib/types.ts';
 import { assessCanvas, filledFields, PUBLISH_THRESHOLD, SAMPLE_COMPLAINT } from '../../lib/engine/canvas.ts';
 import { cites, readModelDraft, readRulesDraft } from '../../lib/engine/ground.ts';
-import { INVENTED_DECIDER, SAMPLE_READING } from './reading.ts';
+import { INVENTED_DECIDER, SAMPLE_READING } from '../../lib/sample-reading.ts';
 
 export type Mark = 'hero' | 'dock';
 

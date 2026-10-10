@@ -2,9 +2,12 @@
 // Niri's model, reached through worker/ (POST /ai/draft). The kurum's text goes out once and the
 // raw draft comes back; engine/ground.ts decides what of it may enter the canvas. Answers are
 // kept per text in this browser, so the same text drafts again without the network and
-// without spending the day's free allocation.
+// without spending the day's free allocation. The sample text also has the model's recorded
+// answer, so "Örnekle doldur" shows a model reading even when the model is out of reach.
 
+import { SAMPLE_COMPLAINT } from './engine/canvas.ts';
 import { readModelDraft, readRulesDraft, type ReadDraft } from './engine/ground.ts';
+import { SAMPLE_READING } from './sample-reading.ts';
 
 /** worker/ address; set per deployment through the PUBLIC_API_URL build variable. */
 const API = (import.meta.env.PUBLIC_API_URL ?? '').replace(/\/+$/, '');
@@ -19,7 +22,9 @@ export interface Reading {
   /** Model name shown to the kurum, e.g. "Gemma 4 26B". */
   label?: string;
   cached?: boolean;
+  /** Set with `recorded` too: the model was out of reach and its recorded answer for the sample was shown. */
   fallback?: Fallback;
+  recorded?: boolean;
 }
 
 type Entry = { raw: unknown; label: string };
@@ -74,7 +79,11 @@ async function ask(text: string): Promise<{ entry: Entry; cached: boolean } | Fa
 /** Model first; the rule-based extractor whenever the model is out of reach or nothing it said survives the checks. */
 export async function readComplaint(text: string): Promise<Reading> {
   const r = await ask(text);
-  if (typeof r === 'string') return { draft: readRulesDraft(text), fallback: r };
+  if (typeof r === 'string') {
+    // Out of reach (not a refused answer): the sample text still gets the model's real, recorded reading.
+    const sample = r !== 'model' && text.trim() === SAMPLE_COMPLAINT ? readModelDraft(text, SAMPLE_READING) : null;
+    return sample ? { draft: sample, label: 'Gemma 4 26B', fallback: r, recorded: true } : { draft: readRulesDraft(text), fallback: r };
+  }
   const draft = readModelDraft(text, r.entry.raw);
   return draft ? { draft, label: r.entry.label, cached: r.cached } : { draft: readRulesDraft(text), fallback: 'model' };
 }

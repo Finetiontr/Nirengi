@@ -788,7 +788,11 @@ function ReadingStep({ reading }: { reading: Reading }) {
   const missing = READ_ROWS.filter((f) => !d.extracted.includes(f as keyof Canvas)).map((f) => LABEL[f].toLocaleLowerCase('tr-TR'));
   const n = d.extracted.length;
   const said = [
-    model ? `${n} alanı doldurdum` : `${FALLBACK[reading.fallback ?? 'model']}, taslağı kurallarla çıkardım. ${n} alan doldu`,
+    reading.recorded
+      ? `${FALLBACK[reading.fallback ?? 'offline']}, bu örnek için kayıtlı cevabını gösteriyorum. ${n} alan dolu`
+      : model
+        ? `${n} alanı doldurdum`
+        : `${FALLBACK[reading.fallback ?? 'model']}, taslağı kurallarla çıkardım. ${n} alan doldu`,
     d.suggestions.length ? `${d.suggestions.length} başarı kriteri öneriyorum` : '',
   ]
     .filter(Boolean)
@@ -851,8 +855,8 @@ function ReadingStep({ reading }: { reading: Reading }) {
 
       <p className="hint">
         {model
-          ? `Okuyan: ${reading.label}, açık ağırlıklı bir model${reading.cached ? ' (bu metin için daha önce verdiği cevap)' : ''}. Yayına model karar vermez: netlik puanını kurallar hesaplar.`
-          : 'Kural motoru cümleleri olduğu gibi alır, kriter önermez. Netlik puanı aynı kurallarla hesaplanır.'}
+          ? `Okuyan: ${reading.label}, açık ağırlıklı bir model${reading.recorded ? ' (bu örnek metne daha önce verdiği gerçek cevap, kayıttan)' : reading.cached ? ' (bu metin için daha önce verdiği cevap)' : ''}. Yayına model karar vermez: netlik puanını kurallar hesaplar.`
+          : `Kural motoru cümleleri olduğu gibi alır, kriter önermez. Netlik puanı aynı kurallarla hesaplanır.${reading.fallback && reading.fallback !== 'model' ? ' Modelin nasıl okuduğunu görmek için geri dönüp “Örnekle doldur”u dene: o metne verdiği cevap kayıtlı.' : ''}`}
       </p>
     </div>
   );
