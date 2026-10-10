@@ -1,5 +1,5 @@
 // After pages-base: writes dist-pages/sw.js from src/sw.js with this build's version (a hash of
-// every file it keeps) and the list of pages and assets to keep for offline use. Films stay out
+// every file it keeps and of the worker itself) and the list of pages and assets to keep offline. Films stay out
 // (they stream from the network), and so do font subsets for scripts the interface never shows.
 
 import { createHash } from 'node:crypto';
@@ -31,9 +31,11 @@ for (const f of walk(OUT).sort()) {
   else assets.push(rel);
 }
 
+// The worker's own code is part of the version too, so a fix to it starts a fresh copy.
+const src = readFileSync('src/sw.js', 'utf8');
+hash.update(src);
 const version = hash.digest('hex').slice(0, 12);
 const files = [...pages, ...assets];
-const src = readFileSync('src/sw.js', 'utf8');
 const out = src.replace("const VERSION = 'dev';", `const VERSION = '${version}';`).replace('const FILES = [];', `const FILES = ${JSON.stringify(files)};`);
 if (out === src || !out.includes(version) || out.includes('const FILES = [];')) throw new Error('pwa: src/sw.js no longer has the VERSION / FILES lines to fill in');
 writeFileSync(join(OUT, 'sw.js'), out);

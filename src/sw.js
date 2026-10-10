@@ -4,6 +4,7 @@
 // shows at once, and fall back to the copy kept here when the network is slow or gone. Built
 // assets carry a hash in their name and are served from here first. scripts/pwa.mjs writes
 // this build's version and file list in; films stream from the network and are never kept.
+// Keeping a copy is best effort: when storage refuses one, the network answer still goes out.
 
 const VERSION = 'dev';
 const FILES = [];
@@ -28,23 +29,37 @@ function detailKey(url) {
   return m && m[2] !== '_' ? at(`${m[1]}/_`) : null;
 }
 
-/** A response that came through a redirect cannot answer a navigation; keep a plain copy. */
-async function plain(res) {
-  if (!res.redirected) return res;
-  return new Response(await res.blob(), { status: res.status, statusText: res.statusText, headers: res.headers });
+/** The kept copy, or undefined; a storage error counts as nothing kept. */
+async function kept(key, ignoreSearch = true) {
+  try {
+    return await (await caches.open(CACHE)).match(key, { ignoreSearch });
+  } catch {
+    return undefined;
+  }
+}
+
+/** Keep a copy, never failing the caller. A redirected response cannot answer a navigation, so it is kept plain. */
+async function keep(key, res) {
+  try {
+    const body = res.redirected ? new Response(await res.blob(), { status: res.status, statusText: res.statusText, headers: res.headers }) : res;
+    await (await caches.open(CACHE)).put(key, body);
+  } catch {
+    /* storage full, busy or refused: the next visit tries again */
+  }
 }
 
 self.addEventListener('install', (event) => {
+  // A new version takes over at once; a page that comes from a broken older one must not wait for it.
+  self.skipWaiting();
   event.waitUntil(
     (async () => {
-      const cache = await caches.open(CACHE);
       // A file that fails to come down now is kept the first time it is opened.
       for (let i = 0; i < FILES.length; i += 8)
         await Promise.all(
           FILES.slice(i, i + 8).map(async (f) => {
             try {
               const res = await fetch(at(f), { cache: 'reload' });
-              if (res.ok) await cache.put(at(f), await plain(res));
+              if (res.ok) await keep(at(f), res);
             } catch {
               /* offline during install */
             }
@@ -57,49 +72,49 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     (async () => {
-      for (const name of await caches.keys()) if (name.startsWith('nirengi-') && name !== CACHE) await caches.delete(name);
+      try {
+        for (const name of await caches.keys()) if (name.startsWith('nirengi-') && name !== CACHE) await caches.delete(name);
+      } catch {
+        /* an old copy that cannot be removed is only wasted space */
+      }
       await self.clients.claim();
     })(),
   );
 });
 
 async function page(request) {
-  const cache = await caches.open(CACHE);
   const key = pageKey(request.url);
-  const net = fetch(request).then(async (res) => {
-    if (res.ok) await cache.put(key, await plain(res.clone()));
+  const detail = detailKey(request.url);
+  const net = fetch(request).then((res) => {
+    if (res.ok) void keep(key, res.clone());
     return res;
   });
-  net.catch(() => undefined);
-  const slow = new Promise((_, fail) => setTimeout(() => fail(new Error('slow')), WAIT_MS));
-  const detail = detailKey(request.url);
-  const asDetail = async (res) => (res.status === 404 && detail ? ((await cache.match(detail)) ?? res) : res);
+  const asDetail = async (res) => (res.status === 404 && detail ? ((await kept(detail)) ?? res) : res);
+  const slow = new Promise((ok) => setTimeout(() => ok(null), WAIT_MS));
+  const first = await Promise.race([net.catch(() => null), slow]);
+  if (first) return asDetail(first);
+  // Slow or offline: the copy kept here, else the network after all.
+  const copy = (await kept(key)) ?? (detail ? await kept(detail) : undefined);
+  if (copy) return copy;
   try {
-    return await asDetail(await Promise.race([net, slow]));
+    return await asDetail(await net);
   } catch {
-    const kept = (await cache.match(key, { ignoreSearch: true })) ?? (detail ? await cache.match(detail) : undefined);
-    if (kept) return kept;
-    try {
-      return await asDetail(await net);
-    } catch {
-      // Nothing kept for this address: the kept 404 page says so (and forwards runtime ids).
-      return (await cache.match(at('404.html'))) ?? Response.error();
-    }
+    // Nothing kept for this address: the kept 404 page says so (and forwards runtime ids).
+    return (await kept(at('404.html'))) ?? Response.error();
   }
 }
 
 async function asset(request) {
-  const cache = await caches.open(CACHE);
-  const kept = await cache.match(request);
+  const hit = await kept(request, false);
   const fresh = () =>
-    fetch(request).then(async (res) => {
-      if (res.ok && res.type === 'basic') await cache.put(request, res.clone());
+    fetch(request).then((res) => {
+      if (res.ok && res.type === 'basic') void keep(request, res.clone());
       return res;
     });
-  if (!kept) return fresh();
+  if (!hit) return fresh();
   // Hashed files never change; anything else is refreshed in the background for the next visit.
   if (!new URL(request.url).pathname.includes('/_astro/')) fresh().catch(() => undefined);
-  return kept;
+  return hit;
 }
 
 self.addEventListener('fetch', (event) => {
@@ -109,6 +124,7 @@ self.addEventListener('fetch', (event) => {
   if (url.origin !== SCOPE.origin || !url.pathname.startsWith(SCOPE.pathname)) return;
   // Films are streamed in ranges straight from the network.
   if (request.headers.has('range') || url.pathname.endsWith('.mp4')) return;
-  if (request.mode === 'navigate') event.respondWith(page(request));
-  else event.respondWith(asset(request));
+  // Whatever goes wrong in here, the plain network answer is the last word.
+  const answer = request.mode === 'navigate' ? page(request) : asset(request);
+  event.respondWith(answer.catch(() => fetch(request)));
 });
