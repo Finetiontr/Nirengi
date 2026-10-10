@@ -161,6 +161,13 @@ export const QA: Answer[] = [
     ],
   },
   {
+    q: 'Kurum az yazarsa ne olur?',
+    say: [
+      'Model metinde olmayan her alan için kurumun derdine özel bir öneri getirir; kutuda “Niri’nin önerisi” olarak soluk durur.',
+      'Öneride sayı uydurmaz, yerine “…” koyar; rakamı kurum yazar. Kurum kullanmadan hiçbir öneri kanvasa girmez.',
+    ],
+  },
+  {
     q: 'İlk pazarınız kim?',
     say: [
       'Bağımsız bir mikro staj pazar büyüklüğü bulamadık; uydurma bir rakam vermiyoruz.',

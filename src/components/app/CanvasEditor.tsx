@@ -375,6 +375,7 @@ export default function CanvasEditor() {
                 toggleSkill={toggleSkill}
                 quotes={reading?.draft.extracted.includes(id as keyof Canvas) ? (reading.draft.quotes[id as keyof Canvas] ?? []) : null}
                 suggestions={id === 'criteria' ? (reading?.draft.suggestions ?? []) : []}
+                idea={reading?.draft.ideas[id as TextField]}
                 onNext={next}
               />
             )}
@@ -508,14 +509,31 @@ interface StepProps {
   /** Sentences of the kurum's text this field was read from; null when the field was not read. */
   quotes: string[] | null;
   suggestions: Suggestion[];
+  /** Niri's suggestion for a field the text left empty; shown faded in the field until taken. */
+  idea?: string;
   onNext: () => void;
 }
 
-function StepView({ id, ok, checks, c, setC, title, setTitle, skills, toggleSkill, quotes, suggestions, onNext }: StepProps) {
+function StepView({ id, ok, checks, c, setC, title, setTitle, skills, toggleSkill, quotes, suggestions, idea, onNext }: StepProps) {
   const m = META[id];
   const val = id === 'title' ? title : TEXT.includes(id) ? c[id as TextField] : '';
   const put = (v: string) => (id === 'title' ? setTitle(v) : setC((p) => ({ ...p, [id]: v })));
-  const single = id === 'painMetric' || id === 'decisionMaker' || id === 'title';
+  // An idea needs room to be read whole, so its field wraps even where the answer is one line.
+  const single = (id === 'painMetric' || id === 'decisionMaker' || id === 'title') && !idea;
+  const field = useRef<HTMLTextAreaElement>(null);
+  const offer = idea && !String(val).trim() ? idea : '';
+  // Taking the idea puts the cursor on its first blank, so the kurum types its own figure there.
+  const take = () => {
+    put(offer);
+    requestAnimationFrame(() => {
+      const el = field.current;
+      if (!el) return;
+      const at = offer.indexOf('…');
+      el.focus();
+      if (at >= 0) el.setSelectionRange(at, at + 1);
+    });
+  };
+  const tip = offer ? 'Metninde bunu bulamadım. Derdine göre bir öneri yazdım: kullan ya da kendi cümleni yaz.' : String(val).includes('…') ? '“…” olan yerlere kendi bilgini yaz.' : m.tip;
   // The rules copy whole sentences, so a quote that equals the answer says nothing new.
   const cited = (quotes ?? []).filter((q) => q.trim() !== String(val).trim());
 
@@ -523,7 +541,7 @@ function StepView({ id, ok, checks, c, setC, title, setTitle, skills, toggleSkil
     <div>
       <h1 className="text-[26px] font-black leading-tight text-ink sm:text-[30px]">{m.q}</h1>
       <p className="mt-2 text-[16px] font-bold text-ink-3">{m.hint}</p>
-      <Coach tip={m.tip} mood={ok ? 'happy' : 'think'} />
+      <Coach tip={tip} mood={ok ? 'happy' : 'think'} />
 
       <div className="mt-2">
         {quotes && (val || id === 'constraints') && (
@@ -564,7 +582,22 @@ function StepView({ id, ok, checks, c, setC, title, setTitle, skills, toggleSkil
         ) : single ? (
           <input className="field" value={val} onChange={(e) => put(e.target.value)} placeholder={m.ph} aria-label={m.q} autoFocus enterKeyHint="next" />
         ) : (
-          <textarea className="field min-h-[120px] resize-none" value={val} onChange={(e) => put(e.target.value)} placeholder={m.ph} aria-label={m.q} autoFocus enterKeyHint="next" />
+          <textarea
+            ref={field}
+            className="field min-h-[120px] resize-none"
+            value={val}
+            onChange={(e) => put(e.target.value)}
+            placeholder={offer ? `Niri’nin önerisi: ${offer}` : m.ph}
+            aria-label={m.q}
+            autoFocus
+            enterKeyHint="next"
+          />
+        )}
+        {offer && (
+          <button type="button" className="btn-line btn-sm mt-3" onClick={take}>
+            <Check className="h-4 w-4" strokeWidth={3.5} aria-hidden="true" />
+            Öneriyi kullan
+          </button>
         )}
       </div>
 
@@ -574,10 +607,12 @@ function StepView({ id, ok, checks, c, setC, title, setTitle, skills, toggleSkil
         ))}
       </ul>
 
-      <div className="mt-5 rounded-[16px] bg-bg-2 px-4 py-3">
-        <p className="text-[13px] font-extrabold text-ink-3">İyi bir örnek</p>
-        <p className="mt-0.5 text-[15px] font-bold leading-snug text-ink-2">“{m.ex}”</p>
-      </div>
+      {!idea && (
+        <div className="mt-5 rounded-[16px] bg-bg-2 px-4 py-3">
+          <p className="text-[13px] font-extrabold text-ink-3">İyi bir örnek</p>
+          <p className="mt-0.5 text-[15px] font-bold leading-snug text-ink-2">“{m.ex}”</p>
+        </div>
+      )}
       {ok && <span className="sr-only" role="status">Bu adım tamam.</span>}
     </div>
   );
@@ -798,7 +833,9 @@ function ReadingStep({ reading }: { reading: Reading }) {
     .filter(Boolean)
     .join(', ');
   const cap = (s: string) => s.charAt(0).toLocaleUpperCase('tr-TR') + s.slice(1);
-  const tip = `${said}.${missing.length ? ` ${cap(missing.slice(0, 2).join(' ve '))} eksik; ${missing.length > 1 ? 'onları' : 'onu'} soracağım.` : ''}`;
+  const ideas = READ_ROWS.filter((f) => d.ideas[f as TextField]);
+  const offered = ideas.length === 1 ? `${cap(LABEL[ideas[0]].toLocaleLowerCase('tr-TR'))} için bir öneri hazırladım.` : ideas.length ? `${ideas.length} alan için öneri hazırladım.` : '';
+  const tip = `${said}.${missing.length ? ` ${cap(missing.slice(0, 2).join(' ve '))} eksik; ${missing.length > 1 ? 'onları' : 'onu'} soracağım.` : ''}${offered ? ` ${offered}` : ''}`;
   // A field the model filled but the guard refused is in the text; it is asked again, not "missing from the text".
   const refused = new Set<string>(d.rejected.map((r) => r.field));
 
@@ -830,7 +867,14 @@ function ReadingStep({ reading }: { reading: Reading }) {
                     ))}
                   </>
                 ) : (
-                  <p className="mt-0.5 text-[15px] font-bold text-ink-3">{refused.has(f) ? 'Doğrulayamadım, soracağım' : 'Metninde yok, soracağım'}</p>
+                  <>
+                    <p className="mt-0.5 text-[15px] font-bold text-ink-3">{refused.has(f) ? 'Doğrulayamadım, soracağım' : 'Metninde yok, soracağım'}</p>
+                    {d.ideas[f as TextField] && (
+                      <p className="mt-1 break-words text-[13px] font-semibold leading-snug text-ink-3">
+                        <span className="font-extrabold">Önerim:</span> {d.ideas[f as TextField]}
+                      </p>
+                    )}
+                  </>
                 )}
               </div>
             </li>

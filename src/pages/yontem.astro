@@ -64,6 +64,7 @@ const aiGuards = [
   ['Her alan bir cümleye dayanır.', 'Model doldurduğu her alan için metinden harfi harfine bir cümle göstermek zorunda. Cümle metinde yoksa alan kanvasa girmez, kuruma soru olarak döner.'],
   ['Metinde olmayan sayı giremez.', 'Alandaki her sayı kurumun metninde geçmeli. Metinde “6.000 arama” yazıyorsa model “8.000” diyemez; derse alan reddedilir.'],
   ['Kriterler öneri olarak kalır.', 'Model başarı kriteri önerir; kurum “Ekle”ye basmadan kanvasa girmez. Eşik ya da somut teslim içermeyen öneri hiç gösterilmez.'],
+  ['Eksik alana öneri, uydurma sayı yok.', 'Metinde olmayan alan için model kurumun derdine özel bir cümle önerir; kutuda “Niri’nin önerisi” olarak soluk durur ve kurum kullanmadan kanvasa girmez. Metinde geçmeyen sayı “…” olur, rakamı kurum yazar.'],
   ['Reddedilen gizlenmez.', 'Denetimden geçmeyen her şey “Almadıklarım” listesinde nedeniyle görünür.'],
   ['Yedek yol hep açık.', 'Ağ, kota ya da model sorununda taslağı kural motoru çıkarır ve ekran bunu söyler. Aynı metnin cevabı tarayıcıda saklanır; örnek metnin, modelden alınmış kayıtlı bir cevabı vardır.'],
 ] as const;

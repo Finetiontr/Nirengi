@@ -2,6 +2,8 @@
 // sentence it cites is really in the kurum's text and every number it states appears there
 // too. Suggested success criteria stay suggestions until the kurum adds them, and they must
 // pass the canvas's own measurability test. Whatever fails is listed, never silently used.
+// Ideas for the fields the text leaves empty are shown as Niri's suggestion; a number the
+// text never states becomes "…" in them, so the kurum writes its own figure.
 
 import type { Canvas, ConstraintKind } from '../types.ts';
 import { SKILLS, skillsInText } from '../skills.ts';
@@ -30,6 +32,8 @@ export interface ReadDraft extends Draft {
   /** For each filled field, the sentences of the kurum's text it came from. */
   quotes: Partial<Record<keyof Canvas, string[]>>;
   suggestions: Suggestion[];
+  /** The model's idea for a field the text leaves empty; it enters the canvas only when the kurum takes it. */
+  ideas: Partial<Record<TextField, string>>;
   rejected: Rejected[];
 }
 
@@ -58,6 +62,12 @@ const numbers = (s: string) => (s.match(/\d+(?:[.,]\d+)*/g) ?? []).map((n) => n.
 export function numbersFrom(text: string, value: string) {
   const have = new Set(numbers(text));
   return numbers(value).every((n) => have.has(n));
+}
+
+/** Numbers the text never states become "…", for the kurum to fill in. */
+export function blankNumbers(text: string, value: string) {
+  const have = new Set(numbers(text));
+  return value.replace(/\d+(?:[.,]\d+)*/g, (n) => (have.has(n.replace(/[.,]/g, '')) ? n : '…'));
 }
 
 const str = (v: unknown, max = MAX) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
@@ -96,16 +106,24 @@ export function readModelDraft(text: string, raw: unknown): ReadDraft | null {
 
   const suggestions: Suggestion[] = [];
   for (const k of list(o.criteria).slice(0, 4)) {
-    const value = str(k.text);
+    const value = str(k.text).replace(/\.{3}/g, '…');
     const basis = str(k.basis, 600);
     if (!value) continue;
+    // A blank threshold ("… adedin altına iner") is the kurum's number to set; the canvas check asks for it once added.
     if (!cites(text, basis)) rejected.push({ field: 'criteria', value, reason: 'quote' });
-    else if (!isCheckable(value)) rejected.push({ field: 'criteria', value, reason: 'measurable' });
+    else if (!isCheckable(value.replace(/…/g, '1'))) rejected.push({ field: 'criteria', value, reason: 'measurable' });
     else if (!suggestions.some((s) => flat(s.text) === flat(value))) suggestions.push({ text: value, basis });
   }
 
   const extracted = filledFields(canvas);
   if (!extracted.length) return null;
+
+  const ideas: ReadDraft['ideas'] = {};
+  const offered = (o.ideas ?? {}) as Record<string, unknown>;
+  for (const f of FIELDS) {
+    const idea = blankNumbers(text, str(offered[f], 200).replace(/\.{3}/g, '…'));
+    if (!canvas[f] && idea.replace(/[\s….]/g, '').length >= 3) ideas[f] = idea;
+  }
 
   const picked = (Array.isArray(o.skills) ? o.skills : []).filter((k): k is string => typeof k === 'string' && Object.hasOwn(SKILLS, k));
   const skills = [...new Set([...picked.slice(0, 5), ...skillsInText(text)])];
@@ -125,6 +143,7 @@ export function readModelDraft(text: string, raw: unknown): ReadDraft | null {
     source: 'model',
     quotes,
     suggestions: suggestions.slice(0, 3),
+    ideas,
     rejected,
   };
 }
@@ -134,5 +153,5 @@ export function readRulesDraft(text: string): ReadDraft {
   const d = draftFromText(text);
   const quotes: ReadDraft['quotes'] = {};
   for (const f of FIELDS) if (d.canvas[f]) quotes[f] = [d.canvas[f]];
-  return { ...d, source: 'rules', quotes, suggestions: [], rejected: [] };
+  return { ...d, source: 'rules', quotes, suggestions: [], ideas: {}, rejected: [] };
 }

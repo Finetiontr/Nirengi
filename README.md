@@ -78,7 +78,7 @@ flowchart LR
 
 ## Yapay zekâ kullanımı
 
-**Ne yapıyor.** Kurum derdini kendi sözleriyle yazar (`/ihtiyaclar/yeni` → **Taslağa dönüştür**). Model metni İhtiyaç Kanvası’nın alanlarına ayırır (mevcut durum, sorun, sorunun ölçüsü, beklenen sonuç, kısıtlar, karar verici, kapsam), her alan için dayandığı cümleyi verir, işin gerektirdiği yetkinlikleri seçer ve 2–3 ölçülebilir başarı kriteri önerir. Kurum **Metninden çıkardıklarım** ekranında neyin hangi cümleden geldiğini ve neyin reddedildiğini görür; eksikleri tamamlar, önerilerden istediğini ekler.
+**Ne yapıyor.** Kurum derdini kendi sözleriyle yazar (`/ihtiyaclar/yeni` → **Taslağa dönüştür**). Model metni İhtiyaç Kanvası’nın alanlarına ayırır (mevcut durum, sorun, sorunun ölçüsü, beklenen sonuç, kısıtlar, karar verici, kapsam), her alan için dayandığı cümleyi verir, işin gerektirdiği yetkinlikleri seçer ve 2–3 ölçülebilir başarı kriteri önerir. Metinde olmayan her alan için de kurumun derdine özel bir öneri yazar: işletmeler çoğu zaman “sorunun ölçüsü” ya da “kapsam” gibi alanları baştan düşünmez, Niri onlara bir başlangıç cümlesi verir. Kurum **Metninden çıkardıklarım** ekranında neyin hangi cümleden geldiğini, neyin reddedildiğini ve neye öneri getirildiğini görür; eksik alanın kutusunda öneri soluk yazıyla “Niri’nin önerisi” olarak durur, kurum **Öneriyi kullan** der ya da kendi cümlesini yazar.
 
 **Model.** Google Gemma 4 26B A4B (`@cf/google/gemma-4-26b-a4b-it`), Cloudflare Workers AI üzerinde. Düşünme kipi kapalı, sıcaklık 0,1, çıktı JSON şemasıyla sınırlı. İstem ve şema [`worker/draft.ts`](worker/draft.ts) içinde sabittir; tarayıcıdan yalnızca metin gider, uç genel amaçlı bir sohbet botu olarak kullanılamaz.
 
@@ -99,7 +99,7 @@ flowchart LR
 **Hatalı çıktıya karşı önlemler** ([`src/lib/engine/ground.ts`](src/lib/engine/ground.ts), testleri [`tests/ground.test.ts`](tests/ground.test.ts)):
 1. **Kaynak cümle şartı.** Modelin doldurduğu her alan, metinden harfi harfine alınmış bir cümleye dayanmalı. Cümle metinde yoksa alan kanvasa girmez, kuruma soru olarak döner.
 2. **Sayı denetimi.** Alandaki her sayı metinde geçmeli; model “6.000” yerine “8.000” yazarsa alan reddedilir.
-3. **Kriterler öneridir.** Kurum “Ekle”ye basmadan kanvasa girmez. Eşik ya da somut teslim içermeyen öneri, kanvasın kendi ölçülebilirlik kuralından geçemez ve gösterilmez.
+3. **Kriterler ve eksik alan önerileri öneridir.** Kurum “Ekle” ya da “Öneriyi kullan”a basmadan kanvasa girmez. Eşik ya da somut teslim içermeyen kriter, kanvasın kendi ölçülebilirlik kuralından geçemez ve gösterilmez. Öneride metinde geçmeyen bir sayı varsa yerine “…” konur; rakamı kurum yazar, “…” kaldıkça sayı isteyen kontrol geçmez.
 4. **Yayın kararı modelde değil.** Netlik puanı, 70 eşiği ve üç zorunlu madde kurallarla hesaplanır.
 5. **Reddedilen gizlenmez.** “Almadıklarım” listesinde nedeniyle görünür.
 6. **Yedek yol.** Ağ, kota ya da model sorununda taslağı kural motoru ([`canvas.ts`](src/lib/engine/canvas.ts)) çıkarır ve ekran bunu söyler. Aynı metnin cevabı tarayıcıda saklanır; sahnede ağ kesilse de çalışır. Örnek metnin ise modelden alınmış gerçek bir cevabı kayıtlı ([`sample-reading.ts`](src/lib/sample-reading.ts)): modele ulaşılamazsa o gösterilir ve ekranda “kayıttan” yazar.

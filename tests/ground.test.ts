@@ -3,7 +3,7 @@
 // the ways a model fails.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { assessCanvas, SAMPLE_COMPLAINT } from '../src/lib/engine/canvas.ts';
+import { assessCanvas, isCheckable, SAMPLE_COMPLAINT } from '../src/lib/engine/canvas.ts';
 import { cites, numbersFrom, readModelDraft, readRulesDraft } from '../src/lib/engine/ground.ts';
 import { INVENTED_DECIDER, SAMPLE_READING as MODEL } from '../src/lib/sample-reading.ts';
 
@@ -60,6 +60,13 @@ test('ground: a criterion without a threshold or deliverable is refused', () => 
   assert.deepEqual(d.rejected, [{ field: 'criteria', value: 'Müşteri memnuniyeti artar.', reason: 'measurable' }]);
 });
 
+test('ground: a criterion may leave its threshold blank for the kurum, and stays unmeasurable until filled', () => {
+  const text = 'Aramaların ... altına inmesi';
+  const d = readModelDraft(SAMPLE_COMPLAINT, bend({ criteria: [{ text, basis: MODEL.pain.quote }] }))!;
+  assert.deepEqual(d.suggestions.map((s) => s.text), ['Aramaların … altına inmesi']);
+  assert.ok(!isCheckable(d.suggestions[0].text), 'added as is, the canvas still asks for the number');
+});
+
 test('ground: unknown skills, kinds and a title with a new number are dropped', () => {
   const d = readModelDraft(
     SAMPLE_COMPLAINT,
@@ -69,6 +76,19 @@ test('ground: unknown skills, kinds and a title with a new number are dropped', 
   assert.equal(d.canvas.constraints.length, 0);
   assert.notEqual(d.title, 'Aramaları 3.000’e indirmek');
   assert.ok(d.rejected.some((r) => r.field === 'title' && r.reason === 'number'));
+});
+
+test('ground: ideas fill only empty fields, and a number the text lacks becomes a blank', () => {
+  const d = readModelDraft(
+    SAMPLE_COMPLAINT,
+    bend({
+      scope: { value: '', quote: '' },
+      ideas: { scope: 'Önce 1 depodan çıkan ... araçla, 6 hafta boyunca deneyelim.', painMetric: 'Ayda ... arama', decisionMaker: '...', budget: 'Bütçe yok' },
+    }),
+  )!;
+  assert.deepEqual(d.ideas, { scope: 'Önce … depodan çıkan … araçla, 6 hafta boyunca deneyelim.' }, 'painMetric is read from the text; unknown and empty ideas are dropped');
+  assert.equal(d.canvas.scope, '', 'an idea never enters the canvas by itself');
+  assert.deepEqual(readRulesDraft(SAMPLE_COMPLAINT).ideas, {});
 });
 
 test('ground: nothing usable means the rules take over', () => {

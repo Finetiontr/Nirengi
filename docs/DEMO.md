@@ -23,6 +23,10 @@ Kenardaki **Demo turu** paneli adımları gerçek durum değişikliklerinden iş
 | 4:10 | `/profil/:kullanici` | Onaylanan aşama profilde Kurum onaylı kanıt olarak görünür; rozetler ve son 10 hafta. |
 | 4:30 | `/gorevler`, `/lig`, `/topluluk`, `/yontem` | Gerçek GitHub “good first issue” görevleri, benzer seviyedeki lig, “İşe yaradı” ile XP kazandıran topluluk. Her sayının kuralı `/yontem`’de. |
 
+## Soru gelirse: eksik alanlara öneri
+
+Jüri “metin eksik olursa?” derse sihirbazda kısa ve belirsiz bir metin yaz (ör. *Kafemizde stok takibini defterle yapıyoruz, sık sık süt ve kahve çekirdeği bitiyor, müşteri kaçırıyoruz.*) → **Taslağa dönüştür**. **Metninden çıkardıklarım** eksik alanların altında “Önerim” gösterir; **Eksikleri tamamla** → sorunun ölçüsü adımında kutuda soluk “Niri’nin önerisi” durur. **Öneriyi kullan** → imleç “…” üzerine gelir, rakamı yaz. “Model metinde olmayanı öneri olarak getirir ama sayı uydurmaz; rakamı kurum yazar.”
+
 ## Yedek senaryo
 
 Canlı akış takılırsa: `/pilotlar/pl-rota` hazır bekler; bir aşama kurum onayı bekliyor. Kurum rolünde **Onayla** → `/profil/canaksoy` yeni Kurum onaylı kanıtı gösterir.
