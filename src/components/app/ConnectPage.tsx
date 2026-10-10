@@ -476,7 +476,9 @@ export default function ConnectPage() {
       const base = slugify(patch.name) || 'genc';
       let handle = base;
       for (let n = 2; taken(handle); n++) handle = `${base}-${n}`;
-      // The example's repositories were never this person's: a real profile starts empty.
+      // Nothing the example did was this person's (work, quests, pilots, posts): it leaves first,
+      // so a real profile starts empty and joins under its own name.
+      if (cur) actions.signOut();
       actions.upsertDemoUser({
         ...patch,
         id: uid('p'),
