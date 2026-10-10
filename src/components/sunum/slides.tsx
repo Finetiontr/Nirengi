@@ -7,11 +7,12 @@
 // The twelve slides follow the flow the organisers recommended and fit the five-minute
 // talk: team, problem, for whom (the focus: young people and the startups that want to work
 // with them), evidence, what we solve (one sentence, the route of five stops that answers
-// the six problems, and the same product in a browser and on a phone), demo (the film),
-// what the AI does (with the open model it runs on), its before and after, the guard
-// against wrong output, design decisions (a game for the genç, a measure for the kurum),
-// done and left, close. After the close an appendix holds the film's eight shots one page
-// each, for questions and for the shared PDF; it is not part of the talk. Numbers come from
+// the six problems, and the same product in a browser and on a phone), demo (the film), the
+// match (the part the jury liked most, on its real screens), what the AI does (with the open
+// model it runs on and its before and after), the guard against wrong output, design
+// decisions (a game for the genç, a measure for the kurum), done (a wall of the real screens,
+// one per problem) and left, close. After the close an appendix holds the film's other shots
+// one page each, for questions and for the shared PDF; it is not part of the talk. Numbers come from
 // docs/PAZAR-ANALIZI.md with their sources on the slide; product numbers from the engine,
 // and the AI slides run a real model answer through the product's own guard. Nothing here
 // is invented: plans are labelled as plans, and people and institutions in the demo are
@@ -535,9 +536,9 @@ function PageBlind() {
       head={['Adaylar isimsiz:', 'önce iş.']}
       problems={['01', '03']}
       points={[
-        ['Kör keşif', 'İsim, yaş, okul, şehir ilk temasa kadar gizli. Kurum problemle arar: “yüksek trafikli dosya dağıtımını çözmüş biri”.'],
-        ['Açık uyum puanı', <>Yaptığı iş {pts('evidence')}, sektör ve ölçek {pts('context')}, zaman {pts('capacity')}, ortak geçmiş {pts('history')} puan. Her parçanın gerekçesi yazar.</>],
-        ['Takipçi değil, ritim', 'Son 10 haftanın kaçında üretim yaptığı sayılır. Kimlik, deneme projesi teklif edilince açılır.'],
+        ['Önce iş, sonra isim', 'İsim, yaş, okul, şehir ilk temasa kadar gizli. Kurum problemle arar; kimlik deneme projesi teklif edilince açılır.'],
+        ['Puan kara kutu değil', <>Yaptığı iş {pts('evidence')}, sektör ve ölçek {pts('context')}, zaman {pts('capacity')}, ortak geçmiş {pts('history')}. Her parçanın neden o kadar olduğu yazar.</>],
+        ['Eşleşmeyen de kazanır', 'Gence eksiği söylenir: “Flutter alanında bir doğrulanmış iş eklersen uyumun 63 → 72 olur.”'],
       ]}
       web={{ src: '/sunum/dk-adaylar.webp', alt: 'Uyan adaylar masaüstünde: Aday 9C03, 86 puan, isim yok', who: 'kurum', route: 'ihtiyaclar/n-rota', mark: { x: 220, y: 235, w: 720, h: 200 } }}
       lift={{ src: '/sunum/lift-neden.webp', alt: 'Neden bu uyum? Yaptığı işin uyumu 41,6/45, sektör ve ölçek 20/20, ayırabileceği zaman 15/15', x: 1178, y: 404, w: 310, css: [390, 547] }}
@@ -674,7 +675,7 @@ function Film() {
   );
 }
 
-// ---------------------------------------------------------------- 7–9. the AI, computed from a real model answer
+// ---------------------------------------------------------------- 8–9. the AI, computed from a real model answer
 
 /** Niri's model on the sample text, through the product's guard; and the rules on the same text. */
 const READ = readModelDraft(SAMPLE_COMPLAINT, SAMPLE_READING)!;
@@ -691,10 +692,16 @@ const sentenceOf = (key: keyof Canvas) => SENTENCES.find((s) => (READ.quotes[key
 
 function AiWhat() {
   const more = filledFields(READ.canvas).length - SHOWN.length;
+  const added: Canvas = { ...READ.canvas, criteria: READ.suggestions.map((s, i) => ({ id: `c${i}`, text: s.text })) };
+  const bars = [
+    { name: 'Kural motoru', a: assessCanvas(RULES.canvas, RULES.skills), tone: 'ink-3' },
+    { name: 'Açık model', a: assessCanvas(READ.canvas, READ.skills), tone: 'indigo' },
+    { name: 'Kurum önerileri ekleyince', a: assessCanvas(added, READ.skills), tone: 'green' },
+  ];
   const card: [string, string][] = [
     ['Nerede', 'Cloudflare Workers AI, günlük ücretsiz kota'],
     ['Nasıl', 'Sabit istem, JSON şeması, sıcaklık 0,1'],
-    ['Neden bu', 'Denediğimiz dört açık model içinde Türkçeyi doğru alana ayıran en hızlısı'],
+    ['Neden bu', 'Denediğimiz dört açık model içinde şemaya uyan, Türkçeyi doğru ayıran en hızlısı'],
     ['Karar', 'Yayın, puan ve sıralama kurallarda; model yalnız okur ve önerir'],
   ];
   return (
@@ -704,13 +711,13 @@ function AiWhat() {
         Niri kurumun kendi sözlerini açık bir modelle okur ve her alanı bir cümleye dayanan ihtiyaç kanvasına çevirir.
       </p>
 
-      <div className="s-in absolute left-[112px] top-[252px] flex w-[960px] items-center" style={d(160)}>
-        <p className="w-[510px] text-[18px] font-bold text-ink-3">Kurumun cümlesi</p>
+      <div className="s-in absolute left-[112px] top-[252px] flex w-[940px] items-center" style={d(160)}>
+        <p className="w-[494px] text-[18px] font-bold text-ink-3">Kurumun cümlesi</p>
         <p className="text-[18px] font-bold text-ink-3">Niri’nin taslağı</p>
       </div>
       {SHOWN.map(([k, label], n) => (
-        <div key={k} className="s-in absolute left-[112px] flex w-[960px] items-center" style={{ top: 292 + n * 124, ...d(260 + n * 180) }}>
-          <p className="w-[440px] rounded-[16px] bg-bg-2 px-[20px] py-[12px] text-[20px] font-semibold leading-[1.35] text-ink-2">“{sentenceOf(k)}”</p>
+        <div key={k} className="s-in absolute left-[112px] flex w-[940px] items-center" style={{ top: 292 + n * 124, ...d(260 + n * 180) }}>
+          <p className="w-[424px] rounded-[16px] bg-bg-2 px-[20px] py-[12px] text-[20px] font-semibold leading-[1.35] text-ink-2">“{sentenceOf(k)}”</p>
           <svg viewBox="0 0 70 24" width="70" height="24" className="shrink-0" aria-hidden="true">
             <path d="M12 12H52M43 4l9 8-9 8" fill="none" stroke="rgb(var(--indigo))" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
@@ -720,58 +727,40 @@ function AiWhat() {
           </div>
         </div>
       ))}
-      <p className="s-in absolute left-[622px] top-[664px] text-[19px] font-semibold text-ink-3" style={d(860)}>
+      <p className="s-in absolute left-[606px] top-[664px] text-[19px] font-semibold text-ink-3" style={d(860)}>
         +{more} alan daha, her biri kendi cümlesiyle.
       </p>
 
       {/* The model, plainly: what it is, where it runs, how it is asked, and what it never decides. */}
-      <aside className="s-in absolute left-[1112px] top-[244px] w-[376px] rounded-[22px] bg-indigo-tint px-[26px] py-[22px]" style={d(420)}>
-        <p className="text-[30px] font-extrabold leading-tight tracking-[-0.02em] text-indigo">Gemma 4 26B</p>
-        <p className="mt-[2px] text-[17px] font-bold text-indigo">Google · ağırlıkları açık · Apache 2.0</p>
-        <dl className="mt-[14px] flex flex-col gap-[12px]">
+      <aside className="s-in absolute left-[1092px] top-[228px] w-[396px] rounded-[22px] bg-indigo-tint px-[24px] py-[16px]" style={d(420)}>
+        <p className="text-[28px] font-extrabold leading-tight tracking-[-0.02em] text-indigo">Gemma 4 26B</p>
+        <p className="mt-[2px] text-[16px] font-bold text-indigo">Google · ağırlıkları açık · Apache 2.0</p>
+        <dl className="mt-[10px] flex flex-col gap-[8px]">
           {card.map(([k, v]) => (
             <div key={k}>
-              <dt className="text-[15px] font-bold text-ink-3">{k}</dt>
-              <dd className="text-[19px] font-semibold leading-[1.3] text-ink">{v}</dd>
+              <dt className="text-[14px] font-bold text-ink-3">{k}</dt>
+              <dd className="text-[17px] font-semibold leading-[1.3] text-ink">{v}</dd>
             </div>
           ))}
         </dl>
       </aside>
-    </>
-  );
-}
 
-function AiDiff() {
-  const added: Canvas = { ...READ.canvas, criteria: READ.suggestions.map((s, i) => ({ id: `c${i}`, text: s.text })) };
-  const bars = [
-    { name: 'Kural motoru', note: `${filledFields(RULES.canvas).length} alan, kriter yok`, a: assessCanvas(RULES.canvas, RULES.skills), tone: 'ink-3' },
-    { name: 'Açık model', note: `${filledFields(READ.canvas).length} alan, ${READ.suggestions.length} kriter önerisi`, a: assessCanvas(READ.canvas, READ.skills), tone: 'indigo' },
-    { name: 'Kurum önerileri ekleyince', note: `${READ.suggestions.length} kriter, “Ekle” ile`, a: assessCanvas(added, READ.skills), tone: 'green' },
-  ];
-  return (
-    <>
-      <Heading width={1300}>Aynı metin: önce kurallar, şimdi model</Heading>
-      <p className="s-in absolute top-[214px] -translate-x-1/2 text-[17px] font-bold text-ink-3" style={{ left: 112 + (1376 * PUBLISH_THRESHOLD) / 100, ...d(100) }}>
-        yayın eşiği {PUBLISH_THRESHOLD}
-      </p>
-      {bars.map((b, n) => (
-        <div key={b.name} className="s-in absolute left-[112px] w-[1376px]" style={{ top: 252 + n * 150, ...d(220 + n * 200) }}>
-          <div className="flex items-end justify-between gap-6">
-            <p className="text-[30px] font-bold leading-none text-ink">
-              {b.name} <span className="ml-[10px] text-[21px] font-semibold text-ink-3">{b.note}</span>
+      {/* Before and after on the same text, scored by the product's own rules. */}
+      <div className="s-in absolute left-[1092px] top-[656px] w-[396px]" style={d(700)}>
+        <p className="text-[16px] font-bold text-ink-3">Aynı metnin netlik puanı · yayın eşiği {PUBLISH_THRESHOLD}</p>
+        {bars.map((b) => (
+          <div key={b.name} className="mt-[10px]">
+            <p className="flex items-baseline justify-between text-[17px] font-bold text-ink">
+              {b.name}
+              <span className="num text-[24px] font-extrabold">{b.a.score}</span>
             </p>
-            <p className="num text-[60px] font-extrabold leading-[0.8] tracking-[-0.04em] text-ink">{b.a.score}</p>
+            <div className="relative mt-[4px] h-[10px] rounded-full bg-bg-3">
+              <div className="h-full rounded-full" style={{ width: `${b.a.score}%`, background: `rgb(var(--${b.tone}))` }} />
+              <span className="absolute top-[-5px] h-[20px] w-[3px] -translate-x-1/2 rounded-full bg-ink" style={{ left: `${PUBLISH_THRESHOLD}%` }} />
+            </div>
           </div>
-          <div className="relative mt-[14px] h-[22px] rounded-full bg-bg-3">
-            <div className="h-full rounded-full" style={{ width: `${b.a.score}%`, background: `rgb(var(--${b.tone}))` }} />
-            <span className="absolute top-[-9px] h-[40px] w-[4px] -translate-x-1/2 rounded-full bg-ink" style={{ left: `${PUBLISH_THRESHOLD}%` }} />
-          </div>
-          <p className={`mt-[10px] text-[20px] font-bold ${b.a.canPublish ? 'text-green-ink' : 'text-ink-3'}`}>{b.a.canPublish ? 'Yayımlanabilir' : 'Yayımlanamaz'}</p>
-        </div>
-      ))}
-      <p className="s-in absolute left-[852px] top-[714px] text-[20px] font-semibold text-ink-3" style={d(900)}>
-        Puanları ürünün kendi netlik kuralları verdi.
-      </p>
+        ))}
+      </div>
     </>
   );
 }
@@ -890,60 +879,36 @@ function Decisions() {
 // ---------------------------------------------------------------- 11. what we finished, what we left on purpose
 
 function Done() {
-  const done = [
-    'Altı problemin altısına çalışan ekran',
-    'GitHub ve DNS ile gerçek doğrulama',
-    'Açık modelle taslak, dört kapılı denetim',
-    'Kör keşif, açık puan, zincirli defter',
-    'Oyunlaştırma, topluluk, haftalık analiz',
-    'Web’de ve telefonda, internetsiz',
-    'Motor 55 otomatik testle sınanıyor',
+  const wall: { code: string; who: 'genc' | 'kurum'; src: string; alt: string }[] = [
+    { code: '02', who: 'genc', src: '/sunum/ph-dogrulandi.webp', alt: 'Profil: GitHub ile doğrulanmış işler' },
+    { code: '05', who: 'kurum', src: '/sunum/kurum-okuma.webp', alt: 'İhtiyaç: Niri kurumun metnini alanlara ayırdı' },
+    { code: '01', who: 'kurum', src: '/sunum/kurum-kesfet.webp', alt: 'Keşif: problemi yaz, isimsiz profiller' },
+    { code: '03', who: 'kurum', src: '/sunum/kurum-neden.webp', alt: 'Eşleşme: neden bu uyum, dört parça' },
+    { code: '06', who: 'kurum', src: '/sunum/kurum-pilot.webp', alt: 'Pilot: aşamalar ve onay bekleyen teslim' },
+    { code: '04', who: 'genc', src: '/sunum/genc-bugun.webp', alt: 'Ağ: gencin haftası, seri ve günün ihtiyaçları' },
   ];
   const left = ['Kalıcı veritabanı', 'Gerçek kullanıcı ve pilot', 'Kod dışı işte makine doğrulaması', 'Bildirim ve mağaza sürümü'];
   const next = ['Kalıcılık', 'İlk ihtiyaç turu', 'Kod dışı doğrulama', 'Pilot raporu'];
   return (
     <>
       <Heading width={1376}>Neyi bitirdik, neyi bilerek bıraktık?</Heading>
-      <div className="s-in absolute left-[112px] top-[214px] w-[640px]" style={d(120)}>
-        <p className="text-[20px] font-bold text-green-ink">Bitti, canlıda çalışıyor</p>
-        <ul className="mt-[16px] flex flex-col gap-[14px]">
-          {done.map((t) => (
-            <li key={t} className="flex items-center gap-[14px] text-[28px] font-bold leading-tight text-ink">
-              <Check size={30} strokeWidth={3.4} className="shrink-0 text-green-ink" />
-              {t}
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div className="s-in absolute left-[848px] top-[214px] w-[640px]" style={d(300)}>
-        <p className="text-[20px] font-bold text-ink-3">Bilerek bıraktık</p>
-        <ul className="mt-[16px] flex flex-col gap-[18px]">
-          {left.map((t) => (
-            <li key={t} className="flex items-center gap-[14px] text-[30px] font-bold leading-tight text-ink-2">
-              <span className="block h-[26px] w-[26px] shrink-0 rounded-full border-[3px] border-dashed border-line-2" />
-              {t}
-            </li>
-          ))}
-        </ul>
-      </div>
-      <Seam top={214} height={290} />
-      <div className="s-in absolute left-[848px] top-[560px] w-[640px]" style={d(480)}>
-        <p className="text-[20px] font-bold text-ink-3">Finalden sonra 4 ay · plan</p>
-        <div className="relative mt-[16px] grid grid-cols-4">
-          <svg viewBox="0 0 640 10" width="640" height="10" className="absolute left-0 top-[20px]" aria-hidden="true">
-            <path d="M40 5H500" stroke="rgb(var(--line-2))" strokeWidth="4" strokeDasharray="2 12" strokeLinecap="round" />
-          </svg>
-          {next.map((t, n) => (
-            <div key={t} className="relative flex flex-col items-start">
-              <span className="rounded-[8px] bg-bg">
-                <Tri size={46} state="waiting">
-                  <span className="text-[17px] font-black leading-none text-ink-3">{n + 1}</span>
-                </Tri>
-              </span>
-              <p className="mt-[8px] pr-[8px] text-[20px] font-bold leading-[1.2] text-ink-2">{t}</p>
-            </div>
-          ))}
-        </div>
+      <p className="s-in absolute left-[112px] top-[176px] flex items-center gap-[10px] text-[22px] font-bold text-green-ink" style={d(80)}>
+        <Check size={24} strokeWidth={3.4} className="shrink-0" />
+        Altı problemin altısı canlıda çalışıyor; motor 55 otomatik testle sınanıyor.
+      </p>
+      {wall.map((w, n) => (
+        <figure key={w.code} className="s-in absolute w-[196px]" style={{ left: 112 + n * 236, top: 226, ...d(160 + n * 90) }}>
+          <Phone src={w.src} alt={w.alt} width={196} />
+          <figcaption className="mt-[10px] text-[16px] font-bold leading-[1.25] text-ink-2">
+            <span className="num text-indigo">{w.code}</span> {PROBLEM[w.code]}
+          </figcaption>
+        </figure>
+      ))}
+      <div className="s-in absolute left-[800px] top-[704px] w-[688px]" style={d(760)}>
+        <p className="text-[17px] font-bold text-ink-3">Bilerek bıraktık</p>
+        <p className="mt-[4px] text-[20px] font-bold leading-[1.3] text-ink-2">{left.join(' · ')}</p>
+        <p className="mt-[12px] text-[17px] font-bold text-ink-3">Finalden sonra 4 ay · plan</p>
+        <p className="mt-[4px] text-[20px] font-bold leading-[1.3] text-ink-2">{next.map((t, i) => `${i + 1}. ${t}`).join('   ')}</p>
       </div>
     </>
   );
@@ -969,16 +934,8 @@ function Close() {
         <Wordmark size={44} />
         <p className="mt-[14px] text-[26px] font-bold text-ink">{SITE}</p>
         <p className="mt-[8px] text-[21px] font-semibold text-ink-2">{TEAM.join(' · ')}</p>
-        <p className="mt-[2px] text-[19px] font-semibold text-ink-3">Açık kaynak, MIT lisanslı</p>
+        <p className="mt-[2px] text-[19px] font-semibold text-ink-3">Açık kaynak, MIT lisanslı · web’de ve telefonda</p>
       </div>
-      {/* The QR opens /uygulama: the jury can put the app on their phones before the questions. */}
-      <figure className="s-in absolute left-[1156px] top-[150px] flex w-[360px] flex-col items-center" style={d(480)}>
-        <img src="/pwa/qr.svg" width={248} height={248} alt="nirengi uygulamasını açan QR kodu" className="rounded-[20px] border-2 border-line bg-white p-[10px]" draggable={false} />
-        <figcaption className="mt-[14px] text-center">
-          <span className="block text-[26px] font-extrabold leading-tight text-ink">Telefonunuza yükleyin</span>
-          <span className="mt-[4px] block text-[19px] font-semibold text-ink-3">Kameranızla okutun; mağaza gerekmez.</span>
-        </figcaption>
-      </figure>
       <SurveyFlag size={96} delay={0.6} className="absolute left-[1478px] top-[694px]" />
     </>
   );
@@ -991,18 +948,17 @@ export const SLIDES: Slide[] = [
   { id: 'kanit', title: 'Kanıt', mark: 'dock', niri: { mood: 'think', gear: 1, line: 'Rakamları uydurmadım; kaynakları altında.' }, View: Evidence },
   { id: 'cozum', title: 'Ne çözüyoruz', mark: 'dock', niri: { mood: 'cheer', gear: 1, line: 'Beş durak, altı problem. Tarayıcıda da cebinde de.' }, View: Solution },
   { id: 'demo', title: 'Tanıtım filmi', mark: 'dock', bare: true, niri: { mood: 'cheer', gear: 2, line: 'Sahne benim! Ürünü telefonda göstereyim.' }, View: Film },
+  { id: 'eslesme', title: 'Eşleşme', mark: 'dock', niri: { mood: 'think', gear: 2, line: 'İsmi değil, işi tartarım.' }, View: PageBlind },
   { id: 'yz-ne', title: 'Yapay zekâ ne yapıyor', mark: 'dock', niri: { mood: 'talk', gear: 2, line: 'Derdini yaz, ben okuyayım. Uydurmam.' }, View: AiWhat },
-  { id: 'yz-fark', title: 'Önce ve sonra', mark: 'dock', niri: { mood: 'happy', gear: 3, line: 'Aynı metinden daha dolu bir taslak.' }, View: AiDiff },
   { id: 'yz-onlem', title: 'Hatalı çıktıya karşı', mark: 'dock', niri: { mood: 'think', gear: 3, line: 'Metinde yoksa almam, sorarım.' }, View: AiGuard },
   { id: 'tasarim', title: 'Tasarım kararları', mark: 'dock', niri: { mood: 'cheer', gear: 3, line: 'Gence oyun, kuruma sakin bir ölçüm.' }, View: Decisions },
   { id: 'bitti', title: 'Bitti ve bırakılan', mark: 'dock', niri: { mood: 'happy', gear: 3, line: 'Prototipim çalışıyor. Gerisini pilotta kanıtlayacağım.' }, View: Done },
-  { id: 'kapanis', title: 'Teşekkürler', mark: 'hero', niri: { mood: 'wave', gear: 4, turns: 2, line: 'Zirvedeyim! Beni telefonunuza alın, haritada görüşmek üzere.' }, View: Close },
+  { id: 'kapanis', title: 'Teşekkürler', mark: 'hero', niri: { mood: 'wave', gear: 4, turns: 2, line: 'Zirvedeyim! İlk noktayı birlikte koyalım.' }, View: Close },
   { id: 'ek-dogrulama', title: 'İşin, kaynağında doğrulanır', mark: 'dock', extra: true, niri: { mood: 'happy', gear: 4, line: 'İşin nerede duruyorsa oradan doğrularım.' }, View: PageVerified },
   { id: 'ek-xp', title: 'XP yalnız gerçek işten', mark: 'dock', extra: true, niri: { mood: 'cheer', gear: 4, line: 'Puan değil makbuz: her XP bir iş.' }, View: PageXp },
   { id: 'ek-analiz', title: 'Eksiğini gör', mark: 'dock', extra: true, niri: { mood: 'think', gear: 4, line: 'Her hafta nerede güçlü olduğunu söylerim.' }, View: PageInsight },
   { id: 'ek-topluluk', title: 'Gençler birbirine yardım eder', mark: 'dock', extra: true, niri: { mood: 'happy', gear: 4, line: 'Burada yardım eden de kazanır.' }, View: PageCommunity },
   { id: 'ek-ihtiyac', title: 'Kurum derdini yazar', mark: 'dock', extra: true, niri: { mood: 'talk', gear: 4, line: 'Derdini anlat, alanları ben doldururum.' }, View: PageNeed },
-  { id: 'ek-aday', title: 'Adaylar isimsiz', mark: 'dock', extra: true, niri: { mood: 'think', gear: 4, line: 'İsmi değil, işi tartarım.' }, View: PageBlind },
   { id: 'ek-defter', title: 'İki onay, zincirli kayıt', mark: 'dock', extra: true, niri: { mood: 'cheer', gear: 4, line: 'İki imza, bir mühür. Sonradan kimse değiştiremez.' }, View: PageLedger },
   { id: 'ek-donus', title: 'Onay, gencin kanıtı olur', mark: 'dock', extra: true, niri: { mood: 'happy', gear: 4, line: 'Onaylanan iş, haritanda yeni bir nokta.' }, View: PageReturn },
 ];

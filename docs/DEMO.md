@@ -34,7 +34,7 @@ Jüri “yalnız yazılımcılar için mi?” derse: `/profil/eceyildiz` (animas
 
 ## Soru gelirse: mobil uygulama
 
-Jüri “telefonda var mı?” derse: kapanış slaytındaki QR’ı okutsunlar ya da telefonda nirengi simgesini aç. İlk açılış “Kim olarak giriyorsun?” diye sorar; sonra doğrudan o tarafa gider. Uçak modunu açıp bir sayfa daha aç: “Sayfalar ve veri telefonda; internet yokken de çalışır.” Android’de Behance ya da YouTube’da bir işi **Paylaş → nirengi** ile gönder: “Eser ekle” ekranı bağlantı ve başlıkla dolu açılır. “Mağaza yerine PWA seçtik: aynı kod, sıfır maliyet, inceleme beklemeden. Bildirim yok, bilerek.”
+Jüri “telefonda var mı?” derse: ana sayfanın sonundaki QR’ı okutsunlar ya da telefonda nirengi simgesini aç. İlk açılış “Kim olarak giriyorsun?” diye sorar; sonra doğrudan o tarafa gider. Uçak modunu açıp bir sayfa daha aç: “Sayfalar ve veri telefonda; internet yokken de çalışır.” Android’de Behance ya da YouTube’da bir işi **Paylaş → nirengi** ile gönder: “Eser ekle” ekranı bağlantı ve başlıkla dolu açılır. “Mağaza yerine PWA seçtik: aynı kod, sıfır maliyet, inceleme beklemeden. Bildirim yok, bilerek.”
 
 ## Yedek senaryo
 

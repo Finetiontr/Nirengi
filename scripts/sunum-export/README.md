@@ -15,7 +15,7 @@ node_modules/playwright>`; `CHROME_PATH` for a specific browser), Python with
 ```sh
 cd scripts/sunum-export
 L="$TEMP/nirengi-sunum-layers"; O="$USERPROFILE/Documents/Nirengi-sunum"
-MSYS_NO_PATHCONV=1 node capture.mjs --out "$L"   # 20 slides, ~65 s
+MSYS_NO_PATHCONV=1 node capture.mjs --out "$L"   # 19 slides, ~60 s
 python build.py "$L" "$O"                         # writes the .pptx and .pdf
 python verify.py "$L" "$O"                        # checks + pixel diff + contact.png in $L
 ```

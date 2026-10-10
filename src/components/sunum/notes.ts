@@ -59,19 +59,20 @@ export const NOTES: Record<string, Note> = {
       'Film açılmazsa slayt kendiliğinden canlı demo paneline döner; Sunum klasöründeki mp4 de yedekte.',
     ],
   },
-  'yz-ne': {
-    sec: 22,
+  eslesme: {
+    sec: 25,
     say: [
-      'Filmdeki yapay zekâ adımı şu: kurum derdini kendi sözleriyle yazıyor.',
-      'Açık ağırlıklı bir model, Gemma 4, metni yedi alanlı kanvasa çeviriyor; her alan metindeki bir cümleye dayanıyor: “ayda 6.000 arama” sorunun ölçüsü oluyor.',
-      'Modeli açık olduğu, ücretsiz kotada çalıştığı ve denediğimiz dört model içinde Türkçeyi en iyi ayırdığı için seçtik. Yayın kararı ve puanlar kurallarda.',
+      'Jürinin en çok sorduğu yer: eşleşme. Kurum adayları isimsiz görüyor: Aday 9C03, iki Kurum onaylı iş, 86 puan.',
+      'Puan kara kutu değil: dört parçası ve ağırlıkları açık, her parçanın gerekçesi “Neden bu uyum?” ekranında yazıyor. Kimlik ancak deneme projesi teklif edilince açılıyor.',
+      'Eşleşmeyen genç de boş dönmüyor: hangi işi eklerse hangi ihtiyaca yaklaşacağını görüyor; Flutter’da bir iş eklerse 63’ten 72’ye.',
     ],
   },
-  'yz-fark': {
-    sec: 16,
+  'yz-ne': {
+    sec: 25,
     say: [
-      'Aynı metni kural motorumuz da okuyor: beş alan, netlik 60, yayımlanamaz.',
-      'Model yedi alanı dolduruyor ve iki ölçülebilir kriter öneriyor: 75. Kurum önerileri ekleyince 100. Bu sayıları ürünün kendi kuralları hesaplıyor.',
+      'Yapay zekâ ne yapıyor? Kurum derdini kendi sözleriyle yazıyor; açık ağırlıklı bir model, Gemma 4, metni yedi alanlı kanvasa çeviriyor. Her alan metindeki bir cümleye dayanıyor: “ayda 6.000 arama” sorunun ölçüsü oluyor.',
+      'Farkı sağ altta: aynı metni kural motoru okuyunca netlik 60, yayımlanamıyor; modelle 75, kurum önerileri ekleyince 100. Bu sayıları ürünün kendi kuralları hesaplıyor.',
+      'Gemma’yı açık olduğu, ücretsiz kotada çalıştığı ve denediğimiz dört model içinde Türkçeyi en iyi ayırdığı için seçtik. Yayın kararı ve puanlar kurallarda.',
     ],
   },
   'yz-onlem': {
@@ -93,7 +94,7 @@ export const NOTES: Record<string, Note> = {
   bitti: {
     sec: 22,
     say: [
-      'Gördüğünüz her şey canlıda çalışıyor: altı problemin altısına bir ekran, gerçek GitHub ve DNS doğrulaması, açık modelle taslak; motor 55 testle sınanıyor.',
+      'Bunların hepsi canlıda çalışıyor: her problemin kendi ekranı var, ekrandakiler ürünün gerçek görüntüleri. GitHub ve DNS doğrulaması gerçek, motor 55 testle sınanıyor.',
       'Bilerek bıraktıklarımız: kalıcı veritabanı, gerçek kullanıcı ve pilot, kod dışı işte makine doğrulaması, bildirim ve mağaza sürümü.',
       'Finalden sonraki dört ay: kalıcılık, ilk ihtiyaç turu, kod dışı doğrulama ve pilot raporu.',
     ],
@@ -102,7 +103,6 @@ export const NOTES: Record<string, Note> = {
     sec: 14,
     say: [
       'Tek bir isteğimiz var: bu salondan bir girişimin ya da kurumun gerçek bir ihtiyacı. İlk kanvası birlikte yazalım.',
-      'Ekrandaki kodu okutursanız Nirengi şimdi telefonunuza gelir.',
       'Beyan değil, kanıt. Teşekkürler.',
     ],
   },
@@ -139,13 +139,6 @@ export const NOTES: Record<string, Note> = {
     say: [
       '(Ek sayfa: “Kurum ihtiyacı nasıl yazıyor?” gelirse.) Kurum derdini düz metinle anlatır; Niri yedi alanlı kanvasa çevirir.',
       'Netlik 70’in altındaysa ihtiyaç yayımlanmaz; benzer ihtiyaçların sonucu aynı ekranda.',
-    ],
-  },
-  'ek-aday': {
-    sec: 0,
-    say: [
-      '(Ek sayfa: “Eşleşme nasıl?” gelirse.) Aday isimsiz: isim, yaş, okul, şehir ilk temasa kadar gizli.',
-      'Puan dört parça: yaptığı iş 45, sektör ve ölçek 20, zaman 15, ortak geçmiş 20; her parçanın gerekçesi yazar.',
     ],
   },
   'ek-defter': {
@@ -225,7 +218,7 @@ export const QA: Answer[] = [
   {
     q: 'Mobil uygulama var mı?',
     say: [
-      'Var. Nirengi bir web uygulaması (PWA): QR’ı okutup Uygulamayı yükle’ye dokununca ana ekrana gelir, tam ekran açılır ve sayfaları telefonda tuttuğu için internetsiz de çalışır.',
+      'Var. Nirengi bir web uygulaması (PWA): adresi telefonda açıp ya da ana sayfadaki QR’ı okutup Uygulamayı yükle’ye dokununca ana ekrana gelir, tam ekran açılır ve sayfaları telefonda tuttuğu için internetsiz de çalışır.',
       'Android’de paylaş menüsünden Behance ya da YouTube bağlantısı doğrudan eser olarak gelir; simgeye basılı tutunca Bugün, Eser ekle, İhtiyaç yaz kısayolları çıkar.',
       'Mağaza yerine bunu seçtik: iki gün içinde, sıfır maliyetle, tek kodla hem gence hem kuruma. Bildirim göndermiyoruz; kalıcı sunucu gelince sıradaki iş o.',
     ],

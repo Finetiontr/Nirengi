@@ -1,10 +1,10 @@
 # Sunum notları
 
-*Zemin360 finali · 12 slayt · planlanan süre 4:12 (film 0:48, konuşma 3:24)*
+*Zemin360 finali · 12 slayt · planlanan süre 4:24 (film 0:48, konuşma 3:36)*
 
 Bu dosya `src/components/sunum/notes.ts` dosyasından üretildi; notları orada düzeltin. Sunum sırasında aynı notlar konuşmacı penceresinde görünür: sunumda **N** tuşu ya da `/sunum?notlar` adresi. Pencere sunumu izler, ok tuşlarıyla sunumu yönetir, **R** süreyi sıfırlar.
 
-Konuşma, organizasyonun önerdiği 12 adımı izler ve beş dakikaya sığar. 5. slayt ne çözdüğümüzü (beş durak, altı problem) ve ürünün bir web sitesi olduğunu (tarayıcıda ve telefona yüklü) gösterir; 6. slaytta tanıtım filmi müziğiyle oynar, Niri ve sayaç o sırada çekilir. Kapanıştan sonra konuşmanın dışında sekiz ek sayfa var: filmin her sahnesi gerçek ekranı ve üç mekanizmasıyla; soru gelince açılır, paylaşılan PDF’te de durur. Kısa cevaplar aşağıda ve kapanıştan itibaren konuşmacı penceresinde.
+Konuşma, organizasyonun önerdiği 12 adımı izler ve beş dakikaya sığar. 5. slayt ne çözdüğümüzü (beş durak, altı problem) ve ürünün bir web sitesi olduğunu (tarayıcıda ve telefona yüklü) gösterir; 6. slaytta tanıtım filmi müziğiyle oynar, Niri ve sayaç o sırada çekilir; 7. slayt jürinin en sevdiği eşleşmeyi gerçek ekranıyla açar; 11. slayt her problemden bir gerçek ekranla bitenleri gösterir. Kapanıştan sonra konuşmanın dışında 7 ek sayfa var: filmin öbür sahneleri gerçek ekranı ve üç mekanizmasıyla; soru gelince açılır, paylaşılan PDF’te de durur. Kısa cevaplar aşağıda ve kapanıştan itibaren konuşmacı penceresinde.
 
 Slaytlardaki her sayı `docs/PAZAR-ANALIZI.md` içindeki kaynağıyla birlikte slaytın üzerinde yazar ya da ürünün kendi kodundan gelir (XP tablosu, uyum ağırlıkları, kanıt düzeylerinin ağırlığı, yayın eşiği); yapay zekâ slaytlarındaki sonuçları ürünün kendi kodu, gerçek bir model cevabıyla hesaplar. Planlar plan olarak etiketli; kullanıcı, pilot ya da gelir rakamı yok.
 
@@ -55,24 +55,25 @@ Slaytlardaki her sayı `docs/PAZAR-ANALIZI.md` içindeki kaynağıyla birlikte s
 - Ses gelmezse filme bir kez tıkla.
 - Film açılmazsa slayt kendiliğinden canlı demo paneline döner; Sunum klasöründeki mp4 de yedekte.
 
-## 7. Yapay zekâ ne yapıyor
+## 7. Eşleşme
 
-*2:16 – 2:38 · Niri: “Derdini yaz, ben okuyayım. Uydurmam.”*
+*2:16 – 2:41 · Niri: “İsmi değil, işi tartarım.”*
 
-- Filmdeki yapay zekâ adımı şu: kurum derdini kendi sözleriyle yazıyor.
-- Açık ağırlıklı bir model, Gemma 4, metni yedi alanlı kanvasa çeviriyor; her alan metindeki bir cümleye dayanıyor: “ayda 6.000 arama” sorunun ölçüsü oluyor.
-- Modeli açık olduğu, ücretsiz kotada çalıştığı ve denediğimiz dört model içinde Türkçeyi en iyi ayırdığı için seçtik. Yayın kararı ve puanlar kurallarda.
+- Jürinin en çok sorduğu yer: eşleşme. Kurum adayları isimsiz görüyor: Aday 9C03, iki Kurum onaylı iş, 86 puan.
+- Puan kara kutu değil: dört parçası ve ağırlıkları açık, her parçanın gerekçesi “Neden bu uyum?” ekranında yazıyor. Kimlik ancak deneme projesi teklif edilince açılıyor.
+- Eşleşmeyen genç de boş dönmüyor: hangi işi eklerse hangi ihtiyaca yaklaşacağını görüyor; Flutter’da bir iş eklerse 63’ten 72’ye.
 
-## 8. Önce ve sonra
+## 8. Yapay zekâ ne yapıyor
 
-*2:38 – 2:54 · Niri: “Aynı metinden daha dolu bir taslak.”*
+*2:41 – 3:06 · Niri: “Derdini yaz, ben okuyayım. Uydurmam.”*
 
-- Aynı metni kural motorumuz da okuyor: beş alan, netlik 60, yayımlanamaz.
-- Model yedi alanı dolduruyor ve iki ölçülebilir kriter öneriyor: 75. Kurum önerileri ekleyince 100. Bu sayıları ürünün kendi kuralları hesaplıyor.
+- Yapay zekâ ne yapıyor? Kurum derdini kendi sözleriyle yazıyor; açık ağırlıklı bir model, Gemma 4, metni yedi alanlı kanvasa çeviriyor. Her alan metindeki bir cümleye dayanıyor: “ayda 6.000 arama” sorunun ölçüsü oluyor.
+- Farkı sağ altta: aynı metni kural motoru okuyunca netlik 60, yayımlanamıyor; modelle 75, kurum önerileri ekleyince 100. Bu sayıları ürünün kendi kuralları hesaplıyor.
+- Gemma’yı açık olduğu, ücretsiz kotada çalıştığı ve denediğimiz dört model içinde Türkçeyi en iyi ayırdığı için seçtik. Yayın kararı ve puanlar kurallarda.
 
 ## 9. Hatalı çıktıya karşı
 
-*2:54 – 3:14 · Niri: “Metinde yoksa almam, sorarım.”*
+*3:06 – 3:26 · Niri: “Metinde yoksa almam, sorarım.”*
 
 - Model yanılırsa? Cevabı dört kapıdan geçiyor: şema, alıntı, sayı, ölçülebilirlik.
 - Model “Genel Müdür onaylar” diye uydurursa, bu cümle metinde olmadığı için alan boş kalır; Niri kuruma sorar.
@@ -80,7 +81,7 @@ Slaytlardaki her sayı `docs/PAZAR-ANALIZI.md` içindeki kaynağıyla birlikte s
 
 ## 10. Tasarım kararları
 
-*3:14 – 3:36 · Niri: “Gence oyun, kuruma sakin bir ölçüm.”*
+*3:26 – 3:48 · Niri: “Gence oyun, kuruma sakin bir ölçüm.”*
 
 - Tasarımın tek fikri: gence oyun, kuruma ölçüm.
 - Genç her hafta hedef, seri ve ligle geri geliyor; ama her XP bir iş makbuzu. Gençler birbirine de yardım ediyor, yardım eden XP kazanıyor. Niri her hafta en yakın kapıyı gösteriyor.
@@ -88,18 +89,17 @@ Slaytlardaki her sayı `docs/PAZAR-ANALIZI.md` içindeki kaynağıyla birlikte s
 
 ## 11. Bitti ve bırakılan
 
-*3:36 – 3:58 · Niri: “Prototipim çalışıyor. Gerisini pilotta kanıtlayacağım.”*
+*3:48 – 4:10 · Niri: “Prototipim çalışıyor. Gerisini pilotta kanıtlayacağım.”*
 
-- Gördüğünüz her şey canlıda çalışıyor: altı problemin altısına bir ekran, gerçek GitHub ve DNS doğrulaması, açık modelle taslak; motor 55 testle sınanıyor.
+- Bunların hepsi canlıda çalışıyor: her problemin kendi ekranı var, ekrandakiler ürünün gerçek görüntüleri. GitHub ve DNS doğrulaması gerçek, motor 55 testle sınanıyor.
 - Bilerek bıraktıklarımız: kalıcı veritabanı, gerçek kullanıcı ve pilot, kod dışı işte makine doğrulaması, bildirim ve mağaza sürümü.
 - Finalden sonraki dört ay: kalıcılık, ilk ihtiyaç turu, kod dışı doğrulama ve pilot raporu.
 
 ## 12. Teşekkürler
 
-*3:58 – 4:12 · Niri: “Zirvedeyim! Beni telefonunuza alın, haritada görüşmek üzere.”*
+*4:10 – 4:24 · Niri: “Zirvedeyim! İlk noktayı birlikte koyalım.”*
 
 - Tek bir isteğimiz var: bu salondan bir girişimin ya da kurumun gerçek bir ihtiyacı. İlk kanvası birlikte yazalım.
-- Ekrandaki kodu okutursanız Nirengi şimdi telefonunuza gelir.
 - Beyan değil, kanıt. Teşekkürler.
 
 ## Ek sayfalar (konuşmanın dışında)
@@ -129,17 +129,12 @@ Slaytlardaki her sayı `docs/PAZAR-ANALIZI.md` içindeki kaynağıyla birlikte s
 - (Ek sayfa: “Kurum ihtiyacı nasıl yazıyor?” gelirse.) Kurum derdini düz metinle anlatır; Niri yedi alanlı kanvasa çevirir.
 - Netlik 70’in altındaysa ihtiyaç yayımlanmaz; benzer ihtiyaçların sonucu aynı ekranda.
 
-### Ek 6. Adaylar isimsiz
-
-- (Ek sayfa: “Eşleşme nasıl?” gelirse.) Aday isimsiz: isim, yaş, okul, şehir ilk temasa kadar gizli.
-- Puan dört parça: yaptığı iş 45, sektör ve ölçek 20, zaman 15, ortak geçmiş 20; her parçanın gerekçesi yazar.
-
-### Ek 7. İki onay, zincirli kayıt
+### Ek 6. İki onay, zincirli kayıt
 
 - (Ek sayfa: “Pilot nasıl takip ediliyor?” gelirse.) Kriterler aşamaya dönüşür; genç teslim eder, kurum onaylar.
 - Her kaydın özeti bir sonrakine yazılır; sonradan tek harf değişirse zincir o kayıtta kırılır.
 
-### Ek 8. Onay, gencin kanıtı olur
+### Ek 7. Onay, gencin kanıtı olur
 
 - (Ek sayfa: “Pilot bitince ne oluyor?” gelirse.) Onaylanan aşama gencin profiline Kurum onaylı kanıt olarak geçer, imzalayanıyla.
 - Kapanan projenin özeti herkese açık bir sayfada kalır; genç bir sonraki ihtiyaca daha yakındır.
@@ -185,7 +180,7 @@ Slaytlardaki her sayı `docs/PAZAR-ANALIZI.md` içindeki kaynağıyla birlikte s
 
 ### Mobil uygulama var mı?
 
-- Var. Nirengi bir web uygulaması (PWA): QR’ı okutup Uygulamayı yükle’ye dokununca ana ekrana gelir, tam ekran açılır ve sayfaları telefonda tuttuğu için internetsiz de çalışır.
+- Var. Nirengi bir web uygulaması (PWA): adresi telefonda açıp ya da ana sayfadaki QR’ı okutup Uygulamayı yükle’ye dokununca ana ekrana gelir, tam ekran açılır ve sayfaları telefonda tuttuğu için internetsiz de çalışır.
 - Android’de paylaş menüsünden Behance ya da YouTube bağlantısı doğrudan eser olarak gelir; simgeye basılı tutunca Bugün, Eser ekle, İhtiyaç yaz kısayolları çıkar.
 - Mağaza yerine bunu seçtik: iki gün içinde, sıfır maliyetle, tek kodla hem gence hem kuruma. Bildirim göndermiyoruz; kalıcı sunucu gelince sıradaki iş o.
 
