@@ -158,6 +158,7 @@ src/
     genc/              genç yüzü: Bugün, Şimdi şeridi, görevler, lig, topluluk, analiz, Saha defteri
     kurum/             kurum yüzü: ana sayfa, haftalık özet
     app/               ortak uygulama ekranları (kanıt bağla, ihtiyaç, pilot, profil, keşif, özet kart)
+      connect/         Kanıt bağla'nın adımları: GitHub yolu, her alandan iş, hedef ve bitiş
     assistant/         Niri: karşılama, turlar, yardım
     shell/             menü, hesap, rol anahtarı, alt bilgi, uygulamayı yükle
     sunum/             uygulama içi sunum destesi

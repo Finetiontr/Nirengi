@@ -40,8 +40,6 @@ const SEG = {
 };
 // Home: "/" exactly, only in link positions.
 const HOME = /((?:href|location\.href)\s*[:=]\s*|assign\()(["'`])\/\2/g;
-// Absolute canonical links (Astro's redirect pages) are built from the site's origin alone.
-const CANON = /(<link rel="canonical" href="https?:\/\/[^/"]+)(\/[^"]*)"/g;
 
 let files = 0;
 let hits = 0;
@@ -52,8 +50,7 @@ for (const f of walk(OUT)) {
   let n = 0;
   const out = src
     .replace(seg, (_, q, h) => (n++, `${q}${BASE}/${h}`))
-    .replace(HOME, (_, pre, q) => (n++, `${pre}${q}${BASE}/${q}`))
-    .replace(CANON, (all, origin, path) => (path.startsWith(`${BASE}/`) || !f.endsWith('.html') ? all : (n++, `${origin}${BASE}${path}"`)));
+    .replace(HOME, (_, pre, q) => (n++, `${pre}${q}${BASE}/${q}`));
   if (n) {
     writeFileSync(f, out);
     files++;

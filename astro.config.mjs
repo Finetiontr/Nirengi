@@ -8,9 +8,8 @@ import tailwindcss from '@tailwindcss/vite';
 const pages = process.env.PAGES === '1';
 
 export default defineConfig({
-  site: pages ? 'https://finetiontr.github.io' : 'https://nirengi.app',
   integrations: [react()],
   devToolbar: { enabled: false },
-  ...(pages ? { output: 'static', outDir: 'dist-pages', build: { format: 'file' } } : { output: 'server', adapter: node({ mode: 'standalone' }) }),
+  ...(pages ? { site: 'https://finetiontr.github.io', output: 'static', outDir: 'dist-pages', build: { format: 'file' } } : { output: 'server', adapter: node({ mode: 'standalone' }) }),
   vite: { plugins: [tailwindcss()] },
 });
