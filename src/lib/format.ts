@@ -1,3 +1,5 @@
+// Small shared helpers: dates and relative time in Turkish, ids and slugs, initials, blind codes.
+
 import { sha256 } from './engine/ledger.ts';
 
 const DAY = 86_400_000;

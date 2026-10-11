@@ -212,7 +212,7 @@ components:
 <!-- Source of truth: src/styles/global.css. Tokens are RGB channels (light on
      :root, dark on [data-theme="dark"]) mapped to Tailwind colours in
      @theme inline. Hex values above are the light theme; dark values are in
-     .impeccable/design.json → extensions.colorMeta.*.dark.
+     the [data-theme="dark"] block of global.css.
      Round 2 ("Pafta", 2026-10-08) replaced the round-1 "Pressable Road". -->
 
 ## Overview

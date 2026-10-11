@@ -1,3 +1,5 @@
+// Turkish display labels for the domain enums in types.ts and the S1–S3 verification ladder.
+
 import type { Availability, ConstraintKind, EvidenceSource, Level, NeedStatus, PilotStatus, Scale, Sector } from './types.ts';
 
 export const SECTOR: Record<Sector, string> = {

@@ -1,3 +1,4 @@
+// The pure engine (src/lib/engine) on the seeded demo world: ledger, matching, canvas, progress, analysis.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';

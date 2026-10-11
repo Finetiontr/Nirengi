@@ -1,3 +1,5 @@
+// The genç pages' right rail on wide screens: this week's progress, league place, quests and Saha defteri.
+
 import { currentMe, useAppState } from '../../lib/store.ts';
 import { league, progress, questsFor, TIERS, XP } from '../../lib/engine/progress.ts';
 import { Bolt, Flame, Shield } from '../ui/icons';

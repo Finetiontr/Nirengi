@@ -1,3 +1,5 @@
+// A nav item's icon name mapped to its drawn icon.
+
 import type { NavItem } from './nav';
 import { Book, Bubbles, Building, Clipboard, Compass, Face, Flag, Home, Route, Scope, Shield } from '../ui/icons';
 

@@ -1,3 +1,6 @@
+// Shared UI primitives: verification badges, avatars that stay blind until first contact,
+// score meters, page head, modal, empty and loading states.
+
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import type { Level, Person } from '../../lib/types.ts';
 import { LEVELS } from '../../lib/labels.ts';

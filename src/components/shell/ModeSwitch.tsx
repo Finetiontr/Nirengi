@@ -1,3 +1,5 @@
+// The genç ↔ kurum switch in the top bar.
+
 import { setView, useView } from '../../lib/store.ts';
 import { HOME, type Mode } from './nav';
 

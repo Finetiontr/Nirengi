@@ -8,10 +8,10 @@
 
 ![Niri kurumun metnini açık bir modelle okur; her alan metindeki bir cümleye dayanır](docs/nirengi-demo.gif)
 
-- **Tanıtım filmi:** [90 saniye, müzikli](https://finetiontr.github.io/Nirengi/sunum/nirengi-film.mp4); nirengi’yi ürünün gerçek ekranlarıyla, masaüstü tarayıcıda önce gencin, sonra kurumun gözünden gösterir: her alandan genç işini bağlar ve deneyimi ölçülebilir bir değere (deneyim puanı) dönüşür, Niri eksiğini söyler; kurum case’ini yazar, Niri açık modelle okur, adaylar isimsiz ve referanssız ölçülür, en uyumlusu deneme projesinde çözer ve onaylanan iş profiline döner. Sunumda canlı demo olarak oynar. Müziği kodla bestelendi, lisansı bize ait. Uzun anlatım: [79 saniye, sessiz](https://finetiontr.github.io/Nirengi/sunum/nirengi-tanitim-web.mp4), Niri ekranları telefonda gezdirir.
+- **Tanıtım filmi:** [90 saniye, müzikli](https://finetiontr.github.io/Nirengi/sunum/nirengi-film.mp4). Ürünün gerçek ekranları, önce gencin sonra kurumun gözünden: genç işini bağlar, deneyimi ölçülebilir bir değere (deneyim puanı) dönüşür; kurum case’ini yazar, Niri açık modelle okur, adaylar isimsiz ölçülür, en uyumlusu deneme projesinde çözer ve onaylanan iş profiline döner. Müziği kodla bestelendi, lisansı bize ait. Telefonda uzun anlatım: [79 saniye, sessiz](https://finetiontr.github.io/Nirengi/sunum/nirengi-tanitim-web.mp4).
 - **Canlı:** https://finetiontr.github.io/Nirengi/ (kurulum gerekmez; veri tarayıcıda tutulur)
 - **Telefona yükle:** [`/uygulama`](https://finetiontr.github.io/Nirengi/uygulama) ya da ana sayfanın sonundaki QR kodu. Mağaza gerekmez: Android’de tek dokunuşla, iPhone’da Paylaş → Ana Ekrana Ekle ile yüklenir; ana ekrandan tam ekran açılır, internetsiz de çalışır.
-- **Sunum:** [`/sunum`](https://finetiontr.github.io/Nirengi/sunum), uygulamanın içinde 12 slaytlık deste; konuşan ekiptir, Niri sessizdir: her slaytta iki üç kısa balon, konuşmacının sıradaki cümlesinin başlığı olarak kendiliğinden ilerler, ekip yalnız sayfa değiştirir (→). Omurga: kurum gerçek bir case verir, genç onu gerçekten çözer; film canlı demo olarak oynar, yapay zekâ slaytları açık modeli, verinin nerede kaldığını ve önce/sonra farkını gösterir; kapanıştan sonra filmin her sahnesi gerçek ekranıyla ek sayfa olarak durur. Yapay zekâ slaytları ürünün kendi denetimini gerçek bir model cevabı üzerinde çalıştırır
+- **Sunum:** [`/sunum`](https://finetiontr.github.io/Nirengi/sunum), uygulamanın içinde 12 slaytlık deste. Konuşan ekiptir; Niri her slaytta iki üç kısa balonla konuşmacının sıradaki cümlesini haber verir. Altıncı slaytta film canlı demo olarak oynar; yapay zekâ slaytları ürünün kendi denetimini gerçek bir model cevabı üzerinde çalıştırır. Kapanıştan sonra filmin her sahnesi gerçek ekranıyla ek sayfa olarak durur.
 - **Sahne akışı:** [`docs/DEMO.md`](docs/DEMO.md), 5 dakikalık demo ve yedek senaryo
 
 ## Çözdüğü problem
@@ -23,7 +23,7 @@ Kurumlar ihtiyacını net tanımlayamıyor, gençler ise ürettiklerini kanıtla
 | 01 | Genç yeteneklerin keşfi | Kör keşif (isim/yaş/okul gizli), problemle arama, takipçiden bağımsız yükselen sinyal | `/kesfet` |
 | 02 | Profil & portfolyo doğruluğu | S1/S2/S3 Doğrulama Merdiveni; **her alandan iş**: GitHub uygulamasıyla seçilen depolar (özel depolar dahil) doğrulanır, LinkedIn, Behance, ArtStation, YouTube gibi profiller ve eser bağlantıları Beyan olarak eklenir; DNS TXT doğrulaması, kopya eser tespiti, şeffaf itiraz | `/kanit-bagla`, `/profil/:kullanici` |
 | 03 | Kurum–kişi eşleşmesi | Dört bileşenli açıklanabilir skor, gerekçe kartı, eksik kanıt geri bildirimi, takım kompozisyonu | `/ihtiyaclar/:id#adaylar` |
-| 04 | Yaşayan bir ağ | Olay akışı, bağlantı sağlığı ve somut sebepli yeniden temas, mikro-etkileşimler, çeyreklik ihtiyaç turu; **telefona yüklenen uygulama**: ana ekrandan açılır, internetsiz çalışır, Android’de paylaş menüsünden eser ekler; **gerçek kullanım sayacı**: GitHub ile gerçekten bağlanan kişileri ve modelin okuduğu kurum metinlerini kişisel veri tutmadan sayar | `/nabiz`, `/uygulama`, `/yontem#veri` |
+| 04 | Yaşayan bir ağ | Olay akışı, bağlantı sağlığı ve somut sebepli yeniden temas, mikro-etkileşimler, çeyreklik ihtiyaç turu; **telefona yüklenen uygulama**: ana ekrandan açılır, internetsiz çalışır, Android’de paylaş menüsünden eser ekler; **gerçek kullanım sayacı**: GitHub ile gerçekten bağlanan kişileri ve modelin okuduğu kurum metinlerini kişisel veri tutmadan sayar | `/topluluk`, `/uygulama`, `/yontem#veri` |
 | 05 | İhtiyaçların net tanımı | Yedi alanlı İhtiyaç Kanvası, kurumun kendi sözlerinden **yapay zekâ taslağı** (her alan metindeki cümlesine dayanır), önerilen başarı kriterleri, çözülebilirlik skoru, yayın eşiği, ekosistem hafızası | `/ihtiyaclar/yeni` |
 | 06 | Şeffaf iş birliği takibi | Kriterden doğan kilometre taşları, çift onay, SHA-256 zincirli defter, sessizlik göstergesi, adil kapanış, kamuya açık özet kartı | `/pilotlar/:id`, `/kart/:id` |
 
@@ -145,16 +145,21 @@ Node 22+ gerekir (testler TypeScript’i doğrudan çalıştırır). Telefona y�
 ## Dosya yapısı
 
 ```
+PRODUCT.md             ürün tanımı: kullanıcılar, amaç, konum, ilkeler
+DESIGN.md              tasarım dili (Pafta): tokenlar, bileşenler, hareket kuralları
+HANDOFF.md             devir-teslim: bugünkü durum, sıradakiler, bilinen sınırlar
+LICENSE                MIT
+.github/workflows/     ci (tip denetimi, test, derleme) ve GitHub Pages yayını
 src/
   pages/               rotalar (Türkçe yol adları)
-  layouts/             sayfa iskeletleri
+  layouts/             sayfa iskeletleri: App (uygulama), Layout (tanıtım, 404, özet kart)
   components/
     landing/           tanıtım sayfası bölümleri
-    genc/              genç yüzü: Bugün, Şimdi şeridi, görevler, lig, topluluk, Saha defteri
+    genc/              genç yüzü: Bugün, Şimdi şeridi, görevler, lig, topluluk, analiz, Saha defteri
     kurum/             kurum yüzü: ana sayfa, haftalık özet
-    app/               ortak uygulama ekranları (kanıt bağla, ihtiyaç, pilot, profil, keşif)
+    app/               ortak uygulama ekranları (kanıt bağla, ihtiyaç, pilot, profil, keşif, özet kart)
     assistant/         Niri: karşılama, turlar, yardım
-    shell/             menü, hesap, rol anahtarı, uygulamayı yükle
+    shell/             menü, hesap, rol anahtarı, alt bilgi, uygulamayı yükle
     sunum/             uygulama içi sunum destesi
     method/            /yontem sayfası parçaları
     ui/                ortak parçalar (Niri, ikonlar, düğmeler)
@@ -169,7 +174,13 @@ src/
     auth.ts            GitHub uygulamasıyla bağlanma ve çıkış
     verify.ts          GitHub ve DNS TXT doğrulaması
     store.ts           tarayıcıda durum ve sekmeler arası senkron
+    types.ts           alan modeli: Kanıt, İhtiyaç, Pilot
     seed.ts            kurgusal demo ekosistemi
+    oss.ts             açık kaynak görevleri: GitHub'daki gerçek "good first issue" kayıtları
+    route.ts           çalışırken oluşan kayıtların detay sayfası (statik derlemede)
+    labels.ts          alan modelinin Türkçe etiketleri, doğrulama merdiveni
+    format.ts          tarih, kimlik, baş harf ve kör kod yardımcıları
+    motion.ts          tanıtım sayfasında bölümlerin bir kez belirmesi
   styles/global.css    renk ve tipografi tokenları
   sw.js                service worker: sayfaları ve dosyaları telefonda tutar (Pages derlemesi)
 public/                favicon, manifest.webmanifest; pwa/ altında uygulama ikonları ve QR kodu; sunum/ altında tanıtım filmi ve posteri, uzun anlatım videosu, sunum sayfalarının telefon ve masaüstü ekranları ile öne çıkarılan kesitleri

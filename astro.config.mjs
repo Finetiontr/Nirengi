@@ -12,6 +12,5 @@ export default defineConfig({
   integrations: [react()],
   devToolbar: { enabled: false },
   ...(pages ? { output: 'static', outDir: 'dist-pages', build: { format: 'file' } } : { output: 'server', adapter: node({ mode: 'standalone' }) }),
-  // three.js is lazy-loaded only by the landing hero, so its chunk size is expected.
-  vite: { plugins: [tailwindcss()], build: { chunkSizeWarningLimit: 700 } },
+  vite: { plugins: [tailwindcss()] },
 });
