@@ -1,10 +1,10 @@
-// Niri on stage. A slide change never makes the room wait: the bubble stays up,
-// gives a small pop and starts typing the new line at once, while Niri does a quick
-// squash and half-turn (about 0.45 s). The new mood is on Niri's face from the first
-// frame and stays there while the line types (no generic talking face in between, so
-// a sad slide never flashes a grin); only the costume swaps at the edge-on moment. A full spin is kept for the Zirve close, and even that runs
-// alongside the line. Fast key presses cancel the move in flight and land clean.
-// Under reduced motion everything swaps instantly and the line is shown whole.
+// Niri on stage. A slide change never makes the room wait: the bubble stays up, gives a small
+// pop and starts typing the new line at once, while Niri does a quick squash and half-turn
+// (about 0.45 s). The next bubble on the same slide only pops and retypes, with a small perk.
+// The mood comes live from the deck: the talking face while a bubble types in, the beat's own
+// mood otherwise; only the costume swaps at the edge-on moment of the turn. A full spin is kept
+// for the Zirve close, and even that runs alongside the line. Fast key presses cancel the move
+// in flight and land clean. Under reduced motion everything swaps instantly and the line is shown whole.
 
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useAnimate, useReducedMotion } from 'framer-motion';
@@ -12,6 +12,8 @@ import Niri, { type Dir, type Mood } from '../ui/Niri';
 
 export interface StageLine {
   key: string;
+  /** The slide the line belongs to: a new scene turns Niri, a new beat on the same scene only perks. */
+  scene: string;
   mood: Mood;
   text: string;
   point?: Dir;
@@ -30,7 +32,7 @@ const TYPE_DELAY = 40;
 export default function StageNiri({ line }: { line: StageLine }) {
   const [scope, animate] = useAnimate<HTMLSpanElement>();
   const reduce = useReducedMotion();
-  // Words and mood switch at once; the costume and size at the edge-on moment of the turn.
+  // The costume and size switch at the edge-on moment of the turn; words and mood at once.
   const [worn, setWorn] = useState(line);
   const [said, setSaid] = useState(line);
   const [n, setN] = useState(Infinity);
@@ -46,6 +48,15 @@ export default function StageNiri({ line }: { line: StageLine }) {
     const el = scope.current;
     if (!el || reduce) {
       setWorn(line);
+      return;
+    }
+    if (line.scene === said.scene) {
+      setWorn(line);
+      (async () => {
+        await animate(el, { scaleY: 0.93, scaleX: 1.04, y: 2 }, { duration: 0.07, ease: 'easeOut' });
+        if (!alive()) return;
+        await animate(el, { scaleY: 1, scaleX: 1, y: 0, rotateY: 0 }, { duration: 0.18, ease: [0.2, 0.8, 0.3, 1.12] });
+      })();
       return;
     }
     (async () => {
@@ -90,7 +101,7 @@ export default function StageNiri({ line }: { line: StageLine }) {
     <div className={`flex items-end gap-3 ${left ? 'flex-row-reverse' : ''}`}>
       <span ref={scope} className="inline-block will-change-transform">
         {/* No hover or click reactions on stage: they would put a passing face on Niri. */}
-        <Niri mood={said.mood} point={said.point} size={worn.size} gear={worn.gear} react={false} cue="sahne" />
+        <Niri mood={line.mood} point={said.point} size={worn.size} gear={worn.gear} react={false} cue="sahne" />
       </span>
       <div
         key={pop}
@@ -102,7 +113,7 @@ export default function StageNiri({ line }: { line: StageLine }) {
           className={`absolute bottom-4 h-4 w-4 rotate-45 bg-bg ${left ? '-right-[9px] border-r-2 border-t-2 border-line' : '-left-[9px] border-b-2 border-l-2 border-line'}`}
           aria-hidden="true"
         />
-        <span className="block px-2 py-1 text-[29px] font-bold leading-[1.3] tracking-[-0.01em] text-ink">
+        <span className="block px-2 py-1 text-[29px] font-bold leading-[1.3] tracking-[-0.01em] text-ink [text-wrap:balance]">
           {n === Infinity ? (
             said.text
           ) : (

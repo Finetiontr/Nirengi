@@ -1,8 +1,10 @@
 // Renders every slide of /sunum as layers for the PowerPoint
 // export (see README.md). Per slide: the full frame (reference), the background (all
 // `s-in` blocks and Niri hidden), every top-level `s-in` block alone on transparency,
-// Niri alone and the bubble alone. The film slide has no Niri: it is shot on the
-// video's poster and build.py embeds the video itself. Frames are 1920×1080 at 2× so
+// Niri alone and the bubble alone; then, for each further bubble on the slide, its full frame,
+// Niri and the bubble again. Every bubble is held through the deck's #n.k address; the manifest
+// carries how long each one stays (timing.ts) for build.py.
+// The film slide has no Niri: it is shot on the video's poster and build.py embeds the video itself. Frames are 1920×1080 at 2× so
 // the stage (1600×900, scaled 1.2) fills them exactly; build.py trims each layer to
 // its alpha box and places it.
 //
@@ -35,6 +37,7 @@ function loadPlaywright() {
 const { chromium } = loadPlaywright();
 
 const { NOTES, QA } = await import(pathToFileURL(join(repo, 'src/components/sunum/notes.ts')).href);
+const { beatSec } = await import(pathToFileURL(join(repo, 'src/components/sunum/timing.ts')).href);
 
 mkdirSync(OUT, { recursive: true });
 const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || undefined });
@@ -50,13 +53,9 @@ await ctx.addInitScript(() => {
   } catch {}
 });
 const page = await ctx.newPage();
-await page.goto(`${URL_}#1`, { waitUntil: 'networkidle' });
+// A held bubble (#n.k) stays put and shows no key hints.
+await page.goto(`${URL_}#1.1`, { waitUntil: 'networkidle' });
 await page.evaluate(() => document.fonts.ready);
-// Step once forward and back so the first-visit key hint is gone.
-await page.keyboard.press('ArrowRight');
-await page.waitForTimeout(300);
-await page.keyboard.press('ArrowLeft');
-await page.waitForTimeout(300);
 await page.mouse.move(0, 0);
 
 // Export-only styles: a transparent page for the layer shots, and a class that
@@ -76,8 +75,8 @@ const count = slideIds.length;
 const manifest = { width: 3840, height: 2160, stage: { width: 1600, height: 900 }, qa: QA, slides: [] };
 
 for (let n = 1; n <= count; n++) {
-  await page.evaluate((n) => (location.hash = `#${n}`), n);
-  await page.waitForFunction((n) => location.hash === `#${n}` && document.title.startsWith(`${n}.`), n);
+  await page.evaluate((n) => (location.hash = `#${n}.1`), n);
+  await page.waitForFunction((n) => location.hash === `#${n}.1` && document.title.startsWith(`${n}.`), n);
   // Let late pieces (the survey flag, fonts in new weights) settle.
   await page.evaluate(() => document.fonts.ready);
   await page.waitForTimeout(1600);
@@ -149,9 +148,36 @@ for (let n = 1; n <= count; n++) {
     });
   });
 
+  // Niri's further bubbles on this slide: only Niri and the bubble change. On the talk's slides
+  // every bubble but the last moves on by itself after `adv` ms, as on the web.
   const id = slideIds[n - 1];
-  manifest.slides.push({ n, id, bare, film_ms: film?.ms || null, title: info.title, line: info.line, notes: NOTES[id] ?? null, layers: info.layers.map((l) => ({ ...l, file: `l${l.k}.png` })) });
-  console.log(`${n}/${count} ${info.title}: ${info.layers.length} layers`);
+  const steps = bare || NOTES[id].beats.some((b) => b.at !== undefined) ? 1 : NOTES[id].beats.length;
+  const adv = (k) => (NOTES[id].sec > 0 && k < steps - 1 ? Math.round(beatSec(NOTES[id].beats[k].say) * 1000) : null);
+  const lines = [{ k: 0, line: info.line, full: 'full.png', niri: bare ? null : 'niri.png', bubble: bare ? null : 'bubble.png', adv: adv(0) }];
+  for (let k = 1; k < steps; k++) {
+    await page.evaluate(([n, k]) => (location.hash = `#${n}.${k + 1}`), [n, k]);
+    await page.waitForFunction((text) => document.querySelector('.narrator .n-bubble')?.textContent.trim() === text, NOTES[id].beats[k].text);
+    await page.waitForTimeout(500);
+    await shot(`full-${k}.png`, false);
+    await page.evaluate(() => {
+      const narrator = document.querySelector('.stage .narrator');
+      narrator.querySelector('span.inline-block').setAttribute('data-x-niri', '');
+      narrator.querySelector('.n-bubble').setAttribute('data-x-bubble', '');
+      document.documentElement.classList.add('x-clear');
+    });
+    await only('[data-x-niri]', `niri-${k}.png`);
+    await only('[data-x-bubble]', `bubble-${k}.png`);
+    await page.evaluate(() => {
+      document.documentElement.classList.remove('x-clear');
+      document.querySelectorAll('[data-x-niri],[data-x-bubble]').forEach((e) => {
+        e.removeAttribute('data-x-niri');
+        e.removeAttribute('data-x-bubble');
+      });
+    });
+    lines.push({ k, line: NOTES[id].beats[k].text, full: `full-${k}.png`, niri: `niri-${k}.png`, bubble: `bubble-${k}.png`, adv: adv(k) });
+  }
+  manifest.slides.push({ n, id, bare, film_ms: film?.ms || null, title: info.title, lines, notes: NOTES[id] ?? null, layers: info.layers.map((l) => ({ ...l, file: `l${l.k}.png` })) });
+  console.log(`${n}/${count} ${info.title}: ${info.layers.length} layers, ${lines.length} Niri lines`);
 }
 
 writeFileSync(join(OUT, 'manifest.json'), JSON.stringify(manifest, null, 2));

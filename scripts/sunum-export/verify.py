@@ -2,10 +2,10 @@
 
     python verify.py <layers dir> <out dir>
 
-Reopens the pptx, checks slide count, picture bounds, names, notes, the order of
-the slide parts and that every animation target exists; then composites the
-placed layers back into frames, diffs them against the web screenshots and writes
-a contact sheet (contact.png) next to the deck.
+Reopens the pptx, checks slide count (one per Niri line), picture bounds, names, notes,
+the order of the slide parts and that every animation target exists; then composites the
+placed layers back into frames, diffs them against the web screenshots of the same line
+and writes a contact sheet (contact.png) next to the deck.
 """
 
 import json
@@ -34,12 +34,14 @@ def check(ok, msg):
 
 
 manifest = json.loads((LAYERS / "manifest.json").read_text(encoding="utf-8"))
+placed = json.loads((LAYERS / "_trim" / "placed.json").read_text(encoding="utf-8"))
 prs = Presentation(PPTX)
 W, H = prs.slide_width, prs.slide_height
-check(len(prs.slides) == len(manifest["slides"]), f"slide count {len(prs.slides)}")
+check(len(prs.slides) == sum(len(s["lines"]) for s in manifest["slides"]), f"slide count {len(prs.slides)}")
+check(len(prs.slides) == len(placed["slides"]), "placed.json does not match the deck")
 for n, slide in enumerate(prs.slides, 1):
     names = [s.name for s in slide.shapes]
-    if manifest["slides"][n - 1].get("bare"):
+    if placed["slides"][n - 1].get("bare"):
         check(any(x.endswith("tanıtım videosu") for x in names), f"{n}: film missing {names}")
     else:
         check(names.count("!!niri") == 1 and names.count("!!bubble") == 1, f"{n}: niri/bubble names {names}")
@@ -67,6 +69,10 @@ with zipfile.ZipFile(PPTX) as z:
         check(len(ctn) == len(set(ctn)), f"{n}: duplicate cTn ids")
         if n > 1:
             check(root.find(f"{MC}AlternateContent/{MC}Choice/{P}transition") is not None, f"{n}: no morph")
+        # All but a slide's last bubble move on by themselves, as on the web.
+        rec = placed["slides"][n - 1]
+        adv = {t.get("advTm") for t in root.iter(P + "transition")}
+        check(adv == ({str(rec["adv"])} if rec.get("adv") else {None}), f"{n}: advTm {adv} vs {rec.get('adv')}")
         if XSD is not None:
             # The schema predates Morph: validate with the Fade fallback in its place.
             for ac in list(root.iter(MC + "AlternateContent")):
@@ -74,22 +80,21 @@ with zipfile.ZipFile(PPTX) as z:
                 ac.getparent().remove(ac)
             check(XSD.validate(root), f"{n}: schema {XSD.error_log.last_error}")
 
-# Composite the placed layers and diff them against the web frames.
-placed = json.loads((LAYERS / "_trim" / "placed.json").read_text(encoding="utf-8"))
+# Composite the placed layers and diff them against the web frames of the same line.
 thumbs, worst = [], 0.0
 for rec in placed["slides"]:
-    n = rec["n"]
+    n = f"{rec['n']}.{rec['k'] + 1}"
     frame = Image.new("RGBA", (3840, 2160))
     for p in rec["pics"]:
         x, y, w, h = (round(v / EMU_PX) for v in p["box"])
         im = Image.open(p["file"]).convert("RGBA")
         check(im.size == (w, h), f"{n}: {p['name']} size {im.size} vs {(w, h)}")
         frame.alpha_composite(im, (x, y))
-    web = Image.open(LAYERS / f"{n:02d}" / "full.png").convert("RGB")
+    web = Image.open(rec["full"]).convert("RGB")
     diff = ImageChops.difference(frame.convert("RGB"), web).convert("L")
     off = sum(diff.point(lambda v: 255 if v > 24 else 0).histogram()[255:]) / (3840 * 2160) * 100
     worst = max(worst, off)
-    print(f"slide {n:2d}: {off:.3f}% pixels differ by >24 levels")
+    print(f"slide {n:>5}: {off:.3f}% pixels differ by >24 levels")
     check(off < 0.5, f"{n}: composite differs from web on {off:.2f}% of pixels")
     pair = Image.new("RGB", (960 * 2 + 12, 540), "white")
     pair.paste(web.resize((960, 540)), (0, 0))

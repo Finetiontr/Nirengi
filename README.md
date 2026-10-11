@@ -8,10 +8,10 @@
 
 ![Niri kurumun metnini açık bir modelle okur; her alan metindeki bir cümleye dayanır](docs/nirengi-demo.gif)
 
-- **Tanıtım filmi:** [56 saniye, müzikli](https://finetiontr.github.io/Nirengi/sunum/nirengi-film.mp4); bir case’in yolculuğunu ürünün gerçek ekranlarıyla, masaüstü tarayıcıda baştan sona gösterir: genç işini bağlar, kurum case’ini yazar, Niri açık modelle okur, gençler case’e göre isimsiz ölçülür, en uyumlusu deneme projesinde çözer ve onaylanan iş profiline döner. Sunumda canlı demo olarak oynar. Müziği kodla bestelendi, lisansı bize ait. Uzun anlatım: [79 saniye, sessiz](https://finetiontr.github.io/Nirengi/sunum/nirengi-tanitim-web.mp4), Niri ekranları telefonda gezdirir.
+- **Tanıtım filmi:** [90 saniye, müzikli](https://finetiontr.github.io/Nirengi/sunum/nirengi-film.mp4); nirengi’yi ürünün gerçek ekranlarıyla, masaüstü tarayıcıda önce gencin, sonra kurumun gözünden gösterir: her alandan genç işini bağlar ve deneyimi ölçülebilir bir değere (deneyim puanı) dönüşür, Niri eksiğini söyler; kurum case’ini yazar, Niri açık modelle okur, adaylar isimsiz ve referanssız ölçülür, en uyumlusu deneme projesinde çözer ve onaylanan iş profiline döner. Sunumda canlı demo olarak oynar. Müziği kodla bestelendi, lisansı bize ait. Uzun anlatım: [79 saniye, sessiz](https://finetiontr.github.io/Nirengi/sunum/nirengi-tanitim-web.mp4), Niri ekranları telefonda gezdirir.
 - **Canlı:** https://finetiontr.github.io/Nirengi/ (kurulum gerekmez; veri tarayıcıda tutulur)
 - **Telefona yükle:** [`/uygulama`](https://finetiontr.github.io/Nirengi/uygulama) ya da ana sayfanın sonundaki QR kodu. Mağaza gerekmez: Android’de tek dokunuşla, iPhone’da Paylaş → Ana Ekrana Ekle ile yüklenir; ana ekrandan tam ekran açılır, internetsiz de çalışır.
-- **Sunum:** [`/sunum`](https://finetiontr.github.io/Nirengi/sunum), uygulamanın içinde Niri’nin anlattığı 12 slaytlık deste: kurum gerçek bir case verir, genç onu gerçekten çözer; film canlı demo olarak oynar, yapay zekâ slaytları açık modeli, verinin nerede kaldığını ve önce/sonra farkını gösterir; kapanıştan sonra filmin her sahnesi gerçek ekranıyla ek sayfa olarak durur. Yapay zekâ slaytları ürünün kendi denetimini gerçek bir model cevabı üzerinde çalıştırır
+- **Sunum:** [`/sunum`](https://finetiontr.github.io/Nirengi/sunum), uygulamanın içinde 12 slaytlık deste; konuşan ekiptir, Niri sessizdir: her slaytta iki üç kısa balon, konuşmacının sıradaki cümlesinin başlığı olarak kendiliğinden ilerler, ekip yalnız sayfa değiştirir (→). Omurga: kurum gerçek bir case verir, genç onu gerçekten çözer; film canlı demo olarak oynar, yapay zekâ slaytları açık modeli, verinin nerede kaldığını ve önce/sonra farkını gösterir; kapanıştan sonra filmin her sahnesi gerçek ekranıyla ek sayfa olarak durur. Yapay zekâ slaytları ürünün kendi denetimini gerçek bir model cevabı üzerinde çalıştırır
 - **Sahne akışı:** [`docs/DEMO.md`](docs/DEMO.md), 5 dakikalık demo ve yedek senaryo
 
 ## Çözdüğü problem
@@ -174,7 +174,7 @@ src/
   sw.js                service worker: sayfaları ve dosyaları telefonda tutar (Pages derlemesi)
 public/                favicon, manifest.webmanifest; pwa/ altında uygulama ikonları ve QR kodu; sunum/ altında tanıtım filmi ve posteri, uzun anlatım videosu, sunum sayfalarının telefon ve masaüstü ekranları ile öne çıkarılan kesitleri
 worker/                tek sunucu parçası (Cloudflare Worker): GitHub token değişimi, yapay zekâ taslağı, gerçek kullanım sayacı
-scripts/               GitHub Pages derlemesi, service worker'ın dosya listesi, sunum dışa aktarımı
+scripts/               GitHub Pages derlemesi, service worker'ın dosya listesi, sunum dışa aktarımı ve notların Markdown’u
 tests/                 node:test testleri
 docs/                  başvuru, demo akışı ve GIF'i, pazar analizi, sunum notları
 ```

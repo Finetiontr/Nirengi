@@ -3,13 +3,16 @@
     python build.py <layers dir> <out dir>
 
 Every layer is a picture at its exact stage position, so a slide matches the web
-deck. Blocks enter with Fade + a 16 px rise in their `--d` order (all automatic);
-Niri and the bubble keep the names `!!niri` / `!!bubble` on every slide and the
-slides change with Morph (Fade fallback), so Niri glides between marks. The film
-slide carries the promo video (public/sunum), full-frame on its poster, and starts
-it on its own as the slide opens. Speaker notes from notes.ts go into each slide's
-notes pane, and the close also carries the short answers for likely questions.
-Needs python-pptx and Pillow.
+deck. Each of Niri's bubbles is its own PowerPoint slide and, as on the web, moves on by itself
+once the team has said its line (timing.ts); a slide's last bubble waits for the click, like →
+on the web. The first bubble's blocks enter with Fade + a 16 px rise in their `--d` order (all
+automatic); on the next ones the blocks stand (same `!!` names, so Morph keeps them) and only
+the bubble changes, with a small pop. Niri and the bubble keep the names `!!niri` / `!!bubble`
+on every slide and the slides change with Morph (Fade fallback), so Niri glides between marks.
+The film slide carries the promo video (public/sunum), full-frame on its poster, and starts it
+on its own as the slide opens. Each slide's notes pane holds the key point, the bubble and what
+to say under it (the film slide all its timed lines), and the close also carries the short
+answers for likely questions. Needs python-pptx and Pillow.
 """
 
 import json
@@ -128,6 +131,10 @@ class Timing:
             return out
         self._effect(32, "emph", delay, body)
 
+    def pulse(self, spid, delay):
+        """The bubble's small pop when the next one comes (the web's stage-pop)."""
+        self._effect(6, "emph", delay, lambda: self._scale(spid, 102500, 110, 0))
+
     def cheer(self, spid, delay):
         """Zirve: two grow/shrink pulses with a small teeter."""
         def body():
@@ -168,15 +175,17 @@ class Timing:
         )
 
 
-def transition_xml(morph: bool):
+def transition_xml(morph: bool, adv_ms=None):
+    """The slide's transition; `adv_ms` moves on by itself after that long."""
+    adv = f' advTm="{adv_ms}"' if adv_ms else ""
     if not morph:
-        return f'<p:transition xmlns:p="{NS["p"]}" spd="fast"><p:fade/></p:transition>'
+        return f'<p:transition xmlns:p="{NS["p"]}" spd="fast"{adv}><p:fade/></p:transition>'
     return (
         '<mc:AlternateContent xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006">'
         '<mc:Choice xmlns:p159="http://schemas.microsoft.com/office/powerpoint/2015/09/main" Requires="p159">'
-        f'<p:transition xmlns:p="{NS["p"]}" xmlns:p14="http://schemas.microsoft.com/office/powerpoint/2010/main" spd="fast" p14:dur="{MORPH}">'
+        f'<p:transition xmlns:p="{NS["p"]}" xmlns:p14="http://schemas.microsoft.com/office/powerpoint/2010/main" spd="fast" p14:dur="{MORPH}"{adv}>'
         '<p159:morph option="byObject"/></p:transition></mc:Choice>'
-        f'<mc:Fallback><p:transition xmlns:p="{NS["p"]}" spd="fast"><p:fade/></p:transition></mc:Fallback></mc:AlternateContent>'
+        f'<mc:Fallback><p:transition xmlns:p="{NS["p"]}" spd="fast"{adv}><p:fade/></p:transition></mc:Fallback></mc:AlternateContent>'
     )
 
 
@@ -192,85 +201,108 @@ def main():
     placed = {"slides": []}
     close = max(x["n"] for x in manifest["slides"])
 
+    first = True
     for s in manifest["slides"]:
         n, src = s["n"], LAYERS / f"{s['n']:02d}"
         dst = WORK / f"{n:02d}"
         dst.mkdir(exist_ok=True)
-        slide = prs.slides.add_slide(blank)
-        shapes = slide.shapes
-        rec = {"n": n, "pics": []}
-
-        def put(file, name):
-            box = trim(src / file, dst / file, frame_w)
-            if box is None:
-                return None
-            pic = shapes.add_picture(str(dst / file), Emu(box[0]), Emu(box[1]), Emu(box[2]), Emu(box[3]))
-            pic.name = name
-            rec["pics"].append({"file": str(dst / file), "name": name, "box": box})
-            return pic
-
-        # The background is opaque and full-frame: no trim.
-        bg = Image.open(src / "bg.png").convert("RGB")
-        bg.save(dst / "bg.png", optimize=True)
-        pic = shapes.add_picture(str(dst / "bg.png"), 0, 0, Emu(SLIDE_W), Emu(SLIDE_H))
-        pic.name = f"s{n} zemin"
-        rec["pics"].append({"file": str(dst / "bg.png"), "name": pic.name, "box": [0, 0, SLIDE_W, SLIDE_H]})
-
-        t = Timing()
-        blocks = []
-        for layer in s["layers"]:
-            p = put(layer["file"], f"s{n} blok {layer['k'] + 1}")
-            if p is not None:
-                blocks.append((layer["delay"], layer["k"], p.shape_id))
-        if s.get("bare"):
-            # The film: full frame on its poster, started by our own timing below.
-            niri = bubble = None
-            if FILM.exists():
-                movie = shapes.add_movie(str(FILM), 0, 0, Emu(SLIDE_W), Emu(SLIDE_H), poster_frame_image=str(dst / "bg.png"), mime_type="video/mp4")
-                movie.name = f"s{n} tanıtım videosu"
-                old = slide._element.find(P + "timing")
-                if old is not None:
-                    old.getparent().remove(old)
-                t.play(movie.shape_id, int(s.get("film_ms") or 90000))
-        else:
-            niri = put("niri.png", "!!niri")
-            bubble = put("bubble.png", "!!bubble")
-
-        # Blocks in their --d order; the first carries no wait after the transition.
-        for delay, _, spid in sorted(blocks):
-            t.rise(spid, int(delay))
-        if n == 1:
-            # Niri waves in on the opening, then the bubble pops.
-            t.pop_in(niri.shape_id, 150)
-            t.wave(niri.shape_id, 520)
-            t.pop_in(bubble.shape_id, 420, dur=300, start=0.92)
-        elif n == close:
-            t.cheer(niri.shape_id, 250)
-
-        sld = slide._element
-        tr = etree.fromstring(transition_xml(morph=n > 1))
-        timing_xml = t.xml()
-        clr = sld.find(P + "clrMapOvr")
-        anchor = clr if clr is not None else sld.find(P + "cSld")
-        anchor.addnext(tr)
-        if timing_xml:
-            tr.addnext(etree.fromstring(timing_xml))
-
         notes = s.get("notes") or {}
-        key = [f"Kritik nokta: {notes['key']}", ""] if notes.get("key") else []
-        lines = [f"{n}. {s['title']} (~{notes.get('sec', '?')} sn)", f"Niri: {s['line']}", ""] + key + list(notes.get("say", []))
-        if n == close:
-            for a in manifest.get("qa", []):
-                lines += ["", f"Soru: {a['q']}"] + list(a["say"])
-        slide.notes_slide.notes_text_frame.text = "\n".join(lines)
-        placed["slides"].append(rec)
+        beats = notes.get("beats", [])
+        timed = any(b.get("at") is not None for b in beats)
+        lines = s["lines"]
+
+        for line in lines:
+            k = line["k"]
+            slide = prs.slides.add_slide(blank)
+            shapes = slide.shapes
+            rec = {"n": n, "k": k, "bare": bool(s.get("bare")), "full": str(src / line["full"]), "pics": []}
+
+            def put(file, name):
+                box = trim(src / file, dst / file, frame_w)
+                if box is None:
+                    return None
+                pic = shapes.add_picture(str(dst / file), Emu(box[0]), Emu(box[1]), Emu(box[2]), Emu(box[3]))
+                pic.name = name
+                rec["pics"].append({"file": str(dst / file), "name": name, "box": box})
+                return pic
+
+            # The background is opaque and full-frame: no trim.
+            if k == 0:
+                Image.open(src / "bg.png").convert("RGB").save(dst / "bg.png", optimize=True)
+            pic = shapes.add_picture(str(dst / "bg.png"), 0, 0, Emu(SLIDE_W), Emu(SLIDE_H))
+            pic.name = f"!!s{n} zemin"
+            rec["pics"].append({"file": str(dst / "bg.png"), "name": pic.name, "box": [0, 0, SLIDE_W, SLIDE_H]})
+
+            t = Timing()
+            blocks = []
+            for layer in s["layers"]:
+                p = put(layer["file"], f"!!s{n} blok {layer['k'] + 1}")
+                if p is not None:
+                    blocks.append((layer["delay"], layer["k"], p.shape_id))
+            if s.get("bare"):
+                # The film: full frame on its poster, started by our own timing below.
+                niri = bubble = None
+                if FILM.exists():
+                    movie = shapes.add_movie(str(FILM), 0, 0, Emu(SLIDE_W), Emu(SLIDE_H), poster_frame_image=str(dst / "bg.png"), mime_type="video/mp4")
+                    movie.name = f"s{n} tanıtım videosu"
+                    old = slide._element.find(P + "timing")
+                    if old is not None:
+                        old.getparent().remove(old)
+                    t.play(movie.shape_id, int(s.get("film_ms") or 90000))
+            else:
+                niri = put(line["niri"], "!!niri")
+                bubble = put(line["bubble"], "!!bubble")
+
+            if k == 0:
+                # Blocks in their --d order; the first carries no wait after the transition.
+                for delay, _, spid in sorted(blocks):
+                    t.rise(spid, int(delay))
+                if n == 1:
+                    # Niri waves in on the opening, then the bubble pops.
+                    t.pop_in(niri.shape_id, 150)
+                    t.wave(niri.shape_id, 520)
+                    t.pop_in(bubble.shape_id, 420, dur=300, start=0.92)
+                elif n == close:
+                    t.cheer(niri.shape_id, 250)
+            else:
+                t.pulse(bubble.shape_id, 0)
+
+            # All but a slide's last bubble move on by themselves once their line is said.
+            rec["adv"] = line.get("adv")
+            sld = slide._element
+            tr = etree.fromstring(transition_xml(morph=not first, adv_ms=rec["adv"]))
+            first = False
+            timing_xml = t.xml()
+            clr = sld.find(P + "clrMapOvr")
+            anchor = clr if clr is not None else sld.find(P + "cSld")
+            anchor.addnext(tr)
+            if timing_xml:
+                tr.addnext(etree.fromstring(timing_xml))
+
+            text = [f"{n}. {s['title']} (~{notes.get('sec', '?')} sn)" + (f" · Niri {k + 1}/{len(lines)}" if len(lines) > 1 else ""), ""]
+            if notes.get("key"):
+                text += [f"Kritik nokta: {notes['key']}", ""]
+            if k == 0 and notes.get("lead"):
+                text += [notes["lead"], ""]
+            if timed:
+                text += [f"{int(b['at']) // 60}:{int(b['at']) % 60:02d} Filmde: “{b['text']}”\n{b['say']}" for b in beats]
+            elif k < len(beats):
+                said = "Söyle" if notes.get("sec") else "Cevap"
+                text += [f"Balon: “{beats[k]['text']}”", f"{said}: {beats[k]['say']}"]
+                if k + 1 < len(beats):
+                    text += ["", f"Sıradaki balon: “{beats[k + 1]['text']}”"]
+            if n == close and k == len(lines) - 1:
+                for a in manifest.get("qa", []):
+                    text += ["", f"Soru: {a['q']}"] + list(a["say"])
+            slide.notes_slide.notes_text_frame.text = "\n".join(text)
+            placed["slides"].append(rec)
 
     pptx_path = OUT / "Nirengi-sunum.pptx"
     prs.save(pptx_path)
     (WORK / "placed.json").write_text(json.dumps(placed, indent=1), encoding="utf-8")
 
-    # PDF: the full frames, final state.
-    frames = [Image.open(LAYERS / f"{s['n']:02d}" / "full.png").convert("RGB") for s in manifest["slides"]]
+    # PDF: the full frames, final state, one page per Niri line like the deck.
+    frames = [Image.open(rec["full"]).convert("RGB") for rec in placed["slides"]]
     pdf_path = OUT / "Nirengi-sunum.pdf"
     frames[0].save(pdf_path, save_all=True, append_images=frames[1:], resolution=288.0, quality=92)
     print(f"{pptx_path} ({pptx_path.stat().st_size // 1024} KB), {pdf_path} ({pdf_path.stat().st_size // 1024} KB)")

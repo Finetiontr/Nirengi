@@ -1,15 +1,19 @@
-// The stage deck: one idea per slide, Niri on stage with one short line each.
+// The stage deck: one idea per slide, Niri on stage with two or three short bubbles a slide, each
+// the headline of the line the team says next. The bubbles move on by themselves at the pace the
+// team speaks (beats.ts); Niri is silent and the presenters only change slides.
 // The organisers' twelve steps, then an appendix of detail pages after the close for questions.
-// Keys: →, Space, PageDown next; ←, PageUp back; Home/End (the close; → goes on into the appendix); 1–9 and 0 jump;
-// F fullscreen; B blanks the screen; N opens the
-// presenter window (/sunum?notlar) with the speaker notes, which follows the deck
-// and can drive it. A click anywhere but a link or key advances. The slide number
-// lives in the hash, so a reload or a shared link lands on the same slide.
+// Keys: →, Space, Enter, PageDown or a click: next slide; ←, PageUp, Backspace or a right click: previous;
+// Home/End (the close; → goes on into the appendix); 1–9 and 0 jump; P pauses or resumes the
+// bubbles (and the film on its slide); F fullscreen; B blanks the screen; N opens the presenter
+// window (/sunum?notlar), which follows the deck bubble by bubble and can drive it. The slide
+// number lives in the hash, so a reload or a shared link lands on the same slide; #n.k holds
+// bubble k of slide n (for the export).
 
-import { useCallback, useEffect, useRef, useState, type CSSProperties, type MouseEvent } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type MouseEvent } from 'react';
 import StageNiri from './StageNiri';
 import Presenter, { CHANNEL, type Msg } from './Presenter';
-import { CLOSE, FILM, place, SLIDES, TALK, type Mark } from './slides';
+import { useBeats } from './beats';
+import { CLOSE, FILM, linesOf, moodOf, place, SLIDES, TALK, type Mark } from './slides';
 import './sunum.css';
 
 /** Where Niri stands: the box is anchored by its bottom-left corner on the 1600×900 stage. */
@@ -21,21 +25,29 @@ const MARKS: Record<Mark, { left: number; bottom: number; width: number; size: n
 const last = SLIDES.length - 1;
 const clamp = (i: number) => Math.max(0, Math.min(last, i));
 
-function fromHash(): number {
-  const n = Number.parseInt(location.hash.slice(1), 10);
-  return Number.isFinite(n) ? clamp(n - 1) : 0;
+/** "#5" is slide 5; "#5.2" holds its second bubble. */
+function fromHash(): { i: number; hold: number | null } {
+  const [a, b] = location.hash.slice(1).split('.');
+  const n = Number.parseInt(a, 10);
+  const i = Number.isFinite(n) ? clamp(n - 1) : 0;
+  const k = Number.parseInt(b ?? '', 10);
+  return { i, hold: Number.isFinite(k) ? Math.max(0, Math.min(linesOf(i).length - 1, k - 1)) : null };
 }
 
 function Stage() {
   const [i, setI] = useState(0);
+  const [hold, setHold] = useState<number | null>(null);
   const [moved, setMoved] = useState(false);
   const [blank, setBlank] = useState(false);
   const [notice, setNotice] = useState('');
   const root = useRef<HTMLDivElement>(null);
   const noticeTimer = useRef(0);
+  const beats = useBeats(i, hold);
+  const k = beats.k;
 
   const go = useCallback((n: number) => {
     setBlank(false);
+    setHold(null);
     setI((cur) => {
       const next = clamp(n);
       if (next !== cur) setMoved(true);
@@ -62,30 +74,34 @@ function Stage() {
 
   // The hash is the source of truth on load and on back/forward.
   useEffect(() => {
-    setI(fromHash());
-    const onHash = () => setI(fromHash());
-    window.addEventListener('hashchange', onHash);
-    return () => window.removeEventListener('hashchange', onHash);
+    const read = () => {
+      const h = fromHash();
+      setI(h.i);
+      setHold(h.hold);
+    };
+    read();
+    window.addEventListener('hashchange', read);
+    return () => window.removeEventListener('hashchange', read);
   }, []);
 
   // The presenter window follows the deck and can drive it.
   const channel = useRef<BroadcastChannel | null>(null);
-  const iRef = useRef(i);
-  iRef.current = i;
+  const atRef = useRef({ i, k });
+  atRef.current = { i, k };
   useEffect(() => {
     if (typeof BroadcastChannel === 'undefined') return;
     const ch = new BroadcastChannel(CHANNEL);
     channel.current = ch;
     ch.onmessage = (e: MessageEvent<Msg>) => {
       if (e.data.type === 'go') go(e.data.i);
-      else if (e.data.type === 'hello') ch.postMessage({ type: 'at', i: iRef.current } satisfies Msg);
+      else if (e.data.type === 'hello') ch.postMessage({ type: 'at', ...atRef.current } satisfies Msg);
     };
     return () => {
       ch.close();
       channel.current = null;
     };
   }, [go]);
-  useEffect(() => channel.current?.postMessage({ type: 'at', i } satisfies Msg), [i]);
+  useEffect(() => channel.current?.postMessage({ type: 'at', i, k } satisfies Msg), [i, k]);
 
   const notes = useCallback(() => {
     const w = window.open(`/sunum?notlar#${i + 1}`, 'nirengi-notlar', 'width=1100,height=760');
@@ -99,33 +115,38 @@ function Stage() {
   }, []);
 
   useEffect(() => {
-    const want = `#${i + 1}`;
+    // The prerendered stage also mounts first in the presenter window: leave its hash for it.
+    if (new URLSearchParams(location.search).has('notlar')) return;
+    const want = hold === null ? `#${i + 1}` : `#${i + 1}.${hold + 1}`;
     if (location.hash !== want) history.replaceState(null, '', want);
     document.title = `${i + 1}. ${SLIDES[i].title} · nirengi sunum`;
-  }, [i]);
+  }, [i, hold]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.ctrlKey || e.metaKey || e.altKey) return;
-      const k = e.key;
+      const key = e.key;
       let hit = true;
-      if (k === 'ArrowRight' || k === 'ArrowDown' || k === 'PageDown' || k === ' ' || k === 'Enter') {
+      if (key === 'ArrowRight' || key === 'ArrowDown' || key === 'PageDown' || key === ' ' || key === 'Enter') {
         // Enter on a focused link or key keeps its own meaning.
-        if (k === 'Enter' && (e.target as HTMLElement).closest?.('a,button')) return;
+        if (key === 'Enter' && (e.target as HTMLElement).closest?.('a,button')) return;
         go(i + 1);
-      } else if (k === 'ArrowLeft' || k === 'ArrowUp' || k === 'PageUp' || k === 'Backspace') go(i - 1);
-      else if (k === 'Home') go(0);
-      else if (k === 'End') go(CLOSE);
-      else if (/^[0-9]$/.test(k)) go(k === '0' ? 9 : Number(k) - 1);
-      else if (k === 'f' || k === 'F') fullscreen();
-      else if (k === 'n' || k === 'N') notes();
-      else if (k === 'b' || k === 'B' || k === '.') setBlank((b) => !b);
+      } else if (key === 'ArrowLeft' || key === 'ArrowUp' || key === 'PageUp' || key === 'Backspace') go(i - 1);
+      else if (key === 'Home') go(0);
+      else if (key === 'End') go(CLOSE);
+      else if (/^[0-9]$/.test(key)) go(key === '0' ? 9 : Number(key) - 1);
+      else if (key === 'p' || key === 'P') {
+        // On the film slide the film takes P itself.
+        if (!SLIDES[i].bare) beats.toggle();
+      } else if (key === 'f' || key === 'F') fullscreen();
+      else if (key === 'n' || key === 'N') notes();
+      else if (key === 'b' || key === 'B' || key === '.') setBlank((b) => !b);
       else hit = false;
       if (hit) e.preventDefault();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [i, go, fullscreen, notes]);
+  }, [i, go, beats.toggle, fullscreen, notes]);
 
   // The cursor hides after a moment of stillness so it never sits on a slide.
   useEffect(() => {
@@ -155,29 +176,31 @@ function Stage() {
   };
 
   const slide = SLIDES[i];
-  const View = slide.View;
   const mark = MARKS[slide.mark];
   const bare = !!slide.bare;
+  // The slide itself does not change while the bubbles move on: render it once per slide.
+  const view = useMemo(() => {
+    const View = SLIDES[i].View;
+    return <View />;
+  }, [i]);
 
   return (
     <div ref={root} className="deck" onClick={onClick} onContextMenu={onContext}>
       <div className="stage">
         {!blank && (
-          <>
-            <section key={slide.id} className="absolute inset-0" aria-roledescription="slayt" aria-label={`${place(i)}: ${slide.title}`}>
-              <View />
-            </section>
-
-          </>
+          <section key={slide.id} className="absolute inset-0" aria-roledescription="slayt" aria-label={`${place(i)}: ${slide.title}`}>
+            {view}
+          </section>
         )}
 
         {/* Niri stays mounted across slides (a blank screen, the film) so every change is a twirl. */}
         <div className={`narrator ${blank || bare ? 'invisible' : ''}`} style={{ left: mark.left, bottom: mark.bottom, width: mark.width }} aria-live="polite">
-          <StageNiri line={{ key: slide.id, ...slide.niri, text: slide.niri.line, size: mark.size, side: mark.side }} />
+          <StageNiri line={{ key: `${slide.id}:${k}`, scene: slide.id, ...slide.niri, mood: beats.talking ? 'talk' : moodOf(i, k), text: linesOf(i)[k], size: mark.size, side: mark.side }} />
         </div>
 
         {/* A quiet counter: the talk's route so far as small survey markers; the appendix keeps them all filled. */}
         <div className={`absolute right-[48px] top-[34px] flex items-center gap-3 ${bare ? 'invisible' : ''}`} aria-hidden="true">
+          {beats.paused && <span className="mono text-[17px] font-bold text-ink-3">duraklatıldı ·</span>}
           <div className="flex items-end gap-[5px]">
             {SLIDES.slice(0, TALK).map((s, n) => (
               <svg key={s.id} viewBox="0 0 12 11" width={n === i ? 16 : 11} height={n === i ? 15 : 10} className="block">
@@ -194,7 +217,7 @@ function Stage() {
           <span className="mono text-[17px] font-bold text-ink-3">{place(i)}</span>
         </div>
 
-        {!moved && i === 0 && !blank && (
+        {!moved && i === 0 && hold === null && !blank && (
           <p className="s-in absolute bottom-[30px] left-[64px] flex items-center gap-2 text-[16px] font-semibold text-ink-3" style={{ '--d': '1400ms' } as CSSProperties}>
             <kbd className="s-kbd">→</kbd> ya da <kbd className="s-kbd">boşluk</kbd> ileri
             <span className="mx-2 text-line-2">·</span>
