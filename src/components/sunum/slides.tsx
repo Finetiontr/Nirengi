@@ -34,6 +34,9 @@ import { WEIGHTS } from '../../lib/engine/match.ts';
 import { LEVELS } from '../../lib/labels.ts';
 import { XP } from '../../lib/engine/progress.ts';
 import { INVENTED_DECIDER, SAMPLE_READING } from '../../lib/sample-reading.ts';
+import { buildSeed } from '../../lib/seed.ts';
+import { personInsight } from '../../lib/engine/insight.ts';
+import { skillLabel } from '../../lib/skills.ts';
 
 export type Mark = 'hero' | 'dock';
 
@@ -139,12 +142,12 @@ function Title() {
           <Wordmark size={156} />
         </div>
         <p className="s-in mt-[44px] text-[80px] font-extrabold leading-[1.02] tracking-[-0.04em] text-ink" style={d(140)}>
-          Her çaban
+          Yaptığın iş,
           <br />
-          <span className="text-indigo">benim için değerli.</span>
+          <span className="text-indigo">deneyimin olsun.</span>
         </p>
-        <p className="s-in mt-[30px] max-w-[780px] text-[30px] font-medium leading-[1.35] text-ink-3" style={d(260)}>
-          Gencin gerçek işini kanıta çeviren, girişimlerin ve kurumların gerçek case’leriyle buluşturan açık kaynak bir web sitesi. Telefonda da uygulama olarak çalışır.
+        <p className="s-in mt-[30px] max-w-[800px] text-[30px] font-medium leading-[1.35] text-ink-3" style={d(260)}>
+          Gençlerin gerçek işini doğrulayan ve onları şirketlerin gerçek case’leriyle buluşturan açık kaynak bir web sitesi. Telefonda da uygulama olarak çalışır.
         </p>
       </div>
       <div className="s-in absolute left-[112px] top-[730px]" style={d(380)}>
@@ -164,8 +167,8 @@ function Problem() {
     {
       who: 'kurum' as const,
       tag: 'Kurum',
-      text: <>BİT uzmanı almakta zorlanan her 100 girişimden <Fig>71’i</Fig>: “ilgili iş deneyimi yok.”</>,
-      src: 'TÜİK, Girişimlerde BİT Kullanımı 2025',
+      text: <>Bilişim uzmanı almakta zorlanan her 100 şirketten <Fig>71’i</Fig>: “ilgili iş deneyimi yok.”</>,
+      src: 'TÜİK, Girişimlerde Bilişim Teknolojileri Kullanımı 2025',
     },
   ];
   return (
@@ -191,8 +194,8 @@ function ForWhom() {
       who: 'kurum' as const,
       tag: 'Startup',
       title: 'Ekip kuran startup',
-      fact: <>İK’sı yok, yanlış işe alımı kaldıramaz. 10–49 çalışanlı girişimlerin yalnız <Fig>%10,8</Fig>’inde BİT uzmanı var.</>,
-      src: 'TÜİK, BİT bülteni 2026',
+      fact: <>İK’sı yok, yanlış işe alımı kaldıramaz. 10–49 çalışanlı şirketlerin yalnız <Fig>%10,8</Fig>’inde bilişim uzmanı var.</>,
+      src: 'TÜİK, bilişim teknolojileri bülteni 2026',
     },
   ];
   return (
@@ -218,8 +221,8 @@ function ForWhom() {
 
 function Evidence() {
   const rows = [
-    { value: '700’de 1', text: 'Diploma şartını kaldıran şirketlerde gerçekten değişen işe alım: bundan da az.', src: 'Harvard Business School ve Burning Glass Institute, 2024' },
-    { value: '%63', text: 'İşverenlerin dönüşümdeki bir numaralı engeli: beceri açığı.', src: 'Dünya Ekonomik Forumu, İşlerin Geleceği 2025' },
+    { value: '700’de 1', text: 'Diploma şartını kaldıran şirketlerde bu karar, her 700 işe alımdan 1’ini bile değiştirmedi. Kâğıtta şart kalktı, işe alım aynı kaldı.', src: 'Harvard Business School ve Burning Glass Institute, 2024' },
+    { value: '%63', text: 'İşverenlerin %63’üne göre dönüşümün önündeki en büyük engel beceri açığı.', src: 'Dünya Ekonomik Forumu, İşlerin Geleceği 2025' },
     { value: '37', text: 'platform ve program inceledik. Oyun ritmi, doğrulanmış iş ve kurum imzasını bir arada sunanı Türkiye’de bulamadık.', src: 'Bizim araştırmamız, kaynaklarıyla: docs/PAZAR-ANALIZI.md', ours: true },
   ];
   return (
@@ -474,9 +477,9 @@ function PageVerified() {
       head={['İşin, kaynağında', 'doğrulanır.']}
       problems={['02']}
       points={[
-        ['Doğrulama Merdiveni', <>Her iş düzeyini taşır ve eşleşmede o kadar sayılır: Beyan {LV('S1')}, Doğrulandı {LV('S2')}, Kurum onaylı {LV('S3')}.</>],
-        ['GitHub ve alan adı', 'Genç depolarını GitHub’da kendisi seçer, özeller dahil. Alan adı DNS kaydıyla doğrulanır; kod kopyalanmaz.'],
-        ['Her alandan, dürüstçe', 'Behance, ArtStation, LinkedIn’deki iş Beyan olarak gelir. Kopya eser sayılmaz; itiraz herkese açık kaydedilir.'],
+        ['Her işin güveni yazar', <>Beyan: gencin kendi söylediği. Doğrulandı: kaynağından kontrol edildi. Kurum onaylı: bir kurum imzaladı. Eşleşmede {LV('S1')}, {LV('S2')} ve {LV('S3')} kat sayılır.</>],
+        ['GitHub’dan otomatik', 'Genç hesabını bağlar, hangi projelerini göstereceğini kendisi seçer. Projenin gerçekten onun olduğunu GitHub’dan kontrol ederiz; kodunu almayız.'],
+        ['Kod dışı işler de', 'Tasarım, video, çeviri Behance, ArtStation ya da LinkedIn bağlantısıyla gelir. Sahipliğini dışarıdan doğrulayamadığımız için dürüstçe Beyan yazar.'],
       ]}
       phone={{ src: '/sunum/ph-dogrulandi.webp', alt: 'Gencin profili: GitHub ile doğrulanmış depolar', who: 'genc', route: 'profil/emirhanacik', mark: { x: 16, y: 130, w: 358, h: 366 } }}
       lift={{ src: '/sunum/lift-dogrulandi.webp', alt: 'Doğrulandı: edge-mirror deposu, doğrulayan GitHub API, hesap sahipliği', x: 742, y: 214, w: 400, css: [358, 366] }}
@@ -487,15 +490,15 @@ function PageVerified() {
 function PageXp() {
   return (
     <Page
-      head={['XP yalnız', 'gerçek işten gelir.']}
+      head={['Lig, seri, XP:', 'hepsi gerçek işten.']}
       problems={['04']}
       points={[
-        ['GitHub’dan seri', 'GitHub’a push, PR ya da sürüm attığın günler kendiliğinden hedefe ve seriye yazılır. Sayılan commit değil, üretim günü.'],
-        ['Sıralamada yüksel, görün', 'Haftalık ligde ilk beşe giren üst lige çıkar. Kurumun keşif listesi düzenliliğe göre sıralanır; ivmen “Yükselen sinyal” olur.'],
-        ['XP bir iş makbuzu', <>Üretim günü {XP.activeDay}, doğrulanmış iş {XP.evidence}, kurum onaylı aşama {XP.milestone} XP; günde en çok {XP.dailyCap}. Kurum tarafında oyun yok.</>],
+        ['Haftalık lig', 'Benzer tempodaki 18 gençle bir hafta yarışırsın; ilk 5 üst lige çıkar. Zemin’den Zirve’ye beş lig var, her ligde Niri yeni bir kostüm giyer.'],
+        ['Seri: üretim günleri', 'GitHub’a push, PR ya da sürüm attığın günler kendiliğinden seriye yazılır. Sayılan commit değil, üretim günü; mola haftası seriyi bozmaz.'],
+        ['XP bir iş makbuzu', <>Üretim günü {XP.activeDay}, doğrulanmış iş {XP.evidence}, kurum onaylı aşama {XP.milestone}, işe yarayan cevap {XP.helpful} XP; günde en çok {XP.dailyCap}. Kurum tarafında oyun yok.</>],
       ]}
-      web={{ src: '/sunum/dk-bugun.webp', alt: 'Gencin Bugün ekranı masaüstünde: bu hafta, lig, haftanın rotası ve Saha defteri', who: 'genc', route: 'bugun', mark: { x: 226, y: 220, w: 600, h: 291 } }}
-      lift={{ src: '/sunum/lift-hafta.webp', alt: 'Bu hafta: haftada 3 gün hedefi tamam, 13 haftalık seri, bu hafta 46 XP', x: 968, y: 520, w: 520, css: [600, 291] }}
+      web={{ src: '/sunum/dk-lig.webp', alt: 'Lig ekranı masaüstünde: Sırt Ligi, sıralama, haftalık seri ve haftanın rotası', who: 'genc', route: 'lig', mark: { x: 242, y: 118, w: 638, h: 532 } }}
+      lift={{ src: '/sunum/lift-lig.webp', alt: 'Sırt Ligi: Zemin, Tepe, Sırt, Doruk, Zirve; ilk 5’e girmek için 52 XP daha', x: 1076, y: 470, w: 412, css: [600, 499] }}
     />
   );
 }
@@ -889,49 +892,110 @@ function AiGuard() {
   );
 }
 
-// ---------------------------------------------------------------- 10. design decisions
+// ---------------------------------------------------------------- 10. design decisions: a rhythm for the genç, a calm measure for the kurum
+
+/** Emirhan's road map as the Analiz page computes it from the demo state: the closest door, then the widest levers. */
+const SEED = buildSeed();
+const ROAD = personInsight(SEED, SEED.people.find((p) => p.id === 'p-emirhan')!);
+const orgOfNeed = (id: string) => SEED.orgs.find((o) => o.id === SEED.needs.find((n) => n.id === id)?.orgId)?.name ?? '';
+
+/** Niri's road map drawn on the pafta: today's fit at the foot, one verified piece of work, the door at the top. */
+function RoadMap() {
+  const door = ROAD.closest!;
+  const from = door.match.score;
+  const gain = door.to - from;
+  // Card coordinates of the three stops, bottom-up.
+  const stops: [number, number][] = [
+    [96, 300],
+    [160, 226],
+    [104, 152],
+  ];
+  const route = `M${stops[0][0]} ${stops[0][1]} C 160 290 180 256 ${stops[1][0]} ${stops[1][1]} S 84 182 ${stops[2][0]} ${stops[2][1]}`;
+  const rows = [
+    { y: stops[2][1] - 34, head: `Uyum ${door.to}: en yakın kapı`, sub: `${orgOfNeed(door.match.need.id)} · ${door.match.need.title}` },
+    { y: stops[1][1] - 26, head: `${skillLabel(door.skill)} alanında bir doğrulanmış iş`, sub: `Uyumuna +${gain} puan` },
+    { y: stops[0][1] - 26, head: `Bugün · uyum ${from}`, sub: 'Niri eksiğini bulur, yolu çizer' },
+  ];
+  return (
+    <div className="relative h-full w-full overflow-hidden rounded-[22px] bg-bg ring-2 ring-line">
+      <Contours seed={4} x={0.2} y={0.55} rings={12} step={26} opacity={0.45} />
+      <p className="absolute left-[24px] top-[18px] text-[26px] font-extrabold tracking-[-0.02em] text-ink">Niri’nin yol haritası</p>
+      <p className="absolute left-[24px] top-[54px] text-[16px] font-bold text-ink-3">Emirhan’ın eksiğine göre, her hafta yeniden</p>
+      <svg viewBox="0 0 600 454" width="600" height="454" className="pointer-events-none absolute inset-0" aria-hidden="true">
+        <path d={route} fill="none" stroke="rgb(var(--orange))" strokeWidth="4.5" strokeDasharray="10 9" strokeLinecap="round" />
+      </svg>
+      <div className="absolute" style={{ left: stops[0][0] - 26, top: stops[0][1] - 44 }}>
+        <Tri size={52} tone="orange">
+          <span className="text-[16px] font-black leading-none text-white">{from}</span>
+        </Tri>
+      </div>
+      <div className="absolute" style={{ left: stops[1][0] - 22, top: stops[1][1] - 38 }}>
+        <Tri size={44} state="waiting" />
+      </div>
+      <div className="absolute" style={{ left: stops[2][0] - 22, top: stops[2][1] - 72 }}>
+        <SurveyFlag size={74} delay={0.8} />
+      </div>
+      {rows.map((r) => (
+        <div key={r.head} className="absolute left-[208px] w-[370px]" style={{ top: r.y }}>
+          <p className="text-[21px] font-extrabold leading-tight tracking-[-0.01em] text-ink">{r.head}</p>
+          <p className="mt-[2px] text-[16px] font-semibold leading-[1.3] text-ink-2">{r.sub}</p>
+        </div>
+      ))}
+      <div className="absolute inset-x-[24px] bottom-[18px] border-t-2 border-line pt-[12px]">
+        <p className="text-[15px] font-bold text-ink-3">Sonraki yollar</p>
+        <p className="mt-[4px] flex flex-wrap gap-x-[18px] gap-y-[2px] text-[17px] font-bold text-ink-2">
+          {ROAD.levers.slice(0, 3).map((l) => (
+            <span key={l.skill}>
+              {skillLabel(l.skill)} <span className="num text-orange-ink">+{l.gain}</span>
+              <span className="font-semibold text-ink-3"> · {l.needs.length > 1 ? `${l.needs.length} case` : orgOfNeed(l.needs[0].id)}</span>
+            </span>
+          ))}
+        </p>
+      </div>
+    </div>
+  );
+}
 
 function Decisions() {
   const pts = (k: keyof typeof WEIGHTS) => Math.round(WEIGHTS[k] * 100);
-  const cols: { who: 'genc' | 'kurum'; tag: string; items: [string, ReactNode][] }[] = [
-    {
-      who: 'genc',
-      tag: 'Genç: oyun gibi',
-      items: [
-        ['Her XP bir iş makbuzu', <>Üretim günü {XP.activeDay}, doğrulanmış iş {XP.evidence}, kurum onaylı aşama {XP.milestone}; günde en çok {XP.dailyCap}.</>],
-        ['Hedef, seri, lig', 'Hedef üretim günüdür, commit değil. Mola haftası seriyi bozmaz; Niri her ligde yeni kostüm giyer.'],
-        ['Topluluk', <>Gençler birbirine yardım eder: soran “İşe yaradı” derse yanıtlayan +{XP.helpful} XP alır.</>],
-        ['Haftalık analiz', 'Niri en yakın kapıyı gösterir: “Flutter’da bir doğrulanmış iş eklersen uyumun 63 → 72.”'],
-      ],
-    },
-    {
-      who: 'kurum',
-      tag: 'Kurum: sakin bir ölçüm',
-      items: [
-        ['İsim değil iş', 'Aday listesi ilk temasa kadar isimsiz; kurum unvanla değil problemle arar.'],
-        ['Açık uyum puanı', <>Yaptığı iş {pts('evidence')}, sektör ve ölçek {pts('context')}, zaman {pts('capacity')}, ortak geçmiş {pts('history')}; her parçanın gerekçesi yazar.</>],
-        ['İki onay, zincirli kayıt', 'Genç teslim eder, kurum onaylar; her kayıt SHA-256 ile öncekine bağlı.'],
-        ['Oyun yok, tek iş', 'Kurum ekranında XP, seri ya da lig yok. Her ekranda tek iş; Niri yol gösterir, kimseyi bekletmez.'],
-      ],
-    },
+  const calm: [string, ReactNode][] = [
+    ['İsim değil iş', 'Aday listesi ilk temasa kadar isimsiz.'],
+    ['Açık uyum puanı', <>Yaptığı iş {pts('evidence')}, sektör {pts('context')}, zaman {pts('capacity')}, ortak geçmiş {pts('history')}.</>],
+    ['İki onay, zincirli kayıt', 'Genç teslim eder, kurum onaylar.'],
+    ['Oyun yok, tek iş', 'Kurum ekranında XP, seri ya da lig yok.'],
   ];
   return (
     <>
       <Heading width={1376}>Tasarım: gence oyun, kuruma ölçüm.</Heading>
-      {cols.map((c, n) => (
-        <div key={c.tag} className="s-in absolute top-[196px] w-[640px]" style={{ left: n ? 848 : 112, ...d(140 + n * 200) }}>
-          <Tag who={c.who}>{c.tag}</Tag>
-          <ul className="mt-[10px]">
-            {c.items.map(([term, text]) => (
-              <li key={term} className="border-t-2 border-line py-[11px] first:border-t-0">
-                <p className="text-[25px] font-extrabold leading-tight tracking-[-0.02em] text-ink">{term}</p>
-                <p className="mt-[3px] text-[19px] font-semibold leading-[1.35] text-ink-2">{text}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
-      <Seam top={200} height={460} />
+      <div className="s-in absolute left-[112px] top-[186px]" style={d(100)}>
+        <Tag who="genc">Genç: oyun gibi bir ritim, yol gösteren Niri</Tag>
+      </div>
+      <div className="s-in absolute left-[112px] top-[236px] h-[454px] w-[600px]" style={d(200)}>
+        <RoadMap />
+      </div>
+      <figure className="s-in absolute left-[752px] top-[236px] w-[340px]" style={d(420)}>
+        <img src="/sunum/lift-lig.webp" alt="Sırt Ligi: Zemin, Tepe, Sırt, Doruk, Zirve; ilk 5’e girmek için 52 XP daha" width={1200} height={998} draggable={false} className="block h-auto w-full rounded-[18px] ring-2 ring-line" />
+        <figcaption className="mt-[8px] text-[17px] font-semibold leading-[1.3] text-ink-2">
+          <b className="font-extrabold text-ink">Haftalık lig:</b> benzer tempodaki 18 gençle; ilk 5 üst lige çıkar.
+        </figcaption>
+      </figure>
+      <figure className="s-in absolute left-[772px] top-[612px] w-[320px]" style={d(560)}>
+        <img src="/sunum/lift-hafta.webp" alt="Bu hafta: haftada 3 gün hedefi tamam, 13 haftalık seri, bu hafta 46 XP" width={1200} height={580} draggable={false} className="block h-auto w-full rounded-[16px] ring-2 ring-line" />
+      </figure>
+      <svg viewBox="0 0 4 470" width="4" height="470" className="absolute left-[1124px] top-[190px]" aria-hidden="true">
+        <path d="M2 2V468" stroke="rgb(var(--line-2))" strokeWidth="3" strokeDasharray="2 10" strokeLinecap="round" />
+      </svg>
+      <div className="s-in absolute left-[1156px] top-[186px] w-[332px]" style={d(700)}>
+        <Tag who="kurum">Kurum: sakin bir ölçüm</Tag>
+        <ul className="mt-[12px]">
+          {calm.map(([term, text]) => (
+            <li key={term} className="border-t-2 border-line py-[12px] first:border-t-0">
+              <p className="text-[23px] font-extrabold leading-tight tracking-[-0.02em] text-ink">{term}</p>
+              <p className="mt-[3px] text-[17px] font-semibold leading-[1.35] text-ink-2">{text}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
     </>
   );
 }
@@ -988,7 +1052,7 @@ function NiriSays() {
   );
 }
 
-// ---------------------------------------------------------------- 11. what we finished, what we left on purpose
+// ---------------------------------------------------------------- 11. what we finished, what the pilot completes
 
 function Done() {
   const W = 304;
@@ -1000,11 +1064,10 @@ function Done() {
     { code: '06', who: 'kurum', src: '/sunum/dk-pilot.webp', route: 'pilotlar/pl-rota', alt: 'Deneme projesi masaüstünde: aşamalar ve onay' },
     { code: '04', who: 'genc', src: '/sunum/dk-topluluk.webp', route: 'topluluk', alt: 'Topluluk masaüstünde: soru ve işe yarayan cevap' },
   ];
-  const left = ['Kalıcı veritabanı', 'Gerçek kullanıcı ve pilot', 'Kod dışı işte makine doğrulaması', 'Bildirim ve mağaza sürümü'];
-  const next = ['Kalıcılık', 'İlk ihtiyaç turu', 'Kod dışı doğrulama', 'Pilot raporu'];
+  const pilot = ['Kalıcı veritabanı', 'Gerçek kurumlarla ilk ihtiyaç turu', 'Kod dışı işlerde otomatik doğrulama', 'Bildirimler ve pilot raporu'];
   return (
     <>
-      <Heading width={1376}>Neyi bitirdik, neyi bilerek bıraktık?</Heading>
+      <Heading width={1376}>Neyi bitirdik, pilotta ne tamamlanacak?</Heading>
       <p className="s-in absolute left-[112px] top-[172px] flex items-center gap-[10px] text-[21px] font-bold text-green-ink" style={d(80)}>
         <Check size={24} strokeWidth={3.4} className="shrink-0" />
         Web sitesinde altı problemin altısı canlıda çalışıyor; motor ve sunucu 59 otomatik testle sınanıyor.
@@ -1028,10 +1091,14 @@ function Done() {
       </div>
 
       <div className="s-in absolute left-[800px] top-[712px] w-[688px]" style={d(840)}>
-        <p className="text-[16px] font-bold text-ink-3">Bilerek bıraktık</p>
-        <p className="mt-[2px] text-[19px] font-bold leading-[1.3] text-ink-2">{left.join(' · ')}</p>
-        <p className="mt-[10px] text-[16px] font-bold text-ink-3">Finalden sonra 4 ay · plan</p>
-        <p className="mt-[2px] text-[19px] font-bold leading-[1.3] text-ink-2">{next.map((t, i) => `${i + 1}. ${t}`).join('   ')}</p>
+        <p className="text-[16px] font-bold text-ink-3">Pilotta tamamlanacaklar · finalden sonraki 4 ay</p>
+        <ol className="mt-[4px] grid grid-cols-2 gap-x-[24px] gap-y-[2px] text-[19px] font-bold leading-[1.35] text-ink-2">
+          {pilot.map((t, i) => (
+            <li key={t}>
+              <span className="num text-indigo">{i + 1}.</span> {t}
+            </li>
+          ))}
+        </ol>
       </div>
     </>
   );
@@ -1053,7 +1120,7 @@ function Close() {
         <span className="text-indigo">bir nokta.</span>
       </p>
       <p className="s-in absolute left-[112px] top-[436px] w-[640px] text-[32px] font-bold leading-[1.25] tracking-[-0.015em] text-ink-2" style={d(200)}>
-        Tek isteğimiz: bu salondan bir girişimin ya da kurumun gerçek bir ihtiyacı. <span className="text-indigo">İlk kanvası birlikte yazalım.</span>
+        Bu salondaki bir girişimin gerçek bir case’i, bir gencin ilk imzalı deneyimi olabilir. <span className="text-indigo">Gelin, ilkini birlikte yazalım.</span>
       </p>
       <div className="s-in absolute left-[112px] top-[612px] w-[420px]" style={d(360)}>
         <Wordmark size={44} />
@@ -1070,7 +1137,7 @@ function Close() {
 }
 
 export const SLIDES: Slide[] = [
-  { id: 'baslik', title: 'Nirengi', mark: 'hero', niri: { mood: 'wave', gear: 0, line: 'Merhaba, ben Niri! Bugün size haritamı göstereceğim.' }, View: Title },
+  { id: 'baslik', title: 'Nirengi', mark: 'hero', niri: { mood: 'wave', gear: 0, line: 'Merhaba, ben Niri! Her çaban benim için değerli.' }, View: Title },
   { id: 'problem', title: 'Problem', mark: 'dock', niri: { mood: 'sad', gear: 0, line: 'Gençler görünmüyor, kurumlar emin olamıyor.' }, View: Problem },
   { id: 'kim-icin', title: 'Kim için', mark: 'dock', niri: { mood: 'think', gear: 0, line: 'Biri kanıt arıyor, öbürü güvenilir bir ekip.' }, View: ForWhom },
   { id: 'kanit', title: 'Kanıt', mark: 'dock', niri: { mood: 'think', gear: 0, line: 'Rakamları uydurmadım; kaynakları altında.' }, View: Evidence },
@@ -1080,7 +1147,7 @@ export const SLIDES: Slide[] = [
   { id: 'yz-fark', title: 'Case ölçülebilir olur', mark: 'dock', niri: { mood: 'cheer', gear: 2, line: 'Case netleşince kimin uyduğunu gösterebilirim.' }, View: AiDiff },
   { id: 'yz-onlem', title: 'Metinde olmayanı almaz', mark: 'dock', niri: { mood: 'think', gear: 3, line: 'Metinde yoksa almam, sorarım.' }, View: AiGuard },
   { id: 'tasarim', title: 'Tasarım kararları', mark: 'dock', niri: { mood: 'happy', gear: 3, line: 'Gence ritim veririm, kurumu hiç bekletmem.' }, View: Decisions },
-  { id: 'bitti', title: 'Bitti ve bırakılan', mark: 'dock', niri: { mood: 'happy', gear: 3, line: 'Prototipim çalışıyor. Gerisini pilotta kanıtlayacağım.' }, View: Done },
+  { id: 'bitti', title: 'Bitti ve pilotta tamamlanacak', mark: 'dock', niri: { mood: 'happy', gear: 3, line: 'Prototipim çalışıyor. Gerisini pilotta kanıtlayacağım.' }, View: Done },
   { id: 'kapanis', title: 'Teşekkürler', mark: 'hero', niri: { mood: 'wave', gear: 4, turns: 2, line: 'Zirvedeyim! İlk noktayı birlikte koyalım.' }, View: Close },
   { id: 'dogrulama', title: 'İşin, kaynağında doğrulanır', mark: 'dock', extra: true, niri: { mood: 'happy', gear: 4, line: 'İşin nerede duruyorsa oradan doğrularım.' }, View: PageVerified },
   { id: 'xp', title: 'XP yalnız gerçek işten', mark: 'dock', extra: true, niri: { mood: 'cheer', gear: 4, line: 'Puan değil makbuz: her XP bir iş.' }, View: PageXp },

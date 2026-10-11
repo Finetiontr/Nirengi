@@ -257,7 +257,8 @@ def main():
             tr.addnext(etree.fromstring(timing_xml))
 
         notes = s.get("notes") or {}
-        lines = [f"{n}. {s['title']} (~{notes.get('sec', '?')} sn)", f"Niri: {s['line']}", ""] + list(notes.get("say", []))
+        key = [f"Kritik nokta: {notes['key']}", ""] if notes.get("key") else []
+        lines = [f"{n}. {s['title']} (~{notes.get('sec', '?')} sn)", f"Niri: {s['line']}", ""] + key + list(notes.get("say", []))
         if n == close:
             for a in manifest.get("qa", []):
                 lines += ["", f"Soru: {a['q']}"] + list(a["say"])

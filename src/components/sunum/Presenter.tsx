@@ -102,6 +102,12 @@ export default function Presenter() {
 
         <main className="grid flex-1 gap-8 md:grid-cols-[1fr_320px]">
           <div className="flex flex-col gap-8">
+            {note?.key && (
+              <p className="rounded-[18px] bg-indigo-tint px-5 py-4 text-[22px] font-bold leading-[1.35] text-indigo">
+                <span className="block text-[15px] font-bold text-ink-3">Kritik nokta</span>
+                {note.key}
+              </p>
+            )}
             <ul className="flex flex-col gap-4">
               {(note?.say ?? ['Bu slayt için not yok.']).map((t) => (
                 <li key={t} className="flex gap-3 text-[26px] font-semibold leading-[1.4] text-ink">
