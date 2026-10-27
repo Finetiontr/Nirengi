@@ -1,6 +1,6 @@
 # Sunum notları
 
-*Zemin360 finali · 12 slayt · planlanan süre 4:49 (film 1:31, konuşma 3:18)*
+*Zemin360 finali · 16 slayt · planlanan süre 5:55 (film 1:31, konuşma 4:24)*
 
 Bu dosya `src/components/sunum/notes.ts` dosyasından `node scripts/sunum-export/notes-md.mjs` ile üretildi; notları orada düzeltin. Niri sessizdir; konuşan ekiptir. Her slaytta Niri’nin iki ya da üç kısa balonu var: her balon, konuşmacının sıradaki cümlesinin başlığı. Balonlar kendiliğinden ilerler: her biri, altındaki cümleyi sakin bir hızla söylemek için gereken süre (saniyede yaklaşık 14 harf) ve kısa bir nefes boyunca kalır; slaytın son balonundan sonra Niri bekler. Konuşmacılar yalnız sayfa değiştirir: **→** (ya da boşluk, tıklama) sıradaki sayfa, **←** önceki sayfa, **P** balonları (film slaytında filmi) duraklatır ve devam ettirir. Her slaytın bir kritik noktası var: jürinin o slayttan aklında tutması gereken tek cümle. Konuşmacı penceresi (**N** ya da `/sunum?notlar`) her balonun altında söylenecekleri ve balonun kalma süresini, sahnedekini çerçeveli gösterir ve saati plana göre tutar; **R** süreyi sıfırlar.
 
@@ -8,53 +8,108 @@ Konuşma organizasyonun önerdiği on iki adımı izler ve beş dakikaya sığar
 
 Planlanan süreler cümlelerin uzunluğundan hesaplanır (`src/components/sunum/timing.ts`): Niri’nin slayta dönüşü, cümleler saniyede 14 harfle ve aralarında 0,6 saniyelik nefes, bir de tuşa basma. Slaytlardaki her sayı `docs/PAZAR-ANALIZI.md` içindeki kaynağıyla birlikte slaytın üzerinde yazar ya da ürünün kendi kodundan gelir (deneyim puanı tablosu, uyum ağırlıkları, kanıt düzeylerinin ağırlığı, yayın eşiği); yapay zekâ slaytlarındaki sonuçları ürünün kendi kodu, gerçek bir model cevabıyla hesaplar. Planlar plan olarak etiketli; kullanıcı, pilot ya da gelir rakamı yok.
 
-## 1. Nirengi
+## 1. Deneyim yoksa iş yok
 
-*0:00 – 0:16*
+*0:00 – 0:23*
 
-**Kritik nokta:** Nirengi: gencin gerçek işi ölçülebilir deneyim olur, şirketin gerçek case’iyle buluşur.
+**Kritik nokta:** Asıl problem tek: deneyim yoksa iş yok, iş yoksa deneyim yok.
 
-- **Balon:** “Merhaba, ben Niri! Her çaban benim için değerli.” *(6,1 sn)*  
-  Söyle: Merhaba, biz Sezer Uzun ve Emirhan Açık; Niri de bize yol arkadaşlığı edecek.
-- **Balon:** “Yaptığın işi ölçülebilir deneyime çeviririm.” *(8,5 sn)*  
-  Söyle: Nirengi açık kaynak bir web sitesi: gencin gerçek işini doğrular, deneyimini ölçülebilir bir değere dönüştürür.
+- **Balon:** “Merhaba, ben Niri! Bugün tek bir problem var.” *(11,7 sn)*  
+  Söyle: Merhaba, biz Sezer Uzun, Emirhan Açık ve Ayça Güder; Nirengi’yi Zemin360 Hackathon’unda yaptık, sonra açık kaynak olarak kendimiz yayınlamaya karar verdik.
+- **Balon:** “Deneyim yoksa iş yok, iş yoksa deneyim yok.” *(9,5 sn)*  
+  Söyle: Bugün tek bir problemi konuşacağız: deneyim yoksa iş yok, iş yoksa deneyim yok. Geri kalan her şey bunun çözümünden türüyor.
 
-## 2. Problem
+## 2. Problem: genç
 
-*0:16 – 0:32*
+*0:23 – 0:39*
 
-**Kritik nokta:** Kısır döngü: deneyim yoksa iş yok, iş yoksa deneyim yok.
+**Kritik nokta:** Gencin tarafı: her dört gençten biri ne okulda ne işte.
 
-- **Balon:** “Deneyim yoksa iş yok, iş yoksa deneyim yok.” *(6,5 sn)*  
-  Söyle: Deneyim yoksa iş yok, iş yoksa deneyim yok: her 100 gençten 23’ü ne okulda ne işte.
-- **Balon:** “Şirketler de emin olamıyor.” *(7,8 sn)*  
-  Söyle: Bilişim uzmanı almakta zorlanan her 100 şirketten 71’i de aynı şeyi söylüyor: ilgili iş deneyimi yok.
+- **Balon:** “Her dört gençten biri ne okulda ne işte.” *(6,5 sn)*  
+  Söyle: Türkiye’de 15–24 yaşta her 100 gençten 23’ü ne okulda ne işte; genç kadınlarda 31.
+- **Balon:** “İlk kayıtlı iş ortalama 14 ay sürüyor.” *(8,1 sn)*  
+  Söyle: Lisans mezunu ilk kayıtlı işini ortalama 14,4 ayda buluyor. Bu gençlerin çoğu yeteneksiz değil, görünmez.
 
-## 3. Kim için
+## 3. Problem: kurum
 
-*0:32 – 0:47*
+*0:39 – 0:54*
 
-**Kritik nokta:** Odak: İK’sı olmayan startuplar ve her alandan, kanıtı olmayan genç üreticiler.
+**Kritik nokta:** Kurum aynı cümleyi kuruyor: ilgili iş deneyimi yok.
 
-- **Balon:** “Her alandan üreten gençler için buradayım.” *(7,1 sn)*  
-  Söyle: Yalnız yazılımcılar değil; tasarımcı, animasyoncu, çevirmen: üreten ama görünmeyen gençler.
-- **Balon:** “Bir de ekip kuran, İK’sı olmayan startuplar.” *(6,6 sn)*  
-  Söyle: Öbür yanda ekip kuran startuplar: İK’ları yok, yanlış bir işe alımı kaldıramıyorlar.
+- **Balon:** “Kurum da aynı cümleyi kuruyor.” *(4,0 sn)*  
+  Söyle: Kurum tarafı aynı duvarı öbür taraftan görüyor.
+- **Balon:** “100 şirketten 71’i: “deneyim yok.”” *(9,8 sn)*  
+  Söyle: Bilişim uzmanı almakta zorlanan her 100 şirketten 71’i nedeni “ilgili iş deneyimi yok” diye gösteriyor. Aynı cümle, iki taraftan.
 
-## 4. Kanıt
+## 4. Kök neden: ölçüm
 
-*0:47 – 1:05*
+*0:54 – 1:11*
 
-**Kritik nokta:** Sorun niyet değil: beceriyi ölçecek bir araç yok. Nirengi o araç.
+**Kritik nokta:** Kök neden ölçüm: deneyim yılının öngörme gücü 0,07.
 
-- **Balon:** “Diploma şartı kalktı, işe alım değişmedi.” *(8,7 sn)*  
-  Söyle: Şirketler diploma şartını kaldırdı ama bu, her 700 işe alımdan 1’ini bile değiştirmedi; beceriyi ölçecek araç yok.
-- **Balon:** “37 platforma baktık; o ölçüyü biz kurduk.” *(7,7 sn)*  
-  Söyle: 37 platform inceledik; doğrulanmış işi ve kurum imzasını birlikte sunan yok. Nirengi o ölçüm aracı.
+- **Balon:** “Sorun niyet değil, ölçüm.” *(5,7 sn)*  
+  Söyle: Kök neden bir ölçüm sorunu: kurum deneyimi ölçemediği için yıla bakıyor.
+- **Balon:** “Deneyim yılı neredeyse hiçbir şey söylemiyor.” *(10,0 sn)*  
+  Söyle: Deneyim yılının iş performansını öngörme gücü 0,07, neredeyse sıfır. Gerçek bir iş örneği 0,33, yapılandırılmış değerlendirme 0,42.
 
-## 5. Ne çözüyoruz
+## 5. Kök neden: tanıdık
 
-*1:05 – 1:28*
+*1:11 – 1:26*
+
+**Kritik nokta:** Tanıdık mülakat şansını yaklaşık 13 katına çıkarıyor.
+
+- **Balon:** “Ölçemeyince boşluğu tanıdık dolduruyor.” *(3,8 sn)*  
+  Söyle: Kurum ölçemeyince boşluğu tanıdık dolduruyor.
+- **Balon:** “Normalde 100’de 3, referansla 100’de 40.” *(10,0 sn)*  
+  Söyle: Her 100 normal başvurudan 3’ü mülakata çağrılıyor; referanslıda 40. Referanslar başvuruların yüzde 1’i ama işe alımların yüzde 18’i.
+
+## 6. Türkiye’de tanıdık
+
+*1:26 – 1:45*
+
+**Kritik nokta:** Türkiye’de gençler tanıdığı işe girişin şartı sayıyor.
+
+- **Balon:** “Türkiye’de bunun adı torpil.” *(9,0 sn)*  
+  Söyle: Türkiye’de bunun adı torpil, dayı: ne okulda ne işte olan gençlerin yüzde 86’sı “tanıdığın yoksa iş bulmak zor” diyor.
+- **Balon:** “İsim bile geri dönüşü değiştiriyor.” *(8,8 sn)*  
+  Söyle: İstanbul’daki bir saha deneyinde aynı nitelikteki CV’lerde Türk kadın, Kürt kadından 2,5 kat fazla geri dönüş aldı.
+
+## 7. Problemin yeri: ilk eleme
+
+*1:45 – 2:07*
+
+**Kritik nokta:** Problemin düğümlendiği yer: ilk eleme.
+
+- **Balon:** “Her şey ilk elemede düğümleniyor.” *(9,2 sn)*  
+  Söyle: Asıl problemin yeri belli: ilk eleme. CV’lerin çoğu açılmıyor, deneyim yılı burada soruluyor, tanıdık burada öne geçiyor.
+- **Balon:** “Nirengi tam buraya müdahale ediyor.” *(11,5 sn)*  
+  Söyle: İlanların beşte biri de doldurulmak için açılmıyor. Nirengi bu iki noktaya dokunuyor: ihtiyacı netleştiriyor, ilk elemeyi isimsiz ve işe dayalı yapıyor.
+
+## 8. Döngü kırılabilir
+
+*2:07 – 2:27*
+
+**Kritik nokta:** İlk iş ve açık değerlendirme döngüyü kırıyor.
+
+- **Balon:** “Döngü kırılabiliyor.” *(9,7 sn)*  
+  Söyle: Döngü kırılabiliyor: hiç iş almamış kişilere tek bir küçük iş ve açık değerlendirme verilince iş bulma yüzde 12’den 30’a çıktı.
+- **Balon:** “Açık kanıt, dayının işini görebiliyor.” *(8,7 sn)*  
+  Söyle: Kefil olan bir aracı deneyimsizin şansını yüzde 75 artırıyor; ama açık iyi puan biriktikçe aracıya gerek kalmıyor.
+
+## 9. Herkesin dayısı
+
+*2:27 – 2:40*
+
+**Kritik nokta:** Nirengi: herkesin dayısı.
+
+- **Balon:** “Nirengi, herkesin dayısı.” *(6,7 sn)*  
+  Söyle: Dayının yaptığı işi yazılıma çeviriyoruz: kefil olmak, kapıyı açmak, ihtiyacı bilmek.
+- **Balon:** “Tanıdığı olana değil, işini gösterene.” *(4,9 sn)*  
+  Söyle: Tanıdığı olana değil, işini gösterene; herkese aynı kuralla.
+
+## 10. Nasıl çalışır
+
+*2:40 – 3:03*
 
 **Kritik nokta:** Kurum gerçek bir case verir; gençler işleriyle ölçülür; en uyumlusu onu deneme projesinde gerçekten çözer.
 
@@ -65,9 +120,9 @@ Planlanan süreler cümlelerin uzunluğundan hesaplanır (`src/components/sunum/
 - **Balon:** “Kurum case’ini yazar, en uyumlu genç çözer.” *(9,0 sn)*  
   Söyle: Kurum case’ini kendi sözleriyle yazar, Niri ölçülebilir yapar; en uyumlu genç deneme projesinde çözer. Filmde görelim.
 
-## 6. Canlı demo: film
+## 11. Canlı demo: film
 
-*1:28 – 2:59*
+*3:03 – 4:34*
 
 **Kritik nokta:** Filmde iki göz var: önce genç, sonra kurum; her ekran ürünün gerçek ekranı.
 
@@ -106,81 +161,104 @@ Planlanan süreler cümlelerin uzunluğundan hesaplanır (`src/components/sunum/
 - **1:25 · Filmde:** “Emirhan, sıradaki sayfaya geçelim mi?”  
   (Film bitince →.)
 
-## 7. Niri açık bir modelle okur
+## 12. Bugün çalışan
 
-*2:59 – 3:25*
+*4:34 – 4:49*
 
-**Kritik nokta:** Açık kaynak model: veri kapalı bir yapay zekâ şirketine gitmez; istenirse tamamen kendi sunucumuzda çalışır.
+**Kritik nokta:** Bugün çalışan dört cevap, dört problemi kapatıyor.
 
-- **Balon:** “Şimdi yapay zekâya yakından bakalım.” *(8,1 sn)*  
-  Söyle: Yapay zekâ kurumun dağınık metnini okuyor, her alanı bir cümleye dayanan bir ihtiyaç kanvasına çeviriyor.
-- **Balon:** “Açık bir modelle okurum; metni saklamam.” *(10,9 sn)*  
-  Söyle: Model Google’ın açık kaynak Gemma 4’ü. Metin kapalı bir şirkete gitmiyor; kendi sunucumuzda çalışabilir. Demo Cloudflare’de, metni saklamıyoruz.
-- **Balon:** “Ben okur, öneririm; kararı kurallar verir.” *(5,5 sn)*  
-  Söyle: Yayın, puan ve sıralama kurallarda; model yalnız okuyor ve öneriyor.
+- **Balon:** “Dört problem, dört cevap.” *(2,7 sn)*  
+  Söyle: Bunlar bugün sitede çalışıyor.
+- **Balon:** “Yıl değil iş; isim değil kanıt.” *(11,0 sn)*  
+  Söyle: Deneyim yılı yerine işi ölçen merdiven, isim yerine isimsiz ilk temas, muğlak ilan yerine netlik eşiği, ilk iş yerine kurum onaylı deneme projesi.
 
-## 8. Case ölçülebilir olur
+## 13. Sırada: güven
 
-*3:25 – 3:46*
+*4:49 – 5:08*
 
-**Kritik nokta:** Yapay zekâ case’i ölçülebilir yapar; gençler bu case’e isimsiz, referanssız ve açık bir formülle ölçülür.
+**Kritik nokta:** Sırada güven: kurum doğrulama, adil deneme, canlı savunma.
 
-- **Balon:** “Okuyunca case netleşir: 60’tan 75’e.” *(7,0 sn)*  
-  Söyle: Aynı metin kural motoruyla 60 puan alıp yayımlanamıyor; Niri okuyunca 75, önerilerle 100.
-- **Balon:** “Sonra gençleri isimsiz, işleriyle tartarım.” *(6,3 sn)*  
-  Söyle: Gençler bu case’e göre isimsiz ölçülüyor; referans ya da tanıdık puana girmiyor.
-- **Balon:** “Puan açık bir formül; her parçası yazar.” *(5,9 sn)*  
-  Söyle: Puan açık bir formül: yaptığı iş 45, sektör 20, zaman 15, ortak geçmiş 20.
+- **Balon:** “Sırada güven var.” *(3,4 sn)*  
+  Söyle: Çalışmamız gereken alanlar; önce güven.
+- **Balon:** “Kurum da doğrulanmalı, deneme adil olmalı.” *(14,6 sn)*  
+  Söyle: Kurumun ihtiyacı gerçek mi diye alan adıyla doğrulama ve pilota dönüşme oranı; deneme projesi ucuz emeğe dönmesin diye ücretli, gönüllü ya da kredili etiketi; yazarlık için kısa bir canlı savunma.
 
-## 9. Metinde olmayanı almaz
+## 14. Sırada: ölçek
 
-*3:46 – 4:01*
+*5:08 – 5:23*
 
-**Kritik nokta:** Model uydurursa alınmaz, Niri sorar; model yoksa kural motoru devralır.
+**Kritik nokta:** Sırada ölçek: kalıcı hesaplar, usta rolü, taşınabilir kanıt.
 
-- **Balon:** “Model yanılırsa dört kapıdan geçemez.” *(6,0 sn)*  
-  Söyle: Modelin cevabı dört denetimden geçiyor: şema, alıntı, sayı, ölçülebilirlik.
-- **Balon:** “Metinde yoksa almam, kuruma sorarım.” *(8,0 sn)*  
-  Söyle: Metinde olmayan bir şey uydurursa alınmıyor, Niri kuruma soruyor. Model susarsa kural motoru devralıyor.
+- **Balon:** “Sonra ölçek.” *(2,6 sn)*  
+  Söyle: Sonra ölçeğe hazırlanıyoruz.
+- **Balon:** “Usta ile çırak arasında köprü.” *(11,1 sn)*  
+  Söyle: Kalıcı hesaplar ve veritabanı; kurumdan bağımsız bir usta rolü: profesyonel gence yol gösterir ve işini onaylar; kanıt Open Badges ile gencin olur.
 
-## 10. Tasarım kararları
+## 15. Pilot önerisi
 
-*4:01 – 4:21*
+*5:23 – 5:41*
 
-**Kritik nokta:** Niri her gence eksiğine göre kişisel bir yol haritası çizer; deneyim puanı yalnız gerçek işten gelir.
+**Kritik nokta:** Tek ölçüt: kayıttan ilk onaylanmış işe kaç gün.
 
-- **Balon:** “Gence oyun gibi bir ritim, kuruma sakin bir ölçüm.” *(4,7 sn)*  
-  Söyle: Gence oyun gibi bir ritim, kuruma sakin bir ölçüm verdik.
-- **Balon:** “Her gence eksiğine göre bir rota çizerim.” *(7,0 sn)*  
-  Söyle: Niri her gence eksiğine göre yol çiziyor: Emirhan bugün 63 uyumlu, Flutter’da bir işle 72.
-- **Balon:** “Deneyim puanı yalnız gerçek işten gelir.” *(6,8 sn)*  
-  Söyle: Ekrandaki XP, deneyim puanı demek: yalnız gerçek işten gelir. Kurum tarafında oyun yok.
+- **Balon:** “Bunu birlikte ölçelim.” *(7,7 sn)*  
+  Söyle: Bunu bir kez gerçek kurumlarla ölçmek istiyoruz: Zemin360’tan 2–3 kurum, GİRVAK ağından 20–30 genç.
+- **Balon:** “Kayıttan ilk onaylı işe kaç gün?” *(9,2 sn)*  
+  Söyle: Ölçeceğimiz tek şey: gencin kayıttan ilk onaylanmış işine kaç günde geldiği. Hedef rakam koymuyoruz, önce taban çizgisi.
 
-## 11. Bitti ve pilotta tamamlanacak
+## 16. Teşekkürler
 
-*4:21 – 4:36*
+*5:41 – 5:55*
 
-**Kritik nokta:** Altı problemin altısı canlıda çalışıyor; pilotta tamamlanacaklar belli.
+**Kritik nokta:** Çağrı: ilk ihtiyaç turunu birlikte ölçmek.
 
-- **Balon:** “Prototipim çalışıyor: altı problemin altısı canlıda.” *(6,9 sn)*  
-  Söyle: Gördüğünüz her şey canlı: altı problemin altısı çalışıyor, 63 otomatik testle sınanıyor.
-- **Balon:** “Gerisini pilotta, gerçek kurumlarla kanıtlayacağım.” *(7,1 sn)*  
-  Söyle: Pilotta: kalıcı veritabanı, gerçek kurumlarla ilk tur, kod dışı işlerde otomatik doğrulama.
-
-## 12. Teşekkürler
-
-*4:36 – 4:49*
-
-**Kritik nokta:** Çağrı: salondaki bir girişimin gerçek case’i.
-
-- **Balon:** “Zirvedeyim! İlk noktayı birlikte koyalım.” *(8,2 sn)*  
-  Söyle: Bu salondaki bir girişimin case’i, bir gencin ilk imzalı deneyimi olabilir. Gelin, ilkini birlikte yazalım.
+- **Balon:** “Zirvedeyim! İlk noktayı birlikte koyalım.” *(8,5 sn)*  
+  Söyle: Zemin360’taki bir kurumun gerçek ihtiyacı, bir gencin ilk imzalı deneyimi olabilir. İlk turu birlikte ölçelim.
 - **Balon:** “Her çaban haritada bir nokta. Teşekkürler!” *(3,6 sn)*  
   Söyle: Her çaban haritada bir nokta. Teşekkürler.
 
 ## Ek sayfalar (konuşmanın dışında)
 
-### Ek 1. İşin, kaynağında doğrulanır
+### Ek 1. Niri açık bir modelle okur
+
+**Kritik nokta:** Açık kaynak model: veri kapalı bir yapay zekâ şirketine gitmez; istenirse tamamen kendi sunucumuzda çalışır.
+
+- **Balon:** “Şimdi yapay zekâya yakından bakalım.”  
+  Cevap: Yapay zekâ kurumun dağınık metnini okuyor, her alanı bir cümleye dayanan bir ihtiyaç kanvasına çeviriyor.
+- **Balon:** “Açık bir modelle okurum; metni saklamam.”  
+  Cevap: Model Google’ın açık kaynak Gemma 4’ü. Metin kapalı bir şirkete gitmiyor; kendi sunucumuzda çalışabilir. Demo Cloudflare’de, metni saklamıyoruz.
+- **Balon:** “Ben okur, öneririm; kararı kurallar verir.”  
+  Cevap: Yayın, puan ve sıralama kurallarda; model yalnız okuyor ve öneriyor.
+
+### Ek 2. Case ölçülebilir olur
+
+**Kritik nokta:** Yapay zekâ case’i ölçülebilir yapar; gençler bu case’e isimsiz, referanssız ve açık bir formülle ölçülür.
+
+- **Balon:** “Okuyunca case netleşir: 60’tan 75’e.”  
+  Cevap: Aynı metin kural motoruyla 60 puan alıp yayımlanamıyor; Niri okuyunca 75, önerilerle 100.
+- **Balon:** “Sonra gençleri isimsiz, işleriyle tartarım.”  
+  Cevap: Gençler bu case’e göre isimsiz ölçülüyor; referans ya da tanıdık puana girmiyor.
+- **Balon:** “Puan açık bir formül; her parçası yazar.”  
+  Cevap: Puan açık bir formül: yaptığı iş 45, sektör 20, zaman 15, ortak geçmiş 20.
+
+### Ek 3. Metinde olmayanı almaz
+
+**Kritik nokta:** Model uydurursa alınmaz, Niri sorar; model yoksa kural motoru devralır.
+
+- **Balon:** “Model yanılırsa dört kapıdan geçemez.”  
+  Cevap: Modelin cevabı dört denetimden geçiyor: şema, alıntı, sayı, ölçülebilirlik.
+- **Balon:** “Metinde yoksa almam, kuruma sorarım.”  
+  Cevap: Metinde olmayan bir şey uydurursa alınmıyor, Niri kuruma soruyor. Model susarsa kural motoru devralıyor.
+
+### Ek 4. Bitti ve pilotta tamamlanacak
+
+**Kritik nokta:** Altı problemin altısı canlıda çalışıyor; pilotta tamamlanacaklar belli.
+
+- **Balon:** “Prototipim çalışıyor: altı problemin altısı canlıda.”  
+  Cevap: Gördüğünüz her şey canlı: altı problemin altısı çalışıyor, 63 otomatik testle sınanıyor.
+- **Balon:** “Gerisini pilotta, gerçek kurumlarla kanıtlayacağım.”  
+  Cevap: Pilotta: kalıcı veritabanı, gerçek kurumlarla ilk tur, kod dışı işlerde otomatik doğrulama.
+
+### Ek 5. İşin, kaynağında doğrulanır
 
 **Kritik nokta:** Her işin yanında ne kadar güvenilir olduğu yazar.
 
@@ -189,7 +267,7 @@ Planlanan süreler cümlelerin uzunluğundan hesaplanır (`src/components/sunum/
 - **Balon:** “İşin nerede duruyorsa oradan doğrularım.”  
   Cevap: Her işin yanında üç düzeyden biri yazar: Beyan, gencin kendi söylediği; Doğrulandı, kaynağından kontrol edildi; Kurum onaylı, bir kurum imzaladı. GitHub’da projenin gerçekten gencin hesabında olduğunu kontrol ederiz, kodunu almayız. Behance ya da ArtStation’daki işin sahipliğini dışarıdan doğrulayamadığımız için dürüstçe Beyan yazıyoruz; her alanda en güçlü kanıt kurum onayı.
 
-### Ek 2. Deneyim puanı yalnız gerçek işten
+### Ek 6. Deneyim puanı yalnız gerçek işten
 
 **Kritik nokta:** Oyunun her parçası gerçek işe bağlı: deneyim ölçülebilir bir değer olur.
 
@@ -198,7 +276,7 @@ Planlanan süreler cümlelerin uzunluğundan hesaplanır (`src/components/sunum/
 - **Balon:** “Her deneyim puanının arkasında bir iş var.”  
   Cevap: Haftalık ligde genç benzer tempodaki 18 kişiyle yarışır; ilk 5 üst lige çıkar. Seri, üretim yaptığın günlerden oluşur. Ekranda XP diye yazan deneyim puanı bir iş makbuzu: üretim günü 10, doğrulanmış iş 40, kurum onaylı aşama 120.
 
-### Ek 3. Eksiğini gör
+### Ek 7. Eksiğini gör
 
 **Kritik nokta:** Eşleşmeyen genç neyin eksik olduğunu bilir.
 
@@ -207,7 +285,7 @@ Planlanan süreler cümlelerin uzunluğundan hesaplanır (`src/components/sunum/
 - **Balon:** “Uyumunu artıracak en yakın kapıyı gösteririm.”  
   Cevap: Niri her hafta gencin haftasını okur ve en yakın kapıyı gösterir: Flutter’da bir doğrulanmış iş eklersen uyumun 63’ten 72’ye çıkar. Bu analiz kural tabanlı ve formülü açık; ona yapay zekâ demiyoruz.
 
-### Ek 4. Gençler birbirine yardım eder
+### Ek 8. Gençler birbirine yardım eder
 
 **Kritik nokta:** Yardım eden de görünür olur.
 
@@ -216,7 +294,7 @@ Planlanan süreler cümlelerin uzunluğundan hesaplanır (`src/components/sunum/
 - **Balon:** “Burada yardım eden de kazanır.”  
   Cevap: Takılan genç soruyor, o işi daha önce yapmış biri cevaplıyor. Soran “İşe yaradı” deyince yanıtlayan 15 deneyim puanı kazanıyor; haftanın yardımcıları işe yarayan cevap sayısıyla sıralanıyor.
 
-### Ek 5. Kurum derdini yazar
+### Ek 9. Kurum derdini yazar
 
 **Kritik nokta:** Kurum ilan değil, derdini yazar.
 
@@ -225,7 +303,7 @@ Planlanan süreler cümlelerin uzunluğundan hesaplanır (`src/components/sunum/
 - **Balon:** “Derdini anlat, alanları ben doldururum.”  
   Cevap: Kuzey Lojistik ilan yazmıyor, derdini anlatıyor. Niri bunu yedi alanlı kanvasa çeviriyor: durum, sorun, sorunun ölçüsü, beklenen sonuç, kısıtlar, karar verici, kapsam. Netlik 70’i geçmeden ihtiyaç yayımlanmıyor.
 
-### Ek 6. Adaylar isimsiz
+### Ek 10. Adaylar isimsiz
 
 **Kritik nokta:** Önce iş, sonra isim; referans puana girmez.
 
@@ -234,7 +312,7 @@ Planlanan süreler cümlelerin uzunluğundan hesaplanır (`src/components/sunum/
 - **Balon:** “İsmi değil, işi tartarım.”  
   Cevap: Kurum adayları isimsiz görüyor: isim, okul ve şehir ilk temasa kadar gizli; referans ya da tanıdık puana girmiyor. Puan dört parçadan oluşuyor: yaptığı iş 45, sektör ve ölçek 20, zaman 15, ortak geçmiş 20; her parçanın gerekçesi yazıyor.
 
-### Ek 7. İki onay, zincirli kayıt
+### Ek 11. İki onay, zincirli kayıt
 
 **Kritik nokta:** İki imza; sonradan kimse değiştiremez.
 
@@ -243,7 +321,7 @@ Planlanan süreler cümlelerin uzunluğundan hesaplanır (`src/components/sunum/
 - **Balon:** “İki imza, bir mühür. Sonradan kimse değiştiremez.”  
   Cevap: Case’in başarı kriterleri aşamalara dönüşüyor: genç teslim ediyor, kurum onaylıyor. Her kayıt bir öncekine SHA-256 ile bağlı; biri sonradan tek harf değiştirse zincir tam o kayıtta kırılıyor.
 
-### Ek 8. Onay, gencin kanıtı olur
+### Ek 12. Onay, gencin kanıtı olur
 
 **Kritik nokta:** Case boşa gitmez; imzalı deneyim olur.
 
@@ -252,7 +330,7 @@ Planlanan süreler cümlelerin uzunluğundan hesaplanır (`src/components/sunum/
 - **Balon:** “Onaylanan iş, haritanda yeni bir nokta.”  
   Cevap: Şirketler işe almadan önce çoğu zaman bir case ister ve o emek boşa gider. Nirengi’de case bir deneme projesi; onaylanan aşama gencin profiline Kurum onaylı deneyim olarak, imzalayan kurum ve tarihle yazılıyor ve 120 deneyim puanı getiriyor.
 
-### Ek 9. Niri’nin söyleyecekleri
+### Ek 13. Niri’nin söyleyecekleri
 
 **Kritik nokta:** Haritada herkese yer var: gence de, küçük bir ekibe de.
 

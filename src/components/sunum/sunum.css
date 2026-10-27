@@ -60,6 +60,23 @@
 }
 .s-in { animation: s-in 520ms cubic-bezier(0.16, 1, 0.3, 1) var(--d, 0ms) both; }
 
+/* Bars grow from their baseline; the one stage that matters keeps a slow pulse. */
+@keyframes s-grow {
+  from { transform: scaleX(0); }
+  to { transform: none; }
+}
+.s-grow { transform-origin: left center; animation: s-grow 900ms cubic-bezier(0.16, 1, 0.3, 1) var(--d, 0ms) both; }
+@keyframes s-rise {
+  from { transform: scaleY(0); }
+  to { transform: none; }
+}
+.s-rise { transform-origin: center bottom; animation: s-rise 900ms cubic-bezier(0.16, 1, 0.3, 1) var(--d, 0ms) both; }
+@keyframes s-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgb(var(--orange) / 0.55); }
+  50% { box-shadow: 0 0 0 14px rgb(var(--orange) / 0); }
+}
+.s-pulse { animation: s-in 520ms cubic-bezier(0.16, 1, 0.3, 1) var(--d, 0ms) both, s-pulse 1.8s ease-in-out calc(var(--d, 0ms) + 700ms) infinite; }
+
 /* Niri walks between stage marks. */
 .narrator {
   position: absolute;
@@ -84,7 +101,7 @@ kbd.s-kbd {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .s-in { animation: none; }
+  .s-in, .s-grow, .s-rise, .s-pulse { animation: none; }
   .narrator { transition: none; }
 }
 

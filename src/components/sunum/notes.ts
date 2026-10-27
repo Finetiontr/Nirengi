@@ -28,36 +28,76 @@ export interface Note {
 }
 
 export const NOTES: Record<string, Note> = {
-  baslik: {
-    sec: 16,
-    key: 'Nirengi: gencin gerçek işi ölçülebilir deneyim olur, şirketin gerçek case’iyle buluşur.',
+  kapak: {
+    sec: 23,
+    key: 'Asıl problem tek: deneyim yoksa iş yok, iş yoksa deneyim yok.',
     beats: [
-      { text: 'Merhaba, ben Niri! Her çaban benim için değerli.', say: 'Merhaba, biz Sezer Uzun ve Emirhan Açık; Niri de bize yol arkadaşlığı edecek.' },
-      { text: 'Yaptığın işi ölçülebilir deneyime çeviririm.', say: 'Nirengi açık kaynak bir web sitesi: gencin gerçek işini doğrular, deneyimini ölçülebilir bir değere dönüştürür.' },
+      { text: 'Merhaba, ben Niri! Bugün tek bir problem var.', say: 'Merhaba, biz Sezer Uzun, Emirhan Açık ve Ayça Güder; Nirengi’yi Zemin360 Hackathon’unda yaptık, sonra açık kaynak olarak kendimiz yayınlamaya karar verdik.' },
+      { text: 'Deneyim yoksa iş yok, iş yoksa deneyim yok.', say: 'Bugün tek bir problemi konuşacağız: deneyim yoksa iş yok, iş yoksa deneyim yok. Geri kalan her şey bunun çözümünden türüyor.' },
     ],
   },
-  problem: {
+  genc: {
     sec: 16,
-    key: 'Kısır döngü: deneyim yoksa iş yok, iş yoksa deneyim yok.',
+    key: 'Gencin tarafı: her dört gençten biri ne okulda ne işte.',
     beats: [
-      { text: 'Deneyim yoksa iş yok, iş yoksa deneyim yok.', say: 'Deneyim yoksa iş yok, iş yoksa deneyim yok: her 100 gençten 23’ü ne okulda ne işte.' },
-      { text: 'Şirketler de emin olamıyor.', say: 'Bilişim uzmanı almakta zorlanan her 100 şirketten 71’i de aynı şeyi söylüyor: ilgili iş deneyimi yok.' },
+      { text: 'Her dört gençten biri ne okulda ne işte.', say: 'Türkiye’de 15–24 yaşta her 100 gençten 23’ü ne okulda ne işte; genç kadınlarda 31.' },
+      { text: 'İlk kayıtlı iş ortalama 14 ay sürüyor.', say: 'Lisans mezunu ilk kayıtlı işini ortalama 14,4 ayda buluyor. Bu gençlerin çoğu yeteneksiz değil, görünmez.' },
     ],
   },
-  'kim-icin': {
+  kurum: {
     sec: 15,
-    key: 'Odak: İK’sı olmayan startuplar ve her alandan, kanıtı olmayan genç üreticiler.',
+    key: 'Kurum aynı cümleyi kuruyor: ilgili iş deneyimi yok.',
     beats: [
-      { text: 'Her alandan üreten gençler için buradayım.', say: 'Yalnız yazılımcılar değil; tasarımcı, animasyoncu, çevirmen: üreten ama görünmeyen gençler.' },
-      { text: 'Bir de ekip kuran, İK’sı olmayan startuplar.', say: 'Öbür yanda ekip kuran startuplar: İK’ları yok, yanlış bir işe alımı kaldıramıyorlar.' },
+      { text: 'Kurum da aynı cümleyi kuruyor.', say: 'Kurum tarafı aynı duvarı öbür taraftan görüyor.' },
+      { text: '100 şirketten 71’i: “deneyim yok.”', say: 'Bilişim uzmanı almakta zorlanan her 100 şirketten 71’i nedeni “ilgili iş deneyimi yok” diye gösteriyor. Aynı cümle, iki taraftan.' },
     ],
   },
-  kanit: {
-    sec: 18,
-    key: 'Sorun niyet değil: beceriyi ölçecek bir araç yok. Nirengi o araç.',
+  olcum: {
+    sec: 17,
+    key: 'Kök neden ölçüm: deneyim yılının öngörme gücü 0,07.',
     beats: [
-      { text: 'Diploma şartı kalktı, işe alım değişmedi.', say: 'Şirketler diploma şartını kaldırdı ama bu, her 700 işe alımdan 1’ini bile değiştirmedi; beceriyi ölçecek araç yok.' },
-      { text: '37 platforma baktık; o ölçüyü biz kurduk.', say: '37 platform inceledik; doğrulanmış işi ve kurum imzasını birlikte sunan yok. Nirengi o ölçüm aracı.' },
+      { text: 'Sorun niyet değil, ölçüm.', say: 'Kök neden bir ölçüm sorunu: kurum deneyimi ölçemediği için yıla bakıyor.' },
+      { text: 'Deneyim yılı neredeyse hiçbir şey söylemiyor.', say: 'Deneyim yılının iş performansını öngörme gücü 0,07, neredeyse sıfır. Gerçek bir iş örneği 0,33, yapılandırılmış değerlendirme 0,42.' },
+    ],
+  },
+  dayi: {
+    sec: 15,
+    key: 'Tanıdık mülakat şansını yaklaşık 13 katına çıkarıyor.',
+    beats: [
+      { text: 'Ölçemeyince boşluğu tanıdık dolduruyor.', say: 'Kurum ölçemeyince boşluğu tanıdık dolduruyor.' },
+      { text: 'Normalde 100’de 3, referansla 100’de 40.', say: 'Her 100 normal başvurudan 3’ü mülakata çağrılıyor; referanslıda 40. Referanslar başvuruların yüzde 1’i ama işe alımların yüzde 18’i.' },
+    ],
+  },
+  turkiye: {
+    sec: 19,
+    key: 'Türkiye’de gençler tanıdığı işe girişin şartı sayıyor.',
+    beats: [
+      { text: 'Türkiye’de bunun adı torpil.', say: 'Türkiye’de bunun adı torpil, dayı: ne okulda ne işte olan gençlerin yüzde 86’sı “tanıdığın yoksa iş bulmak zor” diyor.' },
+      { text: 'İsim bile geri dönüşü değiştiriyor.', say: 'İstanbul’daki bir saha deneyinde aynı nitelikteki CV’lerde Türk kadın, Kürt kadından 2,5 kat fazla geri dönüş aldı.' },
+    ],
+  },
+  yer: {
+    sec: 22,
+    key: 'Problemin düğümlendiği yer: ilk eleme.',
+    beats: [
+      { text: 'Her şey ilk elemede düğümleniyor.', say: 'Asıl problemin yeri belli: ilk eleme. CV’lerin çoğu açılmıyor, deneyim yılı burada soruluyor, tanıdık burada öne geçiyor.' },
+      { text: 'Nirengi tam buraya müdahale ediyor.', say: 'İlanların beşte biri de doldurulmak için açılmıyor. Nirengi bu iki noktaya dokunuyor: ihtiyacı netleştiriyor, ilk elemeyi isimsiz ve işe dayalı yapıyor.' },
+    ],
+  },
+  kirilir: {
+    sec: 20,
+    key: 'İlk iş ve açık değerlendirme döngüyü kırıyor.',
+    beats: [
+      { text: 'Döngü kırılabiliyor.', say: 'Döngü kırılabiliyor: hiç iş almamış kişilere tek bir küçük iş ve açık değerlendirme verilince iş bulma yüzde 12’den 30’a çıktı.' },
+      { text: 'Açık kanıt, dayının işini görebiliyor.', say: 'Kefil olan bir aracı deneyimsizin şansını yüzde 75 artırıyor; ama açık iyi puan biriktikçe aracıya gerek kalmıyor.' },
+    ],
+  },
+  herkesin: {
+    sec: 13,
+    key: 'Nirengi: herkesin dayısı.',
+    beats: [
+      { text: 'Nirengi, herkesin dayısı.', say: 'Dayının yaptığı işi yazılıma çeviriyoruz: kefil olmak, kapıyı açmak, ihtiyacı bilmek.' },
+      { text: 'Tanıdığı olana değil, işini gösterene.', say: 'Tanıdığı olana değil, işini gösterene; herkese aynı kuralla.' },
     ],
   },
   cozum: {
@@ -94,7 +134,7 @@ export const NOTES: Record<string, Note> = {
   },
 
   'yz-ne': {
-    sec: 26,
+    sec: 0,
     key: 'Açık kaynak model: veri kapalı bir yapay zekâ şirketine gitmez; istenirse tamamen kendi sunucumuzda çalışır.',
     beats: [
       { text: 'Şimdi yapay zekâya yakından bakalım.', say: 'Yapay zekâ kurumun dağınık metnini okuyor, her alanı bir cümleye dayanan bir ihtiyaç kanvasına çeviriyor.' },
@@ -103,7 +143,7 @@ export const NOTES: Record<string, Note> = {
     ],
   },
   'yz-fark': {
-    sec: 21,
+    sec: 0,
     key: 'Yapay zekâ case’i ölçülebilir yapar; gençler bu case’e isimsiz, referanssız ve açık bir formülle ölçülür.',
     beats: [
       { text: 'Okuyunca case netleşir: 60’tan 75’e.', say: 'Aynı metin kural motoruyla 60 puan alıp yayımlanamıyor; Niri okuyunca 75, önerilerle 100.' },
@@ -112,7 +152,7 @@ export const NOTES: Record<string, Note> = {
     ],
   },
   'yz-onlem': {
-    sec: 15,
+    sec: 0,
     key: 'Model uydurursa alınmaz, Niri sorar; model yoksa kural motoru devralır.',
     beats: [
       { text: 'Model yanılırsa dört kapıdan geçemez.', say: 'Modelin cevabı dört denetimden geçiyor: şema, alıntı, sayı, ölçülebilirlik.' },
@@ -120,7 +160,7 @@ export const NOTES: Record<string, Note> = {
     ],
   },
   tasarim: {
-    sec: 20,
+    sec: 0,
     key: 'Niri her gence eksiğine göre kişisel bir yol haritası çizer; deneyim puanı yalnız gerçek işten gelir.',
     beats: [
       { text: 'Gence oyun gibi bir ritim, kuruma sakin bir ölçüm.', say: 'Gence oyun gibi bir ritim, kuruma sakin bir ölçüm verdik.' },
@@ -129,18 +169,50 @@ export const NOTES: Record<string, Note> = {
     ],
   },
   bitti: {
-    sec: 15,
+    sec: 0,
     key: 'Altı problemin altısı canlıda çalışıyor; pilotta tamamlanacaklar belli.',
     beats: [
       { text: 'Prototipim çalışıyor: altı problemin altısı canlıda.', say: 'Gördüğünüz her şey canlı: altı problemin altısı çalışıyor, 63 otomatik testle sınanıyor.' },
       { text: 'Gerisini pilotta, gerçek kurumlarla kanıtlayacağım.', say: 'Pilotta: kalıcı veritabanı, gerçek kurumlarla ilk tur, kod dışı işlerde otomatik doğrulama.' },
     ],
   },
-  kapanis: {
-    sec: 13,
-    key: 'Çağrı: salondaki bir girişimin gerçek case’i.',
+  bugun: {
+    sec: 15,
+    key: 'Bugün çalışan dört cevap, dört problemi kapatıyor.',
     beats: [
-      { text: 'Zirvedeyim! İlk noktayı birlikte koyalım.', say: 'Bu salondaki bir girişimin case’i, bir gencin ilk imzalı deneyimi olabilir. Gelin, ilkini birlikte yazalım.' },
+      { text: 'Dört problem, dört cevap.', say: 'Bunlar bugün sitede çalışıyor.' },
+      { text: 'Yıl değil iş; isim değil kanıt.', say: 'Deneyim yılı yerine işi ölçen merdiven, isim yerine isimsiz ilk temas, muğlak ilan yerine netlik eşiği, ilk iş yerine kurum onaylı deneme projesi.' },
+    ],
+  },
+  'yol-guven': {
+    sec: 19,
+    key: 'Sırada güven: kurum doğrulama, adil deneme, canlı savunma.',
+    beats: [
+      { text: 'Sırada güven var.', say: 'Çalışmamız gereken alanlar; önce güven.' },
+      { text: 'Kurum da doğrulanmalı, deneme adil olmalı.', say: 'Kurumun ihtiyacı gerçek mi diye alan adıyla doğrulama ve pilota dönüşme oranı; deneme projesi ucuz emeğe dönmesin diye ücretli, gönüllü ya da kredili etiketi; yazarlık için kısa bir canlı savunma.' },
+    ],
+  },
+  'yol-olcek': {
+    sec: 15,
+    key: 'Sırada ölçek: kalıcı hesaplar, usta rolü, taşınabilir kanıt.',
+    beats: [
+      { text: 'Sonra ölçek.', say: 'Sonra ölçeğe hazırlanıyoruz.' },
+      { text: 'Usta ile çırak arasında köprü.', say: 'Kalıcı hesaplar ve veritabanı; kurumdan bağımsız bir usta rolü: profesyonel gence yol gösterir ve işini onaylar; kanıt Open Badges ile gencin olur.' },
+    ],
+  },
+  pilot: {
+    sec: 18,
+    key: 'Tek ölçüt: kayıttan ilk onaylanmış işe kaç gün.',
+    beats: [
+      { text: 'Bunu birlikte ölçelim.', say: 'Bunu bir kez gerçek kurumlarla ölçmek istiyoruz: Zemin360’tan 2–3 kurum, GİRVAK ağından 20–30 genç.' },
+      { text: 'Kayıttan ilk onaylı işe kaç gün?', say: 'Ölçeceğimiz tek şey: gencin kayıttan ilk onaylanmış işine kaç günde geldiği. Hedef rakam koymuyoruz, önce taban çizgisi.' },
+    ],
+  },
+  kapanis: {
+    sec: 14,
+    key: 'Çağrı: ilk ihtiyaç turunu birlikte ölçmek.',
+    beats: [
+      { text: 'Zirvedeyim! İlk noktayı birlikte koyalım.', say: 'Zemin360’taki bir kurumun gerçek ihtiyacı, bir gencin ilk imzalı deneyimi olabilir. İlk turu birlikte ölçelim.' },
       { text: 'Her çaban haritada bir nokta. Teşekkürler!', say: 'Her çaban haritada bir nokta. Teşekkürler.' },
     ],
   },
