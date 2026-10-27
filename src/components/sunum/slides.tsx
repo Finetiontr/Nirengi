@@ -1124,7 +1124,7 @@ function Close() {
         <span className="text-indigo">bir nokta.</span>
       </p>
       <p className="s-in absolute left-[112px] top-[436px] w-[640px] text-[32px] font-bold leading-[1.25] tracking-[-0.015em] text-ink-2" style={d(200)}>
-        Zemin360’taki bir kurumun gerçek ihtiyacı, bir gencin ilk imzalı deneyimi olabilir. <span className="text-indigo">İlk turu birlikte ölçelim.</span>
+        Zemin360’taki bir kurumun gerçek ihtiyacı, bir gencin ilk onaylı deneyimi olabilir. <span className="text-indigo">İlk turu birlikte ölçmeyi öneriyoruz.</span>
       </p>
       <div className="s-in absolute left-[112px] top-[612px] w-[420px]" style={d(360)}>
         <Wordmark size={44} />
@@ -1140,11 +1140,12 @@ function Close() {
   );
 }
 
-// ---------------------------------------------------------------- GİRVAK talk (27 Ekim 2026): the loop, where it knots, how it breaks
+// ---------------------------------------------------------------- GİRVAK talk (27 Ekim 2026): the loop, where it locks, how it breaks
 // One problem, told with its numbers: no experience, no job; no job, no experience. The young
-// side and the kurum side, the root cause (experience is measured by years and by whom you know),
-// where it knots (the first screen of applicants), the field evidence that a first job with a public
-// rating breaks it, then nirengi as everyone's "dayı" and the work ahead as problem → solution.
+// side and the employer side, the root cause (experience is measured by years and by whom you know),
+// where it locks (the first screening of applications), the field evidence that a first job with a
+// public rating breaks it, then Niri as a reference for anyone without connections and the work
+// ahead as problem → solution. Plain, formal Turkish: every short term is explained where it appears.
 // Every figure carries its source on the slide. The Zemin360 final's deck is on branch yedek/sunum-zemin360.
 
 /** A figure that counts up from zero when its slide opens; under reduced motion it is simply there. */
@@ -1180,15 +1181,16 @@ function Corner({ children }: { children: ReactNode }) {
 
 const pct = (v: number) => `%${v.toLocaleString('tr-TR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}`;
 
-/** One horizontal bar: its label, the track, a fill that grows in, and the value at its end. */
-function Bar({ top, label, value, share, hot, delay }: { top: number; label: string; value: string; share: number; hot?: boolean; delay: number }) {
+/** One horizontal bar: its label (and a plain explanation under it), the track, a fill that grows in, and the value. */
+function Bar({ top, label, note, value, share, hot, delay }: { top: number; label: string; note?: string; value: string; share: number; hot?: boolean; delay: number }) {
   const left = 560;
   const w = Math.round(share * 760);
   return (
     <>
-      <p className={`s-in absolute left-[112px] w-[430px] text-[26px] leading-[44px] ${hot ? 'font-extrabold text-ink' : 'font-semibold text-ink-2'}`} style={{ top, ...d(delay) }}>
-        {label}
-      </p>
+      <div className="s-in absolute left-[112px] w-[430px]" style={{ top: note ? top - 4 : top, ...d(delay) }}>
+        <p className={`text-[26px] ${note ? 'leading-[30px]' : 'leading-[44px]'} ${hot ? 'font-extrabold text-ink' : 'font-semibold text-ink-2'}`}>{label}</p>
+        {note && <p className="mt-[2px] text-[17px] font-semibold leading-[1.25] text-ink-3">{note}</p>}
+      </div>
       <div className="absolute h-[44px] w-[760px] rounded-[10px]" style={{ left, top, background: 'rgb(var(--bg-3))' }} />
       <div className="s-grow absolute h-[44px] rounded-[10px]" style={{ left, top, width: w, background: hot ? 'rgb(var(--orange))' : 'rgb(var(--indigo) / 0.38)', ...d(delay) }} />
       <p className={`s-in num absolute whitespace-nowrap text-[32px] font-extrabold leading-[44px] ${hot ? 'text-orange-ink' : 'text-ink'}`} style={{ left: left + w + 18, top, ...d(delay + 500) }}>
@@ -1233,10 +1235,10 @@ function Cover() {
         <br />
         <span className="text-indigo">İş yoksa deneyim yok.</span>
       </p>
-      <p className="s-in absolute left-[112px] top-[446px] w-[760px] text-[30px] font-medium leading-[1.35] text-ink-3" style={d(300)}>
-        Bu döngünün düğümlendiği yeri ve onu nasıl çözdüğümüzü verilerle anlatıyoruz.
+      <p className="s-in absolute left-[112px] top-[446px] w-[800px] text-[30px] font-medium leading-[1.35] text-ink-3" style={d(300)}>
+        Bu sunumda döngünün nerede oluştuğunu ve Nirengi’nin onu nasıl kırmayı önerdiğini verilerle anlatıyoruz.
       </p>
-      <div className="s-in absolute left-[112px] top-[586px]" style={d(420)}>
+      <div className="s-in absolute left-[112px] top-[600px]" style={d(420)}>
         <p className="text-[28px] font-bold text-ink">{TEAM.join(' · ')}</p>
         <p className="s-cap mt-[8px]">GİRVAK · Türkiye Girişimcilik Vakfı · 27 Ekim 2026</p>
       </div>
@@ -1247,28 +1249,28 @@ function Cover() {
 
 function Youth() {
   const side = [
-    { v: 30.9, dec: 1, pre: '%', post: '', text: 'Genç kadınlarda ne okulda ne işte olanların payı' },
-    { v: 15.3, dec: 1, pre: '%', post: '', text: '15–24 yaş işsizlik oranı · Haziran 2026’da %12,8' },
-    { v: 14.4, dec: 1, pre: '', post: ' ay', text: 'Lisans mezununun ilk kayıtlı işine kadar geçen süre · 2023' },
+    { v: 30.9, pre: '%', post: '', text: 'Aynı yaş grubundaki genç kadınlarda bu oran' },
+    { v: 15.3, pre: '%', post: '', text: '15–24 yaş grubunda işsizlik oranı (2025). Haziran 2026’da %12,8 oldu.' },
+    { v: 14.4, pre: '', post: ' ay', text: 'Lisans mezunlarının ilk kayıtlı işlerini bulana kadar geçen ortalama süre (2023)' },
   ];
   return (
     <>
       <Heading width={1376} className="!text-[56px]">
-        Her dört gençten biri <span className="text-indigo">ne okulda ne işte.</span>
+        Gençlerin dörtte biri <span className="text-indigo">ne öğrenci ne de çalışan.</span>
       </Heading>
       <p className="s-in num absolute left-[104px] top-[206px] text-[220px] font-extrabold leading-none tracking-[-0.05em] text-ink" style={d(120)}>
         %<Count to={23.3} dec={1} delay={120} />
       </p>
-      <p className="s-in absolute left-[112px] top-[440px] w-[640px] text-[26px] font-semibold leading-[1.35] text-ink-2" style={d(300)}>
-        15–24 yaş, ne eğitimde ne istihdamda · 2025
+      <p className="s-in absolute left-[112px] top-[440px] w-[640px] text-[24px] font-semibold leading-[1.35] text-ink-2" style={d(300)}>
+        15–24 yaş arasında eğitimde ya da istihdamda olmayan gençlerin oranı (2025)
       </p>
-      <div className="absolute left-[112px] top-[506px] flex gap-[22px]" aria-hidden="true">
+      <div className="absolute left-[112px] top-[530px] flex gap-[22px]" aria-hidden="true">
         {[0, 1, 2, 3].map((k) => {
           const bg = { background: k === 0 ? 'rgb(var(--orange))' : 'rgb(var(--bg-3))' };
           return (
             <span key={k} className="s-in flex flex-col items-center gap-[6px]" style={d(520 + k * 140)}>
-              <span className="block h-[38px] w-[38px] rounded-full" style={bg} />
-              <span className="block h-[70px] w-[70px] rounded-[34px_34px_12px_12px]" style={bg} />
+              <span className="block h-[34px] w-[34px] rounded-full" style={bg} />
+              <span className="block h-[60px] w-[62px] rounded-[30px_30px_10px_10px]" style={bg} />
             </span>
           );
         })}
@@ -1278,35 +1280,35 @@ function Youth() {
         <div key={s.text} className="s-in absolute left-[860px] w-[628px]" style={{ top: 222 + n * 150, ...d(420 + n * 200) }}>
           <p className="num text-[64px] font-extrabold leading-none tracking-[-0.03em] text-indigo">
             {s.pre}
-            <Count to={s.v} dec={s.dec} delay={420 + n * 200} />
+            <Count to={s.v} dec={1} delay={420 + n * 200} />
             {s.post}
           </p>
           <p className="mt-[10px] text-[22px] font-semibold leading-[1.3] text-ink-2">{s.text}</p>
         </div>
       ))}
-      <Corner>TÜİK İstatistiklerle Gençlik 2025 · TÜİK İşgücü, Haziran 2026 · TÜİK Yükseköğretim İstihdam Göstergeleri</Corner>
+      <Corner>TÜİK İstatistiklerle Gençlik 2025 · TÜİK İşgücü İstatistikleri, Haziran 2026 · TÜİK Yükseköğretim İstihdam Göstergeleri</Corner>
     </>
   );
 }
 
 function Employer() {
   const rows = [
-    { label: 'Yüksek ücret beklentisi', v: 82.6 },
-    { label: 'Gerekli nitelik yok', v: 71.8 },
+    { label: 'Ücret beklentisi yüksek', v: 82.6 },
+    { label: 'Gerekli nitelik eksik', v: 71.8 },
     { label: 'İlgili iş deneyimi yok', v: 71.0, hot: true },
-    { label: 'Uygun başvuru yok', v: 55.7 },
+    { label: 'Uygun başvuru az', v: 55.7 },
   ];
   return (
     <>
       <Heading width={1376} className="!text-[56px]">
-        Kurum aynı duvarı öbür taraftan görüyor: <span className="text-orange-ink">“deneyim yok.”</span>
+        İşverenler de aynı engeli işaret ediyor: <span className="text-orange-ink">adayların deneyimi yok.</span>
       </Heading>
-      <Eyebrow className="s-in absolute left-[112px] top-[238px]">Bilişim uzmanı almakta zorlanan girişimlerin gösterdiği nedenler</Eyebrow>
+      <Eyebrow className="s-in absolute left-[112px] top-[238px]">Bilişim uzmanı alırken zorlanan girişimlerin belirttiği nedenler</Eyebrow>
       {rows.map((r, n) => (
         <Bar key={r.label} top={290 + n * 88} label={r.label} value={pct(r.v)} share={r.v / 100} hot={r.hot} delay={200 + n * 220} />
       ))}
-      <p className="s-in absolute left-[112px] top-[648px] w-[1376px] text-[22px] font-semibold leading-[1.35] text-ink-3" style={d(1300)}>
-        Bilişim uzmanı almaya çalışan girişimlerin %31,7’si güçlük yaşadı; nedenler birden çok seçilebiliyor.
+      <p className="s-in absolute left-[112px] top-[640px] w-[1376px] text-[21px] font-semibold leading-[1.35] text-ink-3" style={d(1300)}>
+        2025’te bilişim uzmanı almaya çalışan girişimlerin %31,7’si zorlandı. Birden fazla neden seçilebildiği için oranların toplamı 100’ü aşıyor.
       </p>
       <Corner>TÜİK, Girişimlerde Bilişim Teknolojileri Kullanım Araştırması 2025</Corner>
     </>
@@ -1315,22 +1317,27 @@ function Employer() {
 
 function Measure() {
   const rows = [
-    { label: 'Yapılandırılmış mülakat', v: 0.42 },
-    { label: 'İş örneği testi', v: 0.33 },
-    { label: 'Bilişsel yetenek testi', v: 0.31 },
-    { label: 'Yapılandırılmamış mülakat', v: 0.19 },
-    { label: 'Deneyim yılı', v: 0.07, hot: true },
+    { label: 'Yapılandırılmış mülakat', note: 'Her adaya aynı sorular, aynı puanlama', v: 0.42 },
+    { label: 'İş örneği', note: 'Adaya işin küçük bir parçası yaptırılır', v: 0.33 },
+    { label: 'Bilişsel yetenek testi', note: 'Akıl yürütme ve problem çözme testi', v: 0.31 },
+    { label: 'Serbest mülakat', note: 'Plansız, adaya göre değişen görüşme', v: 0.19 },
+    { label: 'Deneyim yılı', note: 'Adayın kaç yıl çalıştığı', v: 0.07, hot: true },
   ];
   const num = (v: number) => v.toFixed(2).replace('.', ',');
   return (
     <>
       <Heading width={1376} className="!text-[56px]">
-        En çok sorulan şey, <span className="text-orange-ink">en az şey söylüyor.</span>
+        En çok sorulan soru, <span className="text-orange-ink">en az bilgiyi veriyor.</span>
       </Heading>
-      <Eyebrow className="s-in absolute left-[112px] top-[178px]">İşe alım yöntemlerinin iş performansını öngörme gücü · 0 = hiç, 1 = tam</Eyebrow>
+      <p className="s-in absolute left-[112px] top-[172px] w-[1376px] text-[22px] font-semibold leading-[1.35] text-ink-3">
+        Her yöntemin, adayın işteki gerçek performansını ne kadar doğru tahmin ettiği (0: hiç, 1: tam)
+      </p>
       {rows.map((r, n) => (
-        <Bar key={r.label} top={236 + n * 82} label={r.label} value={r.hot ? `${num(r.v)} · ama giriş ilanlarının %61’i 3+ yıl istiyor` : num(r.v)} share={r.v / 0.5} hot={r.hot} delay={200 + n * 200} />
+        <Bar key={r.label} top={236 + n * 80} label={r.label} note={r.note} value={num(r.v)} share={r.v / 0.5} hot={r.hot} delay={200 + n * 200} />
       ))}
+      <p className="s-in absolute left-[112px] top-[650px] w-[1376px] text-[26px] font-extrabold leading-[1.3] text-ink" style={d(1400)}>
+        Buna rağmen giriş seviyesindeki ilanların <span className="text-orange-ink">%61’i</span> en az üç yıl deneyim istiyor.
+      </p>
       <Corner>Sackett, Zhang, Berry ve Lievens 2022, Journal of Applied Psychology (meta-analiz) · TalentWorks 2018, yaklaşık 95 bin giriş seviyesi ilan</Corner>
     </>
   );
@@ -1340,24 +1347,24 @@ function Referral() {
   return (
     <>
       <Heading width={1376} className="!text-[56px]">
-        Duvarın etrafından dolaşan yol: <span className="text-orange-ink">tanıdık.</span>
+        Deneyim ölçülemeyince <span className="text-orange-ink">tanıdık devreye giriyor.</span>
       </Heading>
       <Waffle n={3} left={112} top={222} delay={200} />
       <p className="s-in num absolute left-[440px] top-[210px] text-[140px] font-extrabold leading-none tracking-[-0.05em] text-ink" style={d(200)}>
         %<Count to={3} delay={200} />
       </p>
-      <p className="s-in absolute left-[444px] top-[368px] w-[300px] text-[22px] font-semibold leading-[1.3] text-ink-2" style={d(300)}>
-        Normal başvurunun mülakata çağrılma oranı
+      <p className="s-in absolute left-[444px] top-[368px] w-[310px] text-[22px] font-semibold leading-[1.3] text-ink-2" style={d(300)}>
+        Normal başvuruların mülakata çağrılma oranı
       </p>
       <Waffle n={40} left={860} top={222} delay={700} />
       <p className="s-in num absolute left-[1188px] top-[210px] text-[140px] font-extrabold leading-none tracking-[-0.05em] text-orange-ink" style={d(700)}>
         %<Count to={40} delay={700} />
       </p>
       <p className="s-in absolute left-[1192px] top-[368px] w-[296px] text-[22px] font-semibold leading-[1.3] text-ink-2" style={d(800)}>
-        Referanslı başvurunun mülakata çağrılma oranı
+        Şirket çalışanlarının önerdiği adayların mülakata çağrılma oranı
       </p>
-      <p className="s-in absolute left-[112px] top-[560px] w-[1376px] border-t-2 border-line pt-[22px] text-[40px] font-extrabold leading-[1.15] tracking-[-0.02em] text-ink" style={d(1700)}>
-        Referanslar başvuruların <span className="text-orange-ink">%1’i</span>, işe alımların <span className="text-orange-ink">%18’i</span>.
+      <p className="s-in absolute left-[112px] top-[560px] w-[1376px] border-t-2 border-line pt-[22px] text-[34px] font-extrabold leading-[1.2] tracking-[-0.02em] text-ink" style={d(1700)}>
+        Çalışan önerisiyle gelen adaylar başvuruların <span className="text-orange-ink">%1’ini</span>, işe alınanların ise <span className="text-orange-ink">%18’ini</span> oluşturuyor.
       </p>
       <Corner>Ashby Talent Trends 2025 · 38 milyon başvuru, 2021–2024</Corner>
     </>
@@ -1366,26 +1373,26 @@ function Referral() {
 
 function Connections() {
   const cards = [
-    { v: <>%<Count to={86.3} dec={1} delay={200} /></>, text: 'Ne okulda ne işte olan 18–24 yaş gençlerin “tanıdığın yoksa iş bulmak zor” diyen payı', src: 'İstanbul İstatistik Ofisi, 2021' },
-    { v: <>%<Count to={78.5} dec={1} delay={420} /></>, text: 'Aynı gençlerin işsizlik nedenini “önemli yerlerde tanıdığım yok” diye açıklayan payı', src: 'İstanbul İstatistik Ofisi, 2021' },
-    { v: <><Count to={2.5} dec={1} delay={640} />×</>, text: 'İstanbul’da 500 ilana aynı nitelikte CV: Türk kadın, Kürt kadından 2,5 kat fazla geri dönüş aldı', src: 'Balkan ve Cilasun, 2018', dark: true },
+    { v: <>%<Count to={86.3} dec={1} delay={200} /></>, text: 'Eğitimde ya da istihdamda olmayan 18–24 yaş gençlerin “tanıdığınız yoksa iş bulmak zor” görüşüne katılma oranı', src: 'İstanbul İstatistik Ofisi, 2021' },
+    { v: <>%<Count to={78.5} dec={1} delay={420} /></>, text: 'Aynı gençlerden, iş bulamamalarının nedenini “önemli yerlerde tanıdığım yok” diye açıklayanların oranı', src: 'İstanbul İstatistik Ofisi, 2021' },
+    { v: <><Count to={2.5} dec={1} delay={640} /> kat</>, text: 'İstanbul’da 500 ilana nitelikleri aynı iki kadın aday adına başvuruldu. İsmi farklı bir etnik kökeni çağrıştıran aday 2,5 kat daha az geri dönüş aldı.', src: 'Balkan ve Cilasun, 2018', dark: true },
   ];
   return (
     <>
       <Heading width={1376} className="!text-[56px]">
-        Türkiye’de gençler tanıdığı, <span className="text-indigo">işe girişin şartı sayıyor.</span>
+        Türkiye’de gençler iş bulmayı <span className="text-indigo">tanıdığa bağlı görüyor.</span>
       </Heading>
       {cards.map((c, n) => (
         <div key={c.text} className={`s-in absolute top-[236px] w-[440px] rounded-[26px] p-[32px] ${c.dark ? 'bg-ink' : 'border-2 border-line bg-bg'}`} style={{ left: 112 + n * 468, ...d(200 + n * 220) }}>
-          <p className="num text-[92px] font-extrabold leading-none tracking-[-0.045em]" style={{ color: c.dark ? 'rgb(var(--orange))' : 'rgb(var(--indigo))' }}>
+          <p className="num text-[84px] font-extrabold leading-none tracking-[-0.045em]" style={{ color: c.dark ? 'rgb(var(--orange))' : 'rgb(var(--indigo))' }}>
             {c.v}
           </p>
-          <p className={`mt-[18px] text-[23px] font-semibold leading-[1.35] ${c.dark ? 'text-white' : 'text-ink-2'}`}>{c.text}</p>
+          <p className={`mt-[18px] text-[22px] font-semibold leading-[1.35] ${c.dark ? 'text-white' : 'text-ink-2'}`}>{c.text}</p>
           <p className={`mono mt-[16px] text-[15px] font-semibold ${c.dark ? 'text-white/70' : 'text-ink-3'}`}>{c.src}</p>
         </div>
       ))}
-      <p className="s-in absolute left-[860px] top-[700px] w-[628px] text-[20px] font-semibold leading-[1.35] text-ink-3" style={d(1000)}>
-        Torpil verisi algıyı ölçüyor; tanıdıkla işe girişin gerçek oranını ölçen güncel veri yok.
+      <p className="s-in absolute left-[860px] top-[690px] w-[628px] text-[20px] font-semibold leading-[1.4] text-ink-3" style={d(1000)}>
+        Bu oranlar gençlerin algısını gösteriyor. İşe girişte tanıdığın etkisini doğrudan ölçen güncel bir veri yok; mevcut işe alım düzeni bu veriyi üretmiyor.
       </p>
     </>
   );
@@ -1394,15 +1401,15 @@ function Connections() {
 function Bottleneck() {
   const steps = ['İlan', 'Başvuru', 'İlk eleme', 'Mülakat', 'Deneme', 'İşe alım'];
   const facts = [
-    <>CV’lerin yalnız <b className="text-ink">%16’sı</b> açılıyor</>,
-    <>Normal başvurunun <b className="text-ink">%3’ü</b>, referanslının <b className="text-ink">%40’ı</b> geçiyor</>,
-    <>Deneyim yılı burada soruluyor; öngörme gücü <b className="text-ink">0,07</b></>,
-    <>İsme dayalı ayrımcılık bu aşamada oluşuyor</>,
+    <>Gönderilen CV’lerin yalnızca <b className="text-ink">%16’sı</b> açılıp inceleniyor.</>,
+    <>Normal başvuruların <b className="text-ink">%3’ü</b>, çalışan önerisiyle gelenlerin <b className="text-ink">%40’ı</b> mülakata çağrılıyor.</>,
+    <>Bu aşamada en çok deneyim yılına bakılıyor; oysa deneyim yılı performansı neredeyse hiç öngörmüyor.</>,
+    <>İsme dayalı ayrımcılık da bu aşamada ortaya çıkıyor.</>,
   ];
   return (
     <>
       <Heading width={1376} className="!text-[56px]">
-        Döngü tek bir yerde düğümleniyor: <span className="text-orange-ink">ilk eleme.</span>
+        Döngü, başvuruların <span className="text-orange-ink">ilk elendiği aşamada</span> kilitleniyor.
       </Heading>
       {steps.map((s, n) => (
         <div
@@ -1418,18 +1425,18 @@ function Bottleneck() {
           {ARROW('rgb(var(--line-2))')}
         </span>
       ))}
-      <p className="s-in mono absolute left-[112px] top-[346px] w-[440px] text-[16px] font-bold leading-[1.35] text-ink-3" style={d(900)}>
-        %18–22’si hayalet ilan
+      <p className="s-in absolute left-[112px] top-[350px] w-[430px] text-[19px] font-semibold leading-[1.35] text-ink-3" style={d(900)}>
+        İlanların %18–22’si gerçekte doldurulmayacak pozisyonlar için açılıyor.
       </p>
-      <ul className="s-in absolute left-[584px] top-[364px] w-[904px] space-y-[10px] border-l-4 pl-[28px]" style={{ borderColor: 'rgb(var(--orange))', ...d(1000) }}>
+      <ul className="s-in absolute left-[584px] top-[358px] w-[904px] space-y-[10px] border-l-4 pl-[28px]" style={{ borderColor: 'rgb(var(--orange))', ...d(1000) }}>
         {facts.map((f, n) => (
-          <li key={n} className="text-[26px] font-semibold leading-[1.3] text-ink-2">
+          <li key={n} className="text-[23px] font-semibold leading-[1.3] text-ink-2">
             {f}
           </li>
         ))}
       </ul>
-      <p className="s-in absolute left-[112px] top-[590px] w-[1376px] text-[40px] font-extrabold leading-[1.15] tracking-[-0.02em] text-indigo" style={d(1500)}>
-        Nirengi tam bu noktaya müdahale ediyor.
+      <p className="s-in absolute left-[112px] top-[604px] w-[1376px] text-[32px] font-extrabold leading-[1.2] tracking-[-0.015em] text-indigo" style={d(1500)}>
+        Nirengi, bu aşamayı isimsiz ve işe dayalı bir değerlendirmeyle değiştirmeyi öneriyor.
       </p>
       <Corner>Greenhouse 2024 · Balkan ve Cilasun 2018 · Ashby 2025 · Sackett ve ark. 2022</Corner>
     </>
@@ -1440,30 +1447,31 @@ function Breaks() {
   return (
     <>
       <Heading width={1376} className="!text-[56px]">
-        İlk iş ve açık bir değerlendirme verilince <span className="text-indigo">döngü kırılıyor.</span>
+        Deneyimsiz bir kişiye ilk fırsat verildiğinde <span className="text-indigo">döngü kırılıyor.</span>
       </Heading>
       <div className="absolute left-[112px] top-[600px] h-[3px] w-[360px] bg-ink" />
       <div className="s-rise absolute left-[112px] top-[480px] h-[120px] w-[150px] rounded-t-[10px]" style={{ background: 'rgb(var(--indigo) / 0.3)', ...d(200) }} />
       <p className="s-in num absolute left-[112px] top-[422px] w-[150px] text-center text-[44px] font-extrabold leading-none text-ink" style={d(500)}>
         %12
       </p>
-      <p className="absolute left-[102px] top-[614px] w-[170px] text-center text-[18px] font-bold leading-[1.25] text-ink-3">Kontrol grubu</p>
+      <p className="absolute left-[97px] top-[612px] w-[180px] text-center text-[17px] font-bold leading-[1.25] text-ink-3">İş verilmeyen grup</p>
       <div className="s-rise absolute left-[300px] top-[300px] h-[300px] w-[150px] rounded-t-[10px] bg-indigo" style={d(600)} />
       <p className="s-in num absolute left-[300px] top-[242px] w-[150px] text-center text-[44px] font-extrabold leading-none text-indigo" style={d(800)}>
         %<Count to={30} delay={600} />
       </p>
-      <p className="absolute left-[290px] top-[614px] w-[170px] text-center text-[18px] font-bold leading-[1.25] text-ink-3">İlk iş + açık değerlendirme</p>
-      <div className="s-in absolute left-[500px] top-[300px] w-[290px]" style={d(900)}>
-        <p className="text-[22px] font-semibold leading-[1.35] text-ink-2">Hiç iş almamış kişilere tek bir küçük iş ve herkese açık bir değerlendirme verildi: sonraki 2 ayda iş bulma oranı.</p>
+      <p className="absolute left-[275px] top-[612px] w-[200px] text-center text-[17px] font-bold leading-[1.25] text-ink-3">Küçük bir iş ve açık değerlendirme verilen grup</p>
+      <div className="s-in absolute left-[500px] top-[300px] w-[300px]" style={d(900)}>
+        <p className="text-[21px] font-semibold leading-[1.4] text-ink-2">Daha önce hiç iş almamış kişilere küçük bir iş verildi ve yaptıkları iş herkese açık şekilde puanlandı. İki ay içinde iş bulma oranları %12’den %30’a yükseldi.</p>
         <Src className="mt-[12px]">Pallais, American Economic Review 2014</Src>
       </div>
       <div className="absolute left-[828px] top-[240px] h-[420px] w-[2px] bg-line" />
-      <p className="s-in num absolute left-[880px] top-[226px] text-[140px] font-extrabold leading-none tracking-[-0.05em] text-indigo" style={d(1300)}>
-        +%<Count to={75} delay={1300} />
+      <p className="s-in num absolute left-[880px] top-[226px] text-[120px] font-extrabold leading-none tracking-[-0.05em] text-indigo" style={d(1300)}>
+        %<Count to={75} delay={1300} />
       </p>
-      <div className="s-in absolute left-[880px] top-[392px] w-[608px]" style={d(1500)}>
-        <p className="text-[24px] font-semibold leading-[1.35] text-ink-2">Kefil olan bir aracıya bağlı deneyimsizin iş bulma olasılığı. Herkese açık iyi puan biriktikçe bu fark kapanıyor: dayının işini açık kanıt da görebiliyor.</p>
+      <div className="s-in absolute left-[880px] top-[370px] w-[608px]" style={d(1500)}>
+        <p className="text-[22px] font-semibold leading-[1.4] text-ink-2">Kendisine kefil olan bir aracı kuruma bağlı deneyimsiz kişilerin iş bulma olasılığı %75 daha yüksekti. Kişiler herkese açık iyi puanlar biriktirdikçe bu fark ortadan kalktı.</p>
         <Src className="mt-[12px]">Stanton ve Thomas, Review of Economic Studies 2016</Src>
+        <p className="mt-[22px] text-[24px] font-extrabold leading-[1.3] text-ink">Tanıdığın sağladığı güveni, doğrulanmış bir iş kaydı da sağlayabilir.</p>
       </div>
     </>
   );
@@ -1471,25 +1479,25 @@ function Breaks() {
 
 function Everyone() {
   const map: [string, string][] = [
-    ['Kefil olur', 'Doğrulanmış iş'],
-    ['Kapıyı açar', 'İsimsiz kısa liste'],
-    ['İhtiyacı bilir', 'Açık ihtiyaç kanvası'],
+    ['Tanıdık kefil olur', 'Niri işi doğrular'],
+    ['Tanıdık kapıyı açar', 'Niri adayı isimsiz kısa listeye taşır'],
+    ['Tanıdık ihtiyacı bilir', 'Niri kurumun ihtiyacını açıkça yazdırır'],
   ];
   return (
     <>
       <div className="absolute inset-0 bg-indigo" />
       <p className="s-in mono absolute left-[112px] top-[110px] text-[16px] font-bold uppercase tracking-[0.14em] text-white/80">Çözüm</p>
-      <p className="s-in absolute left-[112px] top-[156px] w-[1300px] text-[110px] font-extrabold leading-none tracking-[-0.045em] text-white" style={d(120)}>
-        Nirengi, herkesin dayısı.
+      <p className="s-in absolute left-[112px] top-[150px] w-[1100px] text-[84px] font-extrabold leading-[1.02] tracking-[-0.04em] text-white" style={d(120)}>
+        Niri, tanıdığı olmayan herkesin referansı.
       </p>
-      <p className="s-in absolute left-[112px] top-[300px] w-[820px] text-[32px] font-semibold leading-[1.35] text-white/90" style={d(320)}>
-        Dayının yaptığı işi yazılıma çeviriyoruz: kefil olmak, kapıyı açmak, ihtiyacı bilmek. Tanıdığı olana değil, işini gösterene; herkese aynı kuralla.
+      <p className="s-in absolute left-[112px] top-[350px] w-[840px] text-[28px] font-semibold leading-[1.4] text-white/90" style={d(320)}>
+        Bir tanıdığın sağladığı güveni, Niri doğrulanmış iş kaydıyla sağlar. Adayı kim olduğuyla değil, ne yaptığıyla tanıtır ve herkese aynı kuralı uygular.
       </p>
-      <div className="absolute left-[112px] top-[480px] grid w-[820px] grid-cols-3 gap-[16px]">
+      <div className="absolute left-[112px] top-[512px] grid w-[840px] grid-cols-3 gap-[16px]">
         {map.map(([a, b], n) => (
           <div key={a} className="s-in rounded-[18px] bg-white/15 p-[18px]" style={d(600 + n * 160)}>
-            <p className="text-[18px] font-bold text-white/80">Dayı: {a.toLocaleLowerCase('tr-TR')}</p>
-            <p className="mt-[6px] text-[24px] font-extrabold leading-[1.15] text-white">{b}</p>
+            <p className="text-[17px] font-bold text-white/80">{a}</p>
+            <p className="mt-[6px] text-[22px] font-extrabold leading-[1.2] text-white">{b}</p>
           </div>
         ))}
       </div>
@@ -1497,28 +1505,88 @@ function Everyone() {
   );
 }
 
-function Today() {
-  const rows: [string, string][] = [
-    ['Deneyim yılıyla ölçülüyor (öngörme gücü 0,07)', 'İşi ölçen merdiven: Beyan → Doğrulandı → Kurum onaylı'],
-    ['İlk elemede isim, okul ve tanıdık belirleyici', 'İsimsiz ilk temas; kimlik yalnız deneme teklifinde açılır'],
-    ['Muğlak ve hayalet ilanlar (%18–22)', 'Netlik eşiği 70; karar verici ve ölçülebilir kriter zorunlu'],
-    ['Deneyimsize kimse ilk işi vermiyor', 'Kurum onaylı deneme projesi; iki onay, zincirli kayıt'],
+/** How it works, in four plain steps: one sentence of what happens, one of why it matters. */
+function Steps() {
+  const steps: [string, string][] = [
+    ['Kurum ihtiyacını yazar', 'Kurum sorununu kendi cümleleriyle anlatır. Niri metni yedi başlığa ayırır; eksik ya da belirsiz kalan ihtiyaç yayımlanmaz.'],
+    ['Gençler isimsiz değerlendirilir', 'Ad, okul, şehir ve tanıdık görünmez. Adaylar yalnızca doğrulanmış işleriyle sıralanır; puanın nasıl hesaplandığı açıktır.'],
+    ['Deneme projesi yapılır', 'En uygun aday (junior) işi küçük bir projede yapar. Kurumdaki deneyimli kişi (senior) her aşamayı inceler ve onaylar.'],
+    ['İş, deneyim olarak kaydedilir', 'Onaylanan iş gencin profiline kurum onaylı deneyim olarak eklenir. Genç işe alınmasa bile bu kaydı taşır.'],
   ];
   return (
     <>
       <Heading width={1376} className="!text-[56px]">
-        Bugün çalışan: <span className="text-indigo">dört problem, dört cevap.</span>
+        Nirengi <span className="text-indigo">dört adımda</span> çalışır.
       </Heading>
-      <p className="s-in mono absolute left-[112px] top-[200px] text-[16px] font-bold uppercase tracking-[0.14em] text-orange-ink">Problem</p>
-      <p className="s-in mono absolute left-[820px] top-[200px] text-[16px] font-bold uppercase tracking-[0.14em] text-indigo">Nirengi’deki cevap</p>
-      {rows.map(([p, a], n) => (
-        <div key={p} className="s-in absolute left-[112px] grid w-[1376px] grid-cols-[620px_88px_668px] items-center border-t-2 border-line py-[18px]" style={{ top: 234 + n * 104, ...d(200 + n * 220) }}>
-          <p className="text-[25px] font-bold leading-[1.25] text-ink">{p}</p>
-          {ARROW('rgb(var(--orange))')}
-          <p className="text-[25px] font-bold leading-[1.25] text-indigo">{a}</p>
+      <svg viewBox="0 0 1376 8" width="1376" height="8" className="s-in absolute left-[112px] top-[262px]" style={d(200)} aria-hidden="true">
+        <path d="M30 4H1346" stroke="rgb(var(--line-2))" strokeWidth="4" strokeDasharray="2 12" strokeLinecap="round" />
+      </svg>
+      {steps.map(([title, text], n) => (
+        <div key={title} className="s-in absolute top-[236px] w-[320px]" style={{ left: 112 + n * 352, ...d(300 + n * 320) }}>
+          <StopMark n={n} size={56} />
+          <p className="mt-[20px] text-[28px] font-extrabold leading-[1.15] tracking-[-0.02em] text-ink">{title}</p>
+          <p className="mt-[12px] text-[21px] font-semibold leading-[1.4] text-ink-2">{text}</p>
         </div>
       ))}
-      <Corner>Hepsi bugün canlı: {SITE}</Corner>
+    </>
+  );
+}
+
+/** Usta–çırak as software's senior–junior, carried through every layer: what the junior does, what the senior does. */
+function Mentor() {
+  const rows: [string, string, string, boolean][] = [
+    ['İhtiyaç', 'İhtiyacı okur, hangi beceriyi istediğini görür.', 'İşi küçük ve ölçülebilir parçalara böler.', true],
+    ['Deneme projesi', 'İşi yapar ve aşama aşama teslim eder.', 'Her teslimi inceler, geri bildirim verir; yazılımdaki kod incelemesi gibi.', true],
+    ['Onay', 'Onaylanan iş, profiline deneyim olarak eklenir.', 'Onayı verir; onay, kurumun adıyla değiştirilemez şekilde kayda geçer.', true],
+    ['Kariyer', 'Biriken onaylarla bir sonraki seviyeye geçer.', 'Yetiştirdiği junior’lar onun profilinde de görünür.', false],
+  ];
+  return (
+    <>
+      <Heading width={1376} className="!text-[56px]">
+        Usta–çırak ilişkisini <span className="text-indigo">senior–junior modeliyle</span> kuruyoruz.
+      </Heading>
+      <p className="s-in absolute left-[112px] top-[214px] w-[1376px] text-[22px] font-semibold leading-[1.35] text-ink-3" style={d(100)}>
+        Yazılımda yeni başlayan (junior), deneyimli bir çalışanın (senior) incelemesiyle öğrenir. Nirengi bu ilişkiyi her alana ve her aşamaya taşır.
+      </p>
+      <p className="s-in mono absolute left-[400px] top-[298px] text-[16px] font-bold uppercase tracking-[0.14em] text-cyan-ink" style={d(200)}>Junior ne yapar</p>
+      <p className="s-in mono absolute left-[960px] top-[298px] text-[16px] font-bold uppercase tracking-[0.14em] text-indigo" style={d(200)}>Senior ne yapar</p>
+      {rows.map(([layer, junior, senior, live], n) => (
+        <div key={layer} className="s-in absolute left-[112px] grid w-[1376px] grid-cols-[288px_560px_528px] items-start border-t-2 border-line py-[14px]" style={{ top: 328 + n * 86, ...d(300 + n * 220) }}>
+          <p className="text-[24px] font-extrabold leading-[1.25] text-ink">
+            {layer}
+            {!live && <span className="ml-[10px] align-middle text-[15px] font-bold text-orange-ink">sırada</span>}
+          </p>
+          <p className="pr-[24px] text-[21px] font-semibold leading-[1.35] text-ink-2">{junior}</p>
+          <p className="text-[21px] font-semibold leading-[1.35] text-ink-2">{senior}</p>
+        </div>
+      ))}
+      <Corner>Bugün senior rolünü kurumdaki çalışan üstleniyor; kurumdan bağımsız senior’lar ve kariyer katmanı yol haritasında.</Corner>
+    </>
+  );
+}
+
+function Today() {
+  const rows: [string, string][] = [
+    ['Deneyim, çalışılan yıl sayısıyla ölçülüyor.', 'İş kayıtla ölçülür: kişinin beyanı, sistemin doğruladığı iş ve kurumun onayladığı iş ayrı ayrı gösterilir.'],
+    ['İlk elemede isim, okul ve tanıdık belirleyici oluyor.', 'İlk değerlendirme isimsiz yapılır; kimlik yalnızca deneme projesi teklif edildiğinde açılır.'],
+    ['İlanlar belirsiz; bir kısmı gerçek bir ihtiyaca dayanmıyor.', 'İhtiyaç, karar vericisi ve ölçülebilir başarı ölçütü yazılmadan yayımlanmaz.'],
+    ['Deneyimsiz adaya ilk fırsat verilmiyor.', 'Junior, bir senior’ın incelemesiyle küçük bir deneme projesi yapar; onaylanan her aşama kayda geçer.'],
+  ];
+  return (
+    <>
+      <Heading width={1376} className="!text-[56px]">
+        Bugün sitede çalışan <span className="text-indigo">dört çözüm.</span>
+      </Heading>
+      <p className="s-in mono absolute left-[112px] top-[196px] text-[16px] font-bold uppercase tracking-[0.14em] text-orange-ink">Problem</p>
+      <p className="s-in mono absolute left-[820px] top-[196px] text-[16px] font-bold uppercase tracking-[0.14em] text-indigo">Nirengi’deki çözüm</p>
+      {rows.map(([p, a], n) => (
+        <div key={p} className="s-in absolute left-[112px] grid w-[1376px] grid-cols-[620px_88px_668px] items-center border-t-2 border-line py-[16px]" style={{ top: 230 + n * 108, ...d(200 + n * 220) }}>
+          <p className="text-[24px] font-bold leading-[1.3] text-ink">{p}</p>
+          {ARROW('rgb(var(--orange))')}
+          <p className="text-[22px] font-semibold leading-[1.35] text-ink-2">{a}</p>
+        </div>
+      ))}
+      <Corner>Tamamı canlı ve açık kaynak: {SITE}</Corner>
     </>
   );
 }
@@ -1533,10 +1601,10 @@ function NextCards({ head, cards }: { head: ReactNode; cards: [string, string][]
       {cards.map(([p, s], n) => (
         <div key={p} className="s-in absolute top-[210px] w-[440px] rounded-[26px] border-2 border-line bg-bg p-[30px]" style={{ left: 112 + n * 468, ...d(200 + n * 220) }}>
           <p className="mono text-[15px] font-bold uppercase tracking-[0.14em] text-orange-ink">Problem</p>
-          <p className="mt-[8px] text-[30px] font-extrabold leading-[1.15] tracking-[-0.02em] text-ink">{p}</p>
+          <p className="mt-[8px] text-[28px] font-extrabold leading-[1.2] tracking-[-0.015em] text-ink">{p}</p>
           <div className="my-[20px] h-[2px] bg-line" />
           <p className="mono text-[15px] font-bold uppercase tracking-[0.14em] text-indigo">Çözüm</p>
-          <p className="mt-[8px] text-[23px] font-semibold leading-[1.35] text-ink-2">{s}</p>
+          <p className="mt-[8px] text-[22px] font-semibold leading-[1.4] text-ink-2">{s}</p>
         </div>
       ))}
     </>
@@ -1548,13 +1616,13 @@ function Trust() {
     <NextCards
       head={
         <>
-          Sırada: <span className="text-indigo">güveni sağlamlaştırmak.</span>
+          Sırada: <span className="text-indigo">güveni güçlendirmek.</span>
         </>
       }
       cards={[
-        ['Kurumun ihtiyacı gerçek mi?', 'Kurum hesabı alan adıyla doğrulanır; yayımladığı ihtiyaçların kaçının pilota döndüğü profilinde görünür.'],
-        ['Deneme projesi ucuz emeğe dönüşebilir.', 'Her deneme baştan ücretli, gönüllü ya da kredili diye etiketlenir; kurumun taahhüdü yazılı olur.'],
-        ['Hesap sahipliği yazarlığı kanıtlamıyor.', 'Kurum onayına kısa bir canlı savunma eklenir: kod ya da tasarım incelemesi.'],
+        ['Kurumun ihtiyacı gerçek mi?', 'Kurum hesabı, kurumun alan adıyla doğrulanır. Yayımladığı ihtiyaçlardan kaçının deneme projesine dönüştüğü profilinde görünür.'],
+        ['Deneme projesi karşılıksız emeğe dönüşebilir.', 'Her projenin ücretli, gönüllü ya da ders kredili olduğu baştan yazılır. Kurumun taahhüdü kayda geçer.'],
+        ['Hesabın sahibi, işi yapan kişi olmayabilir.', 'Kurum onayından önce kısa bir canlı görüşme yapılır; aday işini anlatır ve soruları yanıtlar.'],
       ]}
     />
   );
@@ -1565,43 +1633,45 @@ function Scale() {
     <NextCards
       head={
         <>
-          Sırada: <span className="text-indigo">ölçeğe hazırlanmak.</span>
+          Sırada: <span className="text-indigo">daha çok kişiye ulaşmak.</span>
         </>
       }
       cards={[
-        ['Veri tarayıcıda; kalıcı hesap yok.', 'Gerçek hesaplar, kurum hesapları ve kalıcı veritabanı (Cloudflare D1).'],
-        ['Usta yok; onayı yalnız kurum veriyor.', 'Kurumdan bağımsız profesyonel “usta”: deneme projesinde gence yol gösterir, işini onaylar.'],
-        ['Kanıt platformun içinde kalabilir.', 'Open Badges 3.0 ile dışa aktarım: imzalı deneyim gencin olur, her yere taşınır.'],
+        ['Veriler yalnızca tarayıcıda saklanıyor.', 'Kalıcı kullanıcı ve kurum hesapları açılır; veriler güvenli bir veritabanında tutulur.'],
+        ['İşi inceleyen senior yalnızca kurumda.', 'Kurumdan bağımsız senior profesyoneller de ağa katılır; junior’lara yol gösterir, işlerini inceler ve onaylar.'],
+        ['Kayıtlar yalnızca Nirengi’de kalıyor.', 'Onaylanan deneyim, uluslararası dijital belge standardıyla (Open Badges 3.0) dışa aktarılır; genç bu belgeyi başka yerlerde de kullanır.'],
       ]}
     />
   );
 }
 
 function Pilot() {
-  const plan = ['Zemin360’tan 2–3 kurum', 'GİRVAK ağından 20–30 genç', 'Bir ihtiyaç turu, açık kayıt'];
+  const plan = ['Zemin360 ağından 2–3 kurum', 'GİRVAK ağından 20–30 genç', 'Tek bir ihtiyaç turu; sonuçlar açık'];
   return (
     <>
       <Heading width={1376} className="!text-[56px]">
-        Önerimiz: bir ihtiyaç turu, <span className="text-indigo">tek bir ölçüt.</span>
+        Önerimiz: <span className="text-indigo">tek bir ihtiyaç turuyla ölçmek.</span>
       </Heading>
-      <p className="s-in absolute left-[112px] top-[222px] w-[660px] text-[66px] font-extrabold leading-[1.04] tracking-[-0.04em] text-ink" style={d(150)}>
-        Kayıttan ilk onaylanmış işe <span className="text-indigo">kaç gün?</span>
+      <p className="s-in absolute left-[112px] top-[222px] w-[660px] text-[50px] font-extrabold leading-[1.08] tracking-[-0.035em] text-ink" style={d(150)}>
+        Bir genç, kayıt olduktan <span className="text-indigo">kaç gün sonra</span> ilk onaylı işine ulaşıyor?
       </p>
-      <p className="s-in absolute left-[112px] top-[400px] w-[620px] text-[24px] font-semibold leading-[1.35] text-ink-3" style={d(350)}>
-        Hedef rakam koymuyoruz; önce taban çizgisini ölçeceğiz.
+      <p className="s-in absolute left-[112px] top-[460px] w-[640px] text-[22px] font-semibold leading-[1.4] text-ink-3" style={d(350)}>
+        Bugün bu süreyi ölçen bir veri yok. İlk turda hedef koymak yerine mevcut durumu ölçmeyi öneriyoruz.
       </p>
       <div className="absolute left-[828px] top-[226px] h-[430px] w-[2px] bg-line" />
       <Eyebrow className="s-in absolute left-[880px] top-[226px]">Pilot</Eyebrow>
       {plan.map((p, n) => (
         <div key={p} className="s-in absolute left-[880px] flex items-center gap-[16px]" style={{ top: 268 + n * 70, ...d(500 + n * 160) }}>
           <StopMark n={n} size={40} />
-          <p className="text-[28px] font-extrabold tracking-[-0.01em] text-ink">{p}</p>
+          <p className="text-[26px] font-extrabold tracking-[-0.01em] text-ink">{p}</p>
         </div>
       ))}
-      <Eyebrow className="s-in absolute left-[880px] top-[500px]">Yan ölçütler</Eyebrow>
-      <p className="s-in absolute left-[880px] top-[534px] w-[608px] text-[22px] font-semibold leading-[1.4] text-ink-2" style={d(1100)}>
-        İhtiyaçların pilota dönüşme oranı · pilotların tamamlanma oranı · eşleşmeyen gencin geri bildirimden sonra yeni kanıt ekleme oranı
-      </p>
+      <Eyebrow className="s-in absolute left-[880px] top-[500px]">Ayrıca ölçülecekler</Eyebrow>
+      <ul className="s-in absolute left-[880px] top-[534px] w-[608px] space-y-[6px] text-[20px] font-semibold leading-[1.35] text-ink-2" style={d(1100)}>
+        <li>Yayımlanan ihtiyaçların kaçı deneme projesine dönüştü</li>
+        <li>Deneme projelerinin kaçı tamamlandı</li>
+        <li>Eşleşmeyen gençlerin kaçı geri bildirimden sonra yeni bir iş ekledi</li>
+      </ul>
     </>
   );
 }
@@ -1615,8 +1685,9 @@ export const SLIDES: Slide[] = [
   { id: 'turkiye', title: 'Türkiye’de tanıdık', mark: 'dock', niri: { mood: 'sad', moods: ['sad', 'think'], gear: 1 }, View: Connections },
   { id: 'yer', title: 'Problemin yeri: ilk eleme', mark: 'dock', niri: { mood: 'point', moods: ['point', 'cheer'], gear: 2 }, View: Bottleneck },
   { id: 'kirilir', title: 'Döngü kırılabilir', mark: 'dock', niri: { mood: 'happy', moods: ['happy', 'cheer'], gear: 2 }, View: Breaks },
-  { id: 'herkesin', title: 'Herkesin dayısı', mark: 'hero', niri: { mood: 'cheer', moods: ['cheer', 'happy'], gear: 3 }, View: Everyone },
-  { id: 'cozum', title: 'Nasıl çalışır', mark: 'dock', niri: { mood: 'cheer', moods: ['cheer', 'happy', 'point'], gear: 3 }, View: Solution },
+  { id: 'herkesin', title: 'Niri: herkesin referansı', mark: 'hero', niri: { mood: 'cheer', moods: ['cheer', 'happy'], gear: 3 }, View: Everyone },
+  { id: 'cozum', title: 'Nasıl çalışır', mark: 'dock', niri: { mood: 'cheer', moods: ['cheer', 'happy', 'point'], gear: 3 }, View: Steps },
+  { id: 'usta', title: 'Usta–çırak: senior ve junior', mark: 'dock', niri: { mood: 'happy', moods: ['happy', 'point'], gear: 3 }, View: Mentor },
   { id: 'demo', title: 'Canlı demo: film', mark: 'dock', bare: true, niri: { mood: 'cheer', gear: 3 }, View: Film },
   { id: 'bugun', title: 'Bugün çalışan', mark: 'dock', niri: { mood: 'happy', moods: ['happy', 'cheer'], gear: 3 }, View: Today },
   { id: 'yol-guven', title: 'Sırada: güven', mark: 'dock', niri: { mood: 'think', moods: ['think', 'happy'], gear: 4 }, View: Trust },
